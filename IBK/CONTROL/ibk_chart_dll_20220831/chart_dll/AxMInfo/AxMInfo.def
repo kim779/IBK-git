@@ -1,0 +1,7 @@
+; AxMInfo.def : Declares the module parameters for the DLL.
+
+LIBRARY      "AxMInfo"
+DESCRIPTION  'AxMInfo Windows Dynamic Link Library'
+
+EXPORTS
+    ; Explicit exports can go here

@@ -1,0 +1,39 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: CX_SimpleAuth - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP6A8.tmp" with contents
+[
+/nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /Fp"Debug/CX_SimpleAuth.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"D:\IBKS(dev)\HTS_WORK\src\control(운영)\CX_SimpleAuth\CX_SimpleAuth.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\control(운영)\CX_SimpleAuth\MainWnd.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP6A8.tmp" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP6A9.tmp" with contents
+[
+/nologo /subsystem:windows /dll /incremental:yes /pdb:"Debug/CX_SimpleAuth.pdb" /debug /machine:I386 /def:".\CX_SimpleAuth.def" /out:"Debug/CX_SimpleAuth.dll" /implib:"Debug/CX_SimpleAuth.lib" /pdbtype:sept 
+".\Debug\CX_SimpleAuth.obj"
+".\Debug\MainWnd.obj"
+".\Debug\StdAfx.obj"
+".\Debug\CX_SimpleAuth.res"
+]
+Creating command line "link.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP6A9.tmp"
+<h3>Output Window</h3>
+Compiling...
+CX_SimpleAuth.cpp
+Generating Code...
+Skipping... (no relevant changes detected)
+MainWnd.cpp
+Linking...
+
+
+
+<h3>Results</h3>
+CX_SimpleAuth.dll - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

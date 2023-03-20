@@ -1,0 +1,84 @@
+// cx_SimpleEasy.odl : type library source for cx_SimpleEasy.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (cx_SimpleEasy.tlb).
+
+[ uuid(26637FAF-9F12-40C6-B6E3-90DB829386F5), version(1.0) ]
+library Cx_SimpleEasy
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for DlgQr
+	
+	[ uuid(D3BD38F3-216F-477C-8BC7-EB07412CB9B9) ]
+	dispinterface IDlgQr
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(DlgQr)
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(DlgQr)
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for DlgQr
+
+	[ uuid(9A7384D3-4783-4DB0-A10D-7171608E4C1A) ]
+	coclass DlgQr
+	{
+		[default] dispinterface IDlgQr;
+	};
+
+
+	//  Primary dispatch interface for CMainWnd
+	
+	[ uuid(E046FA1A-7D7E-48A9-88D9-DCF317AC1C76) ]
+	dispinterface IMainWnd
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CMainWnd)
+			[id(1)] BSTR ERRcode;
+			[id(2)] BSTR OTPsuccYN;
+			[id(3)] BSTR OTPMaxErrCnt;
+			[id(4)] BSTR OTPErrCnt;
+			[id(5)] short OTPState;
+			[id(6)] BSTR OTPSeqNo;
+			[id(7)] BSTR ERRMsg;
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CMainWnd)
+			[id(10)] void testmethod(BSTR sdata);
+			[id(11)] short CertOTP(BSTR sCustNum, BSTR spinNum);
+			[id(12)] BSTR GetCustNumber();
+			[id(13)] short SearchOTP(BSTR custnum);
+			[id(14)] void CertOTPMP(BSTR sCustNum, BSTR sPinNum);
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CMainWnd
+
+	[ uuid(6CB2C0F2-5594-452D-989E-183502462CF5) ]
+	coclass MainWnd
+	{
+		[default] dispinterface IMainWnd;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

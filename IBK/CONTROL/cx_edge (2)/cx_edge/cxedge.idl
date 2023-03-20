@@ -1,0 +1,30 @@
+﻿// cx_edge.idl: cx_edge.dll의 형식 라이브러리 소스
+// 이 파일은 MIDL 컴파일러에 의해 처리되어
+// 형식 라이브러리(cx_edge.tlb)입니다.
+
+[ uuid(1d1313ca-1919-4b6b-aee3-7b07c9355d38), version(1.0) ]
+library cxedge
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+};
+
+//DE2D0B6D-4B0C-475D-A264-BA2B017E3ABA
+[  //직접 만든 내용
+	uuid(DE2D0B6D-4B0C-475D-A264-BA2B017E3ABA)
+]
+dispinterface IControlWnd
+{
+	properties:
+		[id(2)] BSTR testprt;
+
+methods:
+
+	[id(1)] BSTR testmethod(BSTR strCode);
+};
+[uuid(46BB5198-C9DE-441F-99D9-CC72EA8072D5)]   //다른 GUID만들어도 똑같다
+//[uuid(75DF7D66-7F94-449E-9AC3-C6B10FB315FF)]
+coclass CMainWnd
+{
+	[default] dispinterface IControlWnd;
+};

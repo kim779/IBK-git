@@ -1,0 +1,60 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: axisform - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP48.tmp" with contents
+[
+msimg32.lib winmm.lib ../lib/release/axislib.lib /nologo /subsystem:windows /dll /incremental:no /pdb:"Release/axisform.pdb" /map:"Release/axisform.map" /debug /machine:I386 /def:".\axisform.def" /out:"../../../release/axisform.dll" /implib:"Release/axisform.lib" 
+".\Release\axArray.obj"
+".\Release\axform.obj"
+".\Release\axisform.obj"
+".\Release\browser.obj"
+".\Release\cbList.obj"
+".\Release\fmAvi.obj"
+".\Release\fmBase.obj"
+".\Release\fmBox.obj"
+".\Release\fmBrowser.obj"
+".\Release\fmButton.obj"
+".\Release\fmCheck.obj"
+".\Release\fmCombo.obj"
+".\Release\fmCtrl.obj"
+".\Release\fmEdit.obj"
+".\Release\fmEditEx.obj"
+".\Release\fmGrid.obj"
+".\Release\fmGridx.obj"
+".\Release\fmGroup.obj"
+".\Release\fmLabel.obj"
+".\Release\fmMemo.obj"
+".\Release\fmObject.obj"
+".\Release\fmOut.obj"
+".\Release\fmPanel.obj"
+".\Release\fmRadio.obj"
+".\Release\fmSheet.obj"
+".\Release\fmSysm.obj"
+".\Release\fmTab.obj"
+".\Release\fmTable.obj"
+".\Release\fmTreeView.obj"
+".\Release\fmUserTab.obj"
+".\Release\image.obj"
+".\Release\memo.obj"
+".\Release\month.obj"
+".\Release\monthWnd.obj"
+".\Release\StdAfx.obj"
+".\Release\axisform.res"
+]
+Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP48.tmp"
+<h3>Output Window</h3>
+Linking...
+   Creating library Release/axisform.lib and object Release/axisform.exp
+
+
+
+<h3>Results</h3>
+axisform.dll - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

@@ -1,0 +1,67 @@
+﻿  StdAfx.cpp
+  _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+  UGCTafnt.cpp
+  UGCTbutn.cpp
+  ugctelps.cpp
+  UGCTmfnt.cpp
+  UGCTpie.cpp
+  UGCTpro1.cpp
+  UGCTprog.cpp
+  UGCTRado.cpp
+  UGCTsarw.cpp
+  UGCTsldr.cpp
+  UGCTSpin.cpp
+  UGMEdit.cpp
+  UGCBType.cpp
+  UGCell.cpp
+  UGCelTyp.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\UGridCtrl\Source\UGCelTyp.cpp(1445,15): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\UGridCtrl\Source\UGCelTyp.cpp(1446,14): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\UGridCtrl\Source\UGCelTyp.cpp(1495,17): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\UGridCtrl\Source\UGCelTyp.cpp(1495,13): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\UGridCtrl\Source\UGCelTyp.cpp(1496,17): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\UGridCtrl\Source\UGCelTyp.cpp(1496,13): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\UGridCtrl\Source\UGCelTyp.cpp(1535,12): warning C4244: '=': 'double'에서 'LONG'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\UGridCtrl\Source\UGCelTyp.cpp(1536,15): warning C4244: '=': 'double'에서 'LONG'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\UGridCtrl\Source\UGCelTyp.cpp(1540,12): warning C4244: '=': 'double'에서 'LONG'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\UGridCtrl\Source\UGCelTyp.cpp(1541,15): warning C4244: '=': 'double'에서 'LONG'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\UGridCtrl\Source\UGCelTyp.cpp(1544,12): warning C4244: '=': 'double'에서 'LONG'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\UGridCtrl\Source\UGCelTyp.cpp(1545,13): warning C4244: '=': 'double'에서 'LONG'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  UGCnrBtn.cpp
+  UGCTarrw.cpp
+  UGCtrl.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\UGridCtrl\Source\UGCtrl.cpp(4465,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\UGridCtrl\Source\UGCtrl.cpp(5354,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\UGridCtrl\Source\UGCtrl.cpp(6533,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\UGridCtrl\Source\UGCtrl.cpp(6535,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\UGridCtrl\Source\UGCtrl.cpp(6665,9): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  UGDLType.cpp
+  UGDrgDrp.cpp
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  UGDrwHnt.cpp
+  UGDtaSrc.cpp
+  UGEdit.cpp
+  ugexcel.cpp
+  ugformat.cpp
+  uggdinfo.cpp
+  UGGrid.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\UGridCtrl\Source\UGGrid.cpp(121,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  UGHint.cpp
+  ughscrol.cpp
+  ugLstBox.cpp
+  UGMemMan.cpp
+  UGMultiS.cpp
+  ugprint.cpp
+  ugptrlst.cpp
+  ugsidehd.cpp
+  ugtab.cpp
+  UGTopHdg.cpp
+  ugvscrol.cpp
+  UGridCtrl.cpp
+  코드를 생성하고 있습니다...
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(1363,5): warning MSB8012: TargetPath(D:\git\src\IBK\IBK_DRFN\#DRfn-CS\_ObjRD\UGridCtrl\UGridCtrl.dll)이(가) Linker의 OutputFile 속성 값(D:\git\src\IBK\IBK_DRFN\#DRfn-CS\ReleaseDebug\IBK hot Trading\Ibks\dev\UGRIDCTRL.DLL)과 일치하지 않습니다. 이로 인해 프로젝트가 잘못 빌드될 수 있습니다. 이를 수정하려면 $(OutDir), $(TargetName) 및 $(TargetExt) 속성 값이 %(Link.OutputFile)에 지정된 값과 일치해야 합니다.
+UGCTafnt.obj : warning LNK4075: '/EDITANDCONTINUE'이(가) '/INCREMENTAL:NO' 사양으로 인해 무시됩니다.
+.\UGridCtrl.def(4): warning LNK4017: 대상 플랫폼에는 DESCRIPTION 문이 지원되지 않습니다. 무시됩니다.
+     ../../../../#DRfn-CS/_LibRD/UGridCtrl.lib 라이브러리 및 ../../../../#DRfn-CS/_LibRD/UGridCtrl.exp 개체를 생성하고 있습니다.
+  UGridCtrl.vcxproj -> D:\git\src\IBK\IBK_DRFN\#DRfn-CS\_ObjRD\UGridCtrl\UGridCtrl.dll

@@ -1,0 +1,10 @@
+// cx_updown.idl : type library source for cx_updown.dll
+// This file will be processed by the MIDL compiler to produce the
+// type library (cx_updown.tlb).
+
+[ uuid(13DC6A8A-5F61-4592-B895-7B16C31167D0), version(1.0) ]
+library cx_updown
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+};

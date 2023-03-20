@@ -1,0 +1,26 @@
+﻿  StdAfx.cpp
+  _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+  fxImgButton.cpp
+  DrSplitterCtrl.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\Dr_Control\DrSplitterCtrl.cpp(45,22): warning C4996: 'GetVersion': deprecated로 선언되었습니다.
+  CMGrid.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\CMGridCtrl\CMGrid.cpp(33,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  CMGridCtrl.cpp
+  ConditionGrid.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\CMGridCtrl\ConditionGrid.cpp(102,1): warning C4005: '_countof': 매크로 재정의
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22000.0\ucrt\stdlib.h(27): message : '_countof'의 이전 정의를 참조하십시오.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\CMGridCtrl\ConditionGrid.cpp(134,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\CMGridCtrl\ConditionGrid.cpp(135,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  GridCommonView.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\CMGridCtrl\GridCommonView.cpp(38,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\CMGridCtrl\GridCommonView.cpp(39,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  GridOrderView.cpp
+  GridOrderWnd.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\CMGridCtrl\GridOrderWnd.cpp(46,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\CMGridCtrl\GridOrderWnd.cpp(47,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  코드를 생성하고 있습니다...
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(1363,5): warning MSB8012: TargetPath(D:\git\src\IBK\IBK_DRFN\#DRfn-CS\_ObjRD\CMGridCtrl\CMGridCtrl.dll)이(가) Linker의 OutputFile 속성 값(D:\git\src\IBK\IBK_DRFN\#DRfn-CS\ReleaseDebug\IBK hot Trading\Ibks\dev\MGRIDCTRL.DLL)과 일치하지 않습니다. 이로 인해 프로젝트가 잘못 빌드될 수 있습니다. 이를 수정하려면 $(OutDir), $(TargetName) 및 $(TargetExt) 속성 값이 %(Link.OutputFile)에 지정된 값과 일치해야 합니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(1365,5): warning MSB8012: TargetName(CMGridCtrl)이(가) Linker의 OutputFile 속성 값(MGRIDCTRL)과 일치하지 않습니다. 이로 인해 프로젝트가 잘못 빌드될 수 있습니다. 이를 수정하려면 $(OutDir), $(TargetName) 및 $(TargetExt) 속성 값이 %(Link.OutputFile)에 지정된 값과 일치해야 합니다.
+fxImgButton.obj : warning LNK4075: '/EDITANDCONTINUE'이(가) '/INCREMENTAL:NO' 사양으로 인해 무시됩니다.
+     ../../../../#DRfn-CS/_LibRD/MGridCtrl.lib 라이브러리 및 ../../../../#DRfn-CS/_LibRD/MGridCtrl.exp 개체를 생성하고 있습니다.
+  CMGridCtrl.vcxproj -> D:\git\src\IBK\IBK_DRFN\#DRfn-CS\_ObjRD\CMGridCtrl\CMGridCtrl.dll

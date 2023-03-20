@@ -1,0 +1,6 @@
+; fx_misc.def : Declares the module parameters for the DLL.
+
+LIBRARY      "fx_misc"
+
+EXPORTS
+    ; Explicit exports can go here

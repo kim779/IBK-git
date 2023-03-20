@@ -1,0 +1,70 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: cx_alertx - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "midl.exe /nologo /D "NDEBUG" /tlb "Release/cx_alertx.tlb" /mktyplib203 /win32 "D:\IBKS(dev)\HTS\src\control\cx_alertx\cx_alertx.odl""
+Creating command line "rc.exe /l 0x412 /fo"Release/cx_alertx.res" /i "Release" /d "NDEBUG" /d "_AFXDLL" "D:\IBKS(dev)\HTS\src\control\cx_alertx\cx_alertx.rc"" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP45A5.tmp" with contents
+[
+/nologo /MD /W3 /GX /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /Fp"Release/cx_alertx.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\IBKS(dev)\HTS\src\control\cx_alertx\ControlWnd.cpp"
+"D:\IBKS(dev)\HTS\src\control\cx_alertx\cx_alertx.cpp"
+"D:\IBKS(dev)\HTS\src\control\cx_alertx\libctrl.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP45A5.tmp" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP45A6.tmp" with contents
+[
+/nologo /MD /W3 /GX /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /Fp"Release/cx_alertx.pch" /Yc"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\IBKS(dev)\HTS\src\control\cx_alertx\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP45A6.tmp" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP45A7.tmp" with contents
+[
+/nologo /subsystem:windows /dll /incremental:no /pdb:"Release/cx_alertx.pdb" /machine:I386 /def:".\cx_alertx.def" /out:"../../../dev/cx_alertx.dll" /implib:"Release/cx_alertx.lib" 
+".\Release\ControlWnd.obj"
+".\Release\cx_alertx.obj"
+".\Release\libctrl.obj"
+".\Release\StdAfx.obj"
+".\Release\cx_alertx.res"
+]
+Creating command line "link.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP45A7.tmp"
+<h3>Output Window</h3>
+Creating Type Library...
+Processing D:\IBKS(dev)\HTS\src\control\cx_alertx\cx_alertx.odl
+cx_alertx.odl
+Processing C:\Program Files\Microsoft SDK\Include\oaidl.idl
+oaidl.idl
+Processing C:\Program Files\Microsoft SDK\Include\objidl.idl
+objidl.idl
+Processing C:\Program Files\Microsoft SDK\Include\unknwn.idl
+unknwn.idl
+Processing C:\Program Files\Microsoft SDK\Include\wtypes.idl
+wtypes.idl
+Processing C:\Program Files\Microsoft SDK\Include\basetsd.h
+basetsd.h
+Processing C:\Program Files\Microsoft SDK\Include\guiddef.h
+guiddef.h
+Processing C:\Program Files\Microsoft SDK\Include\oaidl.acf
+oaidl.acf
+Compiling resources...
+Compiling...
+StdAfx.cpp
+Compiling...
+ControlWnd.cpp
+cx_alertx.cpp
+libctrl.cpp
+Generating Code...
+Linking...
+   Creating library Release/cx_alertx.lib and object Release/cx_alertx.exp
+
+
+
+<h3>Results</h3>
+cx_alertx.dll - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

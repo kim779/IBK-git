@@ -1,0 +1,97 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: Wizard - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP55.tmp" with contents
+[
+/nologo /MD /W3 /GX /Zi /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /FAcs /Fa"Release/" /FR"Release/" /Fp"Release/Wizard.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"C:\Program Files\IBKS\IBK hot Trading\src\ibk\wizard\WizardCtl.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP55.tmp" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP56.tmp" with contents
+[
+ws2_32.lib imm32.lib version.lib winmm.lib ../dll/lib/release/axislib.lib ../dll/form/release/axisform.lib ../dll/vbs/release/axisvbs.lib /nologo /subsystem:windows /dll /incremental:no /pdb:"Release/axWizard.pdb" /map:"Release/axWizard.map" /debug /machine:I386 /def:".\Wizard.def" /out:"../../release/axWizard.ocx" /implib:"Release/axWizard.lib" 
+".\Release\Client.obj"
+".\Release\Dde.obj"
+".\Release\Dll.obj"
+".\Release\Event.obj"
+".\Release\excel9.obj"
+".\Release\Guard.obj"
+".\Release\History.obj"
+".\Release\Key.obj"
+".\Release\Misc.obj"
+".\Release\Mouse.obj"
+".\Release\Objects.obj"
+".\Release\OleDrop.obj"
+".\Release\OleDropEx.obj"
+".\Release\Printer.obj"
+".\Release\Screen.obj"
+".\Release\Script.obj"
+".\Release\StdAfx.obj"
+".\Release\Stream.obj"
+".\Release\Tips.obj"
+".\Release\Wizard.obj"
+".\Release\WizardCtl.obj"
+".\Release\WizardPpg.obj"
+".\Release\Works.obj"
+".\Release\xscreen.obj"
+".\Release\xsystem.obj"
+".\Release\Wizard.res"
+]
+Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP56.tmp"
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP57.bat" with contents
+[
+@echo off
+regsvr32 /s /c "\Program Files\IBKS\IBK hot Trading\src\release\axWizard.ocx"
+echo regsvr32 exec. time > ".\Release\regsvr32.trg"
+]
+Creating command line "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP57.bat"
+Compiling...
+WizardCtl.cpp
+Linking...
+   Creating library Release/axWizard.lib and object Release/axWizard.exp
+<h3>Output Window</h3>
+Registering ActiveX Control...
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP5B.tmp" with contents
+[
+/nologo /o"Release/Wizard.bsc" 
+".\Release\StdAfx.sbr"
+".\Release\Client.sbr"
+".\Release\Dde.sbr"
+".\Release\Dll.sbr"
+".\Release\Event.sbr"
+".\Release\excel9.sbr"
+".\Release\Guard.sbr"
+".\Release\History.sbr"
+".\Release\Key.sbr"
+".\Release\Misc.sbr"
+".\Release\Mouse.sbr"
+".\Release\Objects.sbr"
+".\Release\OleDrop.sbr"
+".\Release\OleDropEx.sbr"
+".\Release\Printer.sbr"
+".\Release\Screen.sbr"
+".\Release\Script.sbr"
+".\Release\Stream.sbr"
+".\Release\Tips.sbr"
+".\Release\Wizard.sbr"
+".\Release\WizardCtl.sbr"
+".\Release\WizardPpg.sbr"
+".\Release\Works.sbr"
+".\Release\xscreen.sbr"
+".\Release\xsystem.sbr"]
+Creating command line "bscmake.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP5B.tmp"
+Creating browse info file...
+<h3>Output Window</h3>
+
+
+
+<h3>Results</h3>
+axWizard.ocx - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

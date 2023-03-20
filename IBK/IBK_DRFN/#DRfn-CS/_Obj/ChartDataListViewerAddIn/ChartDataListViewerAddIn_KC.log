@@ -1,0 +1,199 @@
+﻿  StdAfx.cpp
+  _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+  _ChartAddInBase.cpp
+  _IWUnknown.cpp
+  Conversion.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include_Chart\Conversion.cpp(56,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include_Chart\Conversion.cpp(106,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include_Chart\Conversion.cpp(3119,11): warning C4996: 'localtime': This function or variable may be unsafe. Consider using localtime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  DataMath.cpp
+  IMetaTable.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include\ProgIDInfo.h(172,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include\ProgIDInfo.h(173,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include\ProgIDInfo.h(174,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include\ProgIDInfo.h(180,4): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include\ProgIDInfo.h(331,4): warning C4996: 'strupr': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _strupr. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include_Chart\MapStringToWord.h(23,1): warning C4302: '형식 캐스트': 'void *'에서 'WORD'(으)로 잘립니다.
+  GridCell.cpp
+  GridCellBase.cpp
+  GridCtrl.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include_GridCtrl\GridCtrl.cpp(161,10): warning C4996: 'GetVersionExA': deprecated로 선언되었습니다.
+  GridDropTarget.cpp
+  InPlaceEdit.cpp
+  TitleTip.cpp
+  BasicExcelVC6.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.h(117,2): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.h(118,2): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.h(119,2): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.h(120,2): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.h(121,2): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.h(122,2): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.h(123,2): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.h(124,2): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.h(125,2): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(21,2): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(52,26): warning C4244: '=': 'std::streamoff'에서 'size_t'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(57,26): warning C4244: '=': 'std::streamoff'에서 'size_t'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(41,2): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(453,2): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(731,3): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(893,2): warning C4996: 'mbstowcs': This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(904,2): warning C4996: 'mbstowcs': This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(915,2): warning C4996: 'mbstowcs': This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(926,2): warning C4996: 'mbstowcs': This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(941,3): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(956,3): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(966,2): warning C4996: 'mbstowcs': This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(977,2): warning C4996: 'mbstowcs': This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(988,2): warning C4996: 'mbstowcs': This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(999,2): warning C4996: 'mbstowcs': This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1010,2): warning C4996: 'mbstowcs': This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1020,2): warning C4996: 'mbstowcs': This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1030,2): warning C4996: 'mbstowcs': This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1040,2): warning C4996: 'mbstowcs': This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1050,2): warning C4996: 'mbstowcs': This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1074,29): warning C4018: '>=': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1086,27): warning C4018: '>=': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1098,27): warning C4018: '>=': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1111,26): warning C4018: '>': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1122,32): warning C4018: '>=': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1134,36): warning C4018: '>=': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1146,37): warning C4018: '>=': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1172,29): warning C4018: '>': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1184,27): warning C4018: '>': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1196,27): warning C4018: '>': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1237,26): warning C4018: '>': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1248,32): warning C4018: '>': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1260,36): warning C4018: '>': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1273,37): warning C4018: '>': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1341,21): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1353,21): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1364,21): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1379,21): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1389,21): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1399,21): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1863,28): warning C4018: '>': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1995,3): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(1997,47): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(2257,40): warning C4018: '>=': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(2264,36): warning C4018: '>=': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(2271,37): warning C4018: '>=': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(2294,40): warning C4018: '>': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(2301,36): warning C4018: '>': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(2308,37): warning C4018: '>': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(2462,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(2468,3): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(2479,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(2485,3): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(2495,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(2504,2): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(2618,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(2629,2): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(2677,4): warning C4996: 'mbstowcs': This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(2698,4): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(2971,62): warning C4309: '초기화 중': 상수 값이 잘립니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(3008,17): warning C4309: '초기화 중': 상수 값이 잘립니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(3008,49): warning C4309: '초기화 중': 상수 값이 잘립니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(3094,21): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(3104,26): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(3154,33): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(3174,20): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(4412,35): warning C4244: '*=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(4426,15): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(4428,15): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(4438,14): warning C4244: '초기화 중': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(4440,13): warning C4805: '|=': 연산에 'int' 형식과 'bool' 형식을 함께 사용하는 것은 안전하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(4455,15): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(4457,15): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(4601,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(4761,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(4774,3): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(4979,79): warning C4267: '=': 'size_t'에서 '_Ty'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+          with
+          [
+              _Ty=short
+          ]
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5023,60): warning C4267: '=': 'size_t'에서 '_Ty'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+          with
+          [
+              _Ty=short
+          ]
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5026,21): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5130,64): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5168,56): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5176,43): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5177,64): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5206,36): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5207,41): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5208,45): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5222,33): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5223,33): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5248,36): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5249,41): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5250,45): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5266,34): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5267,34): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5273,38): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5274,38): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5286,38): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5287,38): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5325,38): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5326,38): warning C4267: '=': 'size_t'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5418,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5430,3): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5728,8): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5741,8): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5836,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5850,3): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5904,16): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5917,27): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.cpp(5966,21): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  ChartDataListViewerAddIn.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include_AddIn_134221\I134221\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  ChartDataListViewerAddInImp.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include_AddIn_134221\I134221\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  ChartDataSimulatorAddInImp.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include_Addin_134221\I134221\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  ChartExcelDataImportAddInImp.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include_AddIn_134221\I134221\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.h(117,2): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.h(118,2): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.h(119,2): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.h(120,2): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.h(121,2): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.h(122,2): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.h(123,2): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.h(124,2): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\BasicExcelVC6.h(125,2): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\ChartExcelDataImportAddInImp.cpp(149,18): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\ChartExcelDataImportAddInImp.cpp(237,18): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\ChartExcelDataImportAddInImp.cpp(295,21): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  Data.cpp
+  DataListViewMngWnd.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include_AddIn_134221\I134221\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  DlgDataListViewer.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include_AddIn_134221\I134221\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\ChartDataListViewerAddIn\DlgDataListViewer.cpp(1368,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  DlgDataSimulator.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  DlgInputDayWeek.cpp
+  DlgInputMin.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  DlgInputMonth.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartDataListViewerAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  DlgInputTick.cpp
+  HeaderCtrlExt.cpp
+  코드를 생성하고 있습니다...
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(1363,5): warning MSB8012: TargetPath(D:\git\src\IBK\IBK_DRFN\#DRfn-CS\_Obj\ChartDataListViewerAddIn\ChartDataListViewerAddIn.dll)이(가) Linker의 OutputFile 속성 값(D:\git\src\IBK\IBK_DRFN\#DRfn-CS\Output\IBK hot Trading\dev\ChartDataListViewerAddIn.dll)과 일치하지 않습니다. 이로 인해 프로젝트가 잘못 빌드될 수 있습니다. 이를 수정하려면 $(OutDir), $(TargetName) 및 $(TargetExt) 속성 값이 %(Link.OutputFile)에 지정된 값과 일치해야 합니다.
+.\ChartDataListViewerAddIn.def(4): warning LNK4017: 대상 플랫폼에는 DESCRIPTION 문이 지원되지 않습니다. 무시됩니다.
+     ../../../../../#DRfn-CS/_Lib/ChartDataListViewerAddIn.lib 라이브러리 및 ../../../../../#DRfn-CS/_Lib/ChartDataListViewerAddIn.exp 개체를 생성하고 있습니다.
+  ChartDataListViewerAddIn_KC.vcxproj -> D:\git\src\IBK\IBK_DRFN\#DRfn-CS\_Obj\ChartDataListViewerAddIn\ChartDataListViewerAddIn.dll

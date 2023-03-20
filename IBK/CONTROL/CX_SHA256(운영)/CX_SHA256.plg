@@ -1,0 +1,79 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: CX_SHA256 - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "midl.exe /nologo /D "NDEBUG" /tlb "Release/CX_SHA256.tlb" /mktyplib203 /win32 "D:\IBKS(dev)\HTS_WORK\src\control(款康)\CX_SHA256(款康)\CX_SHA256.odl""
+Creating command line "rc.exe /l 0x412 /fo"Release/CX_SHA256.res" /i "Release" /d "NDEBUG" /d "_AFXDLL" "D:\IBKS(dev)\HTS_WORK\src\control(款康)\CX_SHA256(款康)\CX_SHA256.rc"" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSPF4A9.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /FR"Release/" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\IBKS(dev)\HTS_WORK\src\control(款康)\CX_SHA256(款康)\CX_SHA256.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\control(款康)\CX_SHA256(款康)\libctr.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\control(款康)\CX_SHA256(款康)\MainWnd.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\control(款康)\CX_SHA256(款康)\Sha256.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSPF4A9.tmp" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSPF4AA.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /FR"Release/" /Fp"Release/CX_SHA256.pch" /Yc"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\IBKS(dev)\HTS_WORK\src\control(款康)\CX_SHA256(款康)\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSPF4AA.tmp" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSPF4AB.tmp" with contents
+[
+/nologo /subsystem:windows /dll /incremental:no /pdb:"Release/CX_SHA256.pdb" /machine:I386 /def:".\CX_SHA256.def" /out:"../../../dev/CX_SHA256.dll" /implib:"Release/CX_SHA256.lib" 
+".\Release\CX_SHA256.obj"
+".\Release\libctr.obj"
+".\Release\MainWnd.obj"
+".\Release\Sha256.obj"
+".\Release\StdAfx.obj"
+".\Release\CX_SHA256.res"
+]
+Creating command line "link.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSPF4AB.tmp"
+<h3>Output Window</h3>
+Creating Type Library...
+Processing D:\IBKS(dev)\HTS_WORK\src\control(款康)\CX_SHA256(款康)\CX_SHA256.odl
+CX_SHA256.odl
+Processing C:\PROGRAM FILES\MICROSOFT SDK\INCLUDE\oaidl.idl
+oaidl.idl
+Processing C:\PROGRAM FILES\MICROSOFT SDK\INCLUDE\objidl.idl
+objidl.idl
+Processing C:\PROGRAM FILES\MICROSOFT SDK\INCLUDE\unknwn.idl
+unknwn.idl
+Processing C:\PROGRAM FILES\MICROSOFT SDK\INCLUDE\wtypes.idl
+wtypes.idl
+Processing C:\PROGRAM FILES\MICROSOFT SDK\INCLUDE\basetsd.h
+basetsd.h
+Processing C:\PROGRAM FILES\MICROSOFT SDK\INCLUDE\guiddef.h
+guiddef.h
+Processing C:\PROGRAM FILES\MICROSOFT SDK\INCLUDE\oaidl.acf
+oaidl.acf
+Compiling resources...
+Compiling...
+StdAfx.cpp
+Compiling...
+CX_SHA256.cpp
+libctr.cpp
+MainWnd.cpp
+Generating Code...
+Compiling...
+Sha256.c
+Generating Code...
+Linking...
+LINK : fatal error LNK1104: cannot open file "../../../dev/CX_SHA256.dll"
+Error executing link.exe.
+Creating command line "bscmake.exe /nologo /o"Release/CX_SHA256.bsc"  ".\Release\StdAfx.sbr" ".\Release\CX_SHA256.sbr" ".\Release\libctr.sbr" ".\Release\MainWnd.sbr" ".\Release\Sha256.sbr""
+Creating browse info file...
+<h3>Output Window</h3>
+
+
+
+<h3>Results</h3>
+CX_SHA256.dll - 1 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

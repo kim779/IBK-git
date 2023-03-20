@@ -1,0 +1,175 @@
+﻿  StdAfx.cpp
+  _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+  BlockRegion.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  CoordinateCalculatorData.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  ElementEnvironment.cpp
+  Conversion.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_Chart\Conversion.cpp(56,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_Chart\Conversion.cpp(106,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_Chart\Conversion.cpp(3154,11): warning C4996: 'localtime': This function or variable may be unsafe. Consider using localtime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  DataMath.cpp
+  IMetaTable.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\ProgIDInfo.h(172,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\ProgIDInfo.h(173,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\ProgIDInfo.h(174,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\ProgIDInfo.h(180,4): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\ProgIDInfo.h(331,4): warning C4996: 'strupr': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _strupr. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_Chart\MapStringToWord.h(23,1): warning C4302: '형식 캐스트': 'void *'에서 'WORD'(으)로 잘립니다.
+  EnvironmentData.cpp
+  ScaleBaseData.cpp
+  AnalysisData.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\AnalysisData.cpp(1051,15): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  AnalysisTool.cpp
+  AutoTrendData.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\AutoTrendData.cpp(243,39): warning C4927: 변환이 잘못되었습니다. 사용자 정의 변환이 암시적으로 두 번 이상 적용되었습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\AutoTrendData.cpp(243,39): message : 'ATL::CStringT<char,StrTraitMFC_DLL<char,ATL::ChTraitsCRT<_CharType>>>::CStringT(const char *)' 생성자를 호출하는 동안
+          with
+          [
+              _CharType=char
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\atlmfc\include\cstringt.h(1047): message : 'ATL::CStringT<char,StrTraitMFC_DLL<char,ATL::ChTraitsCRT<_CharType>>>::CStringT' 선언을 참조하십시오.
+          with
+          [
+              _CharType=char
+          ]
+  AutoTrendDrawer.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  BalanceBasic.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  BalanceBasicDrawer.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  BalanceBasicTool.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  BitmapComboBox.cpp
+  ColorButton.cpp
+  ColumnSet.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  Coordinate.cpp
+  CoordinateCalculator.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  CurrentElementSet.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  DlgAnalysisAdjustRatio.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\DlgAnalysisAdjustRatio.cpp(90,5): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\DlgAnalysisAdjustRatio.cpp(80,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\DlgAnalysisAdjustRatio.cpp(82,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\DlgAnalysisAdjustRatio.cpp(84,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\DlgAnalysisAdjustRatio.cpp(88,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\DlgAnalysisAdjustRatio.cpp(94,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  DlgAnalysisToolSet.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  DlgBalanceBasicSet.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  DlgFiboSet.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\DlgFiboSet.cpp(171,4): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\DlgFiboSet.cpp(183,4): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  Drawer.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  DrawingData.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\DrawingData.cpp(351,71): warning C4244: '인수': 'double'에서 'const int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  Element.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  ElementFactory.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  ElementTree.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_Chart\DequeList.h(214,30): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_Chart\DequeList.h(212): message : 클래스 템플릿 멤버 함수 'int CDequePointerList<CElement>::GetIndex(const T *) const'을(를) 컴파일하는 중입니다.
+          with
+          [
+              T=CElement
+          ]
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\ElementTree.cpp(32): message : 컴파일되는 함수 템플릿 인스턴스화 'int CDequePointerList<CElement>::GetIndex(const T *) const'에 대한 참조를 확인하세요.
+          with
+          [
+              T=CElement
+          ]
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\ElementTree.h(51): message : 컴파일되는 클래스 템플릿 인스턴스화 'CDequePointerList<CElement>'에 대한 참조를 확인하세요.
+  ElementTreeBuilder.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\ElementTreeBuilder.cpp(621,8): warning C4244: '=': '__int64'에서 'double'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  FiboGann.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  FiboGannDrawer.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  FiboGannTool.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  Line.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\Line.cpp(1084,16): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  LineDrawer.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\LineDrawer.cpp(713,42): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\LineDrawer.cpp(826,42): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\LineDrawer.cpp(936,42): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\LineDrawer.cpp(1087,15): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  LineTool.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  MainAnalysisTool.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  MainAutoTrendImplementation.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  MainToolImplementation.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\MainToolImplementation.cpp(683,54): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\MainToolImplementation.cpp(683,33): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  NonChartFormulate.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  NonChartImplementation.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  PointDrawer.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  PointElement.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\PointElement.cpp(547,24): warning C4244: '인수': '__int64'에서 'const double'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\PointElement.cpp(564,28): warning C4244: '=': 'double'에서 'long'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\PointElement.cpp(569,24): warning C4244: '인수': '__int64'에서 'const double'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\PointElement.cpp(583,24): warning C4244: '인수': '__int64'에서 'const double'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\PointElement.cpp(600,22): warning C4244: '인수': '__int64'에서 'const double'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\PointElement.cpp(618,28): warning C4244: '=': 'double'에서 'long'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\PointElement.cpp(623,22): warning C4244: '인수': '__int64'에서 'const double'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\PointElement.cpp(638,22): warning C4244: '인수': '__int64'에서 'const double'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\PointElement.cpp(1276,86): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\AnalysisTool\PointElement.cpp(1276,49): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  PointTool.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  RowSet.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  Selecting.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  Tool.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  ToolSingleton.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  UndoRedoManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  코드를 생성하고 있습니다...
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(1363,5): warning MSB8012: TargetPath(D:\git\src\IBK\IBK_DRFN\#DRfn-CS\_Obj\AnalysisTool\AnalysisTool.dll)이(가) Linker의 OutputFile 속성 값(D:\git\src\IBK\IBK_DRFN\#DRfn-CS\Output\IBK hot Trading\dev\AnalysisTool.dll)과 일치하지 않습니다. 이로 인해 프로젝트가 잘못 빌드될 수 있습니다. 이를 수정하려면 $(OutDir), $(TargetName) 및 $(TargetExt) 속성 값이 %(Link.OutputFile)에 지정된 값과 일치해야 합니다.
+.\AnalysisTool.def(4): warning LNK4017: 대상 플랫폼에는 DESCRIPTION 문이 지원되지 않습니다. 무시됩니다.
+     ../../../../../#DRfn-CS/_Lib/AnalysisTool.lib 라이브러리 및 ../../../../../#DRfn-CS/_Lib/AnalysisTool.exp 개체를 생성하고 있습니다.
+  AnalysisTool.vcxproj -> D:\git\src\IBK\IBK_DRFN\#DRfn-CS\_Obj\AnalysisTool\AnalysisTool.dll

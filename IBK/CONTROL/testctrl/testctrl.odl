@@ -1,0 +1,50 @@
+// testctrl.odl : type library source for testctrl.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (testctrl.tlb).
+
+[ uuid(16A131EE-3115-456B-8228-289C809982FC), version(1.0) ]
+library Testctrl
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for CMainWnd
+	
+	[ uuid(F8C1F100-01F1-4BA3-BE39-2A0048303755) ]
+	dispinterface IMainWnd
+	{
+		properties:
+			[id(1)] boolean show;
+			[id(2)] boolean visible;
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CMainWnd)
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CMainWnd)
+			//}}AFX_ODL_METHOD
+
+			[id(3)] BSTR GetProperties();
+			[id(4)] void SetProperties(BSTR str);
+			[id(5)] void Clear();
+			[id(6)] void SetShowLine(SHORT nLine, SHORT bShow);
+	};
+
+	//  Class information for CMainWnd
+
+	[ uuid(71DA51DA-5893-4D38-BAFE-40A35C25F181) ]
+	coclass MainWnd
+	{
+		[default] dispinterface IMainWnd;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

@@ -1,0 +1,51 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: IBKS_Sample - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x412 /fo"Debug/IBKS_Sample.res" /d "_DEBUG" /d "_AFXDLL" "D:\IBKS(dev)\IBK hot Trading\src\HTS_OpenAPI(款康)\IBKSConnector-sample-C++-vs6 test\IBKS_Sample.rc"" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP5BF.tmp" with contents
+[
+/nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /FR"Debug/" /Fp"Debug/IBKS_Sample.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"D:\IBKS(dev)\IBK hot Trading\src\HTS_OpenAPI(款康)\IBKSConnector-sample-C++-vs6 test\IBKS_Sample.cpp"
+"D:\IBKS(dev)\IBK hot Trading\src\HTS_OpenAPI(款康)\IBKSConnector-sample-C++-vs6 test\IBKS_SampleDlg.cpp"
+"D:\IBKS(dev)\IBK hot Trading\src\HTS_OpenAPI(款康)\IBKSConnector-sample-C++-vs6 test\ibksconnector.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP5BF.tmp" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP5C0.tmp" with contents
+[
+/nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /FR"Debug/" /Fp"Debug/IBKS_Sample.pch" /Yc"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"D:\IBKS(dev)\IBK hot Trading\src\HTS_OpenAPI(款康)\IBKSConnector-sample-C++-vs6 test\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP5C0.tmp" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP5C1.tmp" with contents
+[
+/nologo /subsystem:windows /incremental:yes /pdb:"Debug/CPPSample.pdb" /debug /machine:I386 /out:"../../../exe/CPPSample.exe" /pdbtype:sept 
+".\Debug\IBKS_Sample.obj"
+".\Debug\IBKS_SampleDlg.obj"
+".\Debug\ibksconnector.obj"
+".\Debug\StdAfx.obj"
+".\Debug\IBKS_Sample.res"
+]
+Creating command line "link.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP5C1.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+StdAfx.cpp
+Compiling...
+IBKS_Sample.cpp
+IBKS_SampleDlg.cpp
+ibksconnector.cpp
+Generating Code...
+Linking...
+
+
+
+<h3>Results</h3>
+CPPSample.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

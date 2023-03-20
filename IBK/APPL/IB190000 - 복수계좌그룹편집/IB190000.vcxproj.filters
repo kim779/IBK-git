@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{40fce14d-155b-4909-89a8-905b42ec15d9}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{66eae6cb-8cf8-4a20-92d2-9fb3ee261822}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{f0954cba-68a0-4fa7-91c3-c34b3d6b4838}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="grid">
+      <UniqueIdentifier>{4c14359d-7690-43a9-adfc-14da0e5bde44}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AxisExt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IB190000.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MapWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="grid\GridCell.cpp">
+      <Filter>grid</Filter>
+    </ClCompile>
+    <ClCompile Include="grid\GridCellBase.cpp">
+      <Filter>grid</Filter>
+    </ClCompile>
+    <ClCompile Include="grid\NewCellTypes\GridCellNumeric.cpp">
+      <Filter>grid</Filter>
+    </ClCompile>
+    <ClCompile Include="grid\NewCellTypes\GridCellPassword.cpp">
+      <Filter>grid</Filter>
+    </ClCompile>
+    <ClCompile Include="grid\GridCtrl.cpp">
+      <Filter>grid</Filter>
+    </ClCompile>
+    <ClCompile Include="grid\GridDropTarget.cpp">
+      <Filter>grid</Filter>
+    </ClCompile>
+    <ClCompile Include="grid\InPlaceEdit.cpp">
+      <Filter>grid</Filter>
+    </ClCompile>
+    <ClCompile Include="grid\TitleTip.cpp">
+      <Filter>grid</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="IB190000.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AxisExt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IB190000.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MapWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="grid\CellRange.h">
+      <Filter>grid</Filter>
+    </ClInclude>
+    <ClInclude Include="grid\GridCell.h">
+      <Filter>grid</Filter>
+    </ClInclude>
+    <ClInclude Include="grid\GridCellBase.h">
+      <Filter>grid</Filter>
+    </ClInclude>
+    <ClInclude Include="grid\NewCellTypes\GridCellNumeric.h">
+      <Filter>grid</Filter>
+    </ClInclude>
+    <ClInclude Include="grid\NewCellTypes\GridCellPassword.h">
+      <Filter>grid</Filter>
+    </ClInclude>
+    <ClInclude Include="grid\GridCtrl.h">
+      <Filter>grid</Filter>
+    </ClInclude>
+    <ClInclude Include="grid\GridDropTarget.h">
+      <Filter>grid</Filter>
+    </ClInclude>
+    <ClInclude Include="grid\InPlaceEdit.h">
+      <Filter>grid</Filter>
+    </ClInclude>
+    <ClInclude Include="grid\MemDC.h">
+      <Filter>grid</Filter>
+    </ClInclude>
+    <ClInclude Include="grid\TitleTip.h">
+      <Filter>grid</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="IB190000.def">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="res\IB190000.rc2">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

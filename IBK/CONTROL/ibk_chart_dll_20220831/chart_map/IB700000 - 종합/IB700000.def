@@ -1,0 +1,7 @@
+; IB700000.def : Declares the module parameters for the DLL.
+
+LIBRARY      "IB700000"
+DESCRIPTION  'IB700000 Windows Dynamic Link Library'
+
+EXPORTS
+	axCreate

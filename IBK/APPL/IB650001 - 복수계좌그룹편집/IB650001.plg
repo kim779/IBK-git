@@ -1,0 +1,78 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: IB650001 - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x412 /fo"Release/IB650001.res" /d "NDEBUG" /d "_AFXDLL" "C:\Program Files\IBKS(dev)\HTS\src\appl\IB650001 - 복수계좌그룹편집\IB650001.rc"" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP48F.tmp" with contents
+[
+/nologo /MD /W3 /GX /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /Fp"Release/IB650001.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"C:\Program Files\IBKS(dev)\HTS\src\appl\IB650001 - 복수계좌그룹편집\AxisExt.cpp"
+"C:\Program Files\IBKS(dev)\HTS\src\appl\IB650001 - 복수계좌그룹편집\IB650001.cpp"
+"C:\Program Files\IBKS(dev)\HTS\src\appl\IB650001 - 복수계좌그룹편집\MapWnd.cpp"
+"C:\Program Files\IBKS(dev)\HTS\src\appl\IB650001 - 복수계좌그룹편집\grid\GridCell.cpp"
+"C:\Program Files\IBKS(dev)\HTS\src\appl\IB650001 - 복수계좌그룹편집\grid\GridCellBase.cpp"
+"C:\Program Files\IBKS(dev)\HTS\src\appl\IB650001 - 복수계좌그룹편집\grid\NewCellTypes\GridCellNumeric.cpp"
+"C:\Program Files\IBKS(dev)\HTS\src\appl\IB650001 - 복수계좌그룹편집\grid\NewCellTypes\GridCellPassword.cpp"
+"C:\Program Files\IBKS(dev)\HTS\src\appl\IB650001 - 복수계좌그룹편집\grid\GridCtrl.cpp"
+"C:\Program Files\IBKS(dev)\HTS\src\appl\IB650001 - 복수계좌그룹편집\grid\GridDropTarget.cpp"
+"C:\Program Files\IBKS(dev)\HTS\src\appl\IB650001 - 복수계좌그룹편집\grid\InPlaceEdit.cpp"
+"C:\Program Files\IBKS(dev)\HTS\src\appl\IB650001 - 복수계좌그룹편집\grid\TitleTip.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP48F.tmp" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP490.tmp" with contents
+[
+/nologo /MD /W3 /GX /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /Fp"Release/IB650001.pch" /Yc"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"C:\Program Files\IBKS(dev)\HTS\src\appl\IB650001 - 복수계좌그룹편집\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP490.tmp" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP491.tmp" with contents
+[
+msimg32.lib ../../control/fx_misc/Release/fx_misc.lib /nologo /subsystem:windows /dll /incremental:no /pdb:"Release/IB650001.pdb" /machine:I386 /def:".\IB650001.def" /out:"../../../dev/IB650001.DLL" /implib:"Release/IB650001.lib" 
+".\Release\AxisExt.obj"
+".\Release\IB650001.obj"
+".\Release\MapWnd.obj"
+".\Release\StdAfx.obj"
+".\Release\GridCell.obj"
+".\Release\GridCellBase.obj"
+".\Release\GridCellNumeric.obj"
+".\Release\GridCellPassword.obj"
+".\Release\GridCtrl.obj"
+".\Release\GridDropTarget.obj"
+".\Release\InPlaceEdit.obj"
+".\Release\TitleTip.obj"
+".\Release\IB650001.res"
+]
+Creating command line "link.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP491.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+StdAfx.cpp
+Compiling...
+AxisExt.cpp
+IB650001.cpp
+MapWnd.cpp
+GridCell.cpp
+GridCellBase.cpp
+GridCellNumeric.cpp
+GridCellPassword.cpp
+GridCtrl.cpp
+GridDropTarget.cpp
+ -- CGridCtrl: No titletips for cells with large data
+ -- CGridCtrl: No printing support
+InPlaceEdit.cpp
+TitleTip.cpp
+Generating Code...
+Linking...
+   Creating library Release/IB650001.lib and object Release/IB650001.exp
+
+
+
+<h3>Results</h3>
+IB650001.DLL - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

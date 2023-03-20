@@ -1,0 +1,89 @@
+﻿  StdAfx.cpp
+  _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+  CoordinateCalculatorData.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  Conversion.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_Chart\Conversion.cpp(56,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_Chart\Conversion.cpp(106,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_Chart\Conversion.cpp(3154,11): warning C4996: 'localtime': This function or variable may be unsafe. Consider using localtime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  DataMath.cpp
+  IMetaTable.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\ProgIDInfo.h(172,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\ProgIDInfo.h(173,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\ProgIDInfo.h(174,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\ProgIDInfo.h(180,4): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\ProgIDInfo.h(331,4): warning C4996: 'strupr': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _strupr. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_Chart\MapStringToWord.h(23,1): warning C4302: '형식 캐스트': 'void *'에서 'WORD'(으)로 잘립니다.
+  BitmapComboBox.cpp
+  ColorButton.cpp
+  Coordinate.cpp
+  CoordinateCalculator.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  DrawingSymbol.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  DrawingSymbolColumn.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  DrawingSymbolFactory.cpp
+  DrawingSymbolRow.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  DynamicBitmapLoad.cpp
+  DynamicBitmapLoadButton.cpp
+  ElementSaverBuilder.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Symbol\ElementSaverBuilder.cpp(116,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  ElementTree.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  MainSymbol.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  MainSymbolImplementation.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  Order.cpp
+  OrderAndElement.cpp
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  OrderSet.cpp
+  PreView.cpp
+  Properties.cpp
+  PropertiesData_text.cpp
+  Properties_Figure.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  Properties_Manager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  Properties_text.cpp
+  Region_AllBlock.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  Region_Column.cpp
+  Region_Row.cpp
+  Symbol.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  SymbolData.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  SymbolDlg.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  SymbolDraw.cpp
+  SymbolDraw_OnePoint_Size.cpp
+  SymbolDraw_TwoPoint.cpp
+  SymbolSingleton.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  SymbolTool.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  TextEdit.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  Tree.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  UndoRedoManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartAnalysisToolAddIn\Include_AddIn_133101\I133101\_AddInCommand.h(391,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  코드를 생성하고 있습니다...
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(1363,5): warning MSB8012: TargetPath(D:\git\src\IBK\IBK_DRFN\#DRfn-CS\_Obj\Symbol\Symbol.dll)이(가) Linker의 OutputFile 속성 값(D:\git\src\IBK\IBK_DRFN\#DRfn-CS\Output\IBK hot Trading\dev\Symbol.dll)과 일치하지 않습니다. 이로 인해 프로젝트가 잘못 빌드될 수 있습니다. 이를 수정하려면 $(OutDir), $(TargetName) 및 $(TargetExt) 속성 값이 %(Link.OutputFile)에 지정된 값과 일치해야 합니다.
+.\Symbol.def(4): warning LNK4017: 대상 플랫폼에는 DESCRIPTION 문이 지원되지 않습니다. 무시됩니다.
+     ../../../../../#DRfn-CS/_Lib/Symbol.lib 라이브러리 및 ../../../../../#DRfn-CS/_Lib/Symbol.exp 개체를 생성하고 있습니다.
+  Symbol.vcxproj -> D:\git\src\IBK\IBK_DRFN\#DRfn-CS\_Obj\Symbol\Symbol.dll

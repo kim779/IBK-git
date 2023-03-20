@@ -1,0 +1,195 @@
+﻿  StdAfx.cpp
+  _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  DllSTLoader.cpp
+  STGfxOutBarCtrl.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\STGfxOutBarCtrl.cpp(290,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\STGfxOutBarCtrl.cpp(725,4): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  STListCtrl.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\ISTManager.h(30,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\STListCtrl.cpp(161,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  STTreeCtrl.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(28,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(35,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(72,22): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(48,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(72,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(136,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(159,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(160,21): warning C4996: '_strupr': This function or variable may be unsafe. Consider using _strupr_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(208,19): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'ATL::CStringT<char,StrTraitMFC_DLL<char,ATL::ChTraitsCRT<_CharType>>>'입니다.
+          with
+          [
+              _CharType=char
+          ]
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(207,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(208,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(232,19): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'ATL::CStringT<char,StrTraitMFC_DLL<char,ATL::ChTraitsCRT<_CharType>>>'입니다.
+          with
+          [
+              _CharType=char
+          ]
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(231,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(232,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(296,22): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(270,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(296,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\ISTManager.h(30,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\STTreeCtrl.cpp(58,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  _STLoadmanager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\ISTManager.h(30,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(28,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(35,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(72,22): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(48,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(72,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(136,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(159,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(160,21): warning C4996: '_strupr': This function or variable may be unsafe. Consider using _strupr_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(208,19): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'ATL::CStringT<char,StrTraitMFC_DLL<char,ATL::ChTraitsCRT<_CharType>>>'입니다.
+          with
+          [
+              _CharType=char
+          ]
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(207,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(208,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(232,19): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'ATL::CStringT<char,StrTraitMFC_DLL<char,ATL::ChTraitsCRT<_CharType>>>'입니다.
+          with
+          [
+              _CharType=char
+          ]
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(231,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(232,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(296,22): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(270,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(296,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\_STLoadmanager.cpp(493,26): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\_STLoadmanager.cpp(493,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\_STLoadmanager.cpp(508,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\_STLoadmanager.cpp(530,7): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\_STLoadmanager.cpp(555,7): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\_STLoadmanager.cpp(887,21): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\_STLoadmanager.cpp(847,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\_STLoadmanager.cpp(887,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\_STLoadmanager.cpp(990,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\_STLoadmanager.cpp(991,20): warning C4996: '_strupr': This function or variable may be unsafe. Consider using _strupr_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  XEdit.cpp
+  XHeaderCtrl.cpp
+  XListCtrl.cpp
+  BitmapItemComboBox.cpp
+  ColorButton.cpp
+  ColoredStatic.cpp
+  LogicEditCtrl.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\STControllerDef.h(205,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\HWSTRATEGYCONFIGUREWIZARD\Control\LogicEditCtrl.cpp(38,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  xSkinButton.cpp
+  XTabCtrl.cpp
+  xySplitterWnd.cpp
+  DlgStrategyConfigure.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\ISTManager.h(30,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  should not include d3dtypes.h when compiling for DX8 or newer interfaces
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(121,3): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(132,3): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(166,14): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(192,21): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(646,17): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(677,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\HWSTRATEGYCONFIGUREWIZARD\DlgStrategyConfigure.cpp(360,23): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\HWSTRATEGYCONFIGUREWIZARD\DlgStrategyConfigure.cpp(361,21): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\HWSTRATEGYCONFIGUREWIZARD\DlgStrategyConfigure.cpp(356,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\HWSTRATEGYCONFIGUREWIZARD\DlgStrategyConfigure.cpp(360,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\HWSTRATEGYCONFIGUREWIZARD\DlgStrategyConfigure.cpp(361,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(28,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(35,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(72,22): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(48,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(72,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(136,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(159,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(160,21): warning C4996: '_strupr': This function or variable may be unsafe. Consider using _strupr_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(208,19): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'ATL::CStringT<char,StrTraitMFC_DLL<char,ATL::ChTraitsCRT<_CharType>>>'입니다.
+          with
+          [
+              _CharType=char
+          ]
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(207,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(208,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(232,19): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'ATL::CStringT<char,StrTraitMFC_DLL<char,ATL::ChTraitsCRT<_CharType>>>'입니다.
+          with
+          [
+              _CharType=char
+          ]
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(231,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(232,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(296,22): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(270,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\LoadSTDir.h(296,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  DlgStrategyList.cpp
+  should not include d3dtypes.h when compiling for DX8 or newer interfaces
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(121,3): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(132,3): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(166,14): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(192,21): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(646,17): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(677,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\ISTManager.h(30,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\STControllerDef.h(205,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\HWSTRATEGYCONFIGUREWIZARD\DlgStrategyList.cpp(183,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\HWSTRATEGYCONFIGUREWIZARD\DlgStrategyList.cpp(1027,4): warning C4996: 'chmod': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _chmod. See online help for details.
+  DlgSysVarOption.cpp
+  DlgTimeSelector.cpp
+  should not include d3dtypes.h when compiling for DX8 or newer interfaces
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(121,3): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(132,3): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(166,14): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(192,21): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(646,17): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(677,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  GridCell.cpp
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  GridCellBase.cpp
+  GridCtrl.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\HWSTRATEGYCONFIGUREWIZARD\GridCtrl_src\GridCtrl.cpp(161,10): warning C4996: 'GetVersionExA': deprecated로 선언되었습니다.
+  GridDropTarget.cpp
+  InPlaceEdit.cpp
+  TitleTip.cpp
+  HWStrategyConfigureWizard.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\ISTManager.h(30,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  should not include d3dtypes.h when compiling for DX8 or newer interfaces
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(121,3): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(132,3): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(166,14): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(192,21): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(646,17): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(677,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  OutLookBarDlg.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\ISTManager.h(30,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  should not include d3dtypes.h when compiling for DX8 or newer interfaces
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(121,3): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(132,3): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(166,14): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(192,21): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(646,17): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\xUtil.h(677,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\STControllerDef.h(205,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\HWSTRATEGYCONFIGUREWIZARD\OutLookBarDlg.cpp(336,5): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\HWSTRATEGYCONFIGUREWIZARD\OutLookBarDlg.cpp(359,5): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  SDItemInfo.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\Common_ST\STControllerDef.h(205,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+  코드를 생성하고 있습니다...
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(1363,5): warning MSB8012: TargetPath(D:\git\src\IBK\IBK_DRFN\#DRfn-CS\_Obj\HWStrategyConfigureWizard\HWStrategyConfigureWizard.dll)이(가) Linker의 OutputFile 속성 값(D:\git\src\IBK\IBK_DRFN\#DRfn-CS\Output\IBK hot Trading\dev\HWStrategyConfigureWizard.dll)과 일치하지 않습니다. 이로 인해 프로젝트가 잘못 빌드될 수 있습니다. 이를 수정하려면 $(OutDir), $(TargetName) 및 $(TargetExt) 속성 값이 %(Link.OutputFile)에 지정된 값과 일치해야 합니다.
+.\HWStrategyConfigureWizard.def(4): warning LNK4017: 대상 플랫폼에는 DESCRIPTION 문이 지원되지 않습니다. 무시됩니다.
+     ../../../../#DRfn-CS/_Lib/HWStrategyConfigureWizard.lib 라이브러리 및 ../../../../#DRfn-CS/_Lib/HWStrategyConfigureWizard.exp 개체를 생성하고 있습니다.
+  HWStrategyConfigureWizard.vcxproj -> D:\git\src\IBK\IBK_DRFN\#DRfn-CS\_Obj\HWStrategyConfigureWizard\HWStrategyConfigureWizard.dll

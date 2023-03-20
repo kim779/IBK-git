@@ -1,0 +1,120 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: C_Bong - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "midl.exe /nologo /D "_DEBUG" /tlb "Debug/C_Bong.tlb" /mktyplib203 /win32 "D:\IBKS(dev)\HTS_WORK\src\control\C_Bong\C_Bong.odl""
+Creating command line "rc.exe /l 0x412 /fo"Debug/C_Bong.res" /i "Debug" /d "_DEBUG" /d "_AFXDLL" "D:\IBKS(dev)\HTS_WORK\src\control\C_Bong\C_Bong.rc"" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSPF48E.tmp" with contents
+[
+/nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /FR"Debug/" /Fp"Debug/C_Bong.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"D:\IBKS(dev)\HTS_WORK\src\control\C_Bong\C_Bong.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\control\C_Bong\CrossLine.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\control\C_Bong\Ctrl.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\control\C_Bong\CtrlWnd.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\control\C_Bong\Grp_Base.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\control\C_Bong\Grp_Data.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\control\C_Bong\Grp_Juga.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\control\C_Bong\Grp_MA.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\control\C_Bong\Grp_Vol.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\control\C_Bong\GrpWnd.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\control\C_Bong\libBong.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\control\C_Bong\MainWnd.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\control\C_Bong\ToolTip.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSPF48E.tmp" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSPF48F.tmp" with contents
+[
+/nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /FR"Debug/" /Fp"Debug/C_Bong.pch" /Yc"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"D:\IBKS(dev)\HTS_WORK\src\control\C_Bong\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSPF48F.tmp" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSPF490.tmp" with contents
+[
+/nologo /subsystem:windows /dll /incremental:yes /pdb:"Debug/C_Bong.pdb" /debug /machine:I386 /def:".\C_Bong.def" /out:"../../../dev/C_Bong.dll" /implib:"Debug/C_Bong.lib" /pdbtype:sept 
+".\Debug\C_Bong.obj"
+".\Debug\CrossLine.obj"
+".\Debug\Ctrl.obj"
+".\Debug\CtrlWnd.obj"
+".\Debug\Grp_Base.obj"
+".\Debug\Grp_Data.obj"
+".\Debug\Grp_Juga.obj"
+".\Debug\Grp_MA.obj"
+".\Debug\Grp_Vol.obj"
+".\Debug\GrpWnd.obj"
+".\Debug\libBong.obj"
+".\Debug\MainWnd.obj"
+".\Debug\StdAfx.obj"
+".\Debug\ToolTip.obj"
+".\Debug\C_Bong.res"
+]
+Creating command line "link.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSPF490.tmp"
+<h3>Output Window</h3>
+Creating Type Library...
+Processing D:\IBKS(dev)\HTS_WORK\src\control\C_Bong\C_Bong.odl
+C_Bong.odl
+Processing C:\PROGRAM FILES\MICROSOFT SDK\INCLUDE\oaidl.idl
+oaidl.idl
+Processing C:\PROGRAM FILES\MICROSOFT SDK\INCLUDE\objidl.idl
+objidl.idl
+Processing C:\PROGRAM FILES\MICROSOFT SDK\INCLUDE\unknwn.idl
+unknwn.idl
+Processing C:\PROGRAM FILES\MICROSOFT SDK\INCLUDE\wtypes.idl
+wtypes.idl
+Processing C:\PROGRAM FILES\MICROSOFT SDK\INCLUDE\basetsd.h
+basetsd.h
+Processing C:\PROGRAM FILES\MICROSOFT SDK\INCLUDE\guiddef.h
+guiddef.h
+Processing C:\PROGRAM FILES\MICROSOFT SDK\INCLUDE\oaidl.acf
+oaidl.acf
+Compiling resources...
+Compiling...
+StdAfx.cpp
+Compiling...
+C_Bong.cpp
+CrossLine.cpp
+Ctrl.cpp
+CtrlWnd.cpp
+Grp_Base.cpp
+Grp_Data.cpp
+Grp_Juga.cpp
+Grp_MA.cpp
+Grp_Vol.cpp
+GrpWnd.cpp
+libBong.cpp
+MainWnd.cpp
+ToolTip.cpp
+Generating Code...
+Linking...
+   Creating library Debug/C_Bong.lib and object Debug/C_Bong.exp
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSPF49D.tmp" with contents
+[
+/nologo /o"Debug/C_Bong.bsc" 
+".\Debug\StdAfx.sbr"
+".\Debug\C_Bong.sbr"
+".\Debug\CrossLine.sbr"
+".\Debug\Ctrl.sbr"
+".\Debug\CtrlWnd.sbr"
+".\Debug\Grp_Base.sbr"
+".\Debug\Grp_Data.sbr"
+".\Debug\Grp_Juga.sbr"
+".\Debug\Grp_MA.sbr"
+".\Debug\Grp_Vol.sbr"
+".\Debug\GrpWnd.sbr"
+".\Debug\libBong.sbr"
+".\Debug\MainWnd.sbr"
+".\Debug\ToolTip.sbr"]
+Creating command line "bscmake.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSPF49D.tmp"
+Creating browse info file...
+<h3>Output Window</h3>
+
+
+
+<h3>Results</h3>
+C_Bong.dll - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

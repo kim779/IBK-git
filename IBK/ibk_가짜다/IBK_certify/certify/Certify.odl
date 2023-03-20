@@ -1,0 +1,75 @@
+// Certify.odl : type library source for ActiveX Control project.
+
+// This file will be processed by the Make Type Library (mktyplib) tool to
+// produce the type library (Certify.tlb) that will become a resource in
+// Certify.ocx.
+
+#include <olectl.h>
+#include <idispids.h>
+
+[ uuid(4EC81D5B-30E3-43C2-A676-4AAD73F5D090), version(1.0),
+  helpfile("Certify.hlp"),
+  helpstring("Certify ActiveX Control module"),
+  control ]
+library CERTIFYLib
+{
+	importlib(STDOLE_TLB);
+	importlib(STDTYPE_TLB);
+
+	//  Primary dispatch interface for CCertifyCtrl
+
+	[ uuid(240CE94C-9426-4C02-BA78-CBB4385BDE8E),
+	  helpstring("Dispatch interface for AXIS Certify Control"), hidden ]
+	dispinterface _DCertify
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CCertifyCtrl)
+			//}}AFX_ODL_PROP
+
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CCertifyCtrl)
+			[id(1)] long OnCertify(long pBytes, long nBytes);
+			[id(2)] boolean Certify(long pBytes, long nBytes, long infos);
+			[id(3)] boolean CertifyErr(long pBytes, long nBytes);
+			[id(4)] void CertifyId(long pBytes);
+			[id(5)] boolean CertifyEx(long pBytes, long nBytes);
+			[id(6)] long CertifyFull(long pInB, long pInL, long pOutB);
+			[id(7)] long CertifyName(long pBytes);
+			//}}AFX_ODL_METHOD
+	};
+
+	//  Event dispatch interface for CCertifyCtrl
+
+	[ uuid(F976A329-037A-407A-A073-38E2B50B614D),
+	  helpstring("Event interface for AXIS Certify Control") ]
+	dispinterface _DCertifyEvents
+	{
+		properties:
+			//  Event interface has no properties
+
+		methods:
+			// NOTE - ClassWizard will maintain event information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_EVENT(CCertifyCtrl)
+			[id(1)] void OnFire(long type, long wParam, long lParam);
+			//}}AFX_ODL_EVENT
+	};
+
+	//  Class information for CCertifyCtrl
+
+	[ uuid(5D693FFF-52BF-4DDA-85A6-1429887D20AB),
+	  helpstring("AXIS Certify Control"), control ]
+	coclass Certify
+	{
+		[default] dispinterface _DCertify;
+		[default, source] dispinterface _DCertifyEvents;
+	};
+
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

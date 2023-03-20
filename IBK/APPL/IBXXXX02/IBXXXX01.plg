@@ -1,0 +1,62 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: IBXXXX01 - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x412 /fo"Release/IBXXXX01.res" /d "NDEBUG" /d "_AFXDLL" "D:\IBKS(dev)\HTS_WORK\src\appl\IBXXXX02\IBXXXX01.rc"" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP41A.tmp" with contents
+[
+/nologo /MD /W3 /GX /Zi /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /FR"Release/" /Fp"Release/IBXXXX01.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\IBKS(dev)\HTS_WORK\src\appl\IBXXXX02\IBXXXX01.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\appl\IBXXXX02\libmap.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\appl\IBXXXX02\MapWnd.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\appl\IBXXXX02\Remain.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\appl\IBXXXX02\RemainFuture.cpp"
+"D:\IBKS(dev)\HTS_WORK\src\appl\IBXXXX02\ShMemory.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP41A.tmp" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP41B.tmp" with contents
+[
+/nologo /MD /W3 /GX /Zi /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /FR"Release/" /Fp"Release/IBXXXX01.pch" /Yc"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\IBKS(dev)\HTS_WORK\src\appl\IBXXXX02\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP41B.tmp" 
+Creating temporary file "C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP41C.tmp" with contents
+[
+/nologo /subsystem:windows /dll /incremental:no /pdb:"Release/IBXXXX02.pdb" /map:"Release/IBXXXX02.map" /debug /machine:I386 /def:".\IBXXXX01.def" /out:"../../../release/IBXXXX02.dll" /implib:"Release/IBXXXX02.lib" /MAPINFO:EXPORTS /MAPINFO:LINES 
+".\Release\IBXXXX01.obj"
+".\Release\libmap.obj"
+".\Release\MapWnd.obj"
+".\Release\Remain.obj"
+".\Release\RemainFuture.obj"
+".\Release\ShMemory.obj"
+".\Release\StdAfx.obj"
+".\Release\IBXXXX01.res"
+]
+Creating command line "link.exe @C:\DOCUME~1\IBKS\LOCALS~1\Temp\RSP41C.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+StdAfx.cpp
+Compiling...
+IBXXXX01.cpp
+libmap.cpp
+MapWnd.cpp
+Remain.cpp
+RemainFuture.cpp
+ShMemory.cpp
+Generating Code...
+Linking...
+   Creating library Release/IBXXXX02.lib and object Release/IBXXXX02.exp
+IBXXXX02.exp : warning LNK4070: /OUT:IBXXXX01.dll directive in .EXP differs from output filename "../../../release/IBXXXX02.dll"; ignoring directive
+
+
+
+<h3>Results</h3>
+IBXXXX02.dll - 0 error(s), 1 warning(s)
+</pre>
+</body>
+</html>

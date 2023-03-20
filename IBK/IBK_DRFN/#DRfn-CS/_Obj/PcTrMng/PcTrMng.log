@@ -1,0 +1,610 @@
+﻿  StdAfx.cpp
+  _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+  #SiteDependency.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+  DispDesk.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\DispDesk.h(90): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispDesk::<unnamed-enum-IIx_SendTR>' 왼쪽은 무시됩니다.
+  DispFormData.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\DispFormData.h(41): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispFormData::<unnamed-enum-IIx_SaveData>' 왼쪽은 무시됩니다.
+  DispFormOpen.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\DispFormOpen.h(35): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispFormOpen::<unnamed-enum-IIx_ReLoadMap>' 왼쪽은 무시됩니다.
+  DispFrame.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\DispFrame.h(31): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispFrame::<unnamed-enum-IIx_GetDataSaveType>' 왼쪽은 무시됩니다.
+  DispMain.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\DispMain.h(61): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispMain::<unnamed-enum-IIx_GetMapInfo>' 왼쪽은 무시됩니다.
+  DispPrimLib.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\DispPrimLib.h(38): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispPrimLib::<unnamed-enum-IIx_IsUserDefinedMode>' 왼쪽은 무시됩니다.
+  DispView.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\DispView.h(28): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispView::<unnamed-enum-IIx_ShowDialog>' 왼쪽은 무시됩니다.
+  CodeOcx.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+  ControlPos.cpp
+  EtcUtil.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+  GwanWnd.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+  NewsMoniterWnd.cpp
+  PCtrMainWnd.cpp
+  PcTrMng.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(26,23): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(34,22): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(15,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(26,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(34,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(59,28): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(60,26): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(67,27): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(68,25): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(46,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(59,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(60,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(67,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(68,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(98,28): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(104,22): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(88,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(98,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(104,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(116,10): warning C4996: 'mkdir': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _mkdir. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(160,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(198,24): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(199,22): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(207,26): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(208,24): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(187,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(198,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(199,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(207,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\AZUtilFileMng.h(208,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\PcTrMng.cpp(116,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\PcTrMng.cpp(130,19): warning C4477: 'sprintf' : 서식 문자열 '%08X'에 'unsigned int' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\PcTrMng.cpp(130,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\PcTrMng.cpp(498,19): warning C4244: '초기화 중': 'ULONGLONG'에서 'DWORD'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\Condition_MngDef.h(15,1): warning C4005: '_countof': 매크로 재정의
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22000.0\ucrt\stdlib.h(27): message : '_countof'의 이전 정의를 참조하십시오.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\PcTrMng.cpp(564,21): warning C4244: '초기화 중': 'ULONGLONG'에서 'long'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\PcTrMng.cpp(572,21): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\PcTrMng.cpp(534,4): warning C4996: 'mkdir': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _mkdir. See online help for details.
+  Tracer.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\Tracer.cpp(59,17): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  TrComm.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\TrComm.cpp(123,17): warning C4244: '초기화 중': 'ULONGLONG'에서 'long'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\TrComm.cpp(314,3): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  _CompanyManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+  _DataMonitorManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+  _DataUtilManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_DataUtilManager.cpp(492,11): warning C4996: 'ATL::CRegKey::QueryValue': CRegKey::QueryValue(TCHAR *value, TCHAR *valueName) has been superseded by CRegKey::QueryStringValue and CRegKey::QueryMultiStringValue
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_DataUtilManager.cpp(634,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_DataUtilManager.cpp(642,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_DataUtilManager.cpp(651,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_DataUtilManager.cpp(685,13): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_DataUtilManager.cpp(708,20): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_DataUtilManager.cpp(952,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_DataUtilManager.cpp(958,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_DataUtilManager.cpp(1035,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  _DebugManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_DebugManager.cpp(55,9): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_DebugManager.cpp(73,13): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_DebugManager.cpp(121,9): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  _DrdsManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_DrdsManager.cpp(92,22): warning C4477: 'sprintf' : 서식 문자열 '%08X'에 'unsigned int' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'CDrdsLib *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_DrdsManager.cpp(92,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_DrdsManager.cpp(123,22): warning C4477: 'sprintf' : 서식 문자열 '%08X'에 'unsigned int' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'CDrdsLib *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_DrdsManager.cpp(123,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  _GateManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+  _GwanManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+  _MainExInfoManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\DefineCode.h(29,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_MainExInfoManager.cpp(381,28): warning C4244: '=': 'ULONGLONG'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  _MainInfoManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+  _MasterDataManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_MasterDataManager.cpp(3181,17): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'const CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_MasterDataManager.cpp(3181,17): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'const CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_MasterDataManager.cpp(3181,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  _NewSignalManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+  _PCTrManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+  _RegistryManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+  _SkinColorManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_SkinColorManager.cpp(214,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_SkinColorManager.cpp(216,3): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_SkinColorManager.cpp(292,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  _STManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+  _SystemUtilManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\ProgIDInfo.h(143,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\ProgIDInfo.h(144,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\ProgIDInfo.h(145,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\ProgIDInfo.h(151,4): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\ProgIDInfo.h(296,4): warning C4996: 'strupr': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _strupr. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_SystemUtilManager.cpp(127,2): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_SystemUtilManager.cpp(131,2): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  _TRCommManager.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(262,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(272,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(282,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(296,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(60,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(106,17): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IOrderMonitorMng.h(147,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: typedef 이름에 사용되는 명명되지 않은 클래스가 비정적 데이터 멤버, 멤버 열거형 또는 멤버 클래스 이외의 멤버를 선언할 수 없습니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_TRCommManager.cpp(93,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_TRCommManager.cpp(93,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  코드를 생성하고 있습니다...
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(1363,5): warning MSB8012: TargetPath(D:\git\src\IBK\IBK_DRFN\#DRfn-CS\_Obj\PcTrMng\PcTrMng.dll)이(가) Linker의 OutputFile 속성 값(D:\git\src\IBK\IBK_DRFN\#DRfn-CS\Output\IBK hot Trading\dev\PCTRMNG.DLL)과 일치하지 않습니다. 이로 인해 프로젝트가 잘못 빌드될 수 있습니다. 이를 수정하려면 $(OutDir), $(TargetName) 및 $(TargetExt) 속성 값이 %(Link.OutputFile)에 지정된 값과 일치해야 합니다.
+.\PcTrMng.def(4): warning LNK4017: 대상 플랫폼에는 DESCRIPTION 문이 지원되지 않습니다. 무시됩니다.
+     ../../../../#DRfn-CS/_Lib/PCTRMNG.lib 라이브러리 및 ../../../../#DRfn-CS/_Lib/PCTRMNG.exp 개체를 생성하고 있습니다.
+  PcTrMng.vcxproj -> D:\git\src\IBK\IBK_DRFN\#DRfn-CS\_Obj\PcTrMng\PcTrMng.dll

@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30330.147
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sock", "..\sock\Sock.vcxproj", "{FA940642-0F67-4858-A76E-1C5167B8810D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Wizard", "Wizard.vcxproj", "{52DC9A3A-EC2C-43ED-9937-97DD06562052}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "axislib", "..\dll\lib\axislib.vcxproj", "{AB0EF74B-E16F-431A-87E6-D871C75B7737}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "axisvbs", "..\dll\vbs\axisvbs.vcxproj", "{BC92C1FB-5363-4CFF-8857-39F449A942F0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "axisform", "..\dll\form\axisform.vcxproj", "{58D17A62-DABE-47D5-B65A-BB1C98BD6055}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+		Template|x86 = Template|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FA940642-0F67-4858-A76E-1C5167B8810D}.Debug|x86.ActiveCfg = Debug|Win32
+		{FA940642-0F67-4858-A76E-1C5167B8810D}.Debug|x86.Build.0 = Debug|Win32
+		{FA940642-0F67-4858-A76E-1C5167B8810D}.Release|x86.ActiveCfg = Release|Win32
+		{FA940642-0F67-4858-A76E-1C5167B8810D}.Release|x86.Build.0 = Release|Win32
+		{FA940642-0F67-4858-A76E-1C5167B8810D}.Template|x86.ActiveCfg = Release|Win32
+		{FA940642-0F67-4858-A76E-1C5167B8810D}.Template|x86.Build.0 = Release|Win32
+		{52DC9A3A-EC2C-43ED-9937-97DD06562052}.Debug|x86.ActiveCfg = Debug|Win32
+		{52DC9A3A-EC2C-43ED-9937-97DD06562052}.Debug|x86.Build.0 = Debug|Win32
+		{52DC9A3A-EC2C-43ED-9937-97DD06562052}.Release|x86.ActiveCfg = Release|Win32
+		{52DC9A3A-EC2C-43ED-9937-97DD06562052}.Release|x86.Build.0 = Release|Win32
+		{52DC9A3A-EC2C-43ED-9937-97DD06562052}.Template|x86.ActiveCfg = Template|Win32
+		{52DC9A3A-EC2C-43ED-9937-97DD06562052}.Template|x86.Build.0 = Template|Win32
+		{AB0EF74B-E16F-431A-87E6-D871C75B7737}.Debug|x86.ActiveCfg = Debug|Win32
+		{AB0EF74B-E16F-431A-87E6-D871C75B7737}.Debug|x86.Build.0 = Debug|Win32
+		{AB0EF74B-E16F-431A-87E6-D871C75B7737}.Release|x86.ActiveCfg = Release|Win32
+		{AB0EF74B-E16F-431A-87E6-D871C75B7737}.Release|x86.Build.0 = Release|Win32
+		{AB0EF74B-E16F-431A-87E6-D871C75B7737}.Template|x86.ActiveCfg = Release|Win32
+		{AB0EF74B-E16F-431A-87E6-D871C75B7737}.Template|x86.Build.0 = Release|Win32
+		{BC92C1FB-5363-4CFF-8857-39F449A942F0}.Debug|x86.ActiveCfg = Debug|Win32
+		{BC92C1FB-5363-4CFF-8857-39F449A942F0}.Debug|x86.Build.0 = Debug|Win32
+		{BC92C1FB-5363-4CFF-8857-39F449A942F0}.Release|x86.ActiveCfg = Release|Win32
+		{BC92C1FB-5363-4CFF-8857-39F449A942F0}.Release|x86.Build.0 = Release|Win32
+		{BC92C1FB-5363-4CFF-8857-39F449A942F0}.Template|x86.ActiveCfg = Template|Win32
+		{BC92C1FB-5363-4CFF-8857-39F449A942F0}.Template|x86.Build.0 = Template|Win32
+		{58D17A62-DABE-47D5-B65A-BB1C98BD6055}.Debug|x86.ActiveCfg = Debug|Win32
+		{58D17A62-DABE-47D5-B65A-BB1C98BD6055}.Debug|x86.Build.0 = Debug|Win32
+		{58D17A62-DABE-47D5-B65A-BB1C98BD6055}.Release|x86.ActiveCfg = Release|Win32
+		{58D17A62-DABE-47D5-B65A-BB1C98BD6055}.Release|x86.Build.0 = Release|Win32
+		{58D17A62-DABE-47D5-B65A-BB1C98BD6055}.Template|x86.ActiveCfg = Template|Win32
+		{58D17A62-DABE-47D5-B65A-BB1C98BD6055}.Template|x86.Build.0 = Template|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DE9BA897-3B76-4C34-9842-16FA8B877590}
+	EndGlobalSection
+EndGlobal

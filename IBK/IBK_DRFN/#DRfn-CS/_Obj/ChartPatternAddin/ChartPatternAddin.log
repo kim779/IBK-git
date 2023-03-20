@@ -1,0 +1,63 @@
+﻿  StdAfx.cpp
+  _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+  CandlePattern.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  ChartPatternAddin.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\include_Addin\I423611\_AddInCommand.h(354,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+  BitmapItemComboBox.cpp
+  ColorButton.cpp
+  HelpHtmlCtrl.cpp
+  Label.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Control\Label.h(23): warning C4091: 'static ': 변수를 선언하지 않으면 'CLabel::FlashType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Control\Label.h(24): warning C4091: 'static ': 변수를 선언하지 않으면 'CLabel::Type3D' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Control\Label.h(25): warning C4091: 'static ': 변수를 선언하지 않으면 'CLabel::BackFillMode' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Control\Label.cpp(912,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  XTabCtrl.cpp
+  DropSource.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Control_Grid\DropSource.cpp(28,2): warning C4996: 'ltoa': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _ltoa. See online help for details.
+  GridCell.cpp
+  GridCellBase.cpp
+  GridCtrl.cpp
+   -- CGridCtrl: No titletips for cells with large data
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Control_Grid\GridCtrl.cpp(216,10): warning C4996: 'GetVersionExA': deprecated로 선언되었습니다.
+  GridDropTarget.cpp
+  InPlaceEdit.cpp
+  DlgAnalysis.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\DlgAnalysis.cpp(146,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  DlgEnvSetup1.cpp
+  DlgEnvSetup2.cpp
+  DlgEnvSetup3.cpp
+  DlgEnvSetup4.cpp
+  DlgHtml.cpp
+  DlgPatternEnvSetup.cpp
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  DlgSetup.cpp
+  Util.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Include\Util.cpp(697,11): warning C4996: 'ATL::CRegKey::QueryValue': CRegKey::QueryValue(TCHAR *value, TCHAR *valueName) has been superseded by CRegKey::QueryStringValue and CRegKey::QueryMultiStringValue
+  _ChartAddInBase.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  _IWUnknown.cpp
+  IMetaTable.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Include\ProgIDInfo.h(172,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Include\ProgIDInfo.h(173,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Include\ProgIDInfo.h(174,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Include\ProgIDInfo.h(180,4): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Include\ProgIDInfo.h(331,4): warning C4996: 'strupr': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _strupr. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Include_Chart\MapStringToWord.h(23,1): warning C4302: '형식 캐스트': 'void *'에서 'WORD'(으)로 잘립니다.
+  PatternDBItems.cpp
+  PatternMaker.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  RscDlg.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  SiteCustomAddin.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\include_Addin\I423611\_AddInCommand.h(354,2): warning C4091: 'typedef ': 변수를 선언하지 않으면 'EAICommandType' 왼쪽은 무시됩니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  WavePattern.cpp
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcChartEx\ChartAddIn\ChartPatternAddIn\Include\PDll.h(468,6): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  코드를 생성하고 있습니다...
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(1363,5): warning MSB8012: TargetPath(D:\git\src\IBK\IBK_DRFN\#DRfn-CS\_Obj\ChartPatternAddin\ChartPatternAddin.dll)이(가) Linker의 OutputFile 속성 값(D:\git\src\IBK\IBK_DRFN\#DRfn-CS\Output\IBK hot Trading\dev\ChartPatternAddin.dll)과 일치하지 않습니다. 이로 인해 프로젝트가 잘못 빌드될 수 있습니다. 이를 수정하려면 $(OutDir), $(TargetName) 및 $(TargetExt) 속성 값이 %(Link.OutputFile)에 지정된 값과 일치해야 합니다.
+     ../../../../#DRfn-CS/_Lib/ChartPatternAddin.lib 라이브러리 및 ../../../../#DRfn-CS/_Lib/ChartPatternAddin.exp 개체를 생성하고 있습니다.
+  ChartPatternAddin.vcxproj -> D:\git\src\IBK\IBK_DRFN\#DRfn-CS\_Obj\ChartPatternAddin\ChartPatternAddin.dll

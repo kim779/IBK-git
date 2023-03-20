@@ -1,0 +1,16 @@
+// AxMInfo.odl : type library source for AxMInfo.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (AxMInfo.tlb).
+
+[ uuid(163C4A35-8B3E-48B9-8B3B-D3407E80FED3), version(1.0) ]
+library AxMInfo
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

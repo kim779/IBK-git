@@ -1,0 +1,7 @@
+; axisvbs.def : Declares the module parameters for the DLL.
+
+LIBRARY      "axisvbs"
+DESCRIPTION  'axisvbs Windows Dynamic Link Library'
+
+EXPORTS
+    ; Explicit exports can go here

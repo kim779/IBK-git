@@ -1,0 +1,6 @@
+; fx_grid.def : Declares the module parameters for the DLL.
+
+LIBRARY      "fx_grid"
+
+EXPORTS
+    ; Explicit exports can go here
