@@ -22,7 +22,7 @@ class CMainWnd : public CWnd
 // Construction
 public:
 	CMainWnd(CWnd* pParent, CString name, struct _param* pInfo);
-
+	CString m_slog;
 // Attributes
 public:
 	int		m_iDtUnit;

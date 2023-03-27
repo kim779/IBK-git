@@ -74,6 +74,8 @@
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <ObjectFileName>.\Release\</ObjectFileName>
       <ProgramDataBaseFileName>.\Release\</ProgramDataBaseFileName>
+      <AdditionalIncludeDirectories>../../h</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Midl>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -94,7 +96,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>.\Release\testctrl.dll</OutputFile>
+      <OutputFile>../../../release/testctrl.dll</OutputFile>
       <ImportLibrary>.\Release\testctrl.lib</ImportLibrary>
       <ModuleDefinitionFile>.\testctrl.def</ModuleDefinitionFile>
     </Link>

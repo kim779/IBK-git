@@ -40,3 +40,30 @@
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
 #endif // !defined(AFX_STDAFX_H__5AD6E1D7_4BAF_4F02_A2FF_8CC03D0CA4D9__INCLUDED_)
+
+#include <vadefs.h>
+
+static void LOG_OUTP(int scnt, ...)
+{
+	va_list argList;
+	va_start(argList, scnt);
+
+	CString sTmp, sResult;
+
+	for (int i = 0; i < scnt; i++)
+	{
+		if (i == 0)
+			sTmp.Format("<%s>", va_arg(argList, LPCTSTR));
+		else
+			sTmp.Format("[%s]", va_arg(argList, LPCTSTR));
+
+		sResult += sTmp;
+		if (i == 0)
+			sResult += "   ";
+		else
+			sResult += " ";
+	}
+	va_end(argList);
+
+	OutputDebugString(sResult);
+}

@@ -239,7 +239,7 @@ struct	_userWH	{
 						// port#(-1) -> close
 #define	loginSHOP		0x04		// ips, port#
 						// port#(-1) -> close
-#define	loginAXISx		0x05		// ips, port#
+#define	loginAXISx		0x05		// ips, port#  0x05
 						// port#(-1) -> close
 #define	signUSERx		0x06		// the signon process pass... P/F startup
 

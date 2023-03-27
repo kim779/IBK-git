@@ -42,6 +42,8 @@ CToolMgr::~CToolMgr()	{}
 
 CToolBase* CToolMgr::CreateTool(CWnd* pwndView, CWnd* pwndParent, CRect rectTool, CRect rectDraw, COLORREF rgbBG, CIndcBase* pIndcBase, int iToolKind)
 {
+	LOG_OUTP(2, "AXISGTOOL", __FUNCTION__);
+
 	CToolBase* pToolBase = (CToolBase *) 0;
 
 	switch (static_cast<enumTK>(iToolKind))

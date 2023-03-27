@@ -5473,6 +5473,8 @@ void CGridWnd::parsingOubs(char *datB, int datL)
 	{
 		for (size_t ii = 0; ii < _vInters.size(); ii++)
 		{
+	//		if (ii >= 100)
+	//			break;
 			tempData = "";
 		//	recommand1 = "";
 		//	recommand2 = "";
@@ -5491,25 +5493,30 @@ void CGridWnd::parsingOubs(char *datB, int datL)
 			{
 				CString strValue;
 				strCode = m_grid->GetItemText(ii + 1, colCODE);
-
-				if (m_mapCurValue.Lookup(strCode, strValue))
+				strCode.TrimRight();
+			//	if (m_mapCurValue.Lookup(strCode, strValue))  //test
+				if (strCode.GetLength() > 0)
 				{
-					int nIndex = 0, nCount = 0;
-
-					while (nIndex != -1)
+					if (m_mapCurValue.Lookup(strCode, strValue))
 					{
-						nIndex = strValue.Find("\t", nIndex + 1);
+						int nIndex = 0, nCount = 0;
 
-						if (++nCount == GRIDMAXNUM)
+						while (nIndex != -1)
 						{
-							strValue = strValue.Left(nIndex + 1);
-							break;
-						}
-					}
+							nIndex = strValue.Find("\t", nIndex + 1);
 
-					strValue += strData;
-					m_mapCurValue.SetAt(strCode, strValue);
-				}
+							if (++nCount == GRIDMAXNUM)
+							{
+								strValue = strValue.Left(nIndex + 1);
+								break;
+							}
+						}
+
+						strValue += strData;
+				//		m_mapCurValue.RemoveKey(strCode);
+						m_mapCurValue.SetAt(strCode, strValue);
+					}
+				}  //getlength check
 			}
 			// 2013.07.04 END
 
@@ -5544,9 +5551,13 @@ void CGridWnd::parsingOubs(char *datB, int datL)
 							m_grid->SetItemData(ii + 1, colSIG, lParam); // KSJ colSIG
 
 						strCode = entry;
-
+						strCode.TrimRight();  //test
 						// 2012.04.03 KSJ 처음 현재가와 데이터들을 저장.
-						m_mapCurValue.SetAt(strCode, strData);
+						if (strCode.GetLength() > 0)
+						{
+					//		m_mapCurValue.RemoveKey(strCode);
+							m_mapCurValue.SetAt(strCode, strData);
+						}
 					}
 
 					const _gridHdr gridHdr = m_gridHdrX.GetAt(jj);
@@ -6358,7 +6369,7 @@ void CGridWnd::parsingOubsOne(char *datB, int datL, int update)
 				}
 
 				strValue += strData;
-				m_mapCurValue.SetAt(strCode, strValue);
+				m_mapCurValue.SetAt(strCode, strValue);   //one
 			}
 		}
 		// 2013.07.04 END
@@ -6389,7 +6400,7 @@ void CGridWnd::parsingOubsOne(char *datB, int datL, int update)
 				strCode = entry;
 
 				// 2012.08.31 추가한 데이터도 맵에 저장함
-				m_mapCurValue.SetAt(strCode, strData);
+				m_mapCurValue.SetAt(strCode, strData);    //one
 
 				if (entry.GetLength() == 6)
 				{
@@ -6972,6 +6983,7 @@ void CGridWnd::SettingGridHeaderName(int index)
 
 void CGridWnd::RTS_parsingAlertx(struct _Ralert *palert)
 {
+	OutputDebugString("[IB202200][RTS_parsingAlertx] start ");
 	CString slog;
 	int xrow{};
 	CString code, name, symbol, entry, datB, strValue, dataExceptCode, strCode, strData, sTime;
@@ -7372,7 +7384,7 @@ void CGridWnd::RTS_parsingAlertx(struct _Ralert *palert)
 					{
 						strTemp = strData.Left(nIndex);
 						strData = strTemp + strNewData;
-						m_mapCurValue.SetAt(strCode, strData);
+						m_mapCurValue.SetAt(strCode, strData);  
 						break;
 					}
 				}
@@ -7785,6 +7797,7 @@ void CGridWnd::RTS_parsingAlertx(struct _Ralert *palert)
 
 					if (palert->ptr[30])
 					{
+						OutputDebugString("[IB202200][RTS_parsingAlertx] 11 ");
 						high.Format("%s", palert->ptr[30].get());
 						high.Remove('+'), high.Remove('-');
 
@@ -7796,6 +7809,8 @@ void CGridWnd::RTS_parsingAlertx(struct _Ralert *palert)
 
 							m_grid->SetItemText(xrow, m_bongField, bongdata);
 						}
+
+						OutputDebugString("[IB202200][RTS_parsingAlertx] 22 ");
 					}
 				}
 
@@ -8420,7 +8435,7 @@ writelog("strlog =" + strlog);
 						strTemp = strData.Left(nIndex);
 						strData = strTemp + strNewData;
 
-						m_mapCurValue.SetAt(strCode, strData);
+						m_mapCurValue.SetAt(strCode, strData);  //not use
 						break;
 					}
 				}

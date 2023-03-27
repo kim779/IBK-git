@@ -76,6 +76,8 @@ static char THIS_FILE[]=__FILE__;
 
 CIndcBase* CGraphMgr::CreateGraph(CWnd* pwndView, CWnd* pwndPnChart, class CDataMgr* pDataMgr, char* pcInfo, char* pcGraph, int iDispDay)
 {
+	LOG_OUTP(2, "axisgindc", __FUNCTION__);
+
 	struct _graph* pGraph = (struct _graph*)pcGraph;
 	int iType = pGraph->btGType;
 	int iKind = pGraph->wGKind;

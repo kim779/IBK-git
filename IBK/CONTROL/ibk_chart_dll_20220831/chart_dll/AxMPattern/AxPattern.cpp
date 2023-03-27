@@ -43,6 +43,7 @@ const char* _patternNames_eng[] =
 
 CAxPattern::CAxPattern(LPCTSTR root)
 {
+	LOG_OUTP(2, "axmpattern", __FUNCTION__);
 	ZeroMemory(&m_bar, sizeof(ctBars));
 	ZeroMemory(&m_indicators, sizeof(ctArray));
 	ZeroMemory(&m_info, sizeof(ctCandleInfo));

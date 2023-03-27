@@ -273,7 +273,7 @@ struct _pidouini_item {
 	char	innm[100];				// INI 파일명
 	char	senm[100];				// 섹션명
 	char	skey[100];				// KEY
-	char	valu[2000];				// VALUE
+	char	valu[2000];				// VALUE  //testcode
 	char	date[8  ];				// 업데이트 일자
 };
 

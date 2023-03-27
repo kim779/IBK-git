@@ -41,6 +41,8 @@ public:
 	CString		m_sCurrency;
 	CString		m_sOrderQty;
 
+	CString		m_sCodeAll{};
+
 	int		m_iSkin;    //1 gray,  2 blue,  4 brown
 
 // Operations

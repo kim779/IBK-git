@@ -92,7 +92,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../../../dev/C_TOTAL.DLL</OutputFile>
+      <OutputFile>../../../../../Release/C_TOTAL.DLL</OutputFile>
       <ImportLibrary>.\Release\C_TOTAL.lib</ImportLibrary>
       <ModuleDefinitionFile>.\C_Total.def</ModuleDefinitionFile>
     </Link>

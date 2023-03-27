@@ -1,0 +1,9 @@
+**/#DRfn-CS
+**/_ObjRD/*
+*.pdb
+*.obj
+**/Debug
+**/Release
+**/ipch
+**/.vs
+*.back

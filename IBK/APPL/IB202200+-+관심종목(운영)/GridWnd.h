@@ -440,7 +440,7 @@ protected:
 
 	// END ADD
 
-	CMapStringToString m_mapCurValue; // 2012.04.03 KSJ 처음 현재가 넣기위해..
+	CMapStringToString m_mapCurValue{}; // 2012.04.03 KSJ 처음 현재가 넣기위해..
 	int m_nCount;			  // 2013.04.22 KSJ 그리드 카운트
 
 	HINSTANCE m_hSignalMng;

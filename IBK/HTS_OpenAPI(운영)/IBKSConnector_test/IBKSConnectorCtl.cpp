@@ -772,16 +772,28 @@ BSTR CIBKSConnectorCtrl::GetLastErrMsg()
 
 BOOL CIBKSConnectorCtrl::S_PIDOUINI()
 {
-	struct pidouini_mid mid;
+	/*struct pidouini_mid mid;
 	ZeroMemory(&mid, L_pidouini_mid);
 	mid.gubn[0] = 'Q';
 	sprintf(mid.item.usid, "%s", (LPCSTR)m_usid);
 	sprintf(mid.item.innm, "IBKSCONNECTOR");
 	sprintf(mid.item.senm, "ALLOW_USER");
-	sprintf(mid.item.skey, "ENABLE");
-	
+	sprintf(mid.item.skey, "ENABLE");*/
+
+	struct pidouini_mid* pmid;
+	char* pdata = new char[L_pidouini_mid];
+	memset(pdata, ' ', L_pidouini_mid);
+	pmid = (struct pidouini_mid*)pdata;
+
+	pmid->gubn[0] = 'Q';
+	memcpy(pmid->item.usid, m_usid, m_usid.GetLength());
+	memcpy(pmid->item.innm, "IBKSCONNECTOR", 13);
+	memcpy(pmid->item.senm, "ALLOW_USER", 10);
+	memcpy(pmid->item.skey, "ENABLE", 6);
+	//memcpy(pmid->item.date, "123456", 6);
+
 	//return SendTR("pidouini", 1, 0, (LPCSTR)&mid, L_pidouini_mid, C_PIDOUINI);  //vc2019
-	return  SendTR("pidouini", 1, 0, (LPCSTR)&mid, L_pidouini_mid, &CIBKSConnectorCtrl::C_PIDOUINI);
+	return  SendTR("pidouini", 1, 0, (LPCSTR)pmid, L_pidouini_mid, &CIBKSConnectorCtrl::C_PIDOUINI);
 }
 
 char* CIBKSConnectorCtrl::GetSHA256(char* data, int dataL,HMODULE hModule,bool isfile)

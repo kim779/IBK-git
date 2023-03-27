@@ -40,6 +40,9 @@ library CX_WebLink
 			[id(14)] void Navigate2(BSTR sUrl, bool bLogin);
 			//}}AFX_ODL_METHOD
 
+			[id(15)] void NavigateFRmap(BSTR sUrl, bool blogin);
+			[id(16)] void SetWidth(LONG width);
+			[id(17)] void SetHeight(LONG height);
 	};
 
 	//  Class information for WebLinkCtrl

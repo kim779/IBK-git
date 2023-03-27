@@ -118,7 +118,7 @@ struct pidouini_item
 	char innm[100];  /* INI 파일명               */
 	char senm[100];  /* 섹션명                   */
 	char skey[100];  /* Key                      */
-	char valu[500];  /* Value                    */
+	char valu[2000];  /* Value                    */
 	char date[ 8];   /* 업데이트일자             */
 };
 

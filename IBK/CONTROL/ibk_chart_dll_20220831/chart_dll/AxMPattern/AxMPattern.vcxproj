@@ -149,7 +149,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../../exe/AxMPattern.dll</OutputFile>
+      <OutputFile>../../../../../release/AxMPattern.dll</OutputFile>
       <ImportLibrary>.\Release\AxMPattern.lib</ImportLibrary>
       <ModuleDefinitionFile>.\AxMPattern.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>

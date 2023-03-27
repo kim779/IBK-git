@@ -9,33 +9,33 @@
       <UniqueIdentifier>{60640945-687e-4d68-aab8-2ab863bb7437}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
-    <Filter Include="Resource Files\Source Files">
+    <Filter Include="Source Files">
       <UniqueIdentifier>{f2db0bbd-3153-4da5-891e-fa4aca34033d}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CX_WebLink.cpp">
-      <Filter>Resource Files\Source Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StdAfx.cpp">
-      <Filter>Resource Files\Source Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WebBrowserCtrl.cpp">
-      <Filter>Resource Files\Source Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WebLinkCtrl.cpp">
-      <Filter>Resource Files\Source Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="CX_WebLink.odl">
-      <Filter>Resource Files\Source Files</Filter>
+      <Filter>Source Files</Filter>
     </Midl>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CX_WebLink.rc">
-      <Filter>Resource Files\Source Files</Filter>
+      <Filter>Source Files</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
@@ -60,7 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="CX_WebLink.def">
-      <Filter>Resource Files\Source Files</Filter>
+      <Filter>Source Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\CX_WebLink.rc2">
       <Filter>Resource Files</Filter>

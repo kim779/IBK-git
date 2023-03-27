@@ -428,8 +428,8 @@ D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(310,2): warning C4996:
 D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IAUGDIMng.h(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
 D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IAUGDIMng.h(49,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
 D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IAUGDIMng.h(60,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\ExControl\ExOCXDLL.cpp(647,22): warning C4477: 'sprintf' : 서식 문자열 '%x'에 'unsigned int' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND'입니다.
-D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\ExControl\ExOCXDLL.cpp(647,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\ExControl\ExOCXDLL.cpp(648,22): warning C4477: 'sprintf' : 서식 문자열 '%x'에 'unsigned int' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Chart\ExControl\ExOCXDLL.cpp(648,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   ExResize.cpp
   ExResizePoint.cpp
   ExResizeRect.cpp

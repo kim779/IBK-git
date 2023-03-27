@@ -14,7 +14,7 @@ class CCertifyCtrl : public COleControl
 // 생성자입니다.
 public:
 	CCertifyCtrl();
-
+	CString m_slog;
 // 재정의입니다.
 public:
 	virtual void OnDraw(CDC* pdc, const CRect& rcBounds, const CRect& rcInvalid);

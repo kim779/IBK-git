@@ -287,6 +287,7 @@ void CControlWnd::parseIMAXMessageData(int nKind, CString sIMAXInfo)
 		m_sCurrency	= sArr[8];
 
 		sISINCode	= sArr[14];
+		m_sCodeAll = sISINCode;
 		sablemedo	= sArr[15];
 m_tmpX.Format("parseIMAXMessageData(IMAX_INFO_CODE) viewNo[%s]Kind[%d]sExid[%s]sCode[%s]sCodeName[%s]m_sBidUnit[%s]m_sAskUnit[%s]m_sSelPrice[%s]m_sBidPrice[%s]m_sAskPrice[%s]m_sCurrency[%s]sASINCode[%s]", 
 		m_sViewNo, nKind, sExid, sCode, sCodeName, m_sBidUnit, m_sAskUnit, m_sSelPrice, m_sBidPrice, m_sAskPrice, m_sCurrency, sISINCode); dprint();
@@ -683,6 +684,12 @@ BSTR CControlWnd::_GetIMAXValue(LPCTSTR sValueText)
 
 	::SendMessage(hWnd, WUM_IMAXDATAGET, (WPARAM)nKey, (LPARAM)szBuf);
 	sValue = szBuf;
+
+	//if (nKey == IMXID_GETCODE)
+	//{
+	//	strResult = m_sCodeAll;
+	//	return strResult.AllocSysString();
+	//}
 
 	if (!sValue.IsEmpty())
 	{

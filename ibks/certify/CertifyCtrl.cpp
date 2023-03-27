@@ -186,23 +186,44 @@ LRESULT CCertifyCtrl::OnMessage(WPARAM wParam, LPARAM lParam)
 {
 	switch (LOWORD(wParam))
 	{
-	case checkPass:
-		if (HIWORD(wParam))	// remove certificate
-			removeCertificate();
-		else
-			return checkPasswd(CString((char*)lParam));
-	case rebootAxis:
-		OnFire(FEV_CA, MAKELONG(closeCA, HIWORD(wParam)), 0);
-		break;
-	case encryptPass:
-		OnFire(FEV_CA, MAKELONG(encryptCA, HIWORD(wParam)), lParam);
-		return (long)lParam;
+		case checkPass:
+		{
+			if (HIWORD(wParam))	// remove certificate
+			{
+				m_slog.Format("[certify][CCertifyCtrl::OnMessage] [checkPass] removeCertificate\r\n");
+				OutputDebugString(m_slog);
+				removeCertificate();
+			}
+			else
+			{
+				m_slog.Format("[certify][CCertifyCtrl::OnMessage] [checkPass] checkPasswd\r\n");
+				OutputDebugString(m_slog);
+				return checkPasswd(CString((char*)lParam));
+			}
+		}
+		case rebootAxis:
+		{
+			m_slog.Format("[certify][CCertifyCtrl::OnMessage] [rebootAxis]\r\n");
+			OutputDebugString(m_slog);
+			OnFire(FEV_CA, MAKELONG(closeCA, HIWORD(wParam)), 0);
+		}
+			break;
+		case encryptPass:
+		{
+			m_slog.Format("[certify][CCertifyCtrl::OnMessage] [encryptPass]\r\n");
+			OutputDebugString(m_slog);
+			OnFire(FEV_CA, MAKELONG(encryptCA, HIWORD(wParam)), lParam);
+			return (long)lParam;
+		}
 	}
 	return 0;
 }
 
 long CCertifyCtrl::OnCertify(long pBytes, long nBytes)
 {
+	m_slog.Format("[certify][CCertifyCtrl::OnCertify]  m_ca=[%d] nBytes=[%d]  pBytes=[%s]\r\n", m_ca , *(int*)nBytes, (char*)pBytes);
+	OutputDebugString(m_slog);
+
 	if (pBytes == NULL)
 	{
 		m_ca = caNO;
@@ -468,6 +489,9 @@ long CCertifyCtrl::OnCertify(long pBytes, long nBytes)
 
 BOOL CCertifyCtrl::Certify(long pBytes, long nBytes, long infos)
 {
+	m_slog.Format("[certify][CCertifyCtrl::Certify]  m_ca=[%d]  pBytes=[%s] infos=[%s] \r\n", m_ca, (unsigned char*)pBytes, CString((char*)infos, L_MAPN));
+	OutputDebugString(m_slog);
+
 	switch (m_ca)
 	{
 	case caNO:
@@ -544,6 +568,9 @@ BOOL CCertifyCtrl::Certify(long pBytes, long nBytes, long infos)
 
 BOOL CCertifyCtrl::CertifyErr(long pBytes, long nBytes)
 {
+	m_slog.Format("[certify][CCertifyCtrl::CertifyErr]  m_ca=[%d]  nBytes=[%d] pBytes=[%s] \r\n", m_ca, (char*)pBytes);
+	OutputDebugString(m_slog);
+
 	enum { eNONE = 0, eHTS = 1, eSIGN = 2 } eKind;
 
 	eKind = eNONE;
@@ -669,13 +696,16 @@ BOOL CCertifyCtrl::CertifyErr(long pBytes, long nBytes)
 // info[1] : 주문자동서명, info[2] : 공인인증사용
 void CCertifyCtrl::CertifyId(long pBytes)
 {
+	m_slog.Format("[certify][CCertifyCtrl::CertifyId]  m_ca=[%d]  pBytes=[%62s] \r\n", m_ca, (char*)pBytes);
+	OutputDebugString(m_slog);
+
 	int	idx;
 	CString	info, pass;
 	//	char* nAuto = _T("주문시매번비밀번호입력한다");
 	//	char* yAuto = _T("주문시매번비밀번호입력하지않는다");
 
 	m_user = CString((char*)pBytes, 12);
-	info = CString((char*)(pBytes + 22), 10);
+	info = CString((char*)(pBytes + 22), 10);  
 	pass = CString((char*)(pBytes + 32), 30);
 	m_user.TrimRight();
 	idx = pass.Find(_T('\0'));
@@ -699,6 +729,9 @@ void CCertifyCtrl::CertifyId(long pBytes)
 
 BOOL CCertifyCtrl::CertifyEx(long pBytes, long nBytes)
 {
+	m_slog.Format("[certify][CCertifyCtrl::CertifyEx]  m_ca=[%d] pBytes=[%s] \r\n", m_ca, (char*)pBytes);
+	OutputDebugString(m_slog);
+
 	if (pBytes == NULL)
 	{
 		if (MessageBox(_T("공인인증 절차를 수행할 수 없습니다.\r\n공인인증을 사용하지 않고 진행을 계속하시겠습니까?"),
@@ -714,6 +747,9 @@ BOOL CCertifyCtrl::CertifyEx(long pBytes, long nBytes)
 
 bool CCertifyCtrl::sign()
 {
+	m_slog.Format("[certify][CCertifyCtrl::sign]  m_ca=[%d]  \r\n", m_ca);
+	OutputDebugString(m_slog);
+
 	UString src, des;
 
 	src.length = m_certifys.GetLength();
@@ -734,6 +770,9 @@ bool CCertifyCtrl::sign()
 
 int CCertifyCtrl::queryDn(CString dn_name, int* nBytes, bool retry)
 {
+	m_slog.Format("[certify][CCertifyCtrl::sign]  m_ca=[%d] nBytes=[%d]  retry=[%d] \r\n", m_ca, dn_name, *nBytes, retry);
+	OutputDebugString(m_slog);
+
 	CWnd* pWnd;
 	BOOL	success = FALSE;
 
@@ -822,6 +861,9 @@ int CCertifyCtrl::queryDn(CString dn_name, int* nBytes, bool retry)
 
 void CCertifyCtrl::savePasswd()
 {
+	m_slog.Format("[certify][CCertifyCtrl::savePasswd]  m_ca=[%d] \r\n", m_ca);
+	OutputDebugString(m_slog);
+
 	if (m_context.pInterfaceContext == NULL)
 		return;
 
@@ -834,6 +876,9 @@ void CCertifyCtrl::savePasswd()
 
 BOOL CCertifyCtrl::checkPasswd(CString pass)
 {
+	m_slog.Format("[certify][CCertifyCtrl::checkPasswd]  m_ca=[%d] pass =[%s]  \r\n", m_ca, pass);
+	OutputDebugString(m_slog);
+
 	CString	text;
 	UString	src, des;
 	char	encpass[32 + 1];
@@ -865,6 +910,9 @@ BOOL CCertifyCtrl::checkPasswd(CString pass)
 
 CString CCertifyCtrl::checkPasswd()
 {
+	m_slog.Format("[certify][CCertifyCtrl::checkPasswd]  m_ca=[%d] \r\n", m_ca);
+	OutputDebugString(m_slog);
+
 	CString	text, pass = _T("");
 	UString	src, des;
 	char	encpass[32 + 1];
@@ -900,6 +948,9 @@ CString CCertifyCtrl::checkPasswd()
 
 bool CCertifyCtrl::certify(bool reissue)
 {
+	m_slog.Format("[certify][CCertifyCtrl::certify]  m_ca=[%d] reissue=[%d]\r\n", m_ca, reissue);
+	OutputDebugString(m_slog);
+
 	m_string = _T("http://www.ibks.com/LoadService.jsp?url=/customer/certificate/newissue.jsp");
 	OnFire(FEV_CA, MAKELONG(htmlCA, 0), (long)(char*)m_string.operator LPCTSTR());
 	return true;
@@ -907,6 +958,9 @@ bool CCertifyCtrl::certify(bool reissue)
 
 void CCertifyCtrl::otherCertificate()
 {
+	m_slog.Format("[certify][CCertifyCtrl::otherCertificate]  m_ca=[%d] \r\n", m_ca);
+	OutputDebugString(m_slog);
+
 	m_string = _T("http://www.ibks.com/LoadService.jsp?url=/customer/certificate/etc_entry.jsp");
 	OnFire(FEV_CA, MAKELONG(htmlCA, 0), (long)(char*)m_string.operator LPCTSTR());
 }
@@ -919,6 +973,9 @@ void CCertifyCtrl::removeCertificate()
 
 bool CCertifyCtrl::guideMsg(msgNO msgno, CString guide, CString title)
 {
+	m_slog.Format("[certify][CCertifyCtrl::guideMsg]  m_ca=[%d] msgno=[%s] guide=[%s] title=[%s]\r\n", m_ca, msgno, guide, title);
+	OutputDebugString(m_slog);
+
 	struct	_msg {
 		char	no;
 		bool	confirm;
@@ -971,6 +1028,9 @@ bool CCertifyCtrl::guideMsg(msgNO msgno, CString guide, CString title)
 
 BOOL CCertifyCtrl::isMustCertify(CString maps)
 {
+	m_slog.Format("[certify][CCertifyCtrl::isMustCertify]  m_ca=[%d] maps=[%s] \r\n", m_ca, maps);
+	OutputDebugString(m_slog);
+
 	void* ptr;
 
 	return m_emaps.Lookup(maps, ptr);
@@ -1013,6 +1073,9 @@ void CCertifyCtrl::OnTimer(UINT nIDEvent)
 // updateXX_20160503
 long CCertifyCtrl::CertifyFull(long pInB, long pInL, long pOutB, long pOutL)
 {
+	m_slog.Format("[certify][CCertifyCtrl::CertifyFull]  m_ca=[%d] pInL=[%d] \r\n", m_ca, pInL);
+	OutputDebugString(m_slog);
+
 	UString src, des;
 	char	encpass[32 + 1];
 	int	pswdL, rc = 0;
@@ -1117,12 +1180,19 @@ long CCertifyCtrl::CertifyFull(long pInB, long pInL, long pOutB, long pOutL)
 	m_calogon = true;
 	savePasswd();
 
+
+	m_slog.Format("[certify][CCertifyCtrl::CertifyFull]  m_ca=[%d] len=[%d] pOutB=[%s] \r\n", m_ca, des.length, pOutB);
+	OutputDebugString(m_slog);
+
 	return 0;
 
 }
 
 long CCertifyCtrl::CertifyName(long pBytes)
 {
+	m_slog.Format("[certify][CCertifyCtrl::CertifyName]  m_ca=[%d] pBytes=[%s] \r\n", m_ca, pBytes);
+	OutputDebugString(m_slog);
+
 	int	rc = 0;
 
 	rc = strlen(m_contextNew.sd.szDN);

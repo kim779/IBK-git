@@ -292,6 +292,7 @@ BOOL CMainWnd::RequestTR(LPCTSTR str)
 	else if (dIndex == GI_DAY || dIndex == GI_WEEK || dIndex == GI_MONTH)
 		SendMessage(GEV_VIEW, MAKEWPARAM(viewNotify, indexInput), MAKELPARAM(dIndex, 0));
 
+	LOG_OUTP(3, "c_total", __FUNCTION__,  str);
 	if (m_pwndChart)
 		SendRequest();
 
@@ -465,7 +466,8 @@ long CMainWnd::GetTotalDay()
 		default:
 			break;
 		}
-
+		m_slog.Format("%d", envinfo->datainfo.aaDayInfo[uIndex][dIndex - GI_DAY].dwTotCnt);
+		LOG_OUTP(3, "c_total", __FUNCTION__, m_slog);
 		return envinfo->datainfo.aaDayInfo[uIndex][dIndex-GI_DAY].dwTotCnt;
 	}
 
@@ -497,6 +499,8 @@ long CMainWnd::GetDisplayDay()
 			break;
 		}
 
+		m_slog.Format("%d", envinfo->datainfo.aaDayInfo[uIndex][dIndex - GI_DAY].dwDisCnt);
+		LOG_OUTP(3, "c_total", __FUNCTION__, m_slog);
 		return envinfo->datainfo.aaDayInfo[uIndex][dIndex-GI_DAY].dwDisCnt;
 	}
 
@@ -1056,16 +1060,23 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	m_pFont = m_pApp->GetFont(m_pwndView, m_iFPoint, m_strFName);
 	if (!m_pApp->m_hGMainLib)
+	{
+		LOG_OUTP(3, "c_total", __FUNCTION__ ,"loadlibrary axisGMain.dll");
 		m_pApp->m_hGMainLib = LoadLibrary("axisGMain.dll");
+	}
 
 	if (!m_pApp->m_hGMainLib)
-		m_pApp->m_hGMainLib = LoadLibraryEx("axisGMain.dll", NULL, LOAD_WITH_ALTERED_SEARCH_PATH);		
+	{
+		LOG_OUTP(3, "c_total", __FUNCTION__ ,"loadlibraryEx axisGMain.dll");
+		m_pApp->m_hGMainLib = LoadLibraryEx("axisGMain.dll", NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+	}
 
 	if (!m_pApp->m_hGMainLib)
 	{
 		DWORD err = GetLastError();
 		CString sErr;
 		sErr.Format("axisGMain.dll LoadLibrary error [%d]", err);
+		LOG_OUTP(3, "c_total", __FUNCTION__, "axisGMain.dll LoadLibrary error");
 		AfxGetMainWnd()->MessageBox(sErr, COMPANYNAME);
 		return -1;
 	}
@@ -1133,6 +1144,7 @@ int CMainWnd::GetToken(char *pData, char token[])
 
 void CMainWnd::ResizeWnd(CRect wRC)
 {
+	LOG_OUTP(2, "c_total", __FUNCTION__ );
 	int cx = wRC.Width();
 	int cy = wRC.Height();
 	
@@ -1250,6 +1262,8 @@ CWnd* CMainWnd::CreateWnd(int ctrlID, CWnd* pWnd)
 	{
 	case PN_INPUT:	
 		{
+	
+LOG_OUTP(3, "c_total", __FUNCTION__, "PN_INPUT");
 			if (pWnd)	return pWnd;
 			struct _pninfo* pninfo = GetPnInfo(ctrlID);
 			if (!pninfo || !(pninfo->info & PO_USE))
@@ -1266,6 +1280,7 @@ CWnd* CMainWnd::CreateWnd(int ctrlID, CWnd* pWnd)
 		break;
 	case PN_CTRL:	
 		{
+		LOG_OUTP(3, "c_total", __FUNCTION__, "PN_CTRL");
 			if (pWnd)	return pWnd;
 			struct _pninfo* pninfo = GetPnInfo(ctrlID);
 			if (!pninfo || !(pninfo->info & PO_USE))
@@ -1283,6 +1298,7 @@ CWnd* CMainWnd::CreateWnd(int ctrlID, CWnd* pWnd)
 	case PN_CFG:	break;
 	case PN_CHART:
 		{
+		LOG_OUTP(3, "c_total", __FUNCTION__, "PN_CHART");
 			if (pWnd)	return pWnd;
 			CWnd*	(APIENTRY *axCreateCtrl)(int, CWnd *, CWnd *, char *, CFont *);
 			axCreateCtrl = (CWnd* (APIENTRY *)(int, CWnd *, CWnd *, char *, CFont *))
@@ -1365,6 +1381,9 @@ void CMainWnd::SendRequest()
 	CopyMemory(&m_pcTemp[L_userTH + nameLen], inputStr, inputLen);
 	CopyMemory(&m_pcTemp[L_userTH + nameLen + inputLen], gDataH, dataHLen);
 
+	CString slog(m_pcTemp, TRLen);
+	LOG_OUTP(3, "c_total", __FUNCTION__, slog);
+
 	int ret = m_pwndView->SendMessage(WM_USER, MAKEWPARAM(invokeTRx, TRLen), (long)m_pcTemp);
 }
 
@@ -1411,6 +1430,9 @@ void CMainWnd::SendRequest2()
 	
 	CopyMemory(&m_pcTemp[L_userTH + nameLen], inputStr, inputLen);
 	CopyMemory(&m_pcTemp[L_userTH + nameLen + inputLen], gDataH, dataHLen);
+
+	CString slog(m_pcTemp, TRLen);
+	LOG_OUTP(3, "c_total", __FUNCTION__, slog);
 
 	m_pwndView->SendMessage(WM_USER, MAKEWPARAM(invokeTRx, TRLen), (long)m_pcTemp);
 }
@@ -1468,6 +1490,9 @@ void CMainWnd::SendRequestS()
 	
 	CopyMemory(&m_pcTemp[L_userTH + nameLen], inputStr, inputLen);
 	CopyMemory(&m_pcTemp[L_userTH + nameLen + inputLen], gDataH, dataHLen);
+
+	CString slog(m_pcTemp, TRLen);
+	LOG_OUTP(3, "c_total", __FUNCTION__, slog);
 
 	m_pwndView->SendMessage(WM_USER, MAKEWPARAM(invokeTRx, TRLen), (long)m_pcTemp);
 }
@@ -1624,6 +1649,8 @@ char* CMainWnd::GetMapInfo(int wKey)
 			return NULL;
 	}
 
+	LOG_OUTP(2, "c_total", __FUNCTION__);
+
 	return m_pcTemp;
 }
 
@@ -1646,7 +1673,7 @@ bool CMainWnd::GetGrpFromDat(char *info)
 			return true;
 		}
 	}
-
+	LOG_OUTP(2, "c_total", __FUNCTION__);
 	return false;
 }
 
@@ -1681,7 +1708,7 @@ bool CMainWnd::SetGrpAtDat(char *info)
 			return true;
 		}
 	}
-
+	LOG_OUTP(2, "c_total", __FUNCTION__);
 	return false;
 }
 
@@ -1704,7 +1731,7 @@ bool CMainWnd::ReadEnv()
 	m_iDtIndex = m_pEnvInfo->datainfo.btIndex;
 	m_pEnvInfo->display.dwDspOption &= ~DO_VIEWGRID;
 	//m_pEnvInfo->display.dwDspOption |= DO_NOCROSS;
-
+	LOG_OUTP(2, "c_total", __FUNCTION__);
 	return true;
 }
 
@@ -1742,7 +1769,7 @@ bool CMainWnd::ReadGrp()
 		CopyMemory(m_pacGraph[ii], &pcGrp[iLen], iGCnt*SZ_GRAPH);
 		iLen += iGCnt*SZ_GRAPH;
 	}
-
+	LOG_OUTP(2, "c_total", __FUNCTION__);
 	return true;
 }
 
@@ -1789,6 +1816,8 @@ void CMainWnd::WriteGrp()
 	}
 	
 	sh.Write(m_strGrpPath);
+
+	LOG_OUTP(2, "c_total", __FUNCTION__);
 }
 
 bool CMainWnd::WriteEnv()
@@ -1813,7 +1842,7 @@ bool CMainWnd::WriteEnv()
 		CopyMemory(pcEnv, penvinfo, SZ_ENVINFO);
 		sh.Write(m_strEnvPath);
 	}
-
+	LOG_OUTP(2, "c_total", __FUNCTION__);
 	return true;
 }
 
@@ -1834,7 +1863,7 @@ void CMainWnd::WriteDat()
 	CopyMemory(pcDat, m_pcGDat, iSize);
 
 	sh.Write(m_strDatPath);
-
+	LOG_OUTP(2, "c_total", __FUNCTION__);
 }
 
 void CMainWnd::EnvProc()
@@ -2169,6 +2198,8 @@ void CMainWnd::SyncMap(char *pScreen)
 
 void CMainWnd::IndexChange(int index)
 {
+	m_slog.Format("%d", index);
+	LOG_OUTP(3, "c_total", __FUNCTION__, m_slog);
 ///////////// old info save
 	struct _envInfo	*envinfo = NULL;
 	if (m_pwndChart)
@@ -2210,6 +2241,7 @@ void CMainWnd::IndexChange(int index)
 
 void CMainWnd::SyncCount()
 {
+	LOG_OUTP(2, "c_total", __FUNCTION__);
 	int index = m_iDtIndex - GI_DAY;
 	_envInfo *envinfo = (_envInfo*)m_pwndChart->SendMessage(GEV_CHART, MAKEWPARAM(CHART_DATA, REQUEST_CUR_ENV), 0);
 	//m_pEnvInfo->grpinfo[index].wRgnCnt = envinfo->grpinfo[index].wRgnCnt;
@@ -2224,6 +2256,7 @@ void CMainWnd::SyncCount()
 
 BOOL CMainWnd::MainChartIsVarType()
 {
+	LOG_OUTP(2, "c_total", __FUNCTION__);
 	struct _envInfo* env = (struct _envInfo*)m_pwndChart->SendMessage(GEV_CHART, MAKEWPARAM(CHART_DATA, REQUEST_CUR_ENV), 0);
 	int mainGKind = env->datainfo.wMainGrpKind;
 
@@ -2237,9 +2270,10 @@ BOOL CMainWnd::MainChartIsVarType()
 
 BOOL CMainWnd::IsAidAddable(LPARAM lParam)
 {
+
 	if (MainChartIsVarType())
 		return FALSE;
-
+	LOG_OUTP(2, "c_total", __FUNCTION__);
 	switch (lParam)
 	{
 	case GK_RRATE:		// 회전율(주 - 일주월)
@@ -2331,6 +2365,7 @@ void CMainWnd::SetSelectTime(LPCTSTR DateTime)
 
 BSTR CMainWnd::GetSelectPrice() 
 {
+	LOG_OUTP(2, "c_total", __FUNCTION__);
 	CString strResult;
 	// TODO: Add your dispatch handler code here
 

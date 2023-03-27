@@ -118,6 +118,7 @@ END_MESSAGE_MAP()
 
 CWnd* CPnChart::CreateCtrl(CWnd* pwndView, CWnd* pwndGView, char *info, CFont* pFont)
 {
+	LOG_OUTP(2, "axisgmain", __FUNCTION__);
 	Create(NULL, NULL, WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS, CRect(0, 0, 1, 1), pwndGView, 0);
 	m_pwndView = pwndView;
 	m_pwndGView = pwndGView;
@@ -136,6 +137,7 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 	{
 	case 999: // get chart index
 		{
+		LOG_OUTP(3, "axisgmain", __FUNCTION__ ,  "999 get chart index");
 			CString str((LPCTSTR)lParam);
 			CString time, price;
 			int nPos = str.Find('\t');
@@ -155,6 +157,7 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case chartChgPalette:
+		LOG_OUTP(3, "axisgmain", __FUNCTION__, "chartChgPalette");
 		m_crBG = m_pwndGView->SendMessage(GEV_VIEW, MAKEWPARAM(viewMain, getPalette), 4);
 		if (m_pObjMgr)
 			//m_pObjMgr->m_clrBack = m_clrBack;
@@ -163,6 +166,7 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 			m_pObjMgr->ReDrawGraphObject(true);
 		break;
 	case CHART_SET_GRP:
+		LOG_OUTP(3, "axisgmain", __FUNCTION__, "CHART_SET_GRP");
 		switch (HIWORD(wParam))
 		{
 		case CHANGE_ENV_INFO:
@@ -203,6 +207,7 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 		break;
 	case CHART_TR_DATA:
 		{
+		LOG_OUTP(3, "axisgmain", __FUNCTION__, "CHART_TR_DATA");
 			// debug : 20090915
 			//CString strDebug;
 			//strDebug.Format("CPnChart::OnChartEvent() start");
@@ -244,6 +249,7 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 
 	case CHART_TR_DATAS:
 		{
+		LOG_OUTP(3, "axisgmain", __FUNCTION__, "CHART_TR_DATAS");
 			struct _trData* pTD = (_trData*)lParam;
 			if (!pTD || !pTD->pcData || pTD->iLen - pTD->iSiseLen == 0)
 				return FALSE;
@@ -257,53 +263,65 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 		switch (HIWORD(wParam))
 		{
 		case REQUEST_HEADER:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_DATA", "REQUEST_HEADER");
 			if (m_pObjMgr)
 				return (long)m_pObjMgr->GetGrpHeader((int*)lParam);
 			return NULL;
 		case REQUEST_HEADER2:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_DATA", "REQUEST_HEADER2");
 			if  (m_pObjMgr)
 				return (long)m_pObjMgr->GetGrpHeader2((int*)lParam);
 			return NULL;
 		case requestHeader3:
 			return NULL;
 		case requestCurInter:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_DATA", "requestCurInter");
 			if (m_pObjMgr)
 				return (long)m_pObjMgr->GetMapInter();
 			else	
 				return 0;
 			break;
 		case REALTIME_DATA:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_DATA", "REALTIME_DATA");
 			if (m_pObjMgr)
 				m_pObjMgr->RealtimeGraphData((char*)lParam);
 			break;
 		case REQUEST_CUR_ENV:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_DATA", "REQUEST_CUR_ENV");
 			if (m_pObjMgr)
 				return long(m_pObjMgr->GetEnvInfo());
 			return NULL;
 		case REQUEST_CUR_MAP:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_DATA", "REQUEST_CUR_MAP");
 			if (m_pObjMgr)
 				return long(m_pObjMgr->GetMapInfo());
 			return NULL;
 		case excelData:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_DATA", "excelData");
 			ExcelProc();			
 			break;
 		case getTableData:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_DATA", "getTableData");
 			if (m_pObjMgr)
 				return long(m_pObjMgr->GetTableData());
 			return NULL;
 		case getPrintTitle:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_DATA", "getPrintTitle");
 			if (m_pObjMgr)
 				return long(m_pObjMgr->GetPrintString());
 			return NULL;
 		case getSaveName:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_DATA", "getSaveName");
 			if (m_pObjMgr)
 				return long(m_pObjMgr->GetSaveString());
 			return NULL;
 		case chartClear:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_DATA", "chartClear");
 			if (m_pObjMgr)
 				m_pObjMgr->ObjectClear();
 			break;
 		case requestHeaderS:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_DATA", "requestHeaderS");
 			if  (m_pObjMgr)
 				return (long)m_pObjMgr->GetGrpHeaderS((int*)lParam);
 			return NULL;
@@ -313,6 +331,7 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 		switch (HIWORD(wParam))
 		{
 		case chartIsValid:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_ENV", "chartIsValid");
 			if (m_pObjMgr)
 			{
 				if (m_pObjMgr->m_arGraphQue.GetSize() > 0)
@@ -321,26 +340,32 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 
 			return FALSE;
 		case chartIndex:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_ENV", "chartIndex");
 			if (m_pObjMgr)
 				m_pObjMgr->ChangeIndex(LOWORD(lParam), HIWORD(lParam));
 			break;
 		case chartUnit:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_ENV", "chartUnit");
 			if (m_pObjMgr)
 				m_pObjMgr->ChangeUnit(lParam);
 			break;
 		case chartTotal:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_ENV", "chartTotal");
 			if (m_pObjMgr)
 				m_pObjMgr->ChangeTotalDay(lParam);
 			break;
 		case CHART_DISPLAY:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_ENV", "CHART_DISPLAY");
 			if (m_pObjMgr)
 				return m_pObjMgr->ChangeDisplay(lParam);
 			break;
 		case chartScale:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_ENV", "chartScale");
 			if (m_pObjMgr)
 				return m_pObjMgr->ChangeDisplayScale(lParam);
 			break;
 		case chartTable:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_ENV", "chartTable");
 			if (m_pObjMgr)
 			{
 				m_pObjMgr->SetTableMode((lParam)? true:false, false);
@@ -348,12 +373,14 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		case chartGrid:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_ENV", "chartGrid");
 			if (m_pObjMgr)
 			{
 				m_pObjMgr->SetGridMode(false);
 				return TRUE;
 			}
 		case chartTip:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_ENV", "chartTip");
 			if (m_pObjMgr)
 			{
 				m_pObjMgr->SetTipMode(false);
@@ -366,11 +393,13 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 		switch (HIWORD(wParam))
 		{
 		case getScrollData:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "chartCtrl", "getScrollData");
 			if (m_pObjMgr)
 				return m_pObjMgr->GetScrollInfo((char*)lParam);
 			break;
 		case changePosition:
 			{
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "chartCtrl", "changePosition");
 				int dispPos = LOWORD(lParam);
 				int dispEnd = HIWORD(lParam);
 				if (m_pObjMgr)
@@ -378,10 +407,12 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		case changeShift:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "chartCtrl", "changeShift");
 			if (m_pObjMgr)
 				return m_pObjMgr->ChangeDisplayShift(lParam);
 			break;
 		case chartAutoScroll:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "chartCtrl", "chartAutoScroll");
 			if (m_pObjMgr)
 			{
 				bool bStatus = (lParam == 0)? false:true;
@@ -389,18 +420,22 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		case isAutoScroll:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "chartCtrl", "isAutoScroll");
 			if (m_pObjMgr)
 				return m_pObjMgr->IsAutoScr();
 			return FALSE;
 		case chartToolSelect:		// tool select
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "chartCtrl", "chartToolSelect");
 			if (m_pObjMgr)
 				return m_pObjMgr->ChangeTool(lParam);
 			return false;
 		case chartToolColor:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "chartCtrl", "chartToolColor");
 			if (m_pObjMgr)
 				m_pObjMgr->ChangeToolColor(lParam);
 			break;
 		case chartToolWidth:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "chartCtrl", "chartToolWidth");
 			if (m_pObjMgr)
 				m_pObjMgr->ChangeToolWidth(lParam);
 			break;
@@ -409,16 +444,19 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 		case chartAutotran:
 			break;
 		case chartUpdate:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "chartCtrl", "chartUpdate");
 			if (m_pObjMgr)
 				m_pObjMgr->ReDrawGraphObject(lParam? true:false);
 			break;
 		case patternChanged:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "chartCtrl", "patternChanged");
 			if (m_pObjMgr)
 				m_pObjMgr->SetPattern(LOWORD(lParam), HIWORD(lParam)? true:false);
 			break;
 		}
 		break;
 	case chartViewFocus:
+		LOG_OUTP(3, "axisgmain", __FUNCTION__, "chartViewFocus");
 		if (!lParam)
 		{
 			if (m_pObjMgr)
@@ -430,6 +468,7 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 		break;
 	case chartToolTip:	// adCross message
 		{
+			LOG_OUTP(3, "axisgmain", __FUNCTION__, "chartToolTip");
 			BOOL bShow = (BOOL)HIWORD(wParam);
 			if (!bShow)
 			{
@@ -442,6 +481,7 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 		switch (HIWORD(wParam))
 		{
 		case ADD_CHART_MENU:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_MENU", "ADD_CHART_MENU");
 			if (m_pObjMgr)
 			{
 				if (m_pObjMgr->m_arGraphQue.GetSize() <= 0)
@@ -454,6 +494,7 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		case selChartMenu:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_MENU", "selChartMenu");
 			if (m_pObjMgr)
 				m_pObjMgr->m_pObjEvent->ProcessChartMenu(LOWORD(lParam), HIWORD(lParam));
 			break;
@@ -465,6 +506,7 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 		{
 		
 		case getSelectTime:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_USER_SELECT", "getSelectTime");
 			Sleep(0);
 			if (m_pObjMgr)
 			{
@@ -474,9 +516,11 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 		case setSelectTime:
 			break;
 		case getSelectPrice:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_USER_SELECT", "getSelectPrice");
 			m_strRtnData = m_pObjMgr->m_pObjEvent->m_strClickPrice;
 			break;
 		case StartOrderMode:
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_USER_SELECT", "StartOrderMode");
 			m_pObjMgr->SetOrderMode(true);
 			break;
 		}
@@ -485,6 +529,7 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 		// 2006.11.20 lsh (end)
 	//** add by macho@20061226 <start>
 	case CHART_STANLINE:
+		LOG_OUTP(3, "axisgmain", __FUNCTION__, "CHART_STANLINE");
 		return (LRESULT)StanLineProc(HIWORD(wParam), lParam);
 	//** add by macho@20061226 <end>
 
@@ -492,6 +537,7 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 	case CHART_ANAL:
 		if (m_pObjMgr) 
 		{
+			LOG_OUTP(3, "axisgmain", __FUNCTION__, "CHART_ANAL");
 			return m_pObjMgr->AnalMessageProc(HIWORD(wParam), lParam);
 		}
 		break;
@@ -802,6 +848,7 @@ BOOL CPnChart::IsPtInGrp()
 
 void CPnChart::ExcelProc()
 {
+	LOG_OUTP(3, "axisgmain", __FUNCTION__, "ExcelProc");
 	CString text = _T("");
 	
 	if (!m_pObjMgr || !m_pObjMgr->GetExcelData(text))

@@ -285,7 +285,8 @@ OutputDebugString(m_slog);
 		m_xtype = xtFlag::xtWS;
 		break;
 	case loginAXISx:
-		m_xtype = xtFlag::xtXEC;
+		//m_xtype = xtFlag::xtXEC;  //testcode
+		m_xtype = xtFlag::xtWS;
 		break;
 	case signUSER:
 	case signUSERc:

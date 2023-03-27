@@ -63,6 +63,8 @@ static char THIS_FILE[]=__FILE__;
 
 CDataMgr::CDataMgr(CWnd *pParent)
 {
+	LOG_OUTP(2, "AXISGDATA", __FUNCTION__);
+
 	m_pParent = pParent;
 	m_dDollar = 0;
 }

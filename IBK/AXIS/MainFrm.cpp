@@ -1388,7 +1388,19 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				case 'z':
 				case 'Z':
 					{
-					
+						struct _pidouini_mid* pmid;
+						char* pdata = new char[sz_pidouini];
+						memset(pdata, ' ', sz_pidouini);
+						pmid = (struct _pidouini_mid*)pdata;
+						pmid->gubn[0] = 'Q';
+						memcpy(pmid->item.usid, "test", 4);
+
+						memcpy(pmid->item.innm, "IBKSCONNECTOR", 13);
+						memcpy(pmid->item.senm, "ALLOW_USER", 10);
+						memcpy(pmid->item.skey, "ENABLE", 6);
+						memcpy(pmid->item.date, "1234567", 6);
+
+						sendTR("pidouini", (char*)pmid, sz_pidouini, 0, 249);
 					}
 					break;
 			}	
