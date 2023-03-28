@@ -138,7 +138,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../dev/C_TOTAL.DLL</OutputFile>
+      <OutputFile>D:\IBKS_TEST\dev/C_TOTAL.DLL</OutputFile>
       <ImportLibrary>.\Debug\C_TOTAL.lib</ImportLibrary>
       <ModuleDefinitionFile>.\C_Total.def</ModuleDefinitionFile>
     </Link>
