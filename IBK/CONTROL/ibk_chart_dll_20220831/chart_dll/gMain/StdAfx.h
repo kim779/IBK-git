@@ -43,6 +43,13 @@
 
 #include <vadefs.h>
 
+static CString Int2CString(CString stmp, int ival)
+{
+	CString slog;
+	slog.Format("[%s = %d]", stmp, ival);
+	return slog;
+}
+
 static void LOG_OUTP(int scnt, ...)
 {
 	va_list argList;
@@ -65,5 +72,5 @@ static void LOG_OUTP(int scnt, ...)
 	}
 	va_end(argList);
 
-	OutputDebugString(sResult);
+	OutputDebugString("\r\n" + sResult);
 }

@@ -282,7 +282,7 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 				return 0;
 			break;
 		case REALTIME_DATA:
-			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_DATA", "REALTIME_DATA");
+			//LOG_OUTP(4, "axisgmain", __FUNCTION__, "CHART_DATA", "REALTIME_DATA");
 			if (m_pObjMgr)
 				m_pObjMgr->RealtimeGraphData((char*)lParam);
 			break;

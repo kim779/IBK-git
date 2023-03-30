@@ -1007,6 +1007,8 @@ void CObjMgr::ReDrawGraphObject(bool bAll, bool bMouse)
 
 bool CObjMgr::AddGraphData(struct _trData* pTD, int& riValidDataCount)
 {
+	LOG_OUTP(2,  "axisgmain", __FUNCTION__);
+
 	int iGDataLen = pTD->iLen[0] - pTD->iSiseLen[0];
 	//if (iGDataLen - SZ_DATAH <= 2)
 	if (iGDataLen - SZ_DATAH < 0)
@@ -1109,12 +1111,13 @@ bool CObjMgr::AddGraphData(struct _trData* pTD, int& riValidDataCount)
 	if (bNoDeleteData)
 		m_pDataMgr->SetNoDeleteData(pDataH->dkey, true);
 	**/
-
+	LOG_OUTP(3, "axisgmain", __FUNCTION__,  Int2CString("iCount", iCount));
 	return true;
 }
 
 bool CObjMgr::AddGraphDataS(struct _trData* pTD)
 {
+	LOG_OUTP(2, "axisgmain", __FUNCTION__);
 	CString	symbol, pDay;
 
 	char* pcGData = pTD->pcData[0] + pTD->iSiseLen[0];
@@ -1175,7 +1178,7 @@ bool CObjMgr::AddGraphDataS(struct _trData* pTD)
 			m_pwndPnChart->SendMessage(GEV_TABLE, tbItem, long(m_strData.operator LPCTSTR()));
 		}
 	}
-
+	LOG_OUTP(4, "axisgmain", __FUNCTION__,  Int2CString("iRequest", iRequest), Int2CString("iCount", iCount));
 	return true;
 }
 
@@ -1187,6 +1190,8 @@ void CObjMgr::RemoveGraphData()
 
 CIndcBase* CObjMgr::AddGraphQue(int iGrpCnt, char* pcData, bool bAppend, bool bUnion)
 {
+	LOG_OUTP(6, "axisgmain", __FUNCTION__, Int2CString("iGrpCnt", iGrpCnt), Int2CString("bAppend", bAppend), 
+		Int2CString("bUnion",bUnion), CString(pcData, 100));
 	struct _graph* pGraph = (struct _graph*)pcData;
 	CIndcBase* pIndcBase = NULL;
 
@@ -1819,7 +1824,7 @@ OutputDebugString(slog);
 			}
 		}
 	}
-
+	
 slog.Format("[axgmain] [CObjMgr::DeleteGraph]  3\r\n");
 OutputDebugString(slog);
 
@@ -1835,7 +1840,7 @@ OutputDebugString(slog);
 		puiSortTop[ii] = pxRegion->xRect.top;
 		ii++;
 	}
-
+	return true;
 slog.Format("[axgmain] [CObjMgr::DeleteGraph]  4\r\n");
 OutputDebugString(slog);
 

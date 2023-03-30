@@ -1063,12 +1063,37 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	{
 		LOG_OUTP(3, "c_total", __FUNCTION__ ,"loadlibrary axisGMain.dll");
 		m_pApp->m_hGMainLib = LoadLibrary("axisGMain.dll");
+
+		HMODULE hModule = GetModuleHandle(_T("axisGMain.dll"));   //testcode 로드된 모듈 절대 경로
+		if (hModule != NULL) {
+			TCHAR szPath[MAX_PATH];
+			GetModuleFileName(hModule, szPath, MAX_PATH);
+			CString spath;
+			spath.Format("%s", szPath);
+			LOG_OUTP(4, "c_total", __FUNCTION__, "!!!!!!!!!!!!!!!!!!!!loadlibrary axisGMain.dll", szPath);
+			// 모듈이 로드된 경로는 szPath에 저장됩니다.
+		}
+		else {
+			// 모듈을 로드할 수 없는 경우 처리할 코드를 작성합니다.
+		}
 	}
 
 	if (!m_pApp->m_hGMainLib)
 	{
-		LOG_OUTP(3, "c_total", __FUNCTION__ ,"loadlibraryEx axisGMain.dll");
+		LOG_OUTP(3, "c_total", __FUNCTION__ ,"@@@@@@@@@@@@@@@loadlibraryEx axisGMain.dll");
 		m_pApp->m_hGMainLib = LoadLibraryEx("axisGMain.dll", NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+		HMODULE hModule = GetModuleHandle(_T("axisGMain.dll"));   //testcode 로드된 모듈 절대 경로
+		if (hModule != NULL) {
+			TCHAR szPath[MAX_PATH];
+			GetModuleFileName(hModule, szPath, MAX_PATH);
+			CString spath;
+			spath.Format("%s", szPath);
+			LOG_OUTP(4, "c_total", __FUNCTION__, "loadlibraryEx axisGMain.dll", szPath);
+			// 모듈이 로드된 경로는 szPath에 저장됩니다.
+		}
+		else {
+			// 모듈을 로드할 수 없는 경우 처리할 코드를 작성합니다.
+		}
 	}
 
 	if (!m_pApp->m_hGMainLib)

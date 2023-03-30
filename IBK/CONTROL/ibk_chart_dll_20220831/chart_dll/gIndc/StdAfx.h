@@ -57,5 +57,5 @@ static void LOG_OUTP(int scnt, ...)
 	}
 	va_end(argList);
 
-	OutputDebugString(sResult);
+	OutputDebugString("\r\n" + sResult);
 }
