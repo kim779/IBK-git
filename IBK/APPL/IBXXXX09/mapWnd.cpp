@@ -609,7 +609,7 @@ void CMapWnd::alertx(gsl::span<DWORD> data, struct _codeinfo* codeinfo)
 	if (codeinfo->a_kind[0] & 0x01) // È®ÀÎÃ¢
 	{
 		CCaptureWnd* capture = new CCaptureWnd(this, m_pFont, m_pBFont);
-
+		capture->m_pWizard = m_pParent;
 		string = _T("");
 		for (int ii = 0; ii < sizeof(check) / sizeof(check[0]); ii++)
 		{

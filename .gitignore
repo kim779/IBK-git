@@ -1,9 +1,10 @@
-**/#DRfn-CS
-**/_ObjRD/*
+**/#DRfn-CS/
 *.pdb
-*.obj
 **/Debug
 **/Release
 **/ipch
 **/.vs
 *.back
+**/*.tlog
+**/*.vcxproj
+*/*.obj

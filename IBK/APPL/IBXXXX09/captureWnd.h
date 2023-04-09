@@ -42,10 +42,12 @@ public:
 	CfxStatic	m_name;
 	CfxButton	m_ok;
 
-	std::unique_ptr<CfxGrid> m_grid;
+	std::unique_ptr<CfxGrid> m_grid{};
 
 	CBrush		m_boxBrush;
 
+	CWnd* m_pWizard{};
+	CString Variant(int comm, CString data);
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CCaptureWnd)

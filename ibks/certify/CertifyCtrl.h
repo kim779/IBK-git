@@ -27,6 +27,7 @@ private:
 	APP_CONTEXT	m_context;
 	SD_API_CONTEXT_NEW m_contextNew;
 	enum { caNO, caNOx, caOK, caRUN, caPWD, caPWDa, caOKx } m_ca;
+	CString getStatus();
 
 	int		m_nBytes;
 	char		m_pBytes[16 * 1024];

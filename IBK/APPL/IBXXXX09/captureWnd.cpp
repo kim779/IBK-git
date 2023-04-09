@@ -56,7 +56,7 @@ END_MESSAGE_MAP()
 BOOL CCaptureWnd::CreatePopup(int key, const void* info, void* data, int wndpos)
 {
 	m_key = key;
-
+	OutputDebugString("\r\n[IBXXXX09] 1\r\n");
 	if (!CreateEx(0, AfxRegisterWndClass(CS_DBLCLKS, ::LoadCursor(nullptr, IDC_ARROW)),
 		_T("capture popup"), WS_POPUP|WS_BORDER, 0, 0, szWIDTH, szHEIGHT,
 		m_parent->GetSafeHwnd(), (HMENU) 0, nullptr))
@@ -64,14 +64,20 @@ BOOL CCaptureWnd::CreatePopup(int key, const void* info, void* data, int wndpos)
 //		TRACE("Error create capture popup...\n");
 		return FALSE;
 	}
-
+	OutputDebugString("\r\n[IBXXXX09] 2\r\n");
 	m_winRC.SetRect(0, 0, szWIDTH, szHEIGHT);
 	m_titRC.SetRect(0, 0, szWIDTH, szTITLEH);
 
 	m_boxBrush.CreateSolidBrush(bxCOLOR);
 	m_boxRC.SetRect(gap2, szTITLEH + gap2, szWIDTH - (gap2*2), szHEIGHT - (gap2*2));
-
-	initialControl(); displayData(info, data); positionWindow(); ShowWindow(SW_SHOW);
+	OutputDebugString("\r\n[IBXXXX09] 3\r\n");
+	
+	OutputDebugString("\r\n[IBXXXX09] 4\r\n");
+	
+	OutputDebugString("\r\n[IBXXXX09] 5\r\n");
+	positionWindow(); ShowWindow(SW_SHOW);
+	initialControl();
+	displayData(info, data);
 	return true;
 }
 
@@ -210,6 +216,9 @@ void CCaptureWnd::initialControl()
 
 void CCaptureWnd::displayData(const void* info, void* data)
 {
+	if (m_grid == nullptr)
+		return;
+	CString slog;
 	CString	string, stringx = (char*) data;
 	struct	_codeinfo* cinfo = (_codeinfo *) info;
 
@@ -218,6 +227,9 @@ void CCaptureWnd::displayData(const void* info, void* data)
 	if (!string.IsEmpty() && string.GetAt(0) == '&')
 		string = string.Mid(1);
 	m_name.SetText(string);
+
+	slog.Format("\r\n[IBXXXX09] displayData 1 [%s] \r\n", stringx);
+	OutputDebugString(slog);
 
 	CString valS;
 	for (int ii = 0; ii < m_grid->GetRowCount(); ii++)
@@ -234,14 +246,81 @@ void CCaptureWnd::displayData(const void* info, void* data)
 	}
 }
 
+#include "../../H/axisfire.h"
+CString CCaptureWnd::Variant(int comm, CString data)
+{
+	CString retvalue;
+	char* dta = (char*)m_pWizard->SendMessage(WM_USER, MAKEWPARAM(variantDLL, comm), (LPARAM)(LPCTSTR)data);
+
+	if ((long)dta > 1)
+		retvalue = dta;
+	else
+		return "";
+
+	return retvalue;
+}
+
 void CCaptureWnd::positionWindow()
 {
+	CString slog;
+	OutputDebugString("\r\n[IBXXXX09] positionWindow\r\n");
 	const int captionH = ::GetSystemMetrics(SM_CYCAPTION);
 	int	xPosition = 0, yPosition = 0;
 	CRect	parentRC; 
-	const gsl::not_null<CWnd*> parentW = AfxGetMainWnd();
+	//const gsl::not_null<CWnd*> parentW = AfxGetMainWnd();
+	CWnd* parentW = AfxGetMainWnd();
+	slog.Format("\r\n[IBXXXX09] positionWindow 1  [%x]\r\n", parentW);
+	OutputDebugString(slog);
+	if (parentW == nullptr)
+	{
+		OutputDebugString("\r\n[IBXXXX09] ------------  nullptr\r\n");
+	
+		CString strdata, name;
+		name = Variant(nameCC, "");
+
+		int readL = 0;
+		char readB[1024];
+		CString userD;
+		userD.Format("%s\\%s\\%s\\%s.ini", Variant(homeCC, ""), "user", name, name);
+		readL = GetPrivateProfileString("MODE", "main", "", readB, sizeof(readB), userD);
+
+		if (readL <= 0)
+		{
+			slog.Format("\r\n[IBXXXX09] ------------  no read [%s]\r\n", userD);
+			OutputDebugString(slog);
+			return;
+		}
+
+		CString sWnd;
+		sWnd.Format("%s", readB);
+		int ddata = atoi(sWnd);
+		HWND hWnd = (HWND)ddata;
+		CWnd* m_pMainFrame = CWnd::FromHandle(hWnd);
+
+		slog.Format("\r\n[IBXXXX09] positionWindow m_pMainFrame = [%x]\r\n", m_pMainFrame);
+		OutputDebugString(slog);
+
+		if (m_pMainFrame && m_pMainFrame->GetSafeHwnd())
+		{
+			//if (m_pMainFrame->IsWindowVisible())
+			{
+				m_pMainFrame->ShowWindow(SW_RESTORE);
+				m_pMainFrame->SetForegroundWindow();
+			}
+		}
+		
+		CenterWindow(m_pMainFrame);
+		ShowWindow(SW_SHOW);
+
+		return;
+	}
 
 	parentW->GetWindowRect(&parentRC); 
+
+	slog.Format("\r\n[IBXXXX09] positionWindow 2  [%d]   [%d][%d][%d][%d]\r\n", m_wndpos, parentRC.left, parentRC.top, parentRC.right, parentRC.bottom);
+	OutputDebugString(slog);
+
+
 	parentRC.top += captionH;
 
 	switch (m_wndpos)
@@ -266,11 +345,15 @@ void CCaptureWnd::positionWindow()
 		yPosition = parentRC.bottom - m_winRC.Height();
 		break;
 	default:
+	//	SetWindowPos(nullptr, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_SHOWWINDOW);
 		CenterWindow(parentW); 
 		return;
 	}
 
 	SetWindowPos(nullptr, xPosition, yPosition, 0, 0, SWP_NOZORDER|SWP_NOSIZE|SWP_SHOWWINDOW);
+
+	slog.Format("\r\n[IBXXXX09] positionWindow 3  [%d][%d]\r\n", xPosition, yPosition);
+	OutputDebugString(slog);
 }
 
 CString CCaptureWnd::idTOstring(UINT id)

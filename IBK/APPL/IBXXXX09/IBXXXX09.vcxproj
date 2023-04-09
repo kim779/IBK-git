@@ -113,7 +113,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>..\..\..\dev\IBXXXX09.DLL</OutputFile>
+      <OutputFile>C:\IBKS\IBK투자증권 HTS\dev\IBXXXX09.DLL</OutputFile>
       <ImportLibrary>.\Debug\IBXXXX09.lib</ImportLibrary>
       <AdditionalDependencies>../../control/fx_misc/debug/fx_misc.lib;../../control/fx_grid/debug/fx_grid.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\IBXXXX09.def</ModuleDefinitionFile>
@@ -161,7 +161,7 @@
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OutputFile>..\..\..\release\IBXXXX09.DLL</OutputFile>
       <ImportLibrary>.\Release\IBXXXX09.lib</ImportLibrary>

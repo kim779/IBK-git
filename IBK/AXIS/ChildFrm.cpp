@@ -416,6 +416,9 @@ void CChildFrame::OnSize(UINT nType, int cx, int cy)
 	form.left -= 3;
 	form.bottom += 3;
 
+	//form.InflateRect(2, 2);
+	//form.top += 1;
+
 	CRgn rgn;
 	rgn.CreateRectRgn(form.left, form.top, form.right, form.bottom);
 	SetWindowRgn(rgn, TRUE);

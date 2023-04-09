@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
-// Used by axis.rc
+// Microsoft Visual C++에서 생성한 포함 파일입니다.
+// axis.rc에서 사용되고 있습니다.
 //
 #define IDC_MAP                         2
 #define IDC_CONFIG                      2
@@ -163,6 +163,7 @@
 #define IDD_LOCK_PASS                   472
 #define IDD_DLGPB                       475
 #define IDB_BITMAP_EVENT                477
+#define IDD_DIG_CLOUDE                  478
 #define IDC_USER                        1001
 #define IDC_PASS                        1002
 #define IDC_CPASS                       1003
@@ -284,9 +285,14 @@
 #define IDC_DTRANSRATE                  1153
 #define IDC_BANNER                      1153
 #define IDC_DSTATIC1                    1154
+#define IDC_CLUDE                       1154
 #define IDC_DSTATIC2                    1155
+#define IDC_CLUDE_CERTUP                1155
 #define IDC_DSTATIC3                    1156
+#define IDC_CLUDE_PSCHANGE              1156
 #define IDC_BN_CA                       1157
+#define IDC_CLUDE_PSCHANGE2             1157
+#define IDC_CLUDE_DELETE                1157
 #define IDC_BN_REMOTE                   1158
 #define IDC_BN_BREAK                    1159
 #define IDC_RECEIVE_RESOURCE            1159
@@ -327,7 +333,9 @@
 #define IDC_MODE                        1187
 #define IDC_EDIT1                       1187
 #define IDC_AOS                         1187
+#define IDC_BTN_CON                     1187
 #define IDC_STATIC_MSG                  1188
+#define IDC_BTN_KEYPAD                  1188
 #define IDC_PROXY2                      1190
 #define IDC_STATIC_INFO                 1191
 #define IDC_NORETRY                     1192
@@ -438,20 +446,40 @@
 #define IDC_BUTTON_L45                  1297
 #define IDC_BTN_AXIS                    1297
 #define IDC_BUTTON_L46                  1298
+#define IDC_EDIT_DN                     1298
 #define IDC_BUTTON_L47                  1299
+#define IDC_BUTTON4                     1299
 #define IDC_BUTTON_L48                  1300
+#define IDC_BTN_EXIT                    1300
 #define IDC_BUTTON_L49                  1301
+#define IDC_BTN_CERT_ISSUE              1301
 #define IDC_BUTTON_L50                  1302
+#define IDC_BTN_CERTNEW                 1302
 #define IDC_BUTTON_L51                  1303
+#define IDC_BTN_PASSCHA                 1303
 #define IDC_BUTTON_L52                  1304
+#define IDC_BTN_CERTDEL                 1304
 #define IDC_BUTTON_L53                  1305
+#define IDC_BTN_CERTUP                  1305
 #define IDC_BUTTON_L54                  1306
+#define IDC_BTN_CONNTCHK                1306
 #define IDC_BUTTON_L55                  1307
+#define IDC_BTN_CERTDOWN                1307
 #define IDC_BUTTON_L56                  1308
+#define IDC_BTN_WITHDRAW                1308
 #define IDC_BUTTON_L57                  1309
+#define IDC_BTN_CONCLOUDE               1309
 #define IDC_BUTTON_L58                  1310
+#define IDC_BTN_AUTOCHK                 1310
 #define IDC_BUTTON_L59                  1311
+#define IDC_EDIT_DN2                    1311
 #define IDC_BUTTON_L60                  1312
+#define IDC_EDIT_DN3                    1312
+#define IDC_BTN_LOGIN                   1313
+#define IDC_BTN_CERT_ORDER              1314
+#define IDC_BTN_CERT_TRANSFER           1315
+#define IDC_EDIT_CMPIP                  1316
+#define IDC_EDIT_CMPPORT                1317
 #define IDD_ACCTOOLBAR                  7001
 #define IDC_NEWSHIDECOUNT               7027
 #define IDC_NEWSHIDESPIN                7028
@@ -620,9 +648,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        478
+#define _APS_NEXT_RESOURCE_VALUE        480
 #define _APS_NEXT_COMMAND_VALUE         32879
-#define _APS_NEXT_CONTROL_VALUE         1298
+#define _APS_NEXT_CONTROL_VALUE         1314
 #define _APS_NEXT_SYMED_VALUE           113
 #endif
 #endif

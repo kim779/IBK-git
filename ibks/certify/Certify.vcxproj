@@ -256,6 +256,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Certify.def" />
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Certify.rc" />

@@ -19,6 +19,7 @@
 #include "SChild.h"
 #include "inca/npenkAppInstall5WIN.h"
 
+
 #include <vector>
 #include <algorithm>
 
@@ -1482,6 +1483,8 @@ public:
 	//접속서버 확인
 	void CheckServer(CString strip);
 	CString m_strServer{};
+
+	
 protected:
 // #ifdef USE_AHNLAB_SECUREBROWSER
 // 	IAosSB *m_pAosSB;

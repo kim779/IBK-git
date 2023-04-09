@@ -491,8 +491,8 @@ void CBVolume::DrawChart(CDC* pDC)
 
 	if (m_RgnInfo.Rgn[m_RgnInfo.iCount].pRgn)
 	{
-		m_RgnInfo.Rgn[m_RgnInfo.iCount].pRgn->DeleteObject();
-		delete m_RgnInfo.Rgn[m_RgnInfo.iCount].pRgn;
+	//	m_RgnInfo.Rgn[m_RgnInfo.iCount].pRgn->DeleteObject();  //test delete
+	//	delete m_RgnInfo.Rgn[m_RgnInfo.iCount].pRgn;   //test delete
 		m_RgnInfo.Rgn[m_RgnInfo.iCount].pRgn = NULL;
 	}
 

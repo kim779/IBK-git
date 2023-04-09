@@ -214,6 +214,10 @@ BEGIN_MESSAGE_MAP(CCertLogin, CDialog)
 	ON_WM_SHOWWINDOW()
 	//}}AFX_MSG_MAP
 	//ON_MESSAGE(WM_STOP, OnExit)  //vc2019 ?
+	ON_BN_CLICKED(IDC_CLUDE, &CCertLogin::OnBnClickedClude)
+	ON_BN_CLICKED(IDC_CLUDE_CERTUP, &CCertLogin::OnBnClickedCludeCertup)
+	ON_BN_CLICKED(IDC_CLUDE_PSCHANGE, &CCertLogin::OnBnClickedCludePschange)
+	ON_BN_CLICKED(IDC_CLUDE_DELETE, &CCertLogin::OnBnClickedCludeDelete)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -281,6 +285,7 @@ BOOL CCertLogin::OnInitDialog()
 		m_bCertLogin = TRUE;
 
 	//CString s;
+	// 
 	//s.Format("PASSWORD 22 TYPE [%d] [%d]n",m_bCertLogin,loginType);
 	//OutputDebugString(s);
 	
@@ -349,7 +354,7 @@ BOOL CCertLogin::OnInitDialog()
 	if (!m_btnExit || !m_btnExit->GetSafeHwnd())
 		m_btnExit = CreateBmpButton(IDC_DEXIT, "LOGIN_BTN_CANCEL");
 
-	m_btnCert = CreateBmpButton(IDC_CERT, "NEW_LOGIN_TAB_01_OFF");
+	m_btnCert = CreateBmpButton(IDC_CERT, "NEW_LOGIN_TAB_01_OFF");  
 
 	if (!m_btnCert || !m_btnCert->GetSafeHwnd())	
 		m_btnCert = CreateBmpButton(IDC_CERT, "LOGIN_TAB_01");
@@ -359,13 +364,29 @@ BOOL CCertLogin::OnInitDialog()
 	if (!m_btnGen || !m_btnGen->GetSafeHwnd())
 		m_btnGen = CreateBmpButton(IDC_GEN, "LOGIN_TAB_02");
 
-	m_btnCert->SetWindowPos(NULL, 300, 75, 320, 36, SWP_NOZORDER);
-	m_btnGen->SetWindowPos(NULL, 459, 75, 320, 36, SWP_NOZORDER);
+	//clude 클라우드 버튼생성
+	m_btnClude = CreateBmpButton(IDC_CLUDE, "NEW_LOGIN_TAB_03_OFF");
+	m_btnClude->SetWindowPos(NULL, 500, 75, 320, 36, SWP_NOZORDER);
+
+	m_btnCert->SetWindowPos(NULL, 300, 75, 320, 36, SWP_NOZORDER);   //clude  버튼사이즈 150->100
+	m_btnGen->SetWindowPos(NULL, 400, 75, 320, 36, SWP_NOZORDER);
+
+	m_btnClude_cert = CreateBmpButton(IDC_CLUDE_CERTUP, "clude_cert", 0, 1);     
+	m_btnClude_cert->SetWindowPos(m_bmpInput, 300, 125, 107, 36, 0);
+	m_btnClude_PSchange = CreateBmpButton(IDC_CLUDE_PSCHANGE, "clude_cert", 0, 1);
+	m_btnClude_PSchange->SetWindowPos(m_bmpInput, 407, 125, 107, 36, 0);
+	m_btnClude_Delete = CreateBmpButton(IDC_CLUDE_DELETE, "clude_cert", 0, 1);
+	m_btnClude_Delete->SetWindowPos(m_bmpInput, 514, 125, 107, 36, 0);
+	ShowCloudeBtn(FALSE);  
+
+	//m_btnCert->SetWindowPos(NULL, 300, 75, 320, 36, SWP_NOZORDER);
+    //m_btnGen->SetWindowPos(NULL, 459, 75, 320, 36, SWP_NOZORDER);
 
 	if(Axis::isCustomer)
 	{
 		m_btnCert->ShowWindow(SW_SHOW);
 		m_btnGen->ShowWindow(SW_SHOW);
+		m_btnClude->ShowWindow(SW_SHOW);
 	}
 	
 	//m_btnMode = CreateBmpButton(IDC_MODE, "NEW_LOGIN_BTN_MODE");
@@ -1250,6 +1271,8 @@ void CCertLogin::OnCert()
 	m_btnCert->SetImgBitmap("NEW_LOGIN_TAB_01_ON",2);
 	
 	m_btnGen->SetImgBitmap("NEW_LOGIN_TAB_02_OFF",2);
+
+	m_btnClude->SetImgBitmap("NEW_LOGIN_TAB_03_OFF", 2);  //clude
 	
 	if (!m_btnGen || !m_btnGen->GetSafeHwnd())
 		m_btnGen = CreateBmpButton(IDC_DRUN, "LOGIN_TAB_02");
@@ -1277,6 +1300,8 @@ void CCertLogin::OnCert()
 	GetDlgItem(IDC_DSAVEID)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_DONLYSISE)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_DSAVEPASS)->ShowWindow(SW_HIDE);
+
+	ShowCloudeBtn(FALSE); //clude
 
 	SetGuide("");
 
@@ -1317,6 +1342,8 @@ void CCertLogin::OnGen()
 	m_btnCert->SetImgBitmap("NEW_LOGIN_TAB_01_OFF",2);
 	
 	m_btnGen->SetImgBitmap("NEW_LOGIN_TAB_02_ON",2);
+
+	m_btnClude->SetImgBitmap("NEW_LOGIN_TAB_03_OFF", 2); //clude
 	
 	m_bmpBg = Axis::GetBitmap(imgN);
 
@@ -1329,6 +1356,8 @@ void CCertLogin::OnGen()
 	GetDlgItem(IDC_DSAVEPASS)->ShowWindow(SW_SHOW);
 
 	GetDlgItem(IDC_DCSTART)->ShowWindow(SW_HIDE);
+
+	ShowCloudeBtn(FALSE); //clude
 	
 	m_ckSAVEID.DrawTransparent();
 	m_ckSAVEPASS.DrawTransparent();
@@ -2137,11 +2166,11 @@ HBRUSH CCertLogin::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	return CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
 }
 
-CBmpButton* CCertLogin::CreateBmpButton(UINT buttonID, const char* bmpFileName, BOOL check)
+CBmpButton* CCertLogin::CreateBmpButton(UINT buttonID, const char* bmpFileName, BOOL check, int statusCount)  //clude
 {
 	CBmpButton* btn = new CBmpButton;
 
-	btn->SetImgBitmap(bmpFileName, 2);
+	btn->SetImgBitmap(bmpFileName, statusCount);  //clude
 	btn->SubclassWindow(GetDlgItem(buttonID)->m_hWnd);
 	if (check)
 	{
@@ -2871,3 +2900,78 @@ OutputDebugString(m_slog);
 //	m_frame->PostMessage(WM_CLOSE);
 //	EndDialog(IDCANCEL);
 //}
+
+void CCertLogin::OnBnClickedClude()  //clude
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CString file, usnm = Axis::user;
+	file.Format("%s\\%s\\%s\\%s.ini", Axis::home, USRDIR, usnm, usnm);
+
+	WritePrivateProfileString("LOGINTYPE", "TYPE", "2", file);
+
+	m_bCertLogin = TRUE;
+
+	CString imgN;
+
+	imgN.Format("%s\\%s\\new_login_bg_bagic_03.bmp", Axis::home, IMAGEDIR);
+
+	m_bmpBg = Axis::GetBitmap(imgN);
+
+	m_btnCert->SetImgBitmap("NEW_LOGIN_TAB_01_OFF", 2);
+
+	m_btnGen->SetImgBitmap("NEW_LOGIN_TAB_02_OFF", 2);
+
+	m_btnClude->SetImgBitmap("NEW_LOGIN_TAB_03_ON", 2);
+
+	if (!m_btnGen || !m_btnGen->GetSafeHwnd())
+		m_btnGen = CreateBmpButton(IDC_DRUN, "LOGIN_TAB_02");
+
+	Invalidate();
+
+	GetDlgItem(IDC_DCSTART)->ShowWindow(SW_HIDE);
+
+	GetDlgItem(IDC_DUSER)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_DPASS)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_DCPASS)->ShowWindow(SW_HIDE);
+
+	GetDlgItem(IDC_DSAVEID)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_DONLYSISE)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_DSAVEPASS)->ShowWindow(SW_HIDE);
+
+
+	ShowCloudeBtn(TRUE);
+
+	SetGuide("");
+
+	if (!m_auto)
+	{
+		if (m_bCertStart)
+		{
+			SetTimer(2000, 1000, NULL);
+		}
+	}
+}
+
+void CCertLogin::ShowCloudeBtn(BOOL bShow)
+{
+	m_btnClude_cert->ShowWindow(bShow);
+	m_btnClude_PSchange->ShowWindow(bShow);
+	m_btnClude_Delete->ShowWindow(bShow);
+}
+
+void CCertLogin::OnBnClickedCludeCertup()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CCertLogin::OnBnClickedCludePschange()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CCertLogin::OnBnClickedCludeDelete()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}

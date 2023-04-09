@@ -1892,8 +1892,8 @@ void CBongBase::DrawLine(CDC *pDC, double Max, double Min, double pValue[], int 
 
 	if (m_RgnInfo.Rgn[m_RgnInfo.iCount].pRgn)
 	{
-		m_RgnInfo.Rgn[m_RgnInfo.iCount].pRgn->DeleteObject();
-		delete m_RgnInfo.Rgn[m_RgnInfo.iCount].pRgn;
+		//m_RgnInfo.Rgn[m_RgnInfo.iCount].pRgn->DeleteObject();
+		//delete m_RgnInfo.Rgn[m_RgnInfo.iCount].pRgn;     //test delete
 		m_RgnInfo.Rgn[m_RgnInfo.iCount].pRgn = NULL;
 	}
 

@@ -1840,7 +1840,7 @@ OutputDebugString(slog);
 		puiSortTop[ii] = pxRegion->xRect.top;
 		ii++;
 	}
-	return true;
+
 slog.Format("[axgmain] [CObjMgr::DeleteGraph]  4\r\n");
 OutputDebugString(slog);
 
@@ -1945,6 +1945,7 @@ OutputDebugString(slog);
 	slog.Format("[axgmain] [CObjMgr::DeleteGraph]  7\r\n");
 	OutputDebugString(slog);
 
+
 	// 해당 indc에 있는 tool 삭제
 	if (m_pObjEvent->m_arToolQue.GetSize() > 0)
 	{
@@ -1970,6 +1971,7 @@ OutputDebugString(slog);
 slog.Format("[axgmain] [CObjMgr::DeleteGraph]  8\r\n");
 OutputDebugString(slog);
 
+
 	RemoveGraphQue(pindcDelete);
 	m_pObjEvent->m_pindcSelect = NULL;
 
@@ -1991,6 +1993,8 @@ OutputDebugString(slog);
 slog.Format("[axgmain] [CObjMgr::DeleteGraph]  9\r\n");
 OutputDebugString(slog);
 
+
+
 	m_pDataFormat->SetFgraph(pcNewGrpInfo, iNRCnt, iNGCnt);
 	delete[] pcNewGrpInfo;
 
@@ -1999,7 +2003,6 @@ OutputDebugString(slog);
 	if (puiSortTop)
 		delete[] puiSortTop;
 	
-
 
 	ReviseTick();
 	ResizeGraphObject();
@@ -2017,7 +2020,7 @@ OutputDebugString(slog);
 	}
 
 
-	slog.Format("[axgmain] [CObjMgr::DeleteGraph]  10\r\n");
+	slog.Format("[axgmain] [CObjMgr::DeleteGraph]  end\r\n");
 	OutputDebugString(slog);
 
 

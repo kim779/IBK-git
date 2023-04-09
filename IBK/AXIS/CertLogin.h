@@ -200,6 +200,9 @@ private:
 	CArray <CBmpButton*, CBmpButton*> m_bmpButtons;
 	CBitmap*	m_bmpBg;
 	BOOL	m_bCertLogin;
+
+	enum { TYPE_NORMAL_CERT = 0, TYPE_ID_LOGIN, TYPE_CLUDE };  //clude
+	int		m_bLoginType = TYPE_ID_LOGIN;
 	
 	CBmpButton* m_btnRun;
 	CBmpButton* m_btnSetup;
@@ -209,9 +212,19 @@ private:
 	CBmpButton* m_btnGen;
 	CBmpButton* m_btnBanner;
 
+
+
+
+	void ShowCloudeBtn(BOOL bShow);
+	CBmpButton* m_btnClude;  //clude
+	CBmpButton* m_btnClude_cert;
+	CBmpButton* m_btnClude_PSchange;
+	CBmpButton* m_btnClude_Delete;
+	
+
 	IAstxMkd8* m_AkSdk;
 
-	CBmpButton* CreateBmpButton(UINT buttonID, const char* bmpFileName, BOOL check = FALSE);
+	CBmpButton* CreateBmpButton(UINT buttonID, const char* bmpFileName, BOOL check = FALSE, int statusCount = 2);
 	void		ReleaseBmpButton();
 
 	void SetEventBitmap(int index);
@@ -253,6 +266,10 @@ public:
 	CString m_slog;
 	void OnEasyCert();
 	void ShowQRDlg();
+	afx_msg void OnBnClickedClude();
+	afx_msg void OnBnClickedCludeCertup();
+	afx_msg void OnBnClickedCludePschange();
+	afx_msg void OnBnClickedCludeDelete();
 };
 
 //{{AFX_INSERT_LOCATION}}

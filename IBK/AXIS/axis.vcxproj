@@ -238,6 +238,7 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /MAPINFO:LINES /MAPINFO:EXPORTS   /MAPINFO:LINES /MAPINFO:EXPORTS </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /D /Gz"WIN32"   /D /Gz"WIN32" </AdditionalOptions>
     </ClCompile>
+    <ClCompile Include="CDlg_Cloude.cpp" />
     <ClCompile Include="CertErrDialog.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /MAPINFO:LINES /MAPINFO:EXPORTS   /MAPINFO:LINES /MAPINFO:EXPORTS </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /D /Gz"WIN32"   /D /Gz"WIN32" </AdditionalOptions>
@@ -599,6 +600,7 @@
     <ClInclude Include="BmpButton.h" />
     <ClInclude Include="BtnST.h" />
     <ClInclude Include="button.h" />
+    <ClInclude Include="CDlg_Cloude.h" />
     <ClInclude Include="CertErrDialog.h" />
     <ClInclude Include="CertLogin.h" />
     <ClInclude Include="Chaser.h" />
