@@ -737,19 +737,6 @@ LONG CTreeWnd::OnManage(WPARAM wParam, LPARAM lParam)
 	case MK_RECVDATA:
 		RecvOper(kind, (CRecvData*)lParam);
 		break;
-	case MK_GETDATATITLE:
-		{
-			m_szRET.Format("%s", GetDataTitle((DWORD)lParam));
-			
-// 			int index = m_szRET.Find("보유종목");
-// 			if(index > 0)
-// 			{
-// 				m_szRET += " (※현금/대용 잔고만 확인 가능하십니다.)";
-// 			}
-
-			ret = (LONG)(char*)m_szRET.operator LPCTSTR();	
-		}	
-		break;
 	case MK_SELGROUP:
 		if (kind == MO_SET)
 		{
@@ -2864,7 +2851,7 @@ void CTreeWnd::OnClick(NMHDR* pNMHDR, LRESULT* pResult)
 				}
 				break;
 			default:
-				opt = (int)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SEARCHOPT, MO_GET));
+				
 				break;
 			}
 	

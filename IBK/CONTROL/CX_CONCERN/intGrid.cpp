@@ -3994,7 +3994,7 @@ BOOL CintGrid::DrawCell(CDC* pDC, int nRow, int nCol, CRect rect, BOOL bEraseBk)
 		else
 		{
 			CGridWnd* pWnd = (CGridWnd*)GetParent();
-			CString strTitle = pWnd->GetTitle();
+			CString strTitle;
 			if (strTitle.Find(_T(" [업종지수] - 거래소")) != -1)
 			{
 				rgb = m_clrKospi;

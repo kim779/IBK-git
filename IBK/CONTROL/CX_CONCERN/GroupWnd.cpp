@@ -91,10 +91,7 @@ void CGroupWnd::OperDraw(CDC* pDC)
 
 void CGroupWnd::DrawTitle(CDC* pDC)
 {
-	pDC->FillSolidRect(m_rcTitle, RGB(255, 255, 0));
-	const int	nmode = pDC->SetBkMode(TRANSPARENT);
-	pDC->DrawText(m_szTITLE, m_rcTitle, DT_SINGLELINE|DT_VCENTER|DT_LEFT);
-	pDC->SetBkMode(nmode);
+
 }
 
 LONG CGroupWnd::OnManage(WPARAM wParam, LPARAM lParam)
@@ -1214,8 +1211,6 @@ void CGroupWnd::OperResize(int cx, int cy)
 {
 	const CRect	rect(0, 0, cx, cy);
 	CRect	rcGrid;	
-	m_rcTitle = rect;
-	m_rcTitle.bottom = m_rcTitle.top + 20;
 	MakeGridRect(rect);
 
 	if(m_globalRect.IsRectEmpty())
@@ -1266,8 +1261,6 @@ void CGroupWnd::OperResizeMinus(int cx, int cy)
 {
 	const CRect	rect(0, 0, cx, cy);
 	CRect	rcGrid;	
-	m_rcTitle = rect;
-	m_rcTitle.bottom = m_rcTitle.top + 20;
 	MakeGridRect(rect);
 	
 	if(m_globalRect.IsRectEmpty())

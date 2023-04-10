@@ -53,8 +53,6 @@ public:
 public:
 
 	std::vector<std::shared_ptr<_intersx>> m_inters;
-	CString GetTitle() { return m_szTitle; }
-	void SetTitle(CString sztitle) { m_szTitle = sztitle, InvalidateRect(m_rcTitle, FALSE); }
 	BOOL IsExist(CString code) 
 	{ 
 		CString name; 
@@ -419,7 +417,6 @@ protected:
 	COLORREF	m_clrTEXT[2];	// 0 : focus 1 : normal
 	CRect		m_rcTitle;
 	CSize		m_size;
-	CString		m_szTitle;
 	CString		m_szFIELD;
 	CString		m_szWIDTH;
 	CString		m_MultiViewCols;

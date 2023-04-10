@@ -34,7 +34,7 @@
 #define MK_CLOSEGRID		20	// 그리드 창을 닫는다
 #define MK_SETDATAKIND		21	// 데이터 종류
 #define MK_TREEDATA		22	// 트리선택시 그룹으로 보내지는 메시지
-#define MK_GETDATATITLE		23	// 현재 데이터의 타이틀을 요구한다.
+
 #define MK_GETWND		24	// 윈도우 포인터 가져오기
 #define MK_GETAFIELD		25	// 현재 선택된 필드 인덱스를 가져온다 From ToolWindow
 #define MK_TURNCODE		26	// 종목돌려보기

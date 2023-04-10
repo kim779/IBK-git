@@ -45,7 +45,6 @@ CGridWnd::CGridWnd(CWnd* pMainWnd, int nIndex) : CBaseWnd(pMainWnd)
 
 	m_grid = nullptr;
 	m_kind = 0;
-	m_szTitle = _T("");
 	m_updateROW = -1;
 	m_mapCode.RemoveAll();
 	m_endsort = false;
@@ -354,8 +353,6 @@ void CGridWnd::DrawTitle(CDC* pDC)
 	}
 	CRect	rect = m_rcTitle;
 	rect.OffsetRect(0, 1);
-	pDC->DrawText(m_szTitle, rect, DT_SINGLELINE|DT_VCENTER|DT_LEFT);
-	pDC->SetTextColor(clr);
 
 	if (oldfont)
 		pDC->SelectObject(oldfont);
@@ -4734,8 +4731,8 @@ void CGridWnd::ShowPopupMenu(int nX /* = -1 */, int nY /* = -1 */)
 
 		dlg.AddMenu(nBase + 2, "관심종목 등록하기");
 
-		if (!m_szTitle.IsEmpty())
-			dlg.AddMenu(nBase + 3, "관심종목 덮어쓰기");
+	//	if (!m_szTitle.IsEmpty())
+		dlg.AddMenu(nBase + 3, "관심종목 덮어쓰기");
 
 		dlg.AddMenu(nBase + 4, "등록순으로 정렬");
 
@@ -4755,7 +4752,6 @@ void CGridWnd::ShowPopupMenu(int nX /* = -1 */, int nY /* = -1 */)
 	}
 	else
 	{
-		m_menuHeader.EnableMenuItem(IDC_MENU_INTERTAKE, m_szTitle.IsEmpty() ? MF_DISABLED : MF_ENABLED);
 		m_menuHeader.EnableMenuItem(IDC_MENU_MARKER, m_bSorting ? MF_DISABLED : MF_ENABLED);
 
 		nResult = m_menuHeader.TrackPopupMenu(TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RETURNCMD, nX, nY, this);
@@ -6902,8 +6898,6 @@ void CGridWnd::InsertNews(CString datB)
 
 	if (!code.IsEmpty())
 	{
-		m_szTitle.Format(" %s", (char*)m_pTreeWnd->SendMessage(WM_MANAGE, MK_GETDATATITLE, m_kind));
-		m_szTitle += ("- " + szTitle);
 		InvalidateRect(m_rcTitle, FALSE);
 		const int ncnt = gsl::narrow_cast<int>(m_inters.size());
 		int	nIndex = -1;
@@ -6949,8 +6943,6 @@ void CGridWnd::InsertNewsx(DWORD* data)
 
 	if (!code.IsEmpty())
 	{
-		m_szTitle.Format(" %s", (char*)m_pTreeWnd->SendMessage(WM_MANAGE, MK_GETDATATITLE, m_kind));
-		m_szTitle += ("- " + szTitle);
 		InvalidateRect(m_rcTitle, FALSE);
 		const int ncnt = gsl::narrow_cast<int>(m_inters.size());
 		int	nIndex = -1;
@@ -8340,8 +8332,7 @@ writelog(m_slog);
 void CGridWnd::SetKind(UINT kind)
 {
 	m_kind = kind;
-	m_szTitle.Format(" %s", (char*)m_pTreeWnd->SendMessage(WM_MANAGE, MK_GETDATATITLE, kind));
-
+	
 // 	if (kind != 0)
 // 		((CMainWnd*)m_pMainWnd)->SetRTSTreeData(this);
 
@@ -8352,9 +8343,6 @@ void CGridWnd::SetKind(UINT kind)
 CString CGridWnd::FindTitle(UINT kind)
 {
 	CString title = _T("");
-	if (m_pTreeWnd)
-		title.Format(" %s",(char*)m_pTreeWnd->SendMessage(WM_MANAGE, MK_GETDATATITLE, kind));
-
 	return title;
 }
 
@@ -8499,7 +8487,6 @@ void CGridWnd::Reset(bool bAll)
 
 	if (bAll)
 	{
-		m_szTitle = _T("");
 		SetKind(0);
 	}
 }
@@ -9121,7 +9108,6 @@ void CGridWnd::Assign(CGridWnd* pGrid)
 		m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SELGROUP, MO_SET));
 	m_grid->Clear();
 
-	m_szTitle = _T("");
 	SetKind(0);
 
 	SetKind(pGrid->GetKind());
@@ -10179,8 +10165,6 @@ void CGridWnd::SendWhenSortVisibleMode(CString data[MAX_LINE][2])
 	}
 
 	//////////////////////////////////////
-	// 	CWnd* m_pWnd = (CWnd*)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_TREE));
-	// 	m_pWnd->SendMessage(WM_MANAGE, MK_GETTREEITEM);
 
 	if(m_pGridArray.GetSize() > GRIDMAXNUM)
 	{

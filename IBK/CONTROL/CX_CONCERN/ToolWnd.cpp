@@ -920,49 +920,26 @@ LONG CToolWnd::OnManage(WPARAM wParam, LPARAM lParam)
 	case MK_CHANGEVIEWTYPE:
 		{
 			loadcfg();
-
 			const int nView = HIWORD(wParam);
-			//2012.04.05 KSJ 받은것 구분자로 자름
-// 			BOOL bRemain = (BOOL)lParam;
 			CString strTemp, strRemain, strIndex;
-
 			strTemp.Format("%s", (char*)lParam);
 
 			AfxExtractSubString(strIndex, strTemp, 0, (char)0x09);
 			AfxExtractSubString(strRemain, strTemp, 1, (char)0x09);
 
 			const int nIndex = atoi(strIndex); //- 1 ;	//받은 것에서 -1 해야 본래 인덱스나옴
-
 			const BOOL bRemain = (BOOL)atoi(strRemain);
-			// 
 
 			m_cbViewType.SetCurSel(nView);
-// 			int nIndex = m_cbGROUP.GetCurSel();
-			// KSJ
-			
 			SetViewType();
 
 			if(((CMainWnd*)m_pMainWnd)->GetFileType() == SMALLTYPE_FILE)
-			{
 				m_fileCFG.Format("%s\\%s\\%s\\%s", m_root, USRDIR, m_user, FILE_SMALLCONFIG); 
-			}
 			else
-			{
 				m_fileCFG.Format("%s\\%s\\%s\\%s", m_root, USRDIR, m_user, FILE_LARGECONFIG); 
-			}
 			
-			//if (nIndex >= 0 && nIndex < m_cbGROUP.GetCount())
-			{
-				//if(m_selectedTab != -1)
-				//{
-				//	const CWnd* pWnd = (CWnd*)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_GROUP));
-				//	pWnd->SendMessage(WM_MANAGE, MK_GROUPSAVE2, (LPARAM)m_selectedTab);
-				//}
-				
-				//m_selectedTab = nIndex;		
-				if(bRemain != TRUE)
-					SendTree(nIndex);
-			}
+			if(bRemain != TRUE)
+				SendTree(nIndex);
 		}
 		break;
 	case MK_SETGROUP:
@@ -1068,44 +1045,19 @@ void CToolWnd::savecfg()
 
 void CToolWnd::loadcfg()
 {
-	// MODIFY PSH 20070918
-	//BOOL	bCheck = (BOOL)GetPrivateProfileInt(SEC_TOOL, KEY_EXPAND, 0, m_fileCFG);
 	BOOL	bCheck = (BOOL)GetPrivateProfileInt(SEC_TOOL, KEY_EXPAND, 1, m_fileCFG);
-	// END MODIFY
-	//m_chkEXPAND->SetCheck(bCheck);
 
-	
 	bCheck = (BOOL)GetPrivateProfileInt(SEC_TOOL, KEY_AUTO, 1, m_fileCFG);
-//	m_chkAUTO->SetCheck(bCheck);
-	
-// 	if(bCheck)
-// 	{
-// 		m_btTEXT[1].EnableWindow(FALSE);
-// 	}
-// 	else
-// 	{
-// 		m_btTEXT[1].EnableWindow(TRUE);
-// 	}
 
-	// ADD PSH 20070918
 	m_bMoveCfg  = (BOOL)GetPrivateProfileInt(SEC_TOOL, KEY_MOVECFG, 0, m_fileCFG);
 	m_nMoveSave = GetPrivateProfileInt(SEC_TOOL, KEY_MOVESAVE, 0, m_fileCFG);
-	// END ADD
-	
+
 	const int	nmode = (int)GetPrivateProfileInt(SEC_TOOL, KEY_FILLMODE, MO_SELECT, m_fileCFG);
 	
 	m_cbViewType.SetCurSel(nmode);
 	
-
 	m_bBig = true;
 
-//	m_bBig = (BOOL)GetPrivateProfileInt(SEC_TOOL, KEY_BIG, 1, m_fileCFG);
-// 	bool m_bIsEqual = (BOOL)GetPrivateProfileInt(SEC_TOOL, KEY_EQUALIZER, 0, m_fileCFG);
-// 
-// 	if(m_bIsEqual)
-// 		m_btEqualizer.SetCheck(true);
-// 	else
-// 		m_btEqualizer.SetCheck(false);
 	int	ncount = (int)GetPrivateProfileInt(SEC_GROUP, KEY_COUNT, 1, m_fileCFG);
 	
 	if (ncount <= 0)
@@ -1114,16 +1066,8 @@ void CToolWnd::loadcfg()
 	if (ncount > MAX_GROUP)
 		ncount = MAX_GROUP;
 
-// 	if (ncount == 1)
-// 		m_btMINUS.EnableWindow(FALSE);
-// 	else if (ncount == MAX_GROUP)
-// 		m_btPLUS.EnableWindow(FALSE);
-	
 	const int	nval = GetPrivateProfileInt(SEC_TOOL, KEY_TIME, 3, m_fileCFG);
-// 	CString	sztmp;
-// 	sztmp.Format("%d", nval);
-// 	m_spinTIME->SetText(sztmp);
-	
+
 	if(((CMainWnd*)m_pMainWnd)->GetFileType() == SMALLTYPE_FILE)
 		m_fileFIELD.Format("%s/%s/%s/%s", m_root, USRDIR, m_user, FILE_SMALLFIELD);
 	else
@@ -1199,10 +1143,6 @@ void CToolWnd::loadcfg()
  
  	m_filePPOLIO.Format("%s/%s/%s/%s", m_root, USRDIR, m_user, FILE_GROUP);	
 
-// 	ncount = (int)GetPrivateProfileInt(SEC_TOOL, KEY_SELECTGROUP, 0, orgCfg);
-// 	//m_cbGROUP.SetCurSel(ncount);
-// 	m_cbGROUP.SetCurSel(ncount);
-
 	loadTabItem();
 
 	const CString cb[] = {"등록순", "업종순", "종목명순", "종목코드순"};
@@ -1227,13 +1167,10 @@ void CToolWnd::loadcfg()
 	ncount = (int)GetPrivateProfileInt(SEC_TOOL, KEY_CBARRANGE, 0, m_fileCFG);
 	m_cbArrange.SetCurSel(ncount);
 
-	
 	ncount = (int)GetPrivateProfileInt(SEC_TOOL, KEY_VIEWTYPE, 0, m_fileCFG);
 	m_cbViewType.SetCurSel(ncount);
 	
 	SetCbPageView();	
-
-	//m_btPrevView.EnableWindow(FALSE);
 }
 
 void CToolWnd::SetCbPageView()

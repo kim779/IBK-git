@@ -149,11 +149,11 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 	Variant(titleCC, "관심종목");
-/*	init();
+	init();
 	loadinfo();
 	CreateChild();
 	SetPallette();
-	m_pWnd->SendMessage(WM_USER, MAKEWPARAM(procDLL, 0), (LPARAM)(LPCTSTR)"Message");*/
+	m_pWnd->SendMessage(WM_USER, MAKEWPARAM(procDLL, 0), (LPARAM)(LPCTSTR)"Message");
 
 	return 0;
 }
@@ -298,18 +298,9 @@ void CMainWnd::loadinfo()
 
 	// 트리 윈도우
 	m_nTree = GetPrivateProfileInt(SEC_MAIN, KEY_TREESIZE, SIZE_TREE, filepath);
-	//m_bTree = (BOOL)GetPrivateProfileInt(SEC_MAIN, KEY_TREEUSE, 0, filepath);
-	m_bTree = 0;
 
-	// 서치 옵션
-	m_nOption = GetPrivateProfileInt(SEC_MAIN, KEY_SOPTION, OPT_DEFAULT, filepath);
+
 	
-	if (m_bTree)
-	{
-		m_size.cx += m_nTree;
-		m_size.cx += SIZE_DIVIDE;
-	}
-
 	if (m_bRTS)
 		m_size.cx += SIZE_RTS;
 
@@ -383,15 +374,6 @@ void CMainWnd::saveinfo()
 	WritePrivateProfileString(SEC_MAIN, KEY_VERSION, "1", smallpath);
 	WritePrivateProfileString(SEC_MAIN, KEY_VERSION, "1", largepath);
 
-	// 트리윈도우
-// 	sztmp.Format("%d", m_nTree);
-// 	WritePrivateProfileString(SEC_MAIN, KEY_TREESIZE, sztmp, filepath);
-// 	WritePrivateProfileString(SEC_MAIN, KEY_TREEUSE, (m_bTree) ? "1" : "0", filepath);
-
-	sztmp.Format("%d", m_nOption);
-	WritePrivateProfileString(SEC_MAIN, KEY_SOPTION, sztmp, smallpath);
-	WritePrivateProfileString(SEC_MAIN, KEY_SOPTION, sztmp, largepath);
-	
 	// 장바구니 윈도우
 // 	sztmp.Format("%d", m_nBasket);
 // 	WritePrivateProfileString(SEC_MAIN, KEY_BASKETSIZE, sztmp, filepath);
@@ -470,22 +452,8 @@ void CMainWnd::CreateChild()
 	hBITMAP_HV = getBitmap(fileIMG + "TROPT_en.bmp");
 	m_pFont = GetAxFont();
 
-	m_btOption.Create("검색옵션\n제외종목선택", CRect(0, 0, 0, SIZE_BUTTONS), this, IDC_BT_CONFIG, TRUE, TRUE);
-	m_btOption.SetFont(m_pFont, false);  
-	m_btOption.SetImgBitmap(hBITMAP, hBITMAP_DN, hBITMAP_HV);
-	m_btOption.SetCheck(false);
 	m_nOptHeight = 0;
 	
-	if (m_pOptDlg == nullptr)
-	{
-		m_pOptDlg = std::make_unique<COptDlg>(this);
-		m_pOptDlg->Create(COptDlg::IDD, this);
-		CRect	rect;
-		SearchOption(MO_SET, m_nOption);
-		m_pOptDlg->GetWindowRect(rect);
-		m_nOptHeight = rect.Height();
-	}
-
 	if (m_pTreeWnd == nullptr)
 	{
 		m_pTreeWnd = std::make_unique<CTreeWnd>(this);
@@ -516,16 +484,7 @@ void CMainWnd::CreateChild()
 
 void CMainWnd::DestroyChild()
 {
-	//if (LIB_IsWndAlive(m_pToolWnd))
-	//	LIB_DeleteWnd(m_pToolWnd);
-	//if (LIB_IsWndAlive(m_pTreeWnd))
-	//	LIB_DeleteWnd(m_pTreeWnd);
-// 	if (LIB_IsWndAlive(m_pGroupWnd))
-// 		LIB_DeleteWnd(m_pGroupWnd);
-// 	if (LIB_IsWndAlive(m_pBasketWnd))
-// 		LIB_DeleteWnd(m_pBasketWnd);
-
-	m_btOption.DestroyWindow();
+	
 }
 
 LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
@@ -537,20 +496,12 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 	switch (LOWORD(wParam))
 	{
 	case MK_ISTREE:
-		ret = m_bTree;
+		ret = FALSE;
 		break;
 
 	case MK_GROUPHEIGHT:
 		{
 			int	nHeight		= m_size.cy;
-			if(m_bUseToolWnd)
-			{
-				if (!m_pToolWnd->SendMessage(WM_MANAGE, MK_TOOLSIZE))
-					nHeight -= (SIZE_TOOL / 2 + 1);
-				else
-					nHeight -= SIZE_TOOL;
-			}
-
 			ret = nHeight;
 		}
 		break;
@@ -599,17 +550,11 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 	case MK_TREEVISIBLE:
 		ret = OperTreeVisible(HIWORD(wParam));
 		break;
-// 	case MK_BASKETVISIBLE:
-// 		ret = OperBasketVisible(HIWORD(wParam));
-// 		break;
 	case MK_SIZE:
 		OperSize(HIWORD(wParam), CSize(LOWORD(lParam), HIWORD(lParam)));
 		break;
 	case MK_OPENSCR:
 		OpenScreen(HIWORD(wParam), (char*)lParam);
-		break;
-	case MK_SEARCHOPT:
-		ret = SearchOption(HIWORD(wParam), (DWORD)lParam);
 		break;
 	case MK_FILETYPE:
 		ret = m_nFileType;
@@ -827,7 +772,6 @@ void CMainWnd::testSaveFile(CString dt)
 
 LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 {
-	return 0; //test renew
 	CString s = "";
 	LONG	ret = 0;
 	switch(LOBYTE(LOWORD(wParam)))
@@ -922,7 +866,6 @@ void CMainWnd::parsingTrigger(CString datB)
 			const int	ret = (int)m_pToolWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
 			m_pTreeWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
 
-			// 순서를 지켜야한다. m_pToolWnd와 m_pTreeWnd가 서로 setting된후에 그값을 기준으로 m_pGroupWnd가 변한다.
 			m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SETUPOK, ret));	
 			m_pToolWnd->SendMessage(WM_MANAGE, MK_SENDTREE);
 		}
@@ -1057,10 +1000,10 @@ CBrush* CMainWnd::GetAxBrush(COLORREF clr)
 
 void CMainWnd::ResizeOper(int cx, int cy)
 {
-	if (m_pGroupWnd == nullptr || m_pToolWnd == nullptr || m_pTreeWnd == nullptr || m_pOptDlg == nullptr)
+	if (m_pGroupWnd == nullptr || m_pToolWnd == nullptr || m_pTreeWnd == nullptr)
 		return;
 
-	int	minx = ((m_bTree) ? m_nTree : 0);
+	int	minx = 0;
 	const int	miny = SIZE_TOOL + SIZE_GROUPMINY + ((m_bBasket) ? SIZE_BASKETMINY : 0);
 	const int	ncnt = (int)m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETGROUP, MO_ALL));
 	
@@ -1080,7 +1023,7 @@ void CMainWnd::ResizeOper(int cx, int cy)
 
 	const CRect rcRTS(0, (bBig) ? SIZE_TOOL + SIZE_DIVIDE*3 : SIZE_TOOL/2 + SIZE_DIVIDE*4, 0, m_size.cy-2*SIZE_DIVIDE);
 
-	CRect	rcTool((m_bTree) ? SIZE_DIVIDE+GAP1:0, 0, m_size.cx-GAP1, SIZE_TOOL/2), rcTemp(0, 0, 0, 0);
+	CRect	rcTool(0, 0, m_size.cx-GAP1, SIZE_TOOL/2), rcTemp(0, 0, 0, 0);
 
 	m_rcDivide[0] = CRect(0, 0, 0, 0);
 	m_rcDivide[1] = CRect(0, 0, 0, 0);
@@ -1088,65 +1031,6 @@ void CMainWnd::ResizeOper(int cx, int cy)
 	m_rcPanel[0] = CRect(0, 0, 0, 0);
 	m_rcPanel[1] = CRect(0, 0, 0, 0);
 	m_rcPanel[2] = CRect(0, 0, 0, 0);
-
-	if (m_bTree)
-	{
-		m_rcDivide[0].left = rcTree.right = m_nTree;
-		m_rcDivide[0].right = m_rcDivide[0].left + SIZE_DIVIDE;
-		m_rcDivide[0].top = 0;
-		m_rcDivide[0].bottom = m_size.cy;
-		
-		//for rounding
-		m_rcPanel[0].left = GAP1;
-		m_rcPanel[0].right = rcTree.right + SIZE_DIVIDE;
-		m_rcPanel[0].top = GAP2;
-		m_rcPanel[0].bottom = m_size.cy - 1;
-		//for rounding 
-
-		//rcBasket.left = rcTool.left = m_rcDivide[0].right + GAP1;	
-		rcBasket.left = m_rcDivide[0].right + GAP1;		
-		rcTool.left = m_rcDivide[0].right + SIZE_DIVIDE + GAP1;	
-				
-		rcTemp = rect;
-		rcTemp.left = rcTemp.left + SIZE_DIVIDE;//BUFFET
-		rcTemp.right = rcTree.right - SIZE_DIVIDE; 
-		rcTemp.bottom = m_size.cy - SIZE_DIVIDE;
-					
-		if (m_btOption.IsChecked())
-		{
-			rcTemp.right = rcTree.right;
-			rcTemp.top = rcTemp.bottom - m_nOptHeight;
-			m_pOptDlg->MoveWindow(rcTemp, TRUE);
-			m_pOptDlg->ShowWindow(SW_SHOW);
-			rcTemp.bottom = rcTemp.top;
-			rcTemp.top = rcTemp.bottom - SIZE_BUTTONS;
-			
-		}
-		else
-		{
-			m_pOptDlg->ShowWindow(SW_HIDE);
-			rcTemp.right = rcTree.right;
-			rcTemp.top = rcTemp.bottom - SIZE_BUTTONS;
-		}
-
-		m_btOption.MoveWindow(rcTemp, TRUE);
-		rcTree.bottom = rcTemp.top;
-		m_btOption.ShowWindow(SW_SHOW);
-		m_pTreeWnd->MoveWindow(rcTree, TRUE);
-		m_pTreeWnd->ShowWindow(SW_SHOW);
-	}
-	else
-	{
-		m_pTreeWnd->ShowWindow(SW_HIDE);		
-		m_btOption.ShowWindow(SW_HIDE);
-		m_pOptDlg->ShowWindow(SW_HIDE);
-	}
-
-	if(m_bUseToolWnd)
-	{
-		m_pToolWnd->MoveWindow(rcTool);
-		m_pToolWnd->ShowWindow(m_bUseToolWnd);
-	}
 
 	//GRID BACKGROUND OUTBOX
 	m_rcPanel[2].right = rcTool.right+GAP1;
@@ -1158,9 +1042,6 @@ void CMainWnd::ResizeOper(int cx, int cy)
 	m_rcPanel[1].top = rcTool.bottom;
 	m_rcPanel[1].right = rcTool.right;
 	m_rcPanel[1].bottom = m_size.cy;
-
-	if(m_bUseToolWnd)
- 		rcTool.top = rcTool.bottom;// + SIZE_DIVIDE*2;//BUFFET ADD SIZE_DIVIDE
 
 	rcTool.bottom = m_size.cy - SIZE_DIVIDE;//buffet
 
@@ -1188,11 +1069,9 @@ LONG CMainWnd::OperTreeVisible(int opt)
 		{
 		case IDC_BT_PREV:
 			m_size.cx += (m_nTree + SIZE_DIVIDE);
-			m_bTree = TRUE;
 			break;
 		case IDC_BT_NEXT:
 			m_size.cx -= (m_nTree + SIZE_DIVIDE);			
-			m_bTree = FALSE;
 			break;
 		}
 
@@ -1201,7 +1080,7 @@ LONG CMainWnd::OperTreeVisible(int opt)
 	}
 	else			// get visible state
 	{
-		ret = m_bTree;
+		ret = FALSE;
 	}
 
 	return ret;
@@ -1289,27 +1168,6 @@ BOOL CMainWnd::OnCommand(WPARAM wParam, LPARAM lParam)
 		ResizeOper(m_size.cx, m_size.cy);
 	}
 	return CWnd::OnCommand(wParam, lParam);
-}
-
-DWORD CMainWnd::SearchOption(WORD kind, DWORD option)
-{
-	DWORD	ret = 0;
-	switch (kind)
-	{
-	case MO_SET:
-		m_pOptDlg->SetOption((int)option);
-		break;
-	case MO_GET:
-		ret = m_pOptDlg->GetOption();
-		break;
-	case MO_ADD:
-		m_pOptDlg->AddOption((int)option);
-		break;
-	case MO_DEL:
-		m_pOptDlg->DelOption((int)option);
-		break;
-	}
-	return ret;
 }
 
 void CMainWnd::OnLButtonDown(UINT nFlags, CPoint point) 
@@ -1482,13 +1340,6 @@ void CMainWnd::Enable(int kind, bool bEnable /* = true */)
 	{
 		if (m_pTreeWnd)
 			m_pTreeWnd->EnableWindow(bEnable);
-			
-		if (m_pOptDlg)
-			m_pOptDlg->EnableWindow(bEnable);
-		
-		if (m_btOption.m_hWnd)
-			m_btOption.EnableWindow(bEnable);
-		
 	}
 }
 
@@ -1602,7 +1453,7 @@ void CMainWnd::doRTMx(LPARAM lParam)
 
 CString CMainWnd::GetDataTitle(int nKind)
 {
-	CString strTitle = (char*)m_pTreeWnd->SendMessage(WM_MANAGE, MK_GETDATATITLE, nKind);
+	CString strTitle{};
 	return strTitle;
 }
 
@@ -1707,8 +1558,6 @@ BSTR CMainWnd::GetProperties()
 
 void CMainWnd::Reload() 
 {
-	//m_pToolWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
-	//m_pTreeWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
 	m_pGroupWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
 	m_pToolWnd->ReloadList();
 
@@ -1716,7 +1565,7 @@ void CMainWnd::Reload()
 
 void CMainWnd::SetUseToolBox(BOOL bUseTool) 
 {
-	m_bUseToolWnd = bUseTool;
+	
 }
 
 //TRUE:ALL FALSE:100
@@ -1816,12 +1665,10 @@ void CMainWnd::OnPortfolio(LPCTSTR result)
 	if( str == "start")
 		return;
 
-	//m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SETUPOK, 0));
 
 	const int	ret = (int)m_pToolWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
 	m_pTreeWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
 	
-	// 순서를 지켜야한다. m_pToolWnd와 m_pTreeWnd가 서로 setting된후에 그값을 기준으로 m_pGroupWnd가 변한다.
 	m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SETUPOK, ret));
 }
 
@@ -1903,7 +1750,6 @@ void CMainWnd::SetExpect(BOOL bExpect)
 
 void CMainWnd::SetAccount(LPCTSTR strAccount) 
 {
-	return; //test renew
 	m_strAccount = strAccount;
 
 	m_pTreeWnd->m_strAccount = strAccount;

@@ -222,8 +222,6 @@ public:	//2012.02.13 KSJ 이벤트로 보내면 데이터가 깨져서 직접 메소드 호출함.
 
 	int			m_line{};
 	BOOL			m_bMAP{};
-	CString			m_szTITLE;
-	CRect			m_rcTitle;
 	int			m_rowH{};
 
 	// ADD PSH 20070917

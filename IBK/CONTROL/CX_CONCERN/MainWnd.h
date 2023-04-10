@@ -168,14 +168,12 @@ private:
 	CString			m_user;
 	CString			m_id;
 	CString			m_home;
-	BOOL			m_bTree{};
 	BOOL			m_bRTS{};
 	BOOL			m_bBasket{};
 	CCriticalSection	m_sync;
 	CRect			m_rcDivide[3];
 	CRect			m_rcPanel[3];//for rounding
 
-	CfxImgButton		m_btOption;
 	std::unique_ptr<class COptDlg>		m_pOptDlg;
 	CFont*			m_pFont{};
 	bool			m_bDestroy{};
@@ -191,8 +189,6 @@ private:
 	BOOL		m_bPopupDlg{};
 	BOOL		m_bDispCode{};
 
-	//ToolWnd를 사용할지 말지 설정
-	BOOL		m_bUseToolWnd{};
 	//ViewType 설정
 	BOOL		m_bAllType{};
 
@@ -225,8 +221,7 @@ private:
 	LONG	OperDLLOUB(WPARAM wParam, LPARAM lParam);
 	void	parsingTrigger(CString datB);
 	HBITMAP getBitmap(CString path);
-	DWORD	SearchOption(WORD kind, DWORD option);
-	
+
 	void	parsingDomino(CString datB);
 // resource operation
 	void	DrawDivide(CDC* pDC);
