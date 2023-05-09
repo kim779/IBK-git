@@ -154,6 +154,7 @@ LONG CToolWnd::OnManage(WPARAM wParam, LPARAM lParam)
 			const BOOL bRemain = (BOOL)atoi(strRemain);
 
 			((CMainWnd*)m_pMainWnd)->m_iViewType = nView;
+
 			SetViewType();
 
 			if(((CMainWnd*)m_pMainWnd)->GetFileType() == SMALLTYPE_FILE)
@@ -194,6 +195,7 @@ void CToolWnd::savecfg()
 	WritePrivateProfileString(SEC_TOOL, KEY_AUTO, sztmp, m_fileCFG);
 
 	int	nmode = MO_SELECT;
+
 	if(GetMainViewType() == 1)
 		nmode = MO_SELECT;
 	else
@@ -201,7 +203,6 @@ void CToolWnd::savecfg()
 
 	sztmp.Format("%d", nmode);
 	WritePrivateProfileString(SEC_TOOL, KEY_FILLMODE, sztmp, m_fileCFG);
-
 
 	int nIndex = 0;
 	sztmp.Format("%d", (int)nIndex);
@@ -224,7 +225,7 @@ void CToolWnd::loadcfg()
 	const int	nmode = (int)GetPrivateProfileInt(SEC_TOOL, KEY_FILLMODE, MO_SELECT, m_fileCFG);
 	
 	((CMainWnd*)m_pMainWnd)->m_iViewType = nmode;
-	
+
 	int	ncount = (int)GetPrivateProfileInt(SEC_GROUP, KEY_COUNT, 1, m_fileCFG);
 	
 	if (ncount <= 0)
@@ -313,7 +314,7 @@ void CToolWnd::loadcfg()
 	ncount = (int)GetPrivateProfileInt(SEC_TOOL, KEY_VIEWTYPE, 0, m_fileCFG);
 
 	((CMainWnd*)m_pMainWnd)->m_iViewType = ncount;
-	
+
 }
 
 void CToolWnd::SendTree(int nIndex)
@@ -326,3 +327,4 @@ int CToolWnd::GetMainViewType()
 {
 	return ((CMainWnd*)m_pMainWnd)->m_iViewType;
 }
+

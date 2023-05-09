@@ -53,8 +53,8 @@ public:
 	void	loadcfg();
 	void	savecfg();
 	void	SendTree(int nIndex);
-	void SetViewType();
 
+	void SetViewType();
 
 	//½Å±Ô
 	BOOL m_bExpectCheck = FALSE;
