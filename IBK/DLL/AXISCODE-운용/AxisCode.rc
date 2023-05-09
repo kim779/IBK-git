@@ -583,6 +583,11 @@ BEGIN
     0
 END
 
+IDD_DIALOG_FUTURES AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 #endif    // 한국어(대한민국) resources
 /////////////////////////////////////////////////////////////////////////////
 

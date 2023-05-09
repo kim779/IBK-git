@@ -111,6 +111,49 @@ void CMatrixWnd::OnPaint()
 	CPaintDC dc(this); // device context for painting
 	
 	// TODO: Add your message handler code here
+#ifdef _DEBUG
+	CRect rc, rcRtg;
+	GetClientRect(&rc);
+	CPen myPen, * pOldPen = nullptr;
+
+	myPen.CreatePen(PS_SOLID, 1, GetColor(255));
+	pOldPen = dc.SelectObject(&myPen);
+
+	dc.FillSolidRect(&rc, GetColor(64));
+
+	rcRtg.top = rc.top;
+	rcRtg.bottom = rcRtg.top + 20;
+	rcRtg.left = rc.left;
+	rcRtg.right = rcRtg.left + 20;
+
+	for (int ii = 0; ii < MATRIX_MAXCOL; ii++)
+	{
+		for (int jj = 0; jj < MATRIX_MAXROW; jj++)
+		{
+			dc.FillSolidRect(&rcRtg, GetColor(255));
+			dc.Rectangle(rcRtg);
+
+			if (!m_aryMatrix[ii][jj])
+			{
+				dc.FillSolidRect(rcRtg.left + 1, rcRtg.top + 1, rcRtg.Width() - 2, rcRtg.Height() - 2, GetColor(181));
+			}
+			else
+			{
+				dc.FillSolidRect(rcRtg.left + 1, rcRtg.top + 1, rcRtg.Width() - 2, rcRtg.Height() - 2, GetColor(64));
+			}
+
+			rcRtg.left = rcRtg.right;
+			rcRtg.right = rcRtg.left + 20;
+		}
+
+		rcRtg.left = 0;
+		rcRtg.right = rcRtg.left + 20;
+		rcRtg.top = rcRtg.bottom;
+		rcRtg.bottom = rcRtg.top + 20;
+	}
+	// Do not call CWnd::OnPaint() for painting messages
+	myPen.DeleteObject();
+#else
 	xxx::CMemDC memdc(&dc);
 	CRect rc, rcRtg;
 	GetClientRect(&rc);
@@ -153,6 +196,7 @@ void CMatrixWnd::OnPaint()
 	}
 	// Do not call CWnd::OnPaint() for painting messages
 	myPen.DeleteObject();
+#endif
 }
 
 void CMatrixWnd::OnMouseMove(UINT nFlags, CPoint point) 

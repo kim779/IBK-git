@@ -14,6 +14,7 @@
 #define DEV_AGREEMENT_URL "https://tweb.signkorea.com:8700/notice/html/conditionsOfUse.txt"
 #define REAL_AGREEMENT_URL "https://center.signkorea.com:8700/notice/html/conditionsOfUse.txt"
 
+
 IMPLEMENT_DYNAMIC(CDlg_Cloude, CDialog)
 
 CDlg_Cloude::CDlg_Cloude(CWnd* pParent /*=nullptr*/)

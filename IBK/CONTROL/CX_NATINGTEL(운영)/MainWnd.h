@@ -17,7 +17,7 @@ public:
 	HINSTANCE m_instance;
 	CString	m_PhonePadPath;
 	CWnd*	m_pWizard;
-
+	void KillPhonePadProcess(CString processname);
 // Operations
 protected:
 	int	GetState();

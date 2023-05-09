@@ -4,8 +4,9 @@
     <RESOURCE_FILE>axisform.rc</RESOURCE_FILE>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommand>H:\Axis\ibk2_2019\exe\axisbuilder.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>D:\IBKS_TEST\exe\axis.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>/k IBK_TEST /a 211.255.204.134</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerCommand>D:\IBKS_TEST\exe\axis.exe</LocalDebuggerCommand>

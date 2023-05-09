@@ -373,6 +373,15 @@ void CMainWnd::OnClose()
 
 void CMainWnd::ExitPhonePad() 
 {
+	KillPhonePadProcess("PhonePad.exe");
+	if (m_instance)
+	{
+		FreeLibrary(m_instance);
+		m_instance = nullptr;
+	}
+
+	return;
+
 	short	nRtn = 0;
 
 	if (GetState() == 5)
@@ -439,4 +448,43 @@ void CMainWnd::StopRequest()
 short CMainWnd::GetStatus() 
 {
 	return GetState();
+}
+#include <TlHelp32.h>
+void CMainWnd::KillPhonePadProcess(CString processname)
+{
+	HANDLE hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+	PROCESSENTRY32 pe32 = { 0, };
+
+	pe32.dwSize = sizeof(PROCESSENTRY32);
+
+	if (!Process32First(hProcessSnap, &pe32))
+	{
+		OutputDebugString(_T("Error checking process"));
+		CloseHandle(hProcessSnap);
+		return ;
+	}
+
+	do {
+		CString progS(pe32.szExeFile);
+
+		if (progS.Find(processname) > -1)
+		{
+			//if (pe32.th32ProcessID == processId)
+			{
+				HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, pe32.th32ProcessID);
+
+				if (hProcess)
+				{
+					TerminateProcess(hProcess, -1);
+					CloseHandle(hProcess);
+
+					return ;
+				}
+			}
+		}
+	} while (Process32Next(hProcessSnap, &pe32));
+
+
+	CloseHandle(hProcessSnap);
 }

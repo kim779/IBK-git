@@ -111,55 +111,6 @@ public:
 	};
 
 };
-//
-//class	_gpSave	
-//{
-//public:
-//	CString sGrSortNum;		// 그룹일련번호
-//	CString sGrName;		// 그룹명
-//	CString sAccntCnt;		// 계좌갯수
-//	CString	sGroupID;		// 그룹아이디
-//	CIHArray <_acSave *, _acSave *>	arAcEdit;
-//public:
-//	_gpSave()
-//	{
-//		sGrSortNum = _T("");
-//		sGrName = _T("");
-//		sAccntCnt = _T("");
-//		sGroupID = _T("");
-//		arAcEdit.RemoveAll();
-//	};
-//
-//	~_gpSave()
-//	{
-//	};
-//
-//	_gpSave(_gpSave const &other)
-//	{
-//		Copy(other);
-//	};
-//
-//	inline void Copy(_gpSave const &other)
-//	{
-//		sGrSortNum = other.sGrSortNum;
-//		sGrName = other.sGrName;
-//		sAccntCnt = other.sAccntCnt;
-//		sGroupID = other.sGroupID;
-//
-//		_acSave* acSave = nullptr;
-//		_acSave* newSave = nullptr;
-//		for (int ii = 0; ii < other.arAcEdit.GetSize(); ii++)
-//		{
-//			acSave = other.arAcEdit.GetAt(ii);
-//			if (acSave)
-//			{
-//				newSave = new _acSave();
-//				newSave->Copy(*acSave);
-//				arAcEdit.Add(newSave);
-//			}
-//		}
-//	};
-//};
 
 class CAccn
 {
@@ -198,7 +149,6 @@ class CTreeWnd : public CTreeCtrl
 public:
 	CTreeWnd(CWnd* pMainWnd);
 	
-	int m_pageView{};
 // Attributes
 public:
 	CString		m_strAccount;
@@ -209,7 +159,6 @@ public:
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CTreeWnd)
 	protected:
-	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	//}}AFX_VIRTUAL
 
 // Implementation
@@ -220,160 +169,52 @@ public:
 protected:
 	//{{AFX_MSG(CTreeWnd)
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	afx_msg void OnClick(NMHDR* pNMHDR, LRESULT* pResult);
+
 	//}}AFX_MSG
 	afx_msg LONG OnManage(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 public:
-	// szAt = _T("_") input at last szAt = _T("-") at first else ...
-	BOOL IsFolder(HTREEITEM hItem);
-	BOOL IsItem(HTREEITEM hItem);	
-	void settingReminAcc();
-	
-	void clickRemain(UINT selItem);
-	void clickRecommand();
-
-	void settingDataStock(char* buf, class CGridData& sdata);	// 주식잔고 데이터 빼내기
-	void settingDataFuture(char* buf, class CGridData& sdata);	// 선물잔고 데이터 빼내기
 	void settingDataStock2(char* buf, class CGridData& sdata);	// 주식잔고 데이터 빼내기
 	void settingDataFuture2(char* buf, class CGridData& sdata);	// 선물잔고 데이터 빼내기
 
-	void sendUpjong();
-	int GetIndexinGroup(int pageView);
-	void RefreshInterest();
-
 private:
-	int GetChildCount(HTREEITEM	hItem);
-	CString CutCount(CString text);
-	HTREEITEM FindChild(HTREEITEM hItem, CString text);
+	BOOL    IsNumber(CString str);
+	BOOL	sendTR(CString sTR, CString sData, int nKey, int nStat, CString Acnt);
+	BOOL	SendOper(UINT kind, int opt = 0);
 
-	void	loadingInterest(HTREEITEM hParent);
-	void	selectinterest(HTREEITEM hParent, DWORD val);
-	void	loadingHJcode();
-	void	loadingFJcode();
-	void	loadingOJcode();
-	void	loadingPJcode();
-	void	loadingUPcode();
-	void	loadingELWBase();
-
-	void	queryRemain(CString strAccount);
-	void	queryFutureRemain(CString strAccount);
+	CString GetString(char* pChar, int nMinLen);
+	CString Variant(int comm, CString param = _T(""));
+	CString	MakePacket(CString& code, CString amount = _T(""), CString price = _T(""), CString name = _T(""), CString bookmark = _T(""), CString futureGubn = _T(""), CString creditPrc = _T(""), CString maeipPrc = _T(""));
 
 	void	queryRemain2(CString strAccount, CString sPswd);
 	void	queryFutureRemain2(CString strAccount, CString sPswd);
-	BOOL    IsNumber(CString str);
-
-	BOOL	sendTR(CString sTR, CString sData, int nKey, int nStat, CString Acnt);
-
-	void	queryGroup();
-	void	oubGroup(class CRecvData* data);
-	void	oubAccUser(char* buf);
-	void	oubAccList(char* buf, int len);
-	void	oubAccListEx(char* buf, int len);
 	void	oubRemain(char* buf, int len);
-	void	oubRemainEx(char* buf, int len);
 	void	init();
-	void	initTree();
-	BOOL	IsStockAcc(CString sAcc);
-	
-	void	saveGroupwhenClose(int index);
-
-	BOOL	SendOper(UINT kind, int opt = 0);
-	void	SetItemDataUJ(HTREEITEM hItem, UINT gubn);
-	void	SetItemDataX(HTREEITEM hItem, UINT gubn);
-	bool	ExistFile(int gno);
-	BOOL	CheckStock(UINT kind, _shjcode* hjcode); 
-	BOOL	CheckSearch(_shjcode* hjcode, int opt);
-	void	GetStock(class CGridData& sdata, int max, int opt);
-	void	GetFuture(class CGridData& sdata, int max);
-	void	GetOption(class CGridData& Sdata, int max);
-	void	GetJisu(class CGridData& sdata, int max);
-	void	GetPjcode(class CGridData& sdata, int max);
-	void	GetInterest(class CGridData& sdata, int max);
-	void	GetThema(class CGridData& sdata, int max);
-	void	GetELWBase(class CGridData& sdata, int max);
-	void	GetGroup(class CGridData& sdata, int max);
-	void	GetRemain(class CGridData& sdata, int max);	
-	void	GetRecommand(class CGridData& sdata, int max);	
-
-	CString GetCodeName(CString code);
-
-
-	// MODIFY PSH 20070914
-	//CString	MakePacket(CString& code, CString amount = _T(""), CString price = _T(""));
-	double  Round(double data );		//반올림
-	CString	MakePacket(CString& code, CString amount = _T(""), CString price = _T(""), CString name = _T(""), CString bookmark = _T(""), CString futureGubn=_T(""), CString creditPrc= _T(""), CString maeipPrc= _T(""));
-	// END MODIFY
-	CString	makeAccn(CString accnnum, CString accnname);
-	void	GetAccnTotal(CMapStringToString& mapACCN, CStringArray& arACCN, HTREEITEM hItem);
-	void	GetAccnInGroup(CMapStringToString& mapACCN, CStringArray& arACCN, HTREEITEM hItem);
-	CString	GetAccName(CString accn);
-	CString	GetAccNum(CString accn);
-	CString	GetAccGubn(CString accn);
 	void	SendTreeData(const class CGridData& sdata);
 	void	SendRemainData(class CGridData& sdata);
-	BOOL	SetItemData(HTREEITEM hItem, DWORD dwData);	
-	BOOL	DeleteItem(HTREEITEM hItem);
-	BOOL	DeleteAllItems();
-	CString	GetDataTitle(DWORD dwData);
 	void	GetData(class CGridData& gdata, int max, int opt = 0);
 	void	InitData(int kind, int nIndex);	
-	CString GetString(char *pChar, int nMinLen);
-	CString Variant(int comm, CString param = _T(""));
 	void	RecvOper(int kind, CRecvData* data);
-	void	queryNews();
-	void	queryAcc();							// 계좌조회
-	void	queryStaffAcc(CString ledgerS);					// 직원계좌조회
-	CString	getLedger(CString sTran, char cGubn, CString sSvcn, CString sLastKey = "");
 	void	parsingNews(CRecvData* data);
-
-	void	selectKospi();	
 	void    SendInterest(int item);			//툴바에서 그룹 클릭시 작동
-	void    saveGroupIndex(int index);				//선택 관심그룹 저장
 
-
-	//ELW 발생회사별, 기초자산별 트리 추가로 인해 생성되는 모듈
-	void	getELWBaseAsset(UINT selItem, HTREEITEM parent);	//ELW데이터 얻기 위해 Send날리는 함수//기초자산별
-	void	getELWIssueSec(UINT selItem, HTREEITEM parent);		//ELW데이터 얻기 위해 Send날리는 함수//발행회사별
-	void    setELWIssueSec(CRecvData* data);					//받은 데이터,종목만 짤라서 GridWnd에 보내기
-	void    setELWBaseAsset(CRecvData* data);					//받은 데이터,종목만 짤라서 GridWnd에 보내기
-
-	void MakeTotalRemain(int nIndexs);
 	void SendTotalRemain(CString strAccount);
 private:
 
-	CArray <_shjcode, _shjcode>	m_hjcode;		// 현물종목
-	CArray <_sfjcode, _sfjcode>	m_fjcode;		// 선물종목
-	CArray <ojcode, ojcode>		m_ojcode;		// 옵션종목
-	CArray <pjcode, pjcode>		m_pjcode;		// 현물옵션
-	CArray <upcode, upcode>		m_upcode;		// 업종코드	
-	CArray <_sfjcode, _sfjcode>	m_elwbase;		// elw기초자산
-
-	CIHStringMapArray		m_mapPJCODE;
 	CMap<DWORD, DWORD, HTREEITEM, HTREEITEM>	m_mapParam;
 	CWnd*		m_pMainWnd{};
 	CString		m_root;
 	CString		m_user;
 	CString		m_id;
 	CString		m_pass;
-	char		m_gubn{};
-	CString		m_sDeptCode;
 	CString		m_szRET;
 	
 	bool		m_bCustomer{};
-	bool		m_bOper{};
 	UINT		m_kind{};
-	UINT		m_selectTree{};
-	UINT		m_selectTreetype{};
-	int		m_nAccountIndex{};
 	CGridData	m_pSData;
-
-	CStringArray	m_arJango;
 
 	ACCOUNT		m_accn;			// 내 계좌목록 hold
 	CStringArray		m_accnT;
-
-	CImageList m_ilTree;
 
 public:
 	void receiveOub(CString& data, int key);

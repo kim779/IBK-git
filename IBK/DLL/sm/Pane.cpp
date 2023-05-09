@@ -566,7 +566,7 @@ void CPane::OnTimer(UINT nIDEvent)
 		
 		if (m_index >= m_arItem.GetSize())
 			m_index = 0;
-		if (m_index >= 0 && m_index < m_arSym.GetSize())
+	if (m_index >= 0 && m_index < m_arSym.GetSize())
 		{
 			CString	sym, dat, keys;
 
@@ -575,7 +575,7 @@ void CPane::OnTimer(UINT nIDEvent)
 			m_arSymData.Lookup(sym, dat);
 
 slog.Format("[ticker] m_id=[%d] m_index=[%d] keys=[%s] sym=[%s] dat=[%s]\r\n", m_id, m_index, keys, sym, dat);
-OutputDebugString(slog);
+//OutputDebugString(slog);
 
 			//SetData(dat);  //test 
 			SetData(dat, true);
@@ -2102,17 +2102,45 @@ void CPane::UpdatePaneData(int kind, CString dat)
 	SetData(dat);
 	Invalidate();
 }
-//#define DF_USE_MINI 1
+/*
+* #define	TKIND_INDEX		0
+#define TKIND_NEWS		1
+#define TKIND_UPDOWN		2
+#define TKIND_INTER		3
+*/
+CString getKind(int ikind)
+{
+	CString sret;
+	switch (ikind)
+	{
+	case TKIND_INDEX:
+		sret = "지수"; break;
+	case TKIND_NEWS:
+		sret = "뉴스"; break;
+	case TKIND_UPDOWN:
+		sret = "등락"; break;
+	case TKIND_INTER:
+		sret = "관심"; break;
+	default :
+		sret = ""; break;
+	}
+	return sret;
+}
+#define DF_USE_MINI 1
 void CPane::ProcessRTS(CString symbol, DWORD* data)
 {
-	/*CString stmp;
-	stmp.Format("-- [%s] [%s] \r\n\ ", symbol, data );
+	CString stmp;
+	/*stmp.Format("-- [%s] [%s] \r\n\ ", symbol, data );
 	OutputDebugString(stmp);*/
 
-	int const arrtick[4][20] = { {0,23,24,27,28,29,30,31,32,33,34,207,326,361,501,502,503,600},  //지수
-									{0,14,15,16,22,41,42,44,45,46,47,48,49,301},           //뉴스
-									{0,34,251,252,253,254,255,256},                        //등락 
-									{23,24,27 } };                                                       //관심
+	//int const arrtick[4][20] = { {0,23,24,27,28,29,30,31,32,33,34,207,326,361,501,502,503,600},  //지수
+	//								{0,14,15,16,22,41,42,44,45,46,47,48,49,301},           //뉴스
+	//								{0,34,251,252,253,254,255,256},                        //등락 
+	//								{23,24,27 } };                                                       //관심
+
+	int const arTick[] = { 0, 14, 15, 16, 22, 23, 24, 27, 28, 29, 30, 31, 32, 33, 34, 41, 42, 44, 45, 46, 47, 48, 49, 301, 207, 251,  252,  253, 254, 255, 256, 326, 
+		333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, 348, 361, 501, 502, 503, 600 };
+
 	CString		keys, value, tmps, dat;
 	CMapStringToString	newfms, oldfms;
 
@@ -2135,20 +2163,20 @@ void CPane::ProcessRTS(CString symbol, DWORD* data)
 	if (m_kind != TKIND_NEWS && oldfms.GetCount())
 	{
 #ifdef DF_USE_MINI
-		for (int jj = 0;  jj < sizeof(arrtick[m_kind]) / sizeof(int); jj++)
+		for (int jj = 0;  jj < sizeof(arTick) / sizeof(int); jj++)
 		{
 			if (jj == 0)
 			{
-				keys.Format("%03d", arrtick[m_kind][0]);
-				oldfms.SetAt(keys, (char*)data[arrtick[m_kind][jj]]);
+				keys.Format("%03d", arTick[0]);
+				oldfms.SetAt(keys, (char*)data[arTick[jj]]);
 			}
-			else if (arrtick[m_kind][jj])
+			else if (arTick[jj])
 			{
-				keys.Format("%03d", arrtick[m_kind][jj]);
+				keys.Format("%03d", arTick[jj]);
 
 			//	stmp.Format("--------------------- m_kind=[%d]  jj=[%d] symbol=[%s] rtssym=[%s] data=[%s] \n", m_kind, jj, symbol, keys, (char*)data[arrtick[m_kind][jj]]);
 			//	OutputDebugString(stmp);
-				oldfms.SetAt(keys, (char*)data[arrtick[m_kind][jj]]);
+				oldfms.SetAt(keys, (char*)data[arTick[jj]]);
 			}	
 		}
 #else		
@@ -2159,8 +2187,8 @@ void CPane::ProcessRTS(CString symbol, DWORD* data)
 			{
 				keys.Format("%03d",jj);
 
-			//	stmp.Format("--------------------- m_kind=[%d]  symbol=[%s] rtssym=[%s] data=[%s] \n", m_kind, symbol, keys, (char*)data[jj]);
-			//	OutputDebugString(stmp);
+				stmp.Format("\r\n--------------------- m_kind=[%s]  symbol=[%s] rtssym=[%s] data=[%s] \n", getKind(m_kind), symbol, keys, (char*)data[jj]);
+				OutputDebugString(stmp);
 
 				oldfms.SetAt(keys, (char*)data[jj]);
 			}
@@ -2182,21 +2210,21 @@ void CPane::ProcessRTS(CString symbol, DWORD* data)
 	else if(m_kind == TKIND_NEWS)
 	{
 #ifdef DF_USE_MINI
-		const int isize = sizeof(arrtick[m_kind]) / sizeof(int);
-		for (int jj = 0; jj < sizeof(arrtick[m_kind]) / sizeof(int); jj++)
+		const int isize = sizeof(arTick) / sizeof(int);
+		for (int jj = 0; jj < sizeof(arTick) / sizeof(int); jj++)
 		{
 			if (jj == 0)
 			{
-				keys.Format("%03d", arrtick[m_kind][0]);
-				oldfms.SetAt(keys, (char*)data[arrtick[m_kind][jj]]);
+				keys.Format("%03d", arTick[0]);
+				oldfms.SetAt(keys, (char*)data[arTick[jj]]);
 			}
-			else if (arrtick[m_kind][jj])
+			else if (arTick[jj])
 			{
-				keys.Format("%03d", arrtick[m_kind][jj]);
+				keys.Format("%03d", arTick[jj]);
 
 			//	stmp.Format("--------------------- m_kind=[%d]  jj=[%d] symbol=[%s] rtssym=[%s] data=[%s] \n", m_kind, jj, symbol, keys, (char*)data[arrtick[m_kind][jj]]);
 			//	OutputDebugString(stmp);
-				newfms.SetAt(keys, (char*)data[arrtick[m_kind][jj]]);
+				newfms.SetAt(keys, (char*)data[arTick[jj]]);
 			}
 		}
 #else
@@ -2206,8 +2234,8 @@ void CPane::ProcessRTS(CString symbol, DWORD* data)
 			{
 				keys.Format("%03d",jj);
 	
-		//		stmp.Format("---------------------m_kind=[%d]   symbol=[%s] rtssym=[%s] dat=[%s] \n",m_kind, symbol, keys, (char*)data[jj] );
-		//		OutputDebugString(stmp);
+				stmp.Format("\r\n---------------------m_kind=[%s]   symbol=[%s] rtssym=[%s] dat=[%s] \n", getKind(m_kind), symbol, keys, (char*)data[jj] );
+				OutputDebugString(stmp);
 
 				newfms.SetAt(keys, (char*)data[jj]);
 			}

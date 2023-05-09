@@ -1102,7 +1102,8 @@ void Cdepth::dispatchTEN(char* datB, int datL)
 			m_items.GetAt(askPrice1+ii)->m_data = "";
 			m_items.GetAt(askSize1+ii)->m_data = "";
 		}
-		
+
+	
 		tmps = CString(hoga->price[ii].acha, sizeof(hoga->price[ii].acha));
 		m_items.GetAt(askBefore1+ii)->m_data = format(tmps, askBefore1+ii);
 		
@@ -1125,7 +1126,7 @@ void Cdepth::dispatchTEN(char* datB, int datL)
 			m_items.GetAt(bidPrice1+ii)->m_data = "";
 			m_items.GetAt(bidSize1+ii)->m_data = "";
 		}
-		
+
 		tmps = CString(hoga->price[ii].bcha, sizeof(hoga->price[ii].bcha));
 		m_items.GetAt(bidBefore1+ii)->m_data = format(tmps, bidBefore1+ii);
 	}
@@ -4631,7 +4632,7 @@ CString Cdepth::format(CString data, int index)
 	case atCoRgbSup:	// +- 에 따라 색깔을 표시, Sign 기호 제외
 		sign = getSign(data);
 		eliminateZero(data);
-		if (!atof(data) && !m_code.IsEmpty() && (m_code.GetAt(0) != '4' || m_code.GetAt(0) != 'D'))	// 20230125 파생상품 코드 개편	'4', 'D' : 스프레드
+		if (!atof(data) && !m_code.IsEmpty() && (m_code.GetAt(0) != '4' && m_code.GetAt(0) != 'D'))	// 20230125 파생상품 코드 개편	'4', 'D' : 스프레드
 		{
 			item->m_fRGB = m_clrDataFg;
 			return _T("");

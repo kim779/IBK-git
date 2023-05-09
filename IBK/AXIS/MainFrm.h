@@ -1484,7 +1484,8 @@ public:
 	void CheckServer(CString strip);
 	CString m_strServer{};
 
-	
+	//7805ÆË¾÷
+	void PopUp7805();
 protected:
 // #ifdef USE_AHNLAB_SECUREBROWSER
 // 	IAosSB *m_pAosSB;

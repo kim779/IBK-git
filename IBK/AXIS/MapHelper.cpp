@@ -1389,6 +1389,7 @@ OutputDebugString(s);
 	//**frameGap = CSize(2, CAPTION_HEIGHT + 4);
 	nCx = LOWORD(size) + frameGap.cx - 1;
 	nCy = HIWORD(size) + frameGap.cy - 1;
+
 	child->SetSize(nCx, nCy);
 
 	BOOL	rc = FALSE;

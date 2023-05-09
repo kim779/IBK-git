@@ -31,6 +31,19 @@ CEtfDlg::CEtfDlg(CPoint pt, CWnd* pParent /*=nullptr*/)
 	m_point = pt;
 	m_eListsort = FALSE;
 	m_search = FALSE;	
+
+	//test reit
+	CAxisCodeApp* pApp = (CAxisCodeApp*)AfxGetApp();
+	auto future = std::async([&]() {
+		for (auto mt : pApp->_mapCODEx)
+			_mapCODE.emplace(mt);
+		});
+
+	const std::chrono::milliseconds wtime(100);
+	while (future.wait_for(wtime) != std::future_status::ready)
+		AxStd::_Msg("Thread runing");
+
+
 }
 
 
@@ -89,10 +102,10 @@ void CEtfDlg::InitialTree()
 {		
 	CString data, line;	
 	HTREEITEM hItem1{}, hItem2{}, hItem3{};
-	
-	hItem2 = m_Tree.InsertItem("ETF/ETN 전종목",0,1);
-	m_Tree.SetItemData(hItem2, MAKELONG(0, tree_etfetn));
 
+	hItem2 = m_Tree.InsertItem("ETF/ETN/리츠 전종목", 0, 1); //test reits
+	m_Tree.SetItemData(hItem2, MAKELONG(0, tree_etfetn));
+	//-----------------------------------------------------------------------------------
 	hItem1 = m_Tree.InsertItem("ETF",0,1);
 	m_Tree.SetItemData(hItem2, MAKELONG(0, 10000));
 
@@ -120,17 +133,46 @@ void CEtfDlg::InitialTree()
 	hItem2 = m_Tree.InsertItem("국내/외",0,1,hItem1);
 	m_Tree.SetItemData(hItem2, MAKELONG(0, 10000));
 	
-	
+
 	for_each(_vETFfore.begin(), _vETFfore.end(), [&](const auto item){
 		hItem3 = m_Tree.InsertItem(std::get<2>(item), 0, 1, hItem2);		
 		m_Tree.SetItemData(hItem3, MAKELONG(0, tree_etf_fore));
 	});
-	
+
+	//-----------------------------------------------------------------------------------
 	hItem1 = m_Tree.InsertItem("ETN",0,1);
 	m_Tree.SetItemData(hItem2, MAKELONG(0, tree_etn));
 
+
+	//test 리츠
+	hItem2 = m_Tree.InsertItem("리츠종목", 0, 1);
+	m_Tree.SetItemData(hItem2, MAKELONG(0, tree_reits));
+
 	//	m_Tree.Select(hItem2, 2);
 	GetDlgItem(IDC_EDIT_SEARCH)->SetFocus();
+}
+
+void CEtfDlg::InitReitList()
+{
+	m_ListCtrl.DeleteAllItems();
+	m_ListCtrl.SetColumnWidth(1, LVSCW_AUTOSIZE_USEHEADER);	//2015.09.30 KSJ 컬럼사이즈 내용에 맞게 사이즈 조절
+	m_search = FALSE;
+	_vData.clear();
+
+	for_each(_mapCODE.begin(), _mapCODE.end(), [&](auto item) {
+		if ((item.second->ssgb == jmREITS || item.second->ssgb == jmSHIP || item.second->ssgb == jmINFRA))
+			_vData.emplace_back(std::move(std::make_pair(CString(item.second->code, 12).TrimRight().Mid(1), CString(item.second->hnam, 40).TrimRight())));
+		});
+
+	std::copy(_vData.begin(), _vData.end(), std::back_inserter(_vSelect));
+
+	m_search = TRUE;
+
+	m_ListCtrl.SetItemCountEx(_vData.size());
+	m_ListCtrl.Invalidate();
+	m_EditSearch.SetFocus();
+
+	listsort(0);
 }
 
 void CEtfDlg::InitialList(int nETF)
@@ -156,6 +198,15 @@ void CEtfDlg::InitialList(int nETF)
 		});		
 	}
 
+	if (nETF == acETFETN)  //test
+	{
+		for_each(_mapCODE.begin(), _mapCODE.end(), [&](auto item) {
+			if ((item.second->ssgb == jmREITS || item.second->ssgb == jmSHIP || item.second->ssgb == jmINFRA))
+				_vData.emplace_back(std::move(std::make_pair(CString(item.second->code, 12).TrimRight().Mid(1), CString(item.second->hnam, 40).TrimRight())));
+			});
+	}
+
+
 	std::copy(_vData.begin(), _vData.end(), std::back_inserter(_vSelect));
 
 	m_search = TRUE;
@@ -163,6 +214,9 @@ void CEtfDlg::InitialList(int nETF)
 	m_ListCtrl.SetItemCountEx(_vData.size());
 	m_ListCtrl.Invalidate();
 	m_EditSearch.SetFocus();
+
+	if(nETF == acETFETN)
+		listsort(0);
 }
 
 void CEtfDlg::searchAction(int column)
@@ -743,23 +797,30 @@ void CEtfDlg::OnClickTreeBunryu(NMHDR* pNMHDR, LRESULT* pResult)
 			InitialList(acETF);
 			m_ListCtrl.Selected(0);
 		}
-		else if(str.Compare("ETF/ETN 전종목") == 0)	//2014.10.28 etf/etn 전종목 조회
+		else if(str.Compare("ETF/ETN/리츠 전종목") == 0)	
 		{				
 			InitialList(acETFETN);
 			m_ListCtrl.Selected(0);
 		}
-		else if(str.Compare("ETN") == 0)	//2014.10.28 etf/etn 전종목 조회
+		else if(str.Compare("ETN") == 0)	
 		{				
 			InitialList(acETN);
 			m_ListCtrl.Selected(0);
 		}
-		else if(str.Compare("ETF") == 0)	//2014.10.28 etf/etn 전종목 조회
+		else if(str.Compare("ETF") == 0)	
 		{				
 			m_ListCtrl.DeleteAllItems();
 			m_ListCtrl.Selected(0);
 		}
+		else if (str.Compare("리츠종목") == 0)	 //test reit
+		{
+		//	m_ListCtrl.DeleteAllItems();
+		//	m_ListCtrl.Selected(0);
+			InitReitList();
+			m_ListCtrl.Selected(0);
+		}
 
-		if(hChildItem == nullptr && (str.Compare("전체종목") != 0) && (str.Compare("ETF/ETN 전종목") != 0) && (str.Compare("ETN") != 0))
+		if (hChildItem == nullptr && (str.Compare("전체종목") != 0) && (str.Compare("ETF/ETN/리츠 전종목") != 0) && (str.Compare("ETN") != 0) && (str.Compare("리츠종목") != 0))
 		{
 			DataGubn(hItem);
 			m_ListCtrl.Selected(0);
@@ -925,23 +986,23 @@ BOOL CEtfDlg::PreTranslateMessage(MSG* pMsg)
 				{
 					InitialList(acETF);
 				}
-				else if(str.Compare("ETF/ETN 전종목") == 0)	//2014.10.28 etf/etn 전종목 조회
+				else if(str.Compare("ETF/ETN/리츠 전종목") == 0)	
 				{				
 					InitialList(acETFETN);
 					m_ListCtrl.Selected(0);
 				}
-				else if(str.Compare("ETN") == 0)	//2014.10.28 etf/etn 전종목 조회
+				else if(str.Compare("ETN") == 0)	
 				{				
-					InitialList(acETFETN);
+					InitialList(acETN);  //acETFETN->acETN
 					m_ListCtrl.Selected(0);
 				}
-				else if(str.Compare("ETF") == 0)	//2014.10.28 etf/etn 전종목 조회
+				else if(str.Compare("ETF") == 0)	
 				{				
 					m_ListCtrl.DeleteAllItems();
 					m_ListCtrl.Selected(0);
 				}
 
-				if(!m_Tree.ItemHasChildren(hItem) && (str.Compare("전체종목") != 0) && (str.Compare("ETF/ETN 전종목") != 0) && (str.Compare("ETN") != 0)) 
+				if(!m_Tree.ItemHasChildren(hItem) && (str.Compare("전체종목") != 0) && (str.Compare("ETF/ETN/리츠 전종목") != 0) && (str.Compare("ETN") != 0)) 
 				{
 					DataGubn(hItem);
 					m_ListCtrl.Selected(0);

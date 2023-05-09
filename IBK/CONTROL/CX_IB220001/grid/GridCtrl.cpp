@@ -620,7 +620,14 @@ END_MESSAGE_MAP()
 void CGridCtrl::OnPaint()
 {
 	CPaintDC dc(this);      // device context for painting
-
+#ifdef _DEBUG
+	if(m_bDoubleBuffer)    // Use a memory DC to remove flicker
+	{
+		OnDraw(&dc);
+	}
+	else                    // Draw raw - this helps in debugging vis problems.
+	OnDraw(&dc);
+#else
 	if (m_bDoubleBuffer)    // Use a memory DC to remove flicker
 	{
 		xxx::CMemDC memDC(&dc);
@@ -628,6 +635,7 @@ void CGridCtrl::OnPaint()
 	}
 	else                    // Draw raw - this helps in debugging vis problems.
 		OnDraw(&dc);
+#endif
 }
 
 BOOL CGridCtrl::OnEraseBkgnd(CDC* /*pDC*/)

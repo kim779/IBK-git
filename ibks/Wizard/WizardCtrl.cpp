@@ -285,8 +285,7 @@ OutputDebugString(m_slog);
 		m_xtype = xtFlag::xtWS;
 		break;
 	case loginAXISx:
-		//m_xtype = xtFlag::xtXEC;  //testcode
-		m_xtype = xtFlag::xtWS;
+		m_xtype = xtFlag::xtXEC;
 		break;
 	case signUSER:
 	case signUSERc:
@@ -552,7 +551,6 @@ long CWizardCtrl::axWizard(long kind, long variant)
 
 		m_guard->OnCertify(NULL, 0);
 		value = m_guard->CertifyFull(ptr, value, wb, desL);
-
 		struct	_cainfo* cainfo = (struct _cainfo*)ptr;
 		memset(cainfo, 0x20, L_CAINFO);
 		if (desL > 0)
@@ -571,7 +569,7 @@ long CWizardCtrl::axWizard(long kind, long variant)
 			CopyMemory(cainfo->dnL, tmps, sizeof(cainfo->dnL));
 			len += desL;
 		}
-		return value;
+		return value; 
 	}
 	break;
 	case caFULLx:

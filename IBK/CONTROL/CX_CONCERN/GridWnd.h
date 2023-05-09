@@ -159,14 +159,12 @@ public:
 		m_section.Format("%s%02d", SEC_GRID, m_nIndex); 
 	}
 	
-	void	OnAllsave();
 	void	GetHearder(CArray< _gridHdr, _gridHdr >& arHeader);
 	CString	GetCodeName(CString code);
 	void	SetKind(UINT kind);
 	CString FindTitle(UINT kind);			// 타이틀 얻기
 
 	void	AddData(int nIndex, CString sztmp);
-	void	AddData_Overoper(int nIndex, CString sztmp);
 
 //	int	AddInters(std::shared_ptr<struct _intersx> pinters);
 	void	RemoveInters(int nIndex);
@@ -174,11 +172,7 @@ public:
 	void	Reset(bool bAll = true);
 	void	saveInterestX();
 	void	saveInterest(BOOL bVisible = false, bool btmp=false, int gno = -1, bool bBookMark=false); //2013.05.14 KSJ 북마크 지정할때는 MO_VISIBLE 상관안하도록
-	void	saveInterestInverse(BOOL bVisible = false, bool btmp=false, int gno = -1);
-	void	saveInterestVisible(BOOL bVisible = false, int gno = -1);					//MO_VISIBLE 전용 저장함수
-	void	saveBookmark(BOOL bVisible = false, int gno = -1);
-	int	GetRowcountVisibleMode();
-	void	SetLineColor();
+	void	SetLineColor(); 
 
 	double	Round(double data );
 
@@ -192,14 +186,12 @@ public:
 	void	toggleAction5000(bool toggle);
 	void	makeCodeExist();
 	void	OperAlarm(int kind, char* lParam);
-	//std::shared_ptr<struct _intersx> GetData(int nIndex) { return m_inters.at(nIndex); }    //test 확인
 	std::shared_ptr<struct _intersx> GetData(int nIndex) {
 		if (m_inters.size() > nIndex)
 			return m_inters.at(nIndex);
 		return nullptr;
-	//	return m_inters.at(nIndex);
 	}
-	void	SetData(int nIndex, std::shared_ptr<struct _intersx> pinters) { m_inters.at(nIndex) = pinters; }  //test 확인
+	void	SetData(int nIndex, std::shared_ptr<struct _intersx> pinters) { m_inters.at(nIndex) = pinters; }  
 
 	CString CalcuPyungaSonik(struct _intersx* pinters, CString curr);
 	CString CalcuSuik(struct _intersx* pinters, CString curr);
@@ -225,7 +217,6 @@ public:
 	void	MultiChart();
 	void	ShowRTSWnd();
 	int		loadcfg_data();
-	CString	makeGroupName();
 	void	savecfg_data(CString keydata);					//KET_DATA를 저장
 	
 	void		sendtoMutiHoga();							//복수현재가2에 종목연동
@@ -262,7 +253,6 @@ public:
 	void	SetRecommandInfo(int row, CString strData);	//2012.04.24 KSJ 추천종목 값 세팅하기 위해서.
 	void	InsertAtRecommandInfo(int row, CString strData);	//2012.05.07 KSJ Row Insert 시에 추천종목 값도 Insert해서 같은줄로 보이게
 
-	void ParseUpjongData(class CGridData* sdata);
 	void parsingOubsUpjong(char* datB, int datL);
 
 	void ChangeField(bool type);
@@ -330,22 +320,15 @@ public:	//2012.02.13 KSJ 이벤트로 보내면 데이터가 깨져서 직접 메소드 호출함.
 	void	RecvRTSx(LPARAM lParam);	//2012.01.19 KSJ Alertx 추가
 
 protected:
-	void	InsertRowNCode(int row);
-	void	DrawTitle(CDC* pDC);
-	void	DrawGradient(CDC *pDC, CRect drawRC, COLORREF sColor, COLORREF eColor, bool bRight = true);
 	void	ReplaceSymbol(CMapStringToString& fms, CString szold, CString sznew);
 	void	initialGrid(bool size = true);
 	void	ParseData(class CGridData* sdata);
-	void	ParseRemainData(class CGridData* sdata);
 
-	BOOL	IsInterest();
 
 	int	GetCodeType(CString code);
 	int	openView(int type, CString data);
 	
-	void	hawkeyeAction(bool toggle);
 	void	RbuttonAction(int row);
-	void	hawkEyeColor(int row);
 	int		insertRow(int row, BOOL bInsertInter = TRUE, BOOL bLineAdd = TRUE);
 	int		insertRow2(int afterRow, int beforeRow, BOOL bInsertInter = TRUE);
 	
@@ -372,12 +355,9 @@ protected:
 //	int	loadInterest(int gno);
 //	int	loadInterest(CString codes);
 	void	ClearInterest();
-	bool	ExistFile(int gno);	
 	void	DeleteRow(int row);
 	HBITMAP getBitmap(CString path);
-	void	InsertEmpty(int row);
 	void	queryNewsCode();
-	void	parsingNewsCode(CRecvData* data);
 	void	ReIndexing();
 	void	ReIndexSpecial();
 	int	GetIndex(CString symbol);
@@ -402,8 +382,7 @@ protected:
 	
 	CString CalMaketTime(CString strTime, bool bEnd);	//장운영시간 계산
 	//2016.07.12 'b' - 'G' - 'V'
-	void	uploadOK();	//2016.07.06 KSJ 관심종목 설정과 같이 'V' 보내줌
-
+	
 	// END ADD
 	int		chg_count[200];
 

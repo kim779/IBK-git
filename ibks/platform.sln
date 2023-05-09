@@ -23,6 +23,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "axisver", "ver\axisver.vcxp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "axislogin", "dll\login\axislogin.vcxproj", "{DD1FF885-4289-4339-AE3F-413FAC9A7904}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IB201600", "..\IBK\APPL\IB201600(운영)\IB201600.vcxproj", "{435746F9-D1BA-401B-A52F-1A6B30FF57D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -137,6 +139,15 @@ Global
 		{DD1FF885-4289-4339-AE3F-413FAC9A7904}.Template|x64.ActiveCfg = Template|Win32
 		{DD1FF885-4289-4339-AE3F-413FAC9A7904}.Template|x86.ActiveCfg = Template|Win32
 		{DD1FF885-4289-4339-AE3F-413FAC9A7904}.Template|x86.Build.0 = Template|Win32
+		{435746F9-D1BA-401B-A52F-1A6B30FF57D6}.Debug|x64.ActiveCfg = Debug|Win32
+		{435746F9-D1BA-401B-A52F-1A6B30FF57D6}.Debug|x86.ActiveCfg = Debug|Win32
+		{435746F9-D1BA-401B-A52F-1A6B30FF57D6}.Debug|x86.Build.0 = Debug|Win32
+		{435746F9-D1BA-401B-A52F-1A6B30FF57D6}.Release|x64.ActiveCfg = Release|Win32
+		{435746F9-D1BA-401B-A52F-1A6B30FF57D6}.Release|x86.ActiveCfg = Release|Win32
+		{435746F9-D1BA-401B-A52F-1A6B30FF57D6}.Release|x86.Build.0 = Release|Win32
+		{435746F9-D1BA-401B-A52F-1A6B30FF57D6}.Template|x64.ActiveCfg = Template|Win32
+		{435746F9-D1BA-401B-A52F-1A6B30FF57D6}.Template|x86.ActiveCfg = Template|Win32
+		{435746F9-D1BA-401B-A52F-1A6B30FF57D6}.Template|x86.Build.0 = Template|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1561,7 +1561,7 @@ BOOL CFuturesDlg::loadFjCode()
 BOOL CFuturesDlg::loadWCode()
 {
 //writelogs("AXISCODE loadWCode start");
-	CString stmp, stmp1, stmp2, sWfname, sWlname;
+	CString stmp, stmp1, stmp2;  //sWfname, sWlname
 	m_arrayOcode.RemoveAll();
 	int	codeN{}, len{};
 	
@@ -1581,8 +1581,8 @@ BOOL CFuturesDlg::loadWCode()
 	}
 	len = file.Read(&OJCodh, sizeof(struct ojcodh));
 
-//	for (int jj = 0; jj < STANDARDNUM; jj++)  //위클리 이름 
-	for (int jj = 0; jj < STANDARDNUM - 2; jj++)
+	for (int jj = 0; jj < STANDARDNUM; jj++)  
+//	for (int jj = 0; jj < STANDARDNUM - 2; jj++)
 	{
 		CString str = CString(OJCodh.cjym[jj], 6).Right(4);
 		stmp.Format("[%d] %s\n",jj,  str);
@@ -1603,21 +1603,27 @@ BOOL CFuturesDlg::loadWCode()
 	{
 		file.Read(&OJCode, sizeof(struct ojcode));
 
-		stmp.Format("[%d] [%.5s] \n",ii, OJCode.price);
+		stmp.Format("[%d] [%.5s] \r\n",ii, OJCode.price);
+	//	OutputDebugString(stmp);
 		for(int ii = 0 ; ii < 11 ; ii++)
 		{
-			stmp1.Format("%s [%s] [%c]", OJCode.call[ii].cod2, OJCode.call[ii].hnam, OJCode.call[ii].yorn);
+			stmp1.Format("----<%d>", ii);
+		//	OutputDebugString(stmp1 + "\r\n");
+
+			stmp1.Format("%s [%s] [%d]", OJCode.call[ii].cod2, OJCode.call[ii].hnam, OJCode.call[ii].yorn);
 			stmp1.TrimRight();
-		//	if(stmp1.GetLength() == 0)
-		//		stmp1 = "        ";
-			
-			stmp2.Format("%s [%s] [%c]", OJCode.put[ii].cod2, OJCode.put[ii].hnam, OJCode.put[ii].yorn);
+		//	OutputDebugString(stmp1 + "\r\n");
+	
+			stmp2.Format("%s [%s] [%d]", OJCode.put[ii].cod2, OJCode.put[ii].hnam, OJCode.put[ii].yorn);
 			stmp2.TrimRight();
+		//	OutputDebugString(stmp2 + "\r\n");
+
+		//	stmp2 = "-------------------------------------------------";
+		//	OutputDebugString(stmp2 + "\r\n");
 		//	if(stmp2.GetLength() == 0)
 		//	stmp2 = "        ";
 
-		//	stmp.Format("[%d] %s   %s \n",ii, stmp1,  stmp2);
-			if(ii == 9)   
+			/*if(ii == 9)   
 			{
 				stmp.Format("%s", OJCode.call[ii].hnam);
 				stmp.TrimRight();
@@ -1630,13 +1636,13 @@ BOOL CFuturesDlg::loadWCode()
 				stmp.TrimRight();
 				if(stmp.GetLength() > 0)
 					sWfname = stmp.Mid(4,4);
-			}
+			}*/
 		}
 		m_arrayOcode.Add(OJCode);
 	}
 	
-	m_ArrayMonth.Add(sWlname);
-	m_ArrayMonth.Add(sWfname);
+	//m_ArrayMonth.Add(sWlname);
+	//m_ArrayMonth.Add(sWfname);
 
 	if (m_pCheck->GetSafeHwnd())
 		m_pCheck->SetArray();
@@ -1796,6 +1802,7 @@ BOOL CFuturesDlg::loadMoCode()
 	{
 		file.Read(&OJCode, sizeof(struct ojcode));
 		stmp.Format("[%d] [%.5s] \n",ii, OJCode.price);
+		OutputDebugString(stmp);
 		for(int ii = 0 ; ii < 11 ; ii++)
 		{
 			stmp1.Format("%s [%c]", OJCode.call[ii].cod2, OJCode.call[ii].yorn);
@@ -1809,6 +1816,7 @@ BOOL CFuturesDlg::loadMoCode()
 			//	stmp2 = "        ";
 			
 			stmp.Format("%s   %s \n", stmp1,  stmp2);
+			OutputDebugString(stmp);
 		}
 		m_arrayOcode.Add(OJCode);
 	}

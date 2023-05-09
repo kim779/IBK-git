@@ -226,6 +226,7 @@ int CGuard::Initial(CWnd* control)
 	m_certify = new CWnd();
 	if (!m_certify->CreateControl(_T("AxisCertify.CertifyCtrl.IBK2019"), NULL, 0, CRect(0, 0, 0, 0), control, 0))
 	{
+		int iret = GetLastError();
 		delete m_certify;
 		m_certify = NULL;
 	}
@@ -2686,8 +2687,6 @@ void CGuard::OnTrigger(CWorks* works, char* formN, CString text)
 
 void CGuard::OnProcedure(CString proc, CString param, CString maps, int major, int minor)
 {
-	if (proc.Find("OnPortfolio") >= 0)
-		CString str;
 	CWorks*	works;
 
 	if (m_clients.Lookup(major, works))

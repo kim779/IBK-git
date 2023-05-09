@@ -219,10 +219,8 @@ void CCheckBox::DrawWeek()
 {
 	CRect	rc;
 	CStringArray aStr;
-	//int	row1[5] = {0, 32, 64, 96, 128};
-	const int	row1[3] = {0, 64, 128};
-	//int	row2[5] = {192, 222, 254, 288, 320};
-	const int	row2[3] = {192, 254, 320};
+	const int	row1[4] = {0, 43, 86, 128};
+	const int	row2[4] = {192, 235, 278, 320};
 	
 	GetClientRect(rc);
 	m_pTool->FrameRect(rc, USER_BACKCOLOR2);
@@ -243,7 +241,7 @@ void CCheckBox::DrawWeek()
 	m_pTool->WriteText("행사가격", rc);
 	m_pTool->DrawCell(rc);
 	
-	rc.SetRect(192, 0, 320, 20);
+	rc.SetRect(192, 0, 319, 20);
 	m_pTool->FrameRect(rc, USER_BT_NORMALCOR);
 	m_pTool->WriteText("풋옵션", rc);
 	m_pTool->DrawCell(rc);
@@ -253,50 +251,49 @@ void CCheckBox::DrawWeek()
 	
 	if(nCount == 0)	
 		return;	//2015.07.14 KSJ 사이즈가 0이면 그리지 않음.
-	for (int ii = 0; ii < 2; ii++)
+
+	for (int ii = 0; ii < 3; ii++)
 	{
 		rc.SetRect(row1[ii], 20, row1[ii+1], 40);
 		
-		if(ii == 0)
+		if(ii == 0)     //call 의 가장 좌측 첫번째 컬럼
 		{
-		//	tmp = m_Array.GetAt(m_nCallSelect == 0 ? 0:STANDARDNUM - m_nCallSelect);
-			tmp = m_Array.GetAt(9);
+			tmp = m_Array.GetAt(8 + ii);
 			if(tmp == "0000")
 				tmp.Empty();
 			m_pTool->FrameRect(CRect(0, 20, 64, 40), USER_BT_NORMALCOR1);
 			m_pTool->WriteText(tmp, CRect(0, 20, 64, 40));
 			m_pTool->DrawCell(CRect(0, 20, 64, 40));
 		}
-		else
+		else 
 		{	
 			m_pTool->FrameRect(rc, USER_BT_NORMALCOR);
-	//		m_pTool->WriteText(m_Array[7 + ii], rc);
-			tmp = m_Array.GetAt(10);
+			tmp = m_Array.GetAt(8 + ii);
 			if(tmp == "0000")
 				tmp.Empty();
 			m_pTool->WriteText(tmp, rc);
 			m_pTool->DrawCell(rc);
 		}
 	}
-	for (int ii=0; ii < 2; ii++)
+
+
+	for (int ii=0; ii < 3; ii++)
 	{
-		rc.SetRect(row2[2- ii], 20, row2[1- ii], 40);
-		
-		if(ii == 0)
+		rc.SetRect(row2[3- ii], 20, row2[2- ii], 40);
+		 
+		if(ii == 0)     //put 의 가장 우측 마지막 컬럼
 		{
-	//		tmp = m_Array.GetAt(m_nPutSelect == 0 ? 0:STANDARDNUM - m_nPutSelect);
-			tmp = m_Array.GetAt(9);
+			tmp = m_Array.GetAt(8 + ii);
 			if(tmp == "0000")
 				tmp.Empty();
-			m_pTool->FrameRect(CRect(254, 20, 320, 40), USER_BT_NORMALCOR1);
-			m_pTool->WriteText(tmp, CRect(254, 20, 320, 40));
-			m_pTool->DrawCell(CRect(254, 20, 320, 40));
+			m_pTool->FrameRect(CRect(254, 20, 319, 40), USER_BT_NORMALCOR1);
+			m_pTool->WriteText(tmp, CRect(254, 20, 319, 40));
+			m_pTool->DrawCell(CRect(254, 20, 319, 40));
 		}
 		else
 		{	
 			m_pTool->FrameRect(rc, USER_BT_NORMALCOR);
-		//	m_pTool->WriteText(m_Array[7 +ii], rc);
-			tmp = m_Array.GetAt(10);
+			tmp = m_Array.GetAt(8 + ii);
 			if(tmp == "0000")
 				tmp.Empty();
 			m_pTool->WriteText(tmp, rc);
@@ -310,7 +307,7 @@ void CCheckBox::Draw()
 	CRect	rc;
 	CStringArray aStr;
 	const int row1[5] = {0, 32, 64, 96, 128};
-	const int row2[5] = {192, 222, 254, 288, 320};
+	const int row2[5] = {192, 222, 254, 288, 319};
 
 	GetClientRect(rc);
 	m_pTool->FrameRect(rc, USER_BACKCOLOR2);
@@ -381,13 +378,19 @@ void CCheckBox::Draw()
 	}
 }
 
+/*
+	const int	row1[4] = {0, 43, 86, 128};
+	const int	row2[4] = {192, 235, 278, 320};
+*/
 void CCheckBox::DrawWeekList(int row)
 {
 	const int nRow = row;
 	CRect	rc, tmprc;
 	CString	temp;
 	DATA	data;
-	const int	col[6] = {0, 64, 128, 192, 254, 320};
+	                                 //8  9   10   11   12    13   14    15
+	                            //0  1   2     3  -  4      5     6      7
+	const int	col[8] = { 0, 43, 86, 128, 192, 235, 278, 320 };
 	const int	irow = 0, icol = 0;
 	
 	const int nCount = m_Array.GetSize();
@@ -398,24 +401,19 @@ void CCheckBox::DrawWeekList(int row)
 		return;	//2015.07.14 KSJ 사이즈가 0이면 그리지 않음.
 	}
 	
-	//2014.08.11 KSJ 여긴 그리는 부분이기 떄문에 4개만 그림
-	
 	// row index
 	for (int jj = 0; jj < m_nCount; jj++)
 	{	
-		tmprc.SetRect(col[1], row, col[4], row+ROWHIGHT);
-		m_pTool->FrameRect(tmprc, RGB(229,229,230));
-	
-		int icnt = 0;
-
-		for (int ii = WCALL_FAR; ii < WPUT_FAR; ii++)
+		for (int ii = 9; ii < 14; ii++) 
 		{
-			if (ii == STANDARDNUM)   //행사가격 처리
+			rc.SetRect(col[ii - 8], row, col[ii -7], row + ROWHIGHT);
+			m_pTool->FrameRect(rc, RGB(229, 229, 230));
+
+			if (ii == STANDARDNUM)   //행사가격 처리   //11 인 이유는 종목코드가 들어올때 월물갯수가 11개 이기 때문에 12개 11이 행사가다
 			{
-				tmprc.SetRect(col[2], row, col[3], row+ROWHIGHT);
+				tmprc.SetRect(col[3], row, col[4], row+ROWHIGHT);
 				m_Map.Lookup(jj*ROWCOUNT+ii, data);
 				
-
 				if (data.atm == 1)
 				{
 					m_pTool->FrameRect(tmprc, RGB(148, 148, 210)); //USER_FOCUS_COR);
@@ -429,51 +427,25 @@ void CCheckBox::DrawWeekList(int row)
 				m_pTool->DrawCell(tmprc);
 				
 			}
-			else if(  ii ==WCALL_CLOSE || ii == WPUT_CLOSE  )
+			else
 			{	// BOOL값 처리... 
 				const int cnt = jj*ROWCOUNT+ii;
 				m_Map.Lookup((jj*ROWCOUNT+ii), data); 
 
 				if (data.flag)
 				{
-					icnt++;
-					if(ii == WCALL_CLOSE)
-					{
-						rc.SetRect(col[1], row, col[2], row+ROWHIGHT);
-						tmprc = rc;
-						tmprc.top += 2;
-						tmprc.bottom -= 2;
-						tmprc.left += 16;
-						tmprc.right -= 16;
-						m_BitmapNormal.Draw(m_pTool->GetDC(), tmprc);
-					}
-					else if(ii == WPUT_CLOSE)
-					{
-						rc.SetRect(col[3], row, col[4], row+ROWHIGHT);
-						tmprc = rc;
-						tmprc.top += 2;
-						tmprc.bottom -= 2;
-						tmprc.left += 16;
-						tmprc.right -= 16;
-						m_BitmapNormal.Draw(m_pTool->GetDC(), tmprc);
-					}
-					
+					m_BitmapNormal.Draw(m_pTool->GetDC(), rc);
 					if (data.flag == 2 && ((CFuturesDlg*)m_pWnd)->GetKind() != futureCODE
 						&& ((CFuturesDlg*)m_pWnd)->GetKind() != spreadCODE)
 					{	
 						m_BitmapClick.Draw(m_pTool->GetDC(), rc);
 						m_Key = jj*ROWCOUNT+ii;
 					}			
-				}	
+				}
+
+				m_pTool->DrawCell(rc);
 			}
 		}	
-		
-		rc.SetRect(col[1], row, col[2], row+ROWHIGHT);
-		m_pTool->DrawCell(rc);
-		
-		rc.SetRect(col[3], row, col[4], row+ROWHIGHT);
-		m_pTool->DrawCell(rc);
-
 		row += ROWHIGHT;
 	}
 	
@@ -571,6 +543,10 @@ void CCheckBox::ResetScrollBars()
 
 void CCheckBox::AddData(int row, int col, const DATA& data)
 {	
+	CString slog;
+	slog.Format("[CCheckBox][AddData] row=[%d] col=[%d] [%s][%s]\r\n, ", row, col, data.code, data.name, data.flag);
+	OutputDebugString(slog);
+
 	m_Map.SetAt(row*ROWCOUNT + col, data);
 }
 
@@ -586,7 +562,7 @@ void CCheckBox::weeklbtnClick(UINT nFlags, CPoint point)
 {
 	DATA	data;
 	int	val{};
-	const int col[10] = { 0, 62, 130, 192, 256, 320 };
+	const int	col[8] = { 0, 43, 86, 128, 192, 235, 278, 320 };
 
 	m_Map.Lookup(m_Key, data);
 	data.flag = TRUE;
@@ -608,26 +584,37 @@ void CCheckBox::weeklbtnClick(UINT nFlags, CPoint point)
 	{
 		for(int jj = 0; jj < m_nCount ; jj++)
 		{
-			for (int ii = 0; ii < 5 ; ii++)
+			for (int ii = 0; ii < 5 ; ii++) 
 			{
 				if (jj*ROWHIGHT< point.y - 40 + val && point.y - 40 + val < ROWHIGHT + jj*ROWHIGHT 
 					&& col[ii] < point.x && point.x < col[ii+1])
 				{	
+					//call 영역
 					if(ii ==0)
 					{
-						m_Map.Lookup(jj*ROWCOUNT + WCALL_FAR, data);
+						m_Map.Lookup(jj*ROWCOUNT + 8, data);
 					}
 					else if(ii ==1)
 					{
-						m_Map.Lookup(jj*ROWCOUNT + WCALL_CLOSE, data);
+						m_Map.Lookup(jj*ROWCOUNT + 9, data);
 					}
-					else if(ii ==3)
+					else if(ii ==2)
 					{
-						m_Map.Lookup(jj*ROWCOUNT + WPUT_CLOSE, data);
+						m_Map.Lookup(jj*ROWCOUNT + 10, data);
 					}
+
+					//put 영역
 					else if(ii ==4)
 					{
-						m_Map.Lookup(jj*ROWCOUNT + WPUT_FAR, data);
+						m_Map.Lookup(jj*ROWCOUNT + 12, data);
+					}
+					else if (ii == 5)
+					{
+						m_Map.Lookup(jj * ROWCOUNT + 13, data);
+					}
+					else if (ii == 6)
+					{
+						m_Map.Lookup(jj * ROWCOUNT + 14, data);
 					}
 
 					if (data.flag)
@@ -643,9 +630,7 @@ void CCheckBox::weeklbtnClick(UINT nFlags, CPoint point)
 						
 						((CFuturesDlg*)m_pWnd)->SetButton();
 						((CFuturesDlg*)m_pWnd)->UpdateData(FALSE);
-					}
-				//	AddData(jj, nIndex, data);
-				//	Invalidate();		
+					}		
 				}
 			}
 		}
@@ -664,135 +649,6 @@ void CCheckBox::weeklbtnClick(UINT nFlags, CPoint point)
 
 void CCheckBox::OnLButtonDown(UINT nFlags, CPoint point) 
 {
-	/*
-	if(m_bWeek)
-	{
-		weeklbtnClick(nFlags, point);
-	}
-	else
-	{
-		DATA	data;
-		int	val, col[10] = {0, 30, 62, 94, 130, 192, 224, 256, 290, 320};
-		int nIndex;
-
-		m_Map.Lookup(m_Key, data);
-		data.flag = TRUE;
-		m_Map.SetAt(m_Key, data);
-		m_Key = -1;
-
-		data.flag = FALSE;
-		data.code = "";
-		data.name = "";
-
-		if (m_nInit == 40)
-			val = 0;
-		else if (m_nInit < 40 && m_nInit > 0)
-			val = m_nInit;
-		else if (m_nInit <= 0)
-			val = 40 + abs(m_nInit);
-
-		if (point.y > 40 && point.y < 319)
-		{
-			for(int jj = 0; jj < m_nCount ; jj++)
-			{
-				for (int ii = 0; ii < 9 ; ii++)
-				{
-					if (jj*ROWHIGHT< point.y - 40 + val && point.y - 40 + val < ROWHIGHT + jj*ROWHIGHT 
-						&& col[ii] < point.x && point.x < col[ii+1])
-					{	
-						if(ii == 0 || ii == 8)
-						{
-							if(ii == 0)	nIndex = STANDARDNUM - m_nCallSelect + ii;
-							else		nIndex = STANDARDNUM + m_nPutSelect;
-							
-						}
-						else if (ii != 4)
-						{
-							nIndex = ii + 7;	//2014.08.11 KSJ 가운데에 가까운 부분만 보이기 때문에
-						}
-
-						m_Map.Lookup(jj*ROWCOUNT + nIndex, data);
-						if (data.flag)
-							data.flag = 2;
-						
-						if (((CFuturesDlg*)m_pWnd)->GetKind() != futureCODE
-							&& ((CFuturesDlg*)m_pWnd)->GetKind() != spreadCODE)
-						{
-							((CFuturesDlg*)m_pWnd)->SetCode(data.code);
-							((CFuturesDlg*)m_pWnd)->SetName(data.name);
-							
-							m_sCode = data.code;
-							
-							((CFuturesDlg*)m_pWnd)->SetButton();
-							((CFuturesDlg*)m_pWnd)->UpdateData(FALSE);
-						}
-						AddData(jj, nIndex, data);
-						Invalidate();		
-					}
-				}
-			}
-		}
-
-		if ((point.y > 40 && point.y < 319) && (0 < point.x && point.x< 130) || (point.x > 192 && point.x < 321))
-		{
-			if (((CFuturesDlg*)m_pWnd)->GetKind() != futureCODE
-				&& ((CFuturesDlg*)m_pWnd)->GetKind() != spreadCODE)
-			{
-				if (!m_sCode.IsEmpty())
-					((CFuturesDlg*)m_pWnd)->EndDialog(1);
-			}
-		}
-
-		int nSelect = 0;
-		nIndex = 0;
-
-		//2014.07.29 KSJ 컨텍스트 메뉴 띄우기
-		if ((point.y > 20 && point.y < 40) && (0 < point.x && point.x< 32))
-		{
-			m_bCall = true;
-
-			CMenu* popM = new CMenu(); 
-			popM->CreatePopupMenu();
-			for(int ii = 3; ii < m_Array.GetSize(); ii++)
-			{
-				if(m_Array[m_Array.GetSize()-(ii+1)].Compare("0000"))	//2015.07.02 KSJ 0000일때는 넣어주지 않는다.
-					popM->AppendMenu(MF_STRING, ii - 3, m_Array[m_Array.GetSize()-(ii+1)]);
-			}
-			
-			CPoint pot;
-			GetCursorPos(&pot);
-			nSelect = popM->TrackPopupMenu(TPM_LEFTALIGN|TPM_RETURNCMD, pot.x, pot.y, this, CRect(0,0,40,80));
-			
-			nSelect += STARTNUM;
-			delete popM;
-
-			m_nCallSelect = nSelect;
-			Invalidate();
-		}
-		else if((point.y > 20 && point.y < 40) && (point.x > 288 && point.x < 320))
-		{
-			m_bCall = false;
-
-			CMenu* popM = new CMenu(); 
-			popM->CreatePopupMenu();
-			for(int ii = 3; ii < m_Array.GetSize(); ii++)
-			{
-				if(m_Array[m_Array.GetSize()-(ii+1)].Compare("0000"))	//2015.07.02 KSJ 0000일때는 넣어주지 않는다.
-					popM->AppendMenu(MF_STRING, ii - 3, m_Array[m_Array.GetSize()-(ii+1)]);
-			}
-			
-			CPoint pot;
-			GetCursorPos(&pot);
-			nSelect = popM->TrackPopupMenu(TPM_LEFTALIGN|TPM_RETURNCMD, pot.x, pot.y, this, CRect(0,0,40,80));
-			
-			nSelect += STARTNUM;
-			delete popM;
-
-			m_nPutSelect = nSelect;
-			Invalidate();
-		}
-	}
-	*/
 	CWnd::OnLButtonDown(nFlags, point);
 }
 
@@ -810,8 +666,12 @@ void CCheckBox::SetArray()
 	pArray = ((CFuturesDlg*)m_pWnd)->GetArray();
 	m_Array.RemoveAll();
 
-	for (int jj = 0 ; jj < pArray->GetSize() ; jj++)
+	for (int jj = 0; jj < pArray->GetSize(); jj++)
+	{
+		CString slog;
+		slog = pArray->GetAt(jj).Right(4);
 		m_Array.Add(pArray->GetAt(jj).Right(4));
+	}
 	
 	pArray = nullptr;
 }
@@ -983,44 +843,45 @@ void CCheckBox::SetMonth(int row)
 	}
 }
 
+
 void CCheckBox::SetWeekMonth(int row)
 {
 	int nRow = row, nIndex = 0;
 	CRect	rc, tmprc;
 	DATA	data;
-	const int	col[6] = {0, 64, 128, 192, 254, 320};
+
+	 const int	col[8] = { 0, 43, 86, 128, 192, 235, 278, 319 };
 	int	icol = 0;
 	
 	CString strData;
-	
-	
 	const int nCount = m_Array.GetSize();
 	
-	if(nCount == 0)	return;	//2015.07.14 KSJ 사이즈가 0이면 그리지 않음.
-	{
+	if(nCount == 0)	
+		return;	//2015.07.14 KSJ 사이즈가 0이면 그리지 않음.
+	
 		icol = 0;
 		nIndex = STANDARDNUM - m_nCallSelect;
 		strData = m_Array.GetAt(m_nCallSelect == 0 ? 0:nIndex);
-		m_pTool->FrameRect(CRect(0, 20, 64, 40), USER_BT_NORMALCOR1);
+		/*m_pTool->FrameRect(CRect(0, 20, 64, 40), USER_BT_NORMALCOR1);
 		m_pTool->WriteText(strData, CRect(0, 20, 64, 40));
-		m_pTool->DrawCell(CRect(0, 20, 64, 40));
+		m_pTool->DrawCell(CRect(0, 20, 64, 40));*/
 		
 		for (int jj = 0; jj < m_nCount; jj++)
 		{	
 			// col index
 			rc.SetRect(col[icol], nRow, col[icol + 1], nRow+ROWHIGHT);
 			m_pTool->FrameRect(rc, RGB(229,229,230));
-		
+
 			// BOOL값 처리...  
 			m_Map.Lookup((jj*ROWCOUNT + icol + WCALL_FAR), data); 
-			if (data.flag)
+			if (data.flag)   //꺽쇠표시 그리려는...
 			{
 				tmprc = rc;
 				tmprc = rc;
 				tmprc.top += 2;
 				tmprc.bottom -= 2;
-				tmprc.left += 16;
-				tmprc.right -= 16;
+				tmprc.left += 8;
+				tmprc.right -= 8;
 
 				m_BitmapNormal.Draw(m_pTool->GetDC(), tmprc);
 				
@@ -1035,15 +896,13 @@ void CCheckBox::SetWeekMonth(int row)
 			
 			nRow += ROWHIGHT;
 		}
-	}
 	
-	{
 		nRow = row;
-		icol = 4;
+		icol = 6;
 		nIndex = m_nPutSelect + STANDARDNUM -1;
 		strData = m_Array.GetAt(abs(m_nPutSelect == 0 ? 0:m_nPutSelect - STANDARDNUM));
-		m_pTool->FrameRect(CRect(254, 20, 320, 40), USER_BT_NORMALCOR1);
-		m_pTool->DrawCell(CRect(254, 20, 320, 40));
+	/*	m_pTool->FrameRect(CRect(254, 20, 320, 40), USER_BT_NORMALCOR1);
+		m_pTool->DrawCell(CRect(254, 20, 320, 40));*/
 		
 		for (int jj = 0; jj < m_nCount; jj++)
 		{	
@@ -1059,8 +918,8 @@ void CCheckBox::SetWeekMonth(int row)
 				tmprc = rc;
 				tmprc.top += 2;
 				tmprc.bottom -= 2;
-				tmprc.left += 16;
-				tmprc.right -= 16;
+				tmprc.left += 8;
+				tmprc.right -= 8;
 				m_BitmapNormal.Draw(m_pTool->GetDC(), tmprc);
 				
 				if (data.flag == 2 && ((CFuturesDlg*)m_pWnd)->GetKind() != futureCODE
@@ -1073,7 +932,7 @@ void CCheckBox::SetWeekMonth(int row)
 			m_pTool->DrawCell(rc);
 			nRow += ROWHIGHT;
 		}
-	}
+
 }
 
 void CCheckBox::OnLButtonUp(UINT nFlags, CPoint point) 

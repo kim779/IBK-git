@@ -1284,8 +1284,9 @@ void CBongBase::DrawTickVertical(CDC *pDC)
 
 	int first = ii;
 	gBasic = pOrgData->GetGraphData(ii+m_iDispSPos);
-if (!gBasic)
-	return;
+
+	if (!gBasic)
+		return;
 
 	svDay = gBasic->m_index.date.dd;
 	for (; ii < m_iDispEPos - m_iDispSPos; ii++)
@@ -1313,7 +1314,7 @@ if (!gBasic)
 			dispStr.Format("%04d", gBasic->m_index.date.yy);
 			svYear = gBasic->m_index.date.yy;
 			break;
-		case GI_MINUTE:	case GI_TICK:			// 시간
+		case GI_MINUTE:	case GI_TICK:			// 시간  분봉
 			if (svHH == gBasic->m_index.time.hh)
 				continue;
 
@@ -1326,11 +1327,11 @@ if (!gBasic)
 				continue;
 			
 			if (ii == first)
-				dispStr.Format("%02d:%02d", gBasic->m_index.time.hh,
+				dispStr.Format("%02d:%02d", gBasic->m_index.time.hh,   //처음은 시간
 					gBasic->m_index.time.mm);
 			else
 			{
-				dispStr.Format("%02d/%02d", 
+				dispStr.Format("%02d/%02d",                                              //날짜
 					gBasic->m_index.date.mm, gBasic->m_index.date.dd);
 				svDay = gBasic->m_index.date.dd;
 			}
@@ -1452,7 +1453,7 @@ if (!gBasic)
 					pDC->SelectObject(tkFont);
 				
 			}
-			if (dispInfo.dispRC.right < tickRC.right)
+			if (dispInfo.dispRC.right < tickRC.right)  //차트 하단에 시간을 써준다 
 				pDC->DrawText(dispInfo.dispStr, &dispInfo.dispRC, DT_SINGLELINE|DT_TOP|DT_CENTER);
 		}
 	}
@@ -1788,24 +1789,24 @@ void CBongBase::DrawTick(CDC* pDC)
 
 	switch (m_iGrpKind)
 	{
-	case GK_VOL:
-	case GK_VMA:
-		if (CIndcBase::m_pCoDraw && CIndcBase::m_pCoDraw->coWork == MC_VOL)
+	case GK_VOL:  // 거래량
+	case GK_VMA:  // volume MA
+		if (CIndcBase::m_pCoDraw && CIndcBase::m_pCoDraw->coWork == MC_VOL)  // 거래량 차트
 		{
 			m_dYMax = m_pCoDraw->VMax;
 			m_dYMin = m_pCoDraw->VMin;
 		}
 		break;
-	case GK_AMT:
-	case GK_AMA:
-		if (CIndcBase::m_pCoDraw && CIndcBase::m_pCoDraw->coWork == MC_AMT)
+	case GK_AMT:  // 거래대금
+	case GK_AMA:  // volume MA	(거래대금 이평)
+		if (CIndcBase::m_pCoDraw && CIndcBase::m_pCoDraw->coWork == MC_AMT)  	// 거래대금 차트
 		{
 			m_dYMax = m_pCoDraw->AMax;
 			m_dYMin = m_pCoDraw->AMin;
 		}
 		break;
 	default:
-		if (CIndcBase::m_pCoDraw && CIndcBase::m_pCoDraw->coWork == MC_PRC)
+		if (CIndcBase::m_pCoDraw && CIndcBase::m_pCoDraw->coWork == MC_PRC)  	// 가격 차트
 		{
 			m_dYMax = m_pCoDraw->PMax;
 			m_dYMin = m_pCoDraw->PMin;
@@ -1820,9 +1821,9 @@ void CBongBase::DrawTick(CDC* pDC)
 //	if (m_pgraph->dwDraOption & GO_TKBOTTOM)
 //		DrawTickVertical(pDC);
 	if (m_pgraph->dwDraOption & GO_TKLEFT)
-		DrawTickLeft(pDC, m_dYMax, m_dYMin, bDrawMin);
+		DrawTickLeft(pDC, m_dYMax, m_dYMin, bDrawMin);   //차트의 왼쪽 눈금
 	if (m_pgraph->dwDraOption & GO_TKRIGHT)
-		DrawTickRight(pDC, m_dYMax, m_dYMin, bDrawMin);
+		DrawTickRight(pDC, m_dYMax, m_dYMin, bDrawMin);  //차트의 오른쪽 눈금
 }
 
 void CBongBase::DrawLine(CDC *pDC, double Max, double Min, double pValue[], int style, int width, COLORREF color, int index)

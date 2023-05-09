@@ -1407,6 +1407,8 @@ BOOL CPage1::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		{
 		case LVN_COLUMNCLICK:
 #define pnm ((LPNMLISTVIEW)lParam)
+			if (m_arList.GetSize() == 0)   //test search
+				return CPropertyPage::OnNotify(wParam, lParam, pResult);
 			m_gListsort = !m_gListsort;
 			switch ((LPARAM)pnm->iSubItem)
 			{
@@ -2169,101 +2171,6 @@ void CPage1::OnCnvinterest()  //사용되지 않는다
 
 			CWnd* wnd = GetParent()->GetParent();
 			wnd->SendMessage(TOmapWnd, MAKEWPARAM(dnACTIONX, 0), 0);  //사용되지 않는다
-		}
-		break;
-	case 'H':		// hana 증권 X 사용안할듯 
-		{
-			//CFileDialog fDlg(TRUE, nullptr, nullptr, OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT,
-			//			"관심종목파일(*.igf)|*.igf|All Files(*.*)|*.*|");
-			//if (fDlg.DoModal() != IDOK)
-			//	break;
-
-			//CString filePath = fDlg.GetPathName();
-
-			//CFileFind finder;
-			//if (!finder.FindFile(filePath))
-			//{
-			//	GuideMsg(idTOstring(IDS_GUIDE8));
-			//	break;
-			//}
-
-			//struct	_inters  inters;
-			//struct	_hanasec hanas;
-
-			//UINT	readL;
-
-			//CFile	fileH(filePath, CFile::modeRead);
-			//readL = fileH.Read(&hanas.head[0], sizeof(hanas.head) + sizeof(hanas.gnox));
-			//if (readL < sizeof(hanas.head) + sizeof(hanas.gnox)
-			//	|| strncmp(hanas.head, "INTERESTGROUPFILE", sizeof(hanas.head)))
-			//{
-			//	fileH.Close();
-			//	GuideMsg(idTOstring(IDS_GUIDE7));
-			//	break;
-			//}
-
-			//int gcount = atoi(CString(hanas.gnox, sizeof(hanas.gnox)));
-			//if (gcount <= 0)
-			//{
-			//	fileH.Close();
-			//	GuideMsg(idTOstring(IDS_GUIDE7));
-			//	break;
-			//}
-
-			//clearAllFile();
-
-			//char	wB[64]{}, *xxP{};
-			//CString	gname, code, name;
-
-			//CString	portFile, grpFile, strOrder = _T(""), section;
-			//grpFile.Format("%s/%s/%s/portfolio.ini", m_root, USRDIR, m_name);
-			//WritePrivateProfileString(_T("GROUPORDER"), "00", strOrder, grpFile);
-
-			//for (int ii = 0; ii < gcount; ii++)
-			//{
-			//	readL = fileH.Read(&hanas.gnam[0], sizeof(hanas.gnam) + sizeof(hanas.jrec));
-			//	if (readL < sizeof(hanas.gnam) + sizeof(hanas.jrec))
-			//		break;
-
-			//	gname = CString(hanas.gnam, sizeof(hanas.gnam)); gname.TrimRight(); 
-
-			//	section.Format("%02d", ii); strOrder += section + ";";
-			//	WritePrivateProfileString("GROUPNAME", section, gname, grpFile);
-
-			//	portFile.Format("%s/%s/%s/portfolio.i%02d", m_root, USRDIR, m_name, ii);
-			//	CFile	fileIT(portFile, CFile::modeCreate|CFile::modeWrite);
-
-			//	int jcount = atoi(CString(hanas.jrec, sizeof(hanas.jrec)));
-			//	for (int jj = 0; jj < jcount; jj++)
-			//	{
-			//		ZeroMemory(&inters, sz_inters);
-			//		readL = fileH.Read(&hanas.code[0], sizeof(hanas.code));
-			//		if (readL < sizeof(hanas.code))
-			//			break;
-
-			//		inters.gubn[0] = '0';
-
-			//		code = CString(hanas.code, sizeof(hanas.code)); 
-			//		code.TrimRight();
-			//		if (code.GetLength() > 0 && code.GetAt(0) == 'A') code = code.Mid(1);
-
-			//		CopyMemory(inters.code, (char*)code.operator LPCTSTR(), min(code.GetLength(), sizeof(inters.code)));
-
-			//		strncpy(wB, (char*)code.operator LPCTSTR(), code.GetLength());
-			//		xxP = (char *)m_parent->SendMessage(WM_USER, MAKEWPARAM(nameDLL, 0), (LPARAM)wB);
-			//		name = xxP; 
-			//		name.TrimLeft(); 
-			//		name.TrimRight();
-			//		CopyMemory(inters.name, (char*)name.operator LPCTSTR(), name.GetLength());
-
-			//		fileIT.Write(&inters, sz_inters);
-			//	}
-			//	fileIT.Close();
-			//}
-			//WritePrivateProfileString(_T("GROUPORDER"), "00", strOrder, grpFile);
-			//WritePrivateProfileString(nullptr, nullptr, nullptr, grpFile);
-			//fileH.Close(); 
-			//reInitInterest();
 		}
 		break;
 	}
@@ -3218,7 +3125,7 @@ int CPage1::findMatchIndex(CString text)
 	for (int ii = 0; ii < m_list1.GetItemCount(); ii++)
 	{
 		string = m_list1.GetItemText(ii, nameCOL);
-		string = string.Mid(1);
+		string = string.Mid(1);  //test  remove nouse
 
 		if (strncmp(text, string, textL) <= 0)
 			return ii;
@@ -3233,7 +3140,7 @@ int CPage1::findMatchIndex(CString text, int column)
 	for (int ii = 0; ii < m_list1.GetItemCount(); ii++)
 	{
 		string = m_list1.GetItemText(ii, column);
-		if (column == 1) string = string.Mid(1);
+		if (column == 1) string = string.Mid(1);  //test  remove
 
 		if (!strncmp(text, string, textL))
 			return ii;
@@ -3585,7 +3492,8 @@ void CPage1::loadingELWcode()
 		//item = new ITEMS;
 		elwdata.code = CString(ELWCode.codx, sizeof(ELWCode.codx));
 		elwdata.code.TrimRight();	
-		elwdata.name.Format("%s", CString(ELWCode.hnam, ELWHNameLen).Mid(1));
+		//elwdata.name.Format("%s", CString(ELWCode.hnam, ELWHNameLen).Mid(1));  //test remove
+		elwdata.name.Format("%s", CString(ELWCode.hnam, ELWHNameLen).Trim());
 		elwdata.name.TrimRight(); elwdata.name.TrimLeft();
 		elwdata.ktype = CString(ELWCode.krye, 2);
 		elwdata.pcode = CString(ELWCode.bgce, 12);
@@ -4162,8 +4070,7 @@ int CPage1::xAllCodeToList()
 
 		code = CString(hjcode.code, HCodeLen);
 		name = CString(hjcode.name, HNameLen);
-
-		AppendItemToList1(position, code, name.Mid(1));
+		AppendItemToList1(position, code, name.Trim()); //test remove
 		position += 1;
 	}
 
@@ -4206,7 +4113,7 @@ int CPage1::xKospiToList()
 		code = CString(hjcode.code, HCodeLen);
 		name = CString(hjcode.name, HNameLen);
 
-		AppendItemToList1(position, code, name.Mid(1));
+		AppendItemToList1(position, code, name.Trim()); //test remove
 		position += 1;
 	}
 	m_list1.SetItemCountEx(m_arList.GetSize());
@@ -4240,7 +4147,7 @@ int CPage1::xKonexToList()
 		code = CString(hjcode.code, HCodeLen);
 		name = CString(hjcode.name, HNameLen);
 		
-		AppendItemToList1(position, code, name.Mid(1));
+		AppendItemToList1(position, code, name.Trim());  //test remove
 		position += 1;
 	}
 	m_list1.SetItemCountEx(m_arList.GetSize());
@@ -4275,7 +4182,7 @@ int CPage1::xETNCodeToList()
 		code = CString(hjcode.code, HCodeLen);
 		name = CString(hjcode.name, HNameLen);
 		
-		AppendItemToList1(position, code, name.Mid(1));
+		AppendItemToList1(position, code, name.Trim());  //test remove
 		position += 1;
 	}
 	m_list1.SetItemCountEx(m_arList.GetSize());
@@ -4310,7 +4217,7 @@ int CPage1::xSPACCodeToList()
 		code = CString(hjcode.code, HCodeLen);
 		name = CString(hjcode.name, HNameLen);
 		
-		AppendItemToList1(position, code, name.Mid(1));
+		AppendItemToList1(position, code, name.Trim());  //test remove
 		position += 1;
 	}
 	m_list1.SetItemCountEx(m_arList.GetSize());
@@ -4352,7 +4259,7 @@ int CPage1::xKosdaqToList()
 		code = CString(hjcode.code, HCodeLen);
 		name = CString(hjcode.name, HNameLen);
 
-		AppendItemToList1(position, code, name.Mid(1));
+		AppendItemToList1(position, code, name.Trim());  //test remove
 		position += 1;
 	}
 	m_list1.SetItemCountEx(m_arList.GetSize());
@@ -4384,7 +4291,7 @@ int CPage1::xKospi200ToList()
 		code = CString(hjcode.code, HCodeLen);
 		name = CString(hjcode.name, HNameLen);
 
-		AppendItemToList1(position, code, name.Mid(1));
+		AppendItemToList1(position, code, name.Trim());  //test remove
 		position += 1;
 	}
 	m_list1.SetItemCountEx(m_arList.GetSize());
@@ -4416,7 +4323,7 @@ int CPage1::xKosdaq50ToList()
 		code = CString(hjcode.code, HCodeLen);
 		name = CString(hjcode.name, HNameLen);
 
-		AppendItemToList1(position, code, name.Mid(1));
+		AppendItemToList1(position, code, name.Trim());  //test remove
 		position += 1;
 	}
 	m_list1.SetItemCountEx(m_arList.GetSize());
@@ -4442,7 +4349,7 @@ int CPage1::xKRX100ToList()
 		code = CString(hjcode.code, HCodeLen);
 		name = CString(hjcode.name, HNameLen);
 
-		AppendItemToList1(position, code, name.Mid(1));
+		AppendItemToList1(position, code, name.Trim());  //test remove
 		position += 1;
 	}
 	m_list1.SetItemCountEx(m_arList.GetSize());
@@ -4468,7 +4375,7 @@ int CPage1::xFreeCodeToList()
 		code = CString(hjcode.code, HCodeLen);
 		name = CString(hjcode.name, HNameLen);
 
-		AppendItemToList1(position, code, name.Mid(1));
+		AppendItemToList1(position, code, name.Trim());  //test remove
 		position += 1;
 	}
 	m_list1.SetItemCountEx(m_arList.GetSize());
@@ -4567,7 +4474,7 @@ int CPage1::xETFCodeToList()
 		code = CString(hjcode.code, HCodeLen);
 		name = CString(hjcode.name, HNameLen);
 
-		AppendItemToList1(position, code, name.Mid(1));
+		AppendItemToList1(position, code, name.Trim());  //test remove
 		position += 1;
 	}
 	m_list1.SetItemCountEx(m_arList.GetSize());
@@ -4610,7 +4517,7 @@ int CPage1::xSinjuCodeToList()
 		code = CString(hjcode.code, HCodeLen);
 		name = CString(hjcode.name, HNameLen);
 
-		AppendItemToList1(position, code, name.Mid(1));
+		AppendItemToList1(position, code, name.Trim());  //test remove
 		position += 1;
 	}
 	m_list1.SetItemCountEx(m_arList.GetSize());
@@ -5119,7 +5026,7 @@ int CPage1::xKospiUpToList(int selItem)
 		code = hjcode.code;
 		name = hjcode.name;
 
-		AppendItemToList1(position, code, name.Mid(1));
+		AppendItemToList1(position, code, name.Trim()); //test remove
 		position += 1;
 	}
 
@@ -5130,79 +5037,6 @@ int CPage1::xKospiUpToList(int selItem)
 
 int CPage1::xKosdaqUpToList(int selItem, CString sData)
 {
-	/*ClearListitem(); 
-	m_list1.DeleteAllItems();
-
-	const int kind = selItem % 100;
-
-	int position = 0;
-	CString	code, name;
-	CString stemp;
-	
-	bool append = false;
-	struct _shjcode hjcode; 
-	for (int ii = 0; ii < m_hjcode.GetSize(); ii++)
-	{
-		hjcode = m_hjcode.GetAt(ii);
-
-		if (hjcode.kosd != jmKOSDAQ)
-			continue;
-		
-		switch (hjcode.ssgb)
-		{
-		case jmSINJU: case jmSINJS: case jmHYFND: case jmELW:
-			continue;
-		}
-		append = false;
-
-		if (kind == 1)
-		{
-			append = true;
-		}
-		else if (kind == 2)
-		{
-			if ((int)hjcode.jjug == kind)
-				append = true;
-		}
-		else if (kind < 5)
-		{
-			if ((int)hjcode.size == kind)
-				append = true;
-		}
-		else if (kind == 5)
-		{
-			if ((int)hjcode.size == 4 && (int)hjcode.jjug == 2)
-				append = true;
-		}
-		else if (kind < 15 || kind == 41)
-		{
-			if ((int)hjcode.ucdm == kind)
-				append = true;
-		}
-		else if (kind < 38)
-		{
-			if ((int)hjcode.ucds == kind)
-				append = true;
-		}
-		else if (kind < 41)
-		{
-			if ((int)hjcode.jsiz == kind - 37)
-				append = true;
-		}
-		else if (kind == 42)
-		{
-			if ((int)hjcode.prmr == kind - 41)
-				append = true;
-		}
-
-		if (!append) continue;
-
-		code = hjcode.code;
-		name = hjcode.name;
-
-		AppendItemToList1(position, code, name.Mid(1));
-		position += 1;
-	}*/
 	ClearListitem();
 	m_list1.DeleteAllItems();
 
@@ -5278,7 +5112,7 @@ int CPage1::xKosdaqUpToList(int selItem, CString sData)
 		code = hjcode.code;
 		name = hjcode.name;
 
-		AppendItemToList1(position, code, name.Mid(1));
+		AppendItemToList1(position, code, name.Trim()); //test remove
 		position += 1;
 	}
 
@@ -5334,7 +5168,7 @@ int CPage1::xKospiExToList(int selItem)
 		code = hjcode.code;
 		name = hjcode.name;
 
-		AppendItemToList1(position, code, name.Mid(1));
+		AppendItemToList1(position, code, name.Trim());  //test remove
 		position += 1;
 	}
 	m_list1.SetItemCountEx(m_arList.GetSize());
@@ -5384,7 +5218,7 @@ int CPage1::xKosdaqExToList(int selItem)
 		code = hjcode.code;
 		name = hjcode.name;
 
-		AppendItemToList1(position, code, name.Mid(1));
+		AppendItemToList1(position, code, name.Trim()); //test remove
 		position += 1;
 	}
 	m_list1.SetItemCountEx(m_arList.GetSize());
@@ -5973,6 +5807,7 @@ int CPage1::GetCodeType(CString code)
 
 CString CPage1::GetCodeName(CString code)
 {
+	CString name;
 	code = code.Left(12);
 	code.TrimRight();
 	code.TrimLeft();
@@ -5999,7 +5834,11 @@ CString CPage1::GetCodeName(CString code)
 					return hjcode.name;
 				break;
 			}
-			return hjcode.name.Mid(1);
+			name = hjcode.name;   
+			name.Trim(); //test remove
+			if (name.GetLength() > 32)
+				name = name.Mid(0, 32);
+			return name;
 		}
 
 	}
@@ -6019,7 +5858,11 @@ CString CPage1::GetCodeName(CString code)
 					return hjcode.name;
 				break;
 			}
-			return hjcode.name.Mid(1);
+			name = hjcode.name;
+			name.Trim(); //test remove
+			if (name.GetLength() > 32)
+				name = name.Mid(0, 32);
+			return name;
 		}
 	}
 	else if (codeL <= 3)				// upjong code
@@ -6331,7 +6174,8 @@ void CPage1::AppendItemToList1(int ipos, CString code, CString name, CString boo
 	_listitem* listitem{};
 	
 	name.TrimRight();
-	
+	name.TrimLeft();
+
 	nItem = AddItem(&m_list1, code, ipos);
 	AddItem(&m_list1, name, nItem, 1);
 	
@@ -6343,7 +6187,8 @@ void CPage1::AppendItemToList1(int ipos, CString code, CString name, CString boo
 	{
 		listitem = new _listitem();
 		strcpy(listitem->code, code);
-		strcpy(listitem->name, name);
+	//	strcpy(listitem->name, name);
+		memcpy(listitem->name, name, min(36, name.GetLength())); //test search
 		m_listitem.Add(listitem);
 		m_list1.SetItemData(nItem, (LPARAM) listitem);
 	}
@@ -6353,6 +6198,7 @@ void CPage1::AppendItemToList1(int ipos, CString code, CString name,  _listitem 
 {
 	code.TrimRight();
 	name.TrimRight();
+	name.TrimLeft();
 	CITEMS item;
 	item.code = code;
 	item.name = name;
@@ -6374,7 +6220,10 @@ void CPage1::AppendItemToList1(int ipos, CString code, CString name,  _listitem 
 		//		strncpy(listitem->code, code, code.GetLength());
 		//		strncpy(listitem->name, name, name.GetLength());
 		strcpy(listitem->code, code);
-		strcpy(listitem->name, name);
+	//	strcpy(listitem->name, name);
+		//if (name.GetLength() > 50)
+		//	TRACE("long");
+		memcpy(listitem->name, name, min(36, name.GetLength()));  //test search
 		m_listitem.Add(listitem);
 	}
 
@@ -6748,7 +6597,7 @@ bool CPage1::SearchWord(CString sName, bool bAddAll)
 				
 				name = CString(listitem->name, sizeof(listitem->name));
 				//if (hjc.ssgb != jmELW)	
-				name = name.Mid(1);
+				name = name.Trim(); //test remove
 				
 				code = CString(listitem->code, sizeof(listitem->code));
 				name.TrimRight();
@@ -6779,13 +6628,8 @@ bool CPage1::SearchWord(CString sName, bool bAddAll)
 		listitem = (_listitem*)arSearch.GetAt(ii);
 		
 		name = CString(listitem->name, sizeof(listitem->name));
-		//if (hjc.ssgb != jmELW)	
-		//	name = name.Mid(1);
-		
 		code = CString(listitem->code, sizeof(listitem->code));
 		name.TrimRight();
-		//2015.11.03 KSJ ExistCodeList 주석처리하고 AppendItemToList1(idx++, code, name)에 listitem 추가함.
-		//if (!ExistCodeList(code))
 		AppendItemToList1(idx++, code, name, listitem);
 	}
 	m_list1.SetItemCountEx(m_arList.GetSize());
@@ -6832,6 +6676,11 @@ bool CPage1::SearchJongmok(CString sName, bool bAddAll)
 
 	char	cName{};
 	const int sLen = sName.GetLength();
+
+	CString slog;
+	slog.Format("\r\n ~~~~~~~~ [%d] [%s] \r\n", sName.GetLength(), sName);
+	OutputDebugString(slog);
+
 	if (sLen == 1)
 	{	// 일반검색적용(길이만큼 맞는것만 적용)
 		const int sLen = sName.GetLength();
@@ -6859,6 +6708,11 @@ bool CPage1::SearchJongmok(CString sName, bool bAddAll)
 		int ii = 0;
 
 		cName = sName.GetAt(ii);
+
+		CString slog;
+		slog.Format("\r\n ~~~~~~~~ cName =  [%x] \r\n", cName);
+		OutputDebugString(slog);
+
 		if (cName & HANGULMSK)	// 한글일땐 2Byte
 		{
 			wHangul = MakeHangul(sName.GetAt(ii), sName.GetAt(ii+1));
@@ -6872,7 +6726,13 @@ bool CPage1::SearchJongmok(CString sName, bool bAddAll)
 					name.TrimLeft();
 
 					if (name.GetLength() < 2)	continue;
-					wHangul2 = MakeHangul(name.GetAt(ii), name.GetAt(ii+1));
+
+					//@불성실공시, /(액면불할,액면병합), $투자유의, %이상급등, &관리, X거래정지, !기준가발생
+					if (name.GetAt(0) == 88 || name.GetAt(0) == 64 || name.GetAt(0) == 47 || name.GetAt(0) == 36 || name.GetAt(0) == 37 || name.GetAt(0) == 38 || name.GetAt(0) == 33)
+						wHangul2 = MakeHangul(name.GetAt(ii + 1), name.GetAt(ii + 2));
+					else
+						wHangul2 = MakeHangul(name.GetAt(ii), name.GetAt(ii+1));
+
 					if (wStart <= wHangul2 && wHangul2 <= wEnd)	arSearch.Add(listitem);
 				}
 			}
@@ -6886,8 +6746,14 @@ bool CPage1::SearchJongmok(CString sName, bool bAddAll)
 					//앞공백제거
 					name.TrimLeft();
 
-					if (name.GetLength() < 2)	continue;
-					wHangul2 = MakeHangul(name.GetAt(ii), name.GetAt(ii+1));
+					if (name.GetLength() < 2)	continue;    
+					
+					//@불성실공시, /(액면불할,액면병합), $투자유의, %이상급등, &관리, X거래정지, !기준가발생
+					if(name.GetAt(0) == 88 || name.GetAt(0) == 64 || name.GetAt(0) == 47 || name.GetAt(0) == 36 || name.GetAt(0) == 37 || name.GetAt(0) == 38 || name.GetAt(0) == 33)
+						wHangul2 = MakeHangul(name.GetAt(ii + 1), name.GetAt(ii + 2));
+					else
+						wHangul2 = MakeHangul(name.GetAt(ii), name.GetAt(ii + 1));
+
 					if (wHangul == wHangul2)	arSearch.Add(listitem);
 				}
 			}
@@ -6922,7 +6788,13 @@ bool CPage1::SearchJongmok(CString sName, bool bAddAll)
 						name.TrimLeft();
 
 						if (name.GetLength() < ii+2)	arSearch.RemoveAt(jj);;
-						wHangul2 = MakeHangul(name.GetAt(ii), name.GetAt(ii+1));
+
+						//@불성실공시, /(액면불할,액면병합), $투자유의, %이상급등, &관리, X거래정지, !기준가발생
+						if (name.GetAt(0) == 88 || name.GetAt(0) == 64 || name.GetAt(0) == 47 || name.GetAt(0) == 36 || name.GetAt(0) == 37 || name.GetAt(0) == 38 || name.GetAt(0) == 33)
+							wHangul2 = MakeHangul(name.GetAt(ii + 1), name.GetAt(ii + 2));
+						else
+							wHangul2 = MakeHangul(name.GetAt(ii), name.GetAt(ii+1));
+
 						if (wStart > wHangul2 || wHangul2 > wEnd)	arSearch.RemoveAt(jj);
 					}
 				}
@@ -6938,7 +6810,13 @@ bool CPage1::SearchJongmok(CString sName, bool bAddAll)
 
 						if (name.GetLength() < ii+2)	
 							arSearch.RemoveAt(jj);
-						wHangul2 = MakeHangul(name.GetAt(ii), name.GetAt(ii+1));
+
+						//@불성실공시, /(액면불할,액면병합), $투자유의, %이상급등, &관리, X거래정지, !기준가발생
+						if(name.GetAt(0) == 88 || name.GetAt(0) == 64 || name.GetAt(0) == 47 || name.GetAt(0) == 36 || name.GetAt(0) == 37 || name.GetAt(0) == 38 || name.GetAt(0) == 33)
+							wHangul2 = MakeHangul(name.GetAt(ii + 1), name.GetAt(ii + 2));
+						else
+							wHangul2 = MakeHangul(name.GetAt(ii), name.GetAt(ii+1));
+
 						if (wHangul != wHangul2)
 							arSearch.RemoveAt(jj);
 					}

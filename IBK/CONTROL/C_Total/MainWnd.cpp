@@ -1056,7 +1056,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// 환경설정버튼 숨기기
 	sToken = "/b";	nPos = m_sParam.Find(sToken, 0);
-	if (nPos >= 0)	m_bHideMenuBtn = true;
+	if (nPos >= 0)	m_bHideMenuBtn = true;axisGMain.dll LoadLibrary error
 	else		m_bHideMenuBtn = false;
 
 	m_iDtUnit = m_pEnvInfo->datainfo.btUnit;

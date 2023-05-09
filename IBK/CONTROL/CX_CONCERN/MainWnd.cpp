@@ -559,9 +559,6 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 	case MK_FILETYPE:
 		ret = m_nFileType;
 		break;
-	case MK_GETARRANGE:
-		ret = m_pToolWnd->SendMessage(WM_MANAGE,MK_GETARRANGE);
-		break;
 	case MK_SETARRANGE:
 		ret = m_pToolWnd->SendMessage(WM_MANAGE,MK_SETARRANGE);
 		break;
@@ -580,9 +577,6 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 		case MO_TREE:
 			ret = (LONG)m_pTreeWnd.get();
 			break;
-// 		case MO_BASKET:
-// 			ret = (LONG)m_pBasketWnd;
-// 			break;
 		case MO_GRID:
 			ret = m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_GRID));
 			break;
@@ -618,9 +612,6 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 		ret = (LONG)m_pGroupWnd->SendMessage(WM_MANAGE, wParam, lParam);		//4
 		}
 		break;
-	case MK_UPJONGDATA:
-		ret = (LONG)m_pGroupWnd->SendMessage(WM_MANAGE, wParam, lParam);		//4
-		break;
 	case MK_CLOSE:
 		{
 			OnDestroy();
@@ -637,11 +628,6 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 	case MK_SAVEFOROUB:
 		{
 			m_pGroupWnd->SendMessage(WM_MANAGE,wParam,lParam);
-		}
-		break;
-	case MK_ACCOUNT:
-		{
-			m_strAccount = CString((char*)lParam);
 		}
 		break;
 	case MK_BOUCODE:
@@ -704,7 +690,7 @@ LONG CMainWnd::OperDLLOUB(WPARAM wParam, LPARAM lParam)
 	
 	CRecvData	rdata;
 	CSendData	sdata;
-	rdata.SetData(sdata.GetUserData(), wParam, lParam);
+	rdata.SetCRData(sdata.GetUserData(), wParam, lParam);
 	
 	char* data = ex->data; 
 	const int len = ex->size;
@@ -716,7 +702,7 @@ LONG CMainWnd::OperDLLOUB(WPARAM wParam, LPARAM lParam)
 	if (ex->key == TRKEY_INTER)
 	{
 		const CString skey = strRem.Left(2);
-		m_iSendTr--;   //test 20230223
+		m_iSendTr--;   
 		m_slog.Format("[cx_interest][CMainWnd][OperDLLOUB][remove]<%s> m_iSendTr=[%d] len=[%d] skey=[%s]", m_strMap, m_iSendTr, len, skey);
 		OutputDebugString(m_slog);
 		if (atoi(skey) < 0)
@@ -729,27 +715,40 @@ LONG CMainWnd::OperDLLOUB(WPARAM wParam, LPARAM lParam)
 		m_pGroupWnd->m_iInterCnt = atoi(CString(data, len).Mid(22, 4));
 		m_pTreeWnd->receiveOub(CString(data, len), _groupKey);
 
-		
-	
-		//if(m_bChangeGroup == 0)
-		//	m_bChangeGroup = false;  //test 20230223
-
 		return ret;
 	}
 
-	if (len	== sizeof(struct MarketTime))
-	{
+	if (ex->key == TRKEY_MARKETTIME)
 		SetMarketTime(data);
-	}
-	else if(m_strAccount != "" && strRem.Find(m_id) > -1)
+	else if (ex->key == TRKEY_REMAIN) 
 	{
 		_groupKey = 0;
 		m_pTreeWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_RECVDATA, kind), (LPARAM)&rdata);
 	}
-	else
+	else if (ex->key == TRKEY_GRIDSAVE)
 	{
 		m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_RECVDATA, kind), (LPARAM)&rdata);
+#ifdef TEST_1  //saveserver receive
+		SendMessage(WM_MANAGE, MK_PROCDLL);
+		CString string = "OnPortfolio\tok";
+		m_pWnd->SendMessage(WM_USER, MAKEWPARAM(procDLL, 0), (LPARAM)(LPCTSTR)string);
+#endif
 	}
+	else if (ex->key == TRKEY_GRIDNEW || ex->key == TRKEY_GRIDROW  )
+	{
+		if(m_iViewType == 0)  //100 종목보기
+			m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_100RECVDATA, ex->key), (LPARAM)&rdata);
+		else
+			m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_RECVDATA, kind), (LPARAM)&rdata);
+	}
+	else if(ex->key == TRKEY_BACKUP)
+		m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_RECVDATA, kind), (LPARAM)&rdata);
+	else if(ex->key ==  TRKEY_NEWS)
+		m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_RECVDATA, kind), (LPARAM)&rdata);
+	else if(ex->key == TRKEY_GRIDUPJONG)
+		m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_RECVDATA, kind), (LPARAM)&rdata);
+	//else 
+	//	m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_RECVDATA, kind), (LPARAM)&rdata);
 	return ret;
 }
 
@@ -848,7 +847,8 @@ void CMainWnd::parsingDomino(CString datB)
 
 		if(symbol == _T("selectGroup") && !entry.IsEmpty())
 		{
-			m_pToolWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SELECTGROUP, (LPARAM)atoi(entry)));
+			m_pGroupWnd->SendMessage(WM_MANAGE, MK_GROUPSAVE, (LPARAM)-1);
+			m_pTreeWnd->SendMessage(WM_MANAGE, MK_CALLINTEREST, (LPARAM)atoi(entry));
 		}
 	}
 }
@@ -862,12 +862,8 @@ void CMainWnd::parsingTrigger(CString datB)
 	{
 		if (!m_bProc)
 		{
-
-			const int	ret = (int)m_pToolWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
-			m_pTreeWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
-
-			m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SETUPOK, ret));	
-			m_pToolWnd->SendMessage(WM_MANAGE, MK_SENDTREE);
+			m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SETUPOK, 0));	
+			m_pTreeWnd->SendMessage(WM_MANAGE, MK_CALLINTEREST, -1);
 		}
 		m_bProc = false;
 	}	
@@ -917,7 +913,7 @@ void CMainWnd::sendTR(CString name, CString data, BYTE type, int key, CString ke
 	trData += keyName;
 	trData += '\t';
 	trData += std::string((char *)&udat, L_userTH);
-	data.Replace("emptyrow", "        ");  //test 20230208
+	data.Replace("emptyrow", "        ");
 	trData += data.GetString();
 	
 	const LRESULT result = m_pWnd->SendMessage(WM_USER, MAKEWPARAM(invokeTRx, trData.size() - L_userTH - m_param.name.GetLength() - 1), (LPARAM)trData.c_str());
@@ -1020,8 +1016,6 @@ void CMainWnd::ResizeOper(int cx, int cy)
 	CRect	rcBasket(0, SIZE_DIVIDE, m_size.cx, m_size.cy-2*SIZE_DIVIDE);//BUFFET
 
 	const BOOL	bBig = m_pToolWnd->SendMessage(WM_MANAGE, MK_TOOLSIZE);
-
-	const CRect rcRTS(0, (bBig) ? SIZE_TOOL + SIZE_DIVIDE*3 : SIZE_TOOL/2 + SIZE_DIVIDE*4, 0, m_size.cy-2*SIZE_DIVIDE);
 
 	CRect	rcTool(0, 0, m_size.cx-GAP1, SIZE_TOOL/2), rcTemp(0, 0, 0, 0);
 
@@ -1147,17 +1141,13 @@ void CMainWnd::SendOper(class CSendData* sdata)
 	SendMode(true);
 
 	if(sdata->GetTRCODE().Find("PIBOSJG2") > -1 || sdata->GetTRCODE().Find("PIBOFJGO") > -1)  //20200423 잔고조회Tr변경
-	{
-		sendTR(sdata->GetTRCODE(), CString(sdata->GetData(), sdata->GetDataLen()), US_ENC|US_KEY, m_param.key, m_param.name, sdata->GetDataKey());
-		//2013.01.29 KSJ ENd
-	}
+		sendTR(sdata->GetTRCODE(), CString(sdata->GetData(), sdata->GetDataLen()), US_ENC | US_KEY, m_param.key, m_param.name, TRKEY_REMAIN);
 	else if(sdata->GetTRCODE().Find("bo221199") > -1)	//2012.11.28 KSJ 장운영시간 조회
-	{
 		sendTR(sdata->GetTRCODE(), CString(sdata->GetData(), sdata->GetDataLen()), US_PASS|US_KEY, m_param.key, m_param.name, sdata->GetDataKey());
-	}
 	else
-	{
-		sendTR(sdata->GetTRCODE(), CString(sdata->GetData(), sdata->GetDataLen()), US_OOP|US_KEY, m_param.key, m_param.name, sdata->GetDataKey());
+	{ 
+		//if(sdata->m_key != TRKEY_GRIDSAVE)
+			sendTR(sdata->GetTRCODE(), CString(sdata->GetData(), sdata->GetDataLen()), US_OOP | US_KEY, m_param.key, m_param.name, sdata->GetDataKey());
 	}
 }
 
@@ -1363,7 +1353,7 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 	else if(nIDEvent == 1222)
 	{
 		KillTimer(1222);
-		m_bChangeGroup = FALSE;   //test 20230223
+		m_bChangeGroup = FALSE;   
 	}
 	else if (nIDEvent == TM_DRAG)
 	{
@@ -1384,11 +1374,7 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 void CMainWnd::RequestMarketTime()
 {
 	CSendData	sdata;
-	char	key{};
-	_trkey* trkey = (struct _trkey*)&key;	
-	trkey->kind = TRKEY_MARKETTIME;
-	
-	sdata.SetData("bo221199", key, "1", 1, "");	
+	sdata.SetData("bo221199", TRKEY_MARKETTIME, "1", 1, "");
 	
 	SendOper(&sdata);
 }
@@ -1422,7 +1408,7 @@ void CMainWnd::uploadBackup()
 	
 	trkey->kind = TRKEY_BACKUP;
 	
-	sdata.SetData(trUPDOWN, key, sendB, strlen(sendB), "");
+	sdata.SetData(trUPDOWN, TRKEY_BACKUP, sendB, strlen(sendB), "");
 	
 	SendOper(&sdata);
 }
@@ -1559,8 +1545,7 @@ BSTR CMainWnd::GetProperties()
 void CMainWnd::Reload() 
 {
 	m_pGroupWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
-	m_pToolWnd->ReloadList();
-
+	m_pTreeWnd->SendMessage(WM_MANAGE, MK_CALLINTEREST, -1);
 }
 
 void CMainWnd::SetUseToolBox(BOOL bUseTool) 
@@ -1587,8 +1572,8 @@ void CMainWnd::ChangeGroup(short nIndex)
 		m_pGroupWnd->SetInitSortingValue();
 	// KSJ
 
-	m_bChangeGroup = TRUE;
-	SetTimer(1222,1000,nullptr);
+	//m_bChangeGroup = TRUE;
+	//SetTimer(1222,1000,nullptr);
 	//SetTimer(1222, 500, nullptr);
 	m_pGroupWnd->SendMessage(WM_MANAGE, MK_NOSELECT);
 
@@ -1606,7 +1591,8 @@ OutputDebugString(m_slog);
 	else
 	{
 		m_bRemain = FALSE;	//2014.09.16 KSJ 보유잔고에서 다른그룹으로 이동시에 빈칸이 없어지는 현상 발생함.
-		m_pToolWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SELECTGROUP, (LPARAM)nIndex));
+		m_pGroupWnd->SendMessage(WM_MANAGE, MK_GROUPSAVE, (LPARAM)-1);
+		m_pTreeWnd->SendMessage(WM_MANAGE, MK_CALLINTEREST, nIndex);    
 	}
 
 	//OnCommand(MAKEWPARAM(IDC_CB_GROUP, CBN_SELCHANGE), 0);
@@ -1659,17 +1645,13 @@ void CMainWnd::OnPortfolio(LPCTSTR result)
 	m_slog.Format("--------[cx_interest][CMainWnd][OnPortfolio][remove]<%s> str=[%s] m_bChangeGroup=[%d]\r\n", m_strMap, str, m_bChangeGroup);
 	OutputDebugString(m_slog);
 	KillTimer(TM_DRAG);
-	if (m_bChangeGroup == TRUE)
+	if(m_bChangeGroup == TRUE)
 		return;
 
 	if( str == "start")
 		return;
 
-
-	const int	ret = (int)m_pToolWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
-	m_pTreeWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
-	
-	m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SETUPOK, ret));
+	m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SETUPOK, 0));
 }
 
 int CMainWnd::GetFileType()
@@ -1710,9 +1692,9 @@ BOOL CMainWnd::CheckSaveStatus()
 	return isNewDrop;
 }
 
-void CMainWnd::Recover() 
+void CMainWnd::Recover()
 {
-	m_pGroupWnd->SendMessage(WM_MANAGE,MK_RECOVER);
+	m_pGroupWnd->SendMessage(WM_MANAGE, MK_RECOVER);
 
 }
 
@@ -1736,8 +1718,7 @@ BOOL CMainWnd::IsWindow()
 
 void CMainWnd::ClearGrid() 
 {
-//	if (!m_bChangeGroup)
-//		m_pGroupWnd->SendMessage(WM_MANAGE,MK_CLEAR);
+
 }
 
 void CMainWnd::SetExpect(BOOL bExpect) 
@@ -1817,58 +1798,12 @@ BSTR CMainWnd::GetRemainCode()
 
 void CMainWnd::SearchGroupList() 
 {
-	// TODO: Add your dispatch handler code here
-	CString strSendData;
-	struct _updn updn;
 	
-	FillMemory(&updn, sizeof(_updn), ' ');
-	ZeroMemory(&updn, sizeof(_updn));
-	
-	CopyMemory(&updn.uinfo.gubn, "MY", sizeof(updn.uinfo.gubn));
-	updn.uinfo.dirt[0] = 'U';
-	updn.uinfo.cont[0] = 'G';
-	CopyMemory(updn.uinfo.nblc, _T("00001"), sizeof(updn.uinfo.nblc));
-	updn.uinfo.retc[0] = 'O';
-	
-	strSendData = CString((char*)&updn, sizeof(_updn));
-	
-	CSendData	sdata;
-	char	key{};
-	key = 0;
-	_trkey* trkey = (struct _trkey*)&key;
-	
-	sdata.SetData(trUPDOWN, key, (LPSTR)(LPCTSTR)strSendData, strSendData.GetLength(), "");
-	
-	m_iTrkey = TRKEY_GROUPARR;
-	const int ret = searchTR("pidomyst", strSendData, US_KEY, m_param.key, m_param.name, 18);
-	if(ret == 0)
-		m_iTrkey = -1;
 }
 
-//2020 관심그룹 리스트 조회 
 void CMainWnd::SearchGroupList(bool bInit)  //최초 열때 조회, 설정창으로 그룹등 변경후 조회 두가지로 나뉨
 {
-	CString strSendData;
-	struct _updn updn;
 	
-	FillMemory(&updn, sizeof(_updn), ' ');
-	ZeroMemory(&updn, sizeof(_updn));
-
-	CopyMemory(&updn.uinfo.gubn, "MY", sizeof(updn.uinfo.gubn));
-	updn.uinfo.dirt[0] = 'U';
-	updn.uinfo.cont[0] = 'G';
-	CopyMemory(updn.uinfo.nblc, _T("00001"), sizeof(updn.uinfo.nblc));
-	updn.uinfo.retc[0] = 'O';
-	
-	strSendData = CString((char*)&updn, sizeof(_updn));
-	
-	CSendData	sdata;
-	char	key{};
-	key = 0;
-	_trkey* trkey = (struct _trkey*)&key;
-
-	sdata.SetData(trUPDOWN, key, (LPSTR)(LPCTSTR)strSendData, strSendData.GetLength(), "");
-	searchTR("pidomyst", strSendData, US_KEY, m_param.key, m_param.name, 18);
 }
 
 void CMainWnd::RemoveGroupCodeMap(int key)
@@ -1915,7 +1850,7 @@ void CMainWnd::SearchGroupCode(short index)
 	if(m_pGroupWnd)
 		m_pGroupWnd->SetInitSortingValue();
 
-	m_bChangeGroup = TRUE;
+	//m_bChangeGroup = TRUE;
 
 	 if (m_pGroupWnd)
 		 m_pGroupWnd->SendMessage(WM_MANAGE,MK_NOSELECT);
@@ -1980,8 +1915,6 @@ void CMainWnd::Request_GroupCode(int iseq)
 	stmp.Format("%02d", index);
 	memcpy((char*)&sendB[sz_uinfo], stmp, 2);
 
-	//m_bChangeGroup = TRUE;  //test 20230223
-	
 	//m_slog.Format("[cx_interest][CMainWnd][OperDLLOUB][remove] Request_GroupCode [%s] m_iSendTr=[%d]", m_strMap, m_iSendTr);
 	//OutputDebugString(m_slog);
 	sendTR(trUPDOWN, sendB.data(), US_KEY, m_param.key, m_param.name, TRKEY_INTER);
@@ -2001,5 +1934,5 @@ void CMainWnd::SetDragTimer()
 {
 	m_slog.Format("[cx_interest][CMainWnd][remove][SetDragTimer][%s]]------------------------ ", m_strMap);
 	OutputDebugString(m_slog);
-	SetTimer(TM_DRAG, 1500, nullptr);
+//	SetTimer(TM_DRAG, 1500, nullptr);
 }

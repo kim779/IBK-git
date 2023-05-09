@@ -1510,51 +1510,11 @@ void CintGrid::OnTimer(UINT nIDEvent)
 
 					switch (type)
 					{
-// 					case TK_CHART:
-// 						{
-// 							if (!bChart)
-// 							{
-// 								mapname = "IB202210";
-// 								option  = "1301\t";
-// 
-// 								switch(GetMarketByCode(code)) {
-// 								case MarketFuture:
-// 									mapname = "IB202211";
-// 									option  = "31301\t";
-// 									break;
-// 								case MarketOption:
-// 									mapname = "IB202212";
-// 									option  = "41301\t";
-// 									break;
-// 								case MarketIndex:
-// 									mapname = "IB202213";
-// 									option  = "21301\t";
-// 									break;
-// /*								case MarketStockOption:
-// 									mapname = "IB202214";
-// 									option  = "71301\t";
-// 									break;
-// */								}
-// 							
-// 								option += code;
-// 								if (!code.IsEmpty())
-// 								{
-// 									m_pToolChart->ShowMap(cellRC, rect, mapname, option);
-// 									if (m_pToolNews)
-// 											m_pToolNews->HideTips();	
-// 								}
-// 							}
-// 						}
-// 						break;
 					case TK_NEWS:
 						{
 							const LPARAM lParam = GetItemData(row, col);
 							WORD	news = HIWORD(lParam);
 							
-							if (CAST_TREEID(dataidx)->kind == xISSUE)
-							{
-								news = 1;
-							}
 							const WORD	high = 0;
 							SetItemData(row, colSIG, MAKELPARAM(news, high));
 
@@ -3734,7 +3694,7 @@ BOOL CintGrid::DrawCell(CDC* pDC, int nRow, int nCol, CRect rect, BOOL bEraseBk)
 
 	if (nRow > 0)
 	{
-		const auto& pInter = m_pParent->GetData(nRow - 1);   //test 확인
+		const auto& pInter = m_pParent->GetData(nRow - 1);   
 		if (pInter)
 		{
 			if (pInter->bookmark == '1')
@@ -7129,9 +7089,6 @@ void CintGrid::OnLButtonDblClk(UINT nFlags, CPoint point)
 						//보유종목일때 3단계 정렬하면 이전그룹이 보이는 현상이 발생
 						if (((CMainWnd*)m_pMainWnd)->m_bRemain == TRUE)	
 						{
-							CWnd*	pWnd = (CWnd*)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_TOOL));
-							pWnd->SendMessage(WM_MANAGE, MK_TURNCODE);
-							
 							if(((CMainWnd*)m_pMainWnd)->m_bRemain)
 							{
 								CWnd* pWnd = (CWnd*)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_TREE));
@@ -7230,12 +7187,10 @@ void CintGrid::OnLButtonDown(UINT nFlags, CPoint point)
 		case mouseDATECELL:
 		case mouseTIMECELL:
 		case mouseCODECELL:
-// 			TRACE("MessageToParent15 row : %d", m_idClick.row);
 			MessageToParent(m_idClick.row, m_idClick.col, GVNM_LMOUSEDOWN);
-			break;  //return; <-- 이것때문에 드래그가 불가하다
+			break;  
 		}
 	}   
-//	else if (m_mousemode != mouseOVERCOLDIVIDE && m_mousemode != mouseOVERROWDIVIDE) 
 	if (m_mousemode != mouseOVERCOLDIVIDE && m_mousemode != mouseOVERROWDIVIDE)
 	{
 		SetFocusCell(-1,-1); 
@@ -7244,7 +7199,6 @@ void CintGrid::OnLButtonDown(UINT nFlags, CPoint point)
 		if (IsCellAttribute(m_idClick, GVAT_DRAGDROP)) // && hOldFocusWnd == GetSafeHwnd())
 		{
 			SelectRows(m_idClick);
-//			TRACE("NBTNDOWN tmINTERVAL %d\n", tmINTERVAL);
 			m_timerID = SetTimer(WM_LBUTTONDOWN, tmINTERVAL, 0);
 		}
 		else if (IsCellAttribute(m_idClick, GVAT_CHECK))
@@ -7252,28 +7206,6 @@ void CintGrid::OnLButtonDown(UINT nFlags, CPoint point)
 			SelectRows(m_idClick);
 			m_mousemode = mouseCHECKCELL;
 		}
-#ifdef	_winix
-		else if (IsCellAttribute(m_idClick, GVAT_COMBO))
-		{
-			SelectRows(m_idClick);
-			m_mousemode = mouseCOMBOCELL;
-		}
-		else if (IsCellAttribute(m_idClick, GVAT_DATE))
-		{
-			SelectRows(m_idClick);
-			m_mousemode = mouseDATECELL;
-		}
-		else if (IsCellAttribute(m_idClick, GVAT_TIME))
-		{
-			SelectRows(m_idClick);
-			m_mousemode = mouseTIMECELL;
-		}
-		else if (IsCellAttribute(m_idClick, GVAT_CODE))
-		{
-			SelectRows(m_idClick);
-			m_mousemode = mouseCODECELL;
-		}
-#endif
 	}
 
 	SetCapture();
@@ -7302,14 +7234,9 @@ void CintGrid::OnLButtonDown(UINT nFlags, CPoint point)
 		{
 			m_timerID = SetTimer(WM_LBUTTONDOWN, tmAUTOSCRL/10, 0);
 			m_timerID = SetTimer(WM_LBUTTONDOWN, tmAUTOSCRL, 0);
-//			TRACE("NBTNDOWN tmAUTOSCRL %d\n", tmAUTOSCRL);
-			//090807 종목을 빠르게 클릭시 연동이 안되는 부분 있어 추가 수정
-//			TRACE("OnLButtonDown::OnBeginDrag");
 			m_isLbtnClick = TRUE;				//클릭여부 091013 수정
 			m_mousemode = mousePREPAREDRAG;
 			OnBeginDrag();
-//			TRACE("OnLButtonDown::OnBeginDrag mousemode : %d", m_mousemode);
-//			TRACE("tmAUTOSCRL : %d", tmAUTOSCRL);
 		}
 		else{
 
@@ -7337,9 +7264,6 @@ void CintGrid::OnLButtonDown(UINT nFlags, CPoint point)
 						//보유종목일때 3단계 정렬하면 이전그룹이 보이는 현상이 발생
 						if (((CMainWnd*)m_pMainWnd)->m_bRemain == TRUE)	
 						{
-							CWnd*	pWnd = (CWnd*)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_TOOL));
-							pWnd->SendMessage(WM_MANAGE, MK_TURNCODE);
-							
 							if(((CMainWnd*)m_pMainWnd)->m_bRemain)
 							{
 								CWnd* pWnd = (CWnd*)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_TREE));
@@ -8192,14 +8116,9 @@ bool CintGrid::OnEditCell(int nRow, int nCol, UINT nChar)
 	const CIdCell cell(nRow, nCol);
 
 	if ((nCol == colNAME) && !IsCellAttribute(cell, GVAT_MARKER))
-	// END MODIFY
 	{
 		const UINT kind = (UINT)GetParent()->SendMessage(WM_MANAGE, MK_GETDATAKIND);
-		if (CAST_TREEID(kind)->kind == xISSUE)
-			return false;
-		// DEL PSH 20070914
-		//CIdCell cell(nRow, nCol);
-		// END DEL
+
 		if (!IsValid(cell) || !IsCellAttribute(cell, GVAT_EDIT) || !IsCellVisible(nRow, nCol)) 
 		{
 			MessageToParent(nChar, nCol, GVNM_ONCHAR);
@@ -8435,14 +8354,12 @@ void CintGrid::OnBeginDrag()
 		m_idDrag.row = m_idClick.row;
 		m_idDrag.col = m_idClick.col;
 
-// 		TRACE("MessageToParent27 row : %d", m_idDrag.row);
 		MessageToParent(m_idDrag.row, m_idDrag.col, GVNM_BEGINDRAG);
 		MessageToParent(m_idDrag.row,m_idDrag.col, GVNM_TRIGGER);//FOR TRIGGER
 		m_dragWnd = this;
 
 		CintGrid::m_dropdata.SetData(this, m_idDrag.row, m_idDrag.col);
 		m_mousemode = mouseDRAGGING;
-// 		TRACE("Begin::m_mousemode : %d\n", m_mousemode);
 		const DROPEFFECT dropEffect = pSource->DoDragDrop(DROPEFFECT_COPY);
 		
 		if ( dropEffect == DROPEFFECT_NONE )

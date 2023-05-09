@@ -14,7 +14,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CEtfDlg dialog
 
-enum all_code{ acETF, acETN, acETFETN}; //2014.10.28 KSJ 전체종목 
+enum all_code{ acETF, acETN, acETFETN, acETFETNREIT}; //2014.10.28 KSJ 전체종목 
 
 static BOOL m_eListsort;
 /////////////////////////////////////////////////////////////////////////////
@@ -70,7 +70,7 @@ public:
 			tree_elw_jogicode,
 			tree_konex		,//2013.06.05 KSJ 코넥스 추가
 			tree_etn,		//2014.10.28 KSJ etn 추가
-			tree_etfetn		//2014.10.28 KSJ etf/etn 전종목 추가
+			tree_etfetn		//2014.10.28 KSJ ETF/ETN/리츠 전종목
 	};
 
 // Dialog Data
@@ -115,6 +115,9 @@ protected:
 	CPoint  m_point;
 
 	BOOL	m_search{};
+
+	std::map<CString, struct hjcodex*> _mapCODE;  //reit 리츠정보 보이기
+	void InitReitList();
 
 	// Generated message map functions
 	//{{AFX_MSG(CEtfDlg)

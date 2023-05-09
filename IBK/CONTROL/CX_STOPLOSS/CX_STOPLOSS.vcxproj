@@ -161,7 +161,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../dev/CX_STOPLOSS.dll</OutputFile>
+      <OutputFile>D:\IBKS_TEST\dev/CX_STOPLOSS.dll</OutputFile>
       <ImportLibrary>.\Debug\CX_STOPLOSS.lib</ImportLibrary>
       <ModuleDefinitionFile>.\CX_STOPLOSS.def</ModuleDefinitionFile>
     </Link>

@@ -76,11 +76,14 @@ static char THIS_FILE[]=__FILE__;
 
 CIndcBase* CGraphMgr::CreateGraph(CWnd* pwndView, CWnd* pwndPnChart, class CDataMgr* pDataMgr, char* pcInfo, char* pcGraph, int iDispDay)
 {
-	LOG_OUTP(2, "axisgindc", __FUNCTION__);
-
+	
+	CString m_slog;
 	struct _graph* pGraph = (struct _graph*)pcGraph;
 	int iType = pGraph->btGType;
 	int iKind = pGraph->wGKind;
+
+	m_slog.Format("iType=[%d] iKind=[%d] iDispDay=[%d] ", iType, iKind, iDispDay);
+	LOG_OUTP(3, "axisgindc", __FUNCTION__, m_slog);
 
 	CIndcBase* pIndcBase = NULL;
 	switch (iType)

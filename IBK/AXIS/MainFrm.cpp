@@ -3079,71 +3079,7 @@ slog.Format("[MIAN_MONITOR] iFull_width[%d] < x[%d]  or  iFull_height[%d] < y[%d
 
 			CreateHistoryBar();
 			
-			CString strFile;
-			//7805 팝업 
-			strFile.Format("%s\\tab\\NOTICECOOKIE.ini", Axis::home); 
 			
-			char buff[1024];
-			GetPrivateProfileString("7805","VISIBLE","Y",buff,sizeof(buff),strFile);
-			
-			CString str;
-			str = buff;
-			
-			if(str == "Y")
-			{
-				GetPrivateProfileString("7805","TODAY","0",buff,sizeof(buff),strFile);
-				
-				str = buff;
-				
-				const int nFirst = GetPrivateProfileInt("7805","FIRST",1,strFile);
-				
-				const CTime tm(CTime::GetCurrentTime());
-				CString today;
-				today.Format("%04d%02d%02d",tm.GetYear(),tm.GetMonth(),tm.GetDay());
-				
-				if(str != today)
-				{
-					WritePrivateProfileString("7805","FIRST","1",strFile);
-				}
-				
-				if((str == today && nFirst == 1) || str != today)
-				{
-					CTime time;
-					time = CTime::GetCurrentTime();
-			
-					char readB[1024];
-					int readL;
-		
-					readL =	GetPrivateProfileString("7805","FROM","",readB,sizeof(readB),strFile);
-
-					if(readL == 0)  //파일이 없거나 데이터를 못읽으면 그냥 띄운다
-					{
-						SetTimer(TM_POPUP_JISU, 7000, NULL);
-						m_bInit = FALSE;
-						break;
-					}
-
-					CString strFrom(readB,readL);
-					const CTime FromTime(atoi(strFrom.Mid(0,4)), atoi(strFrom.Mid(4,2)), atoi(strFrom.Mid(6,2)), atoi(strFrom.Mid(8,2)), atoi(strFrom.Mid(10,2)), atoi(strFrom.Mid(12,2)));
-					
-					readL =	GetPrivateProfileString("7805","TO","",readB,sizeof(readB),strFile);
-
-					if(readL == 0)  //파일이 없거나 데이터를 못읽으면 그냥 띄운다
-					{
-						SetTimer(TM_POPUP_JISU, 7000, NULL);
-						m_bInit = FALSE;
-						break;
-					}
-
-					CString strTo(readB,readL);
-					const CTime ToTime(atoi(strTo.Mid(0,4)), atoi(strTo.Mid(4,2)), atoi(strTo.Mid(6,2)), atoi(strTo.Mid(8,2)), atoi(strTo.Mid(10,2)), atoi(strTo.Mid(12,2)));
-					
-					if(time <= FromTime || time >= ToTime)
-					{
-						SetTimer(TM_POPUP_JISU, 7000, NULL);	
-					}
-				}
-			}
 			////////////////////////////////////////////////
 			//dkkim 2018.11.12 AXSOCK의 원복으로 기능 제외.아래 기능 활성화를 위해서는 AXSOCK의 기능이 필요함.
 // 			strFile.Format("%s\\tab\\RSCMONITOR.ini", Axis::home); 
@@ -5897,7 +5833,7 @@ void CMainFrame::registerControl()
 	UnregisterControl();
 
 	//char*	control[] = { "axWizard.ocx", "axSock.ocx", "axComCtl.ocx", "axXecure.ocx", "axCertify.ocx", "vbscript.dll", "IBKSConnector.ocx", NULL };
-	char*	control[] = { "axWizard.ocx", "axSock.ocx", "axComCtl.ocx", "axXecure.ocx", "axCertify.ocx", NULL };
+	char*	control[] = { "axWizard.ocx", "axSock.ocx", "axXecure.ocx", "axCertify.ocx", NULL };
 
 	CString	path;
 	HINSTANCE hLib{};
@@ -5915,15 +5851,16 @@ void CMainFrame::registerControl()
 		GetCurrentDirectory(256, buf2);
 		m_slog.Format("[axis][registerControl] registerControl....[%s] [%s]\n", buf1, buf2);
 
-
 		hLib = LoadLibrary(path);
 		if (hLib < (HINSTANCE)HINSTANCE_ERROR)
 		{
+			hLib = LoadLibraryEx(path, NULL, LOAD_LIBRARY_AS_DATAFILE);
 			TRACE("LoadLibrary error....[%s] error=[%d]\n", path, GetLastError());
 			m_slog.Format("[axis][registerControl] LoadLibrary error....[%s] error=[%d]\n", path, GetLastError());
 			OutputDebugString(m_slog);
 			WriteLog(m_slog);
-			continue;
+			if (hLib < (HINSTANCE)HINSTANCE_ERROR)
+				continue;
 		}
 
 		FARPROC	lpDllEntryPoint;
@@ -5931,7 +5868,9 @@ void CMainFrame::registerControl()
 
 		if (lpDllEntryPoint == nullptr)
 		{
+			int iret = GetLastError();
 			FreeLibrary(hLib);
+			AfxMessageBox(path);
 			continue;
 		}
 
@@ -6541,6 +6480,8 @@ OutputDebugString(m_slog);
 	}
 	//@@간편인증
 #endif
+	//m_axConnect->m_bCloudeUSE;
+
 
 OutputDebugString("GLB signOnCert");
 	m_axConnect->SetGuide(_T("사용자정보 확인 중 입니다."));
@@ -11014,6 +10955,8 @@ void CMainFrame::load_eninfomation(bool first)
 
 	if (first && GetPrivateProfileInt("SCREEN", "POPUPACC", 1, file) && Axis::user.CollateNoCase("guest"))
 		AcctPasswordConfig();
+
+	PopUp7805();
 
 	//새창열기 허용
 	m_screenNew = GetPrivateProfileInt("SCREEN", "SCREENNEW", 1, file);
@@ -27683,6 +27626,76 @@ void CMainFrame::CheckServer(CString strip)
 	else if (strip.Find("211.255.204.58") >= 0) m_strServer = "[BP28]";
 	else if (strip.Find("211.255.204.59") >= 0) m_strServer = "[BP29]";
 	else m_strServer = strip;
+
+}
+
+void CMainFrame::PopUp7805()
+{
+	CString strFile;
+	//7805 팝업 
+	strFile.Format("%s\\tab\\NOTICECOOKIE.ini", Axis::home);
+
+	char buff[1024];
+	GetPrivateProfileString("7805", "VISIBLE", "Y", buff, sizeof(buff), strFile);
+
+	CString str;
+	str = buff;
+
+	if (str == "Y")
+	{
+		GetPrivateProfileString("7805", "TODAY", "0", buff, sizeof(buff), strFile);
+
+		str = buff;
+
+		const int nFirst = GetPrivateProfileInt("7805", "FIRST", 1, strFile);
+
+		const CTime tm(CTime::GetCurrentTime());
+		CString today;
+		today.Format("%04d%02d%02d", tm.GetYear(), tm.GetMonth(), tm.GetDay());
+
+		if (str != today)
+		{
+			WritePrivateProfileString("7805", "FIRST", "1", strFile);
+		}
+
+		if ((str == today && nFirst == 1) || str != today)
+		{
+			CTime time;
+			time = CTime::GetCurrentTime();
+
+			char readB[1024];
+			int readL;
+
+			readL = GetPrivateProfileString("7805", "FROM", "", readB, sizeof(readB), strFile);
+			readL = 0; //test
+			if (readL == 0)  //파일이 없거나 데이터를 못읽으면 그냥 띄운다
+			{
+				SetTimer(TM_POPUP_JISU, 1000, NULL);
+				m_bInit = FALSE;
+				return;
+			}
+
+			CString strFrom(readB, readL);
+			const CTime FromTime(atoi(strFrom.Mid(0, 4)), atoi(strFrom.Mid(4, 2)), atoi(strFrom.Mid(6, 2)), atoi(strFrom.Mid(8, 2)), atoi(strFrom.Mid(10, 2)), atoi(strFrom.Mid(12, 2)));
+
+			readL = GetPrivateProfileString("7805", "TO", "", readB, sizeof(readB), strFile);
+
+			if (readL == 0)  //파일이 없거나 데이터를 못읽으면 그냥 띄운다
+			{
+				SetTimer(TM_POPUP_JISU, 1000, NULL);
+				m_bInit = FALSE;
+				return;
+			}
+
+			CString strTo(readB, readL);
+			const CTime ToTime(atoi(strTo.Mid(0, 4)), atoi(strTo.Mid(4, 2)), atoi(strTo.Mid(6, 2)), atoi(strTo.Mid(8, 2)), atoi(strTo.Mid(10, 2)), atoi(strTo.Mid(12, 2)));
+
+			if (time <= FromTime || time >= ToTime)
+			{
+				SetTimer(TM_POPUP_JISU, 1000, NULL);
+			}
+		}
+	}
 
 }
 

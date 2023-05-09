@@ -5512,7 +5512,13 @@ bool CPage1::SearchJongmok(CString sName, bool bAddAll)
 					name.TrimLeft();
 
 					if (name.GetLength() < 2)	continue;
-					wHangul2 = MakeHangul(name.GetAt(ii), name.GetAt(ii+1));
+
+					//@불성실공시, /(액면불할,액면병합), $투자유의, %이상급등, &관리, X거래정지, !기준가발생
+					if (name.GetAt(0) == 88 || name.GetAt(0) == 64 || name.GetAt(0) == 47 || name.GetAt(0) == 36 || name.GetAt(0) == 37 || name.GetAt(0) == 38 || name.GetAt(0) == 33)
+						wHangul2 = MakeHangul(name.GetAt(ii + 1), name.GetAt(ii + 2));
+					else
+						wHangul2 = MakeHangul(name.GetAt(ii), name.GetAt(ii + 1));
+
 					if (wStart <= wHangul2 && wHangul2 <= wEnd)	vSearch.emplace_back(listitem);
 				}
 			}
@@ -5528,7 +5534,13 @@ bool CPage1::SearchJongmok(CString sName, bool bAddAll)
 
 					if (name.GetLength() < 2)	
 						continue;
-					wHangul2 = MakeHangul(name.GetAt(ii), name.GetAt(ii+1));
+
+					//@불성실공시, /(액면불할,액면병합), $투자유의, %이상급등, &관리, X거래정지, !기준가발생
+					if (name.GetAt(0) == 88 || name.GetAt(0) == 64 || name.GetAt(0) == 47 || name.GetAt(0) == 36 || name.GetAt(0) == 37 || name.GetAt(0) == 38 || name.GetAt(0) == 33)
+						wHangul2 = MakeHangul(name.GetAt(ii + 1), name.GetAt(ii + 2));
+					else
+						wHangul2 = MakeHangul(name.GetAt(ii), name.GetAt(ii + 1));
+
 					if (wHangul == wHangul2)	
 						vSearch.emplace_back(listitem);
 				}
@@ -5567,7 +5579,13 @@ bool CPage1::SearchJongmok(CString sName, bool bAddAll)
 						name.TrimLeft();
 
 						if (name.GetLength() < ii+2)	vSearch.erase( vSearch.begin() + jj);
-						wHangul2 = MakeHangul(name.GetAt(ii), name.GetAt(ii+1));
+						
+						//@불성실공시, /(액면불할,액면병합), $투자유의, %이상급등, &관리, X거래정지, !기준가발생
+						if (name.GetAt(0) == 88 || name.GetAt(0) == 64 || name.GetAt(0) == 47 || name.GetAt(0) == 36 || name.GetAt(0) == 37 || name.GetAt(0) == 38 || name.GetAt(0) == 33)
+							wHangul2 = MakeHangul(name.GetAt(ii + 1), name.GetAt(ii + 2));
+						else
+							wHangul2 = MakeHangul(name.GetAt(ii), name.GetAt(ii + 1));
+
 						if (wStart > wHangul2 || wHangul2 > wEnd)	vSearch.erase(vSearch.begin() + jj);
 					}
 				}
@@ -5582,7 +5600,13 @@ bool CPage1::SearchJongmok(CString sName, bool bAddAll)
 
 						if (name.GetLength() < ii+2)	
 							vSearch.erase(vSearch.begin() + jj);
-						wHangul2 = MakeHangul(name.GetAt(ii), name.GetAt(ii+1));
+					
+						// @불성실공시, / (액면불할, 액면병합), $투자유의, % 이상급등, & 관리, X거래정지, !기준가발생
+							if (name.GetAt(0) == 88 || name.GetAt(0) == 64 || name.GetAt(0) == 47 || name.GetAt(0) == 36 || name.GetAt(0) == 37 || name.GetAt(0) == 38 || name.GetAt(0) == 33)
+								wHangul2 = MakeHangul(name.GetAt(ii + 1), name.GetAt(ii + 2));
+							else
+								wHangul2 = MakeHangul(name.GetAt(ii), name.GetAt(ii + 1));
+
 						if (wHangul != wHangul2)
 							vSearch.erase(vSearch.begin() + jj);
 					}

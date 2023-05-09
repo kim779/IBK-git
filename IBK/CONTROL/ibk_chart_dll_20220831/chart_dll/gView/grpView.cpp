@@ -517,8 +517,8 @@ LRESULT CGrpView::OnViewEvent(WPARAM wParam, LPARAM lParam)
 			return (long)OpenCodeDlg(HIWORD(wParam), lParam);
 		case dlgGubnFOSO:
 			return m_pwndView->SendMessage(WM_USER, MAKEWPARAM(nameDLL, whichKIND), lParam);
-		case dlgcommodityName:			// 20090907 : ADD :
-			return m_pwndView->SendMessage(WM_USER, MAKEWPARAM(nameDLL, commodityNAME), lParam);
+		//case dlgcommodityName:			// 20090907 : ADD :
+		//	return m_pwndView->SendMessage(WM_USER, MAKEWPARAM(nameDLL, commodityNAME), lParam);
 		case dlgToolCfg:
 			return CallPnToolDlg((char*)lParam);
 		case DlgAidCfg:
@@ -1037,8 +1037,16 @@ int CGrpView::Init()
 	m_hiGMainLib = LoadLibrary("axisGMain.dll");
 	if (!m_hiGMainLib)
 	{
-		m_pApp->MessageBox("axisGMain.dll LoadLibrary error", COMPANYNAME);
-		return -1;
+		m_hiGMainLib = LoadLibraryEx("axisGMain.dll", NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+		if (!m_hiGMainLib)
+		{
+			m_hiGMainLib = LoadLibraryEx("axisGMain.dll", NULL, LOAD_LIBRARY_SEARCH_USER_DIRS);
+			if (!m_hiGMainLib)
+			{
+				m_pApp->MessageBox("axisGMain.dll LoadLibrary error", COMPANYNAME);
+					return -1;
+			}
+		}
 	}
 
 	InitPnInfo(m_pEnvInfo->panel);
@@ -2043,7 +2051,7 @@ char* CGrpView::OpenCodeDlg(int kind, UINT lParam)
 		break;
 	// 20090907 : ADD
 	case dlgCommoditiesFutureCode:
-		dKind = commodityCODE;
+	//	dKind = commodityCODE;   //test
 		break;
 	default:
 		dKind = usCODE;

@@ -95,7 +95,6 @@ public:
 	void	saveWhenGroupClosed(int index);
 	
 	int	sumEachGroupCount();
-	void	InitSetGroup();			//초기에 그룹 선택하게 하는 함수
 	void	RefreshGrid();
 	int		WriteFileSumtoEachGroup(UINT curruntGroup);
 	CString	MakePacket(CString& code, CString amount = _T(""), CString price = _T(""), CString name = _T(""), CString bookmark = _T(""));
@@ -159,7 +158,6 @@ public:	//2012.02.13 KSJ 이벤트로 보내면 데이터가 깨져서 직접 메소드 호출함.
 	CRect	GetArea(int nIndex);
 	CRect	GetMovedRect(int nIndex, int xPos);
 	void	ExpectOper(int param);
-	void	Recover();
 
 	void	DrawHighlight(CDC* pDC, CRect rect, COLORREF clrLight, COLORREF clrShadow);
 	void	DrawHigV(CDC* pDC, CRect rect, COLORREF clrLight, COLORREF clrShadow);
@@ -173,8 +171,6 @@ public:	//2012.02.13 KSJ 이벤트로 보내면 데이터가 깨져서 직접 메소드 호출함.
 // sub utils
 	int	getTotalSize();
 	void	InvalidateDivide();
-
-	int	loadGroupCount();
 	void	addGridWnd();		//그리드 메모리 재구성
 
 	void	OperResizeMinus(int cx, int cy);

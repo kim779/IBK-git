@@ -35,3 +35,4 @@
 #define BOOK_MARK    '8'
 #define ROW_MARK     '9'
 
+#define TEST_1  1     //그룹서버저장시 저장TR 올리면서 맵화면에서 proc 하지 말고 응답을 받고 하자

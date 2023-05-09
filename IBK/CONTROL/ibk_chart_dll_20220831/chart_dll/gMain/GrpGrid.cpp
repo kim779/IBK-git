@@ -113,7 +113,7 @@ void CGrpGrid::DrawGrid(CDC *pDC)
 	int sMode = pDC->SetBkMode(OPAQUE);
 
 	pDC->FillRect(&m_rectDraw, m_pbrushBG);
-
+	
 	CRect rectC;
 	GetClientRect(&rectC);
 	CRect rectC2 = rectC;

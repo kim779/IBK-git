@@ -47,7 +47,7 @@ public:
 	BOOL		m_bRemain{};
 	CString		m_sMapHandle;
 
-	BOOL		m_bChangeGroup{};
+	BOOL		m_bChangeGroup = FALSE;
 	int			m_iSendTr{};
 	void			SetDragTimer();
 // Operations
@@ -174,7 +174,6 @@ private:
 	CRect			m_rcDivide[3];
 	CRect			m_rcPanel[3];//for rounding
 
-	std::unique_ptr<class COptDlg>		m_pOptDlg;
 	CFont*			m_pFont{};
 	bool			m_bDestroy{};
 	CBrush*			m_pBrush{};
@@ -283,6 +282,14 @@ public:
 	//CString getMapName() { return m_strMap; }
 	CString m_strMap{};
 	int		m_iGroup{};
+
+	int m_iViewType;  //TYPE_VIEW_100,  TYPE_VIEW_DETAIL    100종목보기와 상세보기
+	int GetMViewType() {
+		if (m_iViewType == 1)
+			return MO_SELECT;
+		else
+			return MO_VISIBLE; 
+		}
 protected:
 
 //	CString m_strMap;

@@ -207,7 +207,7 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 		break;
 	case CHART_TR_DATA:
 		{
-		LOG_OUTP(3, "axisgmain", __FUNCTION__, "CHART_TR_DATA");
+		LOG_OUTP(3, "axisgmain", __FUNCTION__, "CHART_TR_DATA c_total에서 리시브 받아서 여기로 2");
 			// debug : 20090915
 			//CString strDebug;
 			//strDebug.Format("CPnChart::OnChartEvent() start");

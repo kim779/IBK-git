@@ -2,8 +2,16 @@
 
 // CertifyCtrl.h : CCertifyCtrl ActiveX 컨트롤 클래스의 선언입니다.
 
+#define LIB_CLOUDE 1
+
+
 #include <afxmt.h>
+#ifdef LIB_CLOUDE
+#include "CaLib/new/interfaceDLL.h"
+#else
 #include "CaLib/interfaceDLL.h"
+#endif
+
 
 // CCertifyCtrl : 구현에 대해서는 CertifyCtrl.cpp을(를) 참조하세요.
 
@@ -15,6 +23,12 @@ class CCertifyCtrl : public COleControl
 public:
 	CCertifyCtrl();
 	CString m_slog;
+	int selectoption;
+	int keypaduse;
+	CString m_root;
+	BOOL CheckCloude();
+	int Cloude_ConTraction_sign(long pOutB, long pOutL);
+	int Cloude_Full_sign(long pOutB, long pOutL);
 // 재정의입니다.
 public:
 	virtual void OnDraw(CDC* pdc, const CRect& rcBounds, const CRect& rcInvalid);
@@ -58,7 +72,8 @@ private:
 	void	removeCertificate();
 	bool	guideMsg(msgNO msgno, CString guide = _T(""), CString title = _T(""));
 	BOOL	isMustCertify(CString maps);
-
+	
+	char* m_pCloudeDn{};
 protected:
 	~CCertifyCtrl();
 

@@ -291,9 +291,9 @@
 #define IDC_DSTATIC3                    1156
 #define IDC_CLUDE_PSCHANGE              1156
 #define IDC_BN_CA                       1157
-#define IDC_CLUDE_PSCHANGE2             1157
-#define IDC_CLUDE_DELETE                1157
+#define IDC_CLUDE_CERTDOWN              1157
 #define IDC_BN_REMOTE                   1158
+#define IDC_CLUDE_PC                    1158
 #define IDC_BN_BREAK                    1159
 #define IDC_RECEIVE_RESOURCE            1159
 #define IDC_PROXY_CUST                  1160
@@ -477,6 +477,7 @@
 #define IDC_EDIT_DN3                    1312
 #define IDC_BTN_LOGIN                   1313
 #define IDC_BTN_CERT_ORDER              1314
+#define IDC_CLOUDE_PCBTN                1314
 #define IDC_BTN_CERT_TRANSFER           1315
 #define IDC_EDIT_CMPIP                  1316
 #define IDC_EDIT_CMPPORT                1317
@@ -650,7 +651,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        480
 #define _APS_NEXT_COMMAND_VALUE         32879
-#define _APS_NEXT_CONTROL_VALUE         1314
+#define _APS_NEXT_CONTROL_VALUE         1315
 #define _APS_NEXT_SYMED_VALUE           113
 #endif
 #endif

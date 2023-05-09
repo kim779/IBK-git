@@ -26,6 +26,7 @@ CAxBrowser::CAxBrowser()
 
 	m_scrGap = 0;
 	m_parentView = NULL;
+	
 }
 
 CAxBrowser::~CAxBrowser()
@@ -95,7 +96,7 @@ int CAxBrowser::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	lpCreateStruct->style |= WS_CLIPCHILDREN;
 	if (CHtmlView::OnCreate(lpCreateStruct) == -1)
 		return -1;
-	
+	//SetSilent(true);
 	return 0;
 }
 

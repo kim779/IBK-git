@@ -126,7 +126,7 @@ BOOL CExitD::OnInitDialog()
 
 	BITMAP bm;
 	m_bitmap->GetBitmap(&bm);
-	SetWindowPos(NULL, 0, 0, bm.bmWidth, bm.bmHeight, SWP_NOMOVE | SWP_NOZORDER);
+	SetWindowPos(NULL, 0, 0, bm.bmWidth - 200, bm.bmHeight, SWP_NOMOVE | SWP_NOZORDER);
 	
 	HRGN hWndRgn = DIBToRgn((HBITMAP)m_bitmap->m_hObject, Axis::maskColor, FALSE);
 	if(hWndRgn)
@@ -149,6 +149,7 @@ BOOL CExitD::OnInitDialog()
 		{
 			m_shapeButtons[i] = CreateShapeButton(IDC_SHAPE1 + i, Format("NEW_LINK_%02d", i + 1),
 				CRect(shapePosition[i].x, shapePosition[i].y, 0, 0));
+			m_shapeButtons[i]->ShowWindow(SW_HIDE);
 		}
 		
 		m_shapeButtons[MAX_SHAPE_EX -2] = CreateShapeButton(IDC_SHAPE1 + MAX_SHAPE_EX -2, Format("NEW_LINK_%02d", MAX_SHAPE_EX -1),

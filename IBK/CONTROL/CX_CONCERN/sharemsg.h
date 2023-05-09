@@ -135,6 +135,8 @@
 #define MK_GetSearchType	121
 #define MK_PTRGROUPCODE     122
 
+#define MK_100RECVDATA		133	// 100 종목보기 data를 받았을 때 메시지
+
 #define SMALLTYPE_FILE		1
 #define LARGETYPE_FILE		2
 
@@ -184,6 +186,9 @@
 #define MO_SELECT		0
 #define MO_VISIBLE		1
 #define MO_FULL			2
+
+#define TYPE_VIEW_100		   0  //100종목 보기  MO_SELECT
+#define TYPE_VIEW_DETAIL  1   //상세 보기       MO_VISIBLE
 
 // lParam
 
@@ -838,7 +843,7 @@ public:
 	CRecvData() {}
 	~CRecvData() {}
 public:
-	void SetData(CString userdata, WPARAM wParam, LPARAM lParam)
+	void SetCRData(CString userdata, WPARAM wParam, LPARAM lParam)
 	{
 		m_userdata = userdata;
 		m_wParam = wParam;

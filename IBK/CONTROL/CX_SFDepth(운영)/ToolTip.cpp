@@ -82,8 +82,12 @@ void CToolTip::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
 	
+#ifdef _DEBUG
+	DrawTip(&dc);
+#else
 	xxx::CMemDC	mdc(&dc);
 	DrawTip(&mdc);
+#endif
 }
 
 void CToolTip::DrawTip(CDC *pDC)

@@ -664,6 +664,12 @@ void CObjMgr::DrawGraphObject()
 
 void CObjMgr::DrawChart(CDC *pDC)
 {
+	//차트 전체의 눈금영역 및 가로서 세로선 을 먼저 그린다.
+     //1.  DrawTickBox,  DrawTickVertical
+	 //2. 범레를 그린다 (한글로 표시된것들이다 ex)이평선등의 설명해주는 부분
+
+
+
 	CRect rectC;
 	m_pwndPnChart->GetClientRect(rectC);
 	DrawEmpty(pDC, rectC);
@@ -680,7 +686,6 @@ void CObjMgr::DrawChart(CDC *pDC)
 		m_pCoDraw[ii].ticky = 0;
 	}
 
-	
 	CIndcBase *pindcMain = GetMainGraph();
 	if (pindcMain)
 	{
@@ -688,20 +693,22 @@ void CObjMgr::DrawChart(CDC *pDC)
 		// Box
 		pindcMain->DrawTickBox(pDC, envInfo->display.rgbEdge, envInfo->display.rgbBG, envInfo->display.rgbChartEdge, envInfo->display.rgbChartBG);
 		// X축의 세로선
-		pindcMain->DrawTickVertical(pDC);
+		pindcMain->DrawTickVertical(pDC);  //세로선과 시간,날자를 써준다
 //		// Y축의 가로선
 //		pindcMain->DrawTick(pDC);
 	}
 
+
+
 	// Tick 을 먼저 그림
-	for (int ii = 0; ii < m_arGraphQue.GetSize(); ii++)
+	for (int ii = 0; ii < m_arGraphQue.GetSize(); ii++)  //일반적으로 봉차트와 거래량 차트 두가지면 2
 	{
 		CIndcBase* pIndcBase = (CIndcBase *) m_arGraphQue.GetAt(ii);
 
-		if (!pIndcBase->IsUnion())
+		if (!pIndcBase->IsUnion())  //합성여부??
 		{
 			// Y축의 가로선
-			pIndcBase->DrawTick(pDC);
+			pIndcBase->DrawTick(pDC);    //CBongBase::DrawTick(...)
 		}
 	}
 
@@ -711,6 +718,7 @@ void CObjMgr::DrawChart(CDC *pDC)
 		m_pwndPnChart->DrawStanLine(pDC, GetMainGraph());
 	}
 
+
 	if (m_analMode) 
 	{
 		DrawAnalArea(pDC);
@@ -718,6 +726,7 @@ void CObjMgr::DrawChart(CDC *pDC)
 
 	m_arGraphQueToDraw.RemoveAll();
 	m_arGraphQueToDraw.Copy(m_arGraphQue);
+
 
 	// 메인범례를 먼저
 	for (int ii = 0; ii < m_arGraphQueToDraw.GetSize(); ii++)
@@ -1200,14 +1209,14 @@ CIndcBase* CObjMgr::AddGraphQue(int iGrpCnt, char* pcData, bool bAppend, bool bU
 
 	if (!bAppend)
 	{
-		if(m_pDataFormat->GetMainGraph() == GK_AVOL)
+		if(m_pDataFormat->GetMainGraph() == GK_AVOL)   //누적거래량(매물차트)
 		{
 			struct _graph *graph = m_pDataFormat->GetAVolGrp();
 			graph->btRgnKey = m_pDataFormat->GetMainGrpRegion();
 			pIndcBase = CGraphMgr::CreateGraph(m_pwndView, m_pwndPnChart, m_pDataMgr, (char*)penvinfo, (char *)graph, iDispDay);
 			m_arGraphQue.Add(pIndcBase);
 		}
-		else if (m_pDataFormat->GetMainGraph() == GK_BALANCE)
+		else if (m_pDataFormat->GetMainGraph() == GK_BALANCE)  //일목균형표
 		{
 			struct _graph *graph = m_pDataFormat->GetBalanceGrp();
 			graph->btRgnKey = m_pDataFormat->GetMainGrpRegion();
@@ -1832,7 +1841,7 @@ OutputDebugString(slog);
 	iCount = m_mapRegion.GetCount();
 	puiSortKey = new UINT[iCount];
 	puiSortTop = new UINT[iCount];
-
+	ii = 0;   //비정상 종료 원인
 	for ( POSITION pos = m_mapRegion.GetStartPosition(); pos; )
 	{
 		m_mapRegion.GetNextAssoc(pos, iRgnKey, pxRegion);

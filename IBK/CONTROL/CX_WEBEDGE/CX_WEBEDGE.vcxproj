@@ -89,7 +89,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../release/CX_WEBEDGE.dll</OutputFile>
+      <OutputFile>D:\IBKS_TEST\release/CX_WEBEDGE.dll</OutputFile>
       <ImportLibrary>.\Release\CX_WEBEDGE.lib</ImportLibrary>
       <ModuleDefinitionFile>.\CX_WEBEDGE.def</ModuleDefinitionFile>
     </Link>
