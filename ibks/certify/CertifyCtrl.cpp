@@ -20,11 +20,8 @@
 #include "../h/axisfire.h"
 #include "../h/axisvar.h"
 
-#ifdef LIB_CLOUDE
-	#pragma	comment(lib, "CaLib/new/SKComdIF")
-#else
-	#pragma	comment(lib, "CaLib/SKComdIF")
-#endif
+#pragma	comment(lib, "CaLib/SKComdIF")
+
 #pragma	message("Automatically linking with SKComdIF library")
 
 #define DF_DEV
@@ -1282,58 +1279,6 @@ long CCertifyCtrl::CertifyFull(long pInB, long pInL, long pOutB, long pOutL)
 	//bCloude = false; 
 	if (bCloude)   //클라우드 로그인
 	{
-#ifndef LIB_CLOUDE
-		CString path, emsg;
-		path.Format("%s\\%s\\%s", m_root, DEVDIR, "cx_cloude.DLL");
-		int ret;
-		HMODULE m_hCloude = LoadLibraryA(path);
-		if (m_hCloude)
-		{
-			char* pCludeCertVal = new char[6776];
-			char* pDnVal = new char[100];
-			memset(pCludeCertVal, 0x00, 6776);
-			memset(pDnVal, 0x00, 100);
-			/*APP_CONTEXT	context;
-			SD_API_CONTEXT_NEW contextNew;*/
-			typedef long (WINAPI* GETSHAFUNC)(CWnd* pwnd, char*, int*, char*);
-			GETSHAFUNC axCloudeLogin = (GETSHAFUNC)GetProcAddress(m_hCloude, "axCloudeLogin");
-			int ilen = 0;
-			ret = axCloudeLogin(this, pCludeCertVal, &ilen, pDnVal);
-			if (ret)
-			{
-				switch (ret)
-				{
-				case 2501:		// 취소
-					sk_if_cert_static_context_release();
-					*(int*)pOutL = -3;
-					break;
-				case 1001:		// 인증서 서명오류 (5회)
-				case 2417:
-					*(int*)pOutL = -4;
-					break;
-
-				default:
-					*(int*)pOutL = -2;
-					break;
-				}
-				return ret;
-			}
-			memcpy((char*)pOutB, pCludeCertVal, ilen);
-			*(int*)pOutL = ilen;
-			m_pCloudeDn = new char[strlen(pDnVal) + 1];
-			memset(m_pCloudeDn, 0x00, strlen(pDnVal) + 1);
-			memcpy(m_pCloudeDn, pDnVal, strlen(pDnVal));
-
-			if (m_ca == caNO)
-				m_ca = caOKx;
-			m_calogon = true;
-			return 0;
-		}
-		else
-		{
-			return GetLastError();
-		}
-#else
 //--------------------------------------------------------------------------------------------------------------------------------
 //클라우드 초기화
 		int	pswdL, rc = 0;
@@ -1454,7 +1399,6 @@ long CCertifyCtrl::CertifyFull(long pInB, long pInL, long pOutB, long pOutL)
 			OnFire(FEV_CA, MAKELONG(guideCA, AE_ECERTIFY), 0);
 			return -1;
 		}
-#endif
 	}
 	else  //공동인증서
 	{

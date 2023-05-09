@@ -554,7 +554,54 @@ typedef struct _SessionInfo {
 	int nSvrCert;
 } SESSIONINFO_CONTEXT ;
 
+//[2021/10/22] 통합인증앱 연동 기능 추가 - 요청 메시지 구조체 추가
+typedef struct _RequestDataBox {
+	int  opCode;             //기능 opCode
+	char companyID[10];      //회사 아이디
+	char App_AndroidID[80];  //안드로이드 appid
+	char App_iosID[80];      //아이폰 appid
+	char UserDn[200];        //선택할 인증서 Dn 
+	unsigned char *pInputData; //원문
+	int pInputDatalen;       //원문 길이
+	int ui;                  //ui 선택
+	int link;                //기능 옵션
+	int authSelect;          //인증수단 선택
+	int policyMode;          //정책 필터 모드
+	char * policyList;	     //정책 리스트
+	int useTestServer;       //테스트서버 사용유무
+} REQUESTDATABOX ;
 
+//[2021/10/22] 통합인증앱 연동 기능 추가 - 결과 메시지 구조체 정의
+typedef struct _ResultDataBox {
+	unsigned char * pOutSignData; //서명 결과값
+	int  pOutSignDatalen;
+	char selectCertDn[301];       //사용한 인증서 DN
+	char certPeriodFrom[51];      //인증서 유효기간
+	char certPeriodTo[51];
+	int regAuthList;              //인증서에 등록된 인증수단 리스트
+	int selectedAuthType;         //서명에 사용한 인증수단
+	char companyID[11];           //회사 아이디
+} RESULTDATABOX ;
+
+
+//Cloud 관련
+
+//Cloud 인증서 선택 기능 관련 옵션
+#define SELECT_CLOUDCERT_OPTION_NOSEARCHLOCAL	1
+#define SELECT_CLOUDCERT_OPTION_INPUTPIN		2
+#define SELECT_CLOUDCERT_OPTION_NOCERT_OUT		4
+
+//cloud config 값 넘겨주는 구조체 추가
+//[10.0.2.4] [2022/11/23] #289 클라우드 config 구조체 수정
+typedef struct _CloudConfig {	
+	char * SITE_CODE[10];
+	char * CUSTOMER_ID;
+	char * SERVER_HOST;
+	char * AGREEMENT_URL;
+	char * VERSION;
+	int SERVER_PORT;
+	unsigned int TIMEOUT_MSEC; /* ms */
+}CloudConfig;
 
 #pragma pack(pop)
 

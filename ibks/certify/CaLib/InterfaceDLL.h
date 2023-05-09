@@ -7,6 +7,7 @@
 #include "session_api.h"
 #endif
 #ifdef _AFXDLL 
+
 #include "./sk_pc_identity.h"
 #endif
 //_AFXDLL
@@ -192,6 +193,10 @@ extern "C" {
 	__declspec(dllimport) int sk_if_cert_Encrypt(APP_CONTEXT *pApp_Context, UString *puIn, UString *puOut) ;
 	__declspec(dllimport) int sk_if_cert_Decrypt(APP_CONTEXT *pApp_Context, UString *puIn, UString *puOut) ;
 
+	/* 2015.06.01  #450 패스워드 기반에 파일 Encrypt, Decrypt 추가 */
+	__declspec(dllexport) int sk_if_cert_EncryptFile(APP_CONTEXT *pApp_Context, const char* pszPassword, const char* pszPlainFilePath, const char* pszEncryptFilePath);
+	__declspec(dllexport) int sk_if_cert_DecryptFile(APP_CONTEXT *pApp_Context, const char* pszPassword, const char* pszEncryptFilePath, const char* pszDecryptFilePath);
+
 	/* 2001.09.21 */
 	__declspec(dllimport) int sk_if_cert_EncryptDataByCert(APP_CONTEXT *pApp_Context, const UString *pIn, UString *pOut, const UString *pECert) ;
 	__declspec(dllimport) int sk_if_cert_DecryptDataByKey(APP_CONTEXT *pApp_Context, const UString *pIn, UString *pOut, const UString *pEKey, const char *pszPasswd) ;
@@ -370,7 +375,7 @@ extern "C" {
 	//      pOid => 정책 OID 직접 입력   (oid end 표시 ';')
 	
 	// 호출 예 ) 범용인증서만 선택창에서 보여주고 싶은 경우 
-	//           sk_if_SetPolicyFilter(1+16, "");
+		//           sk_if_SetPolicyFilter(1+16, "");
 	//
 	//           증권전용 인증서와 OID가 1.2.410.200004.5.1.1.4 또는  1.2.410.200004.5.1.1.5 인 인증서 선택 
 	//			 sk_if_SetPolicyFilter(256, "1.2.410.200004.5.1.1.4;1.2.410.200004.5.1.1.5;");
@@ -447,10 +452,9 @@ extern "C" {
 	     return : encrypted size  플래그 + 16 = 17
 		                          플래그 + 32 = 33
 	--------------------------------------------------------------------------------------------*/
-    __declspec(dllimport) int sk_if_GetPCIdentity( PC_INFO_CONTEXT * pContext, int nMode );
+	__declspec(dllimport) int sk_if_GetPCIdentity(PC_INFO_CONTEXT* pContext, int nMode);
 	/*--------------------------------------------------------------------------------------------*/
-	__declspec(dllimport) int sk_if_GetEncryptedPassword(const char *password, char *enc_password33Bytes );
-	
+	__declspec(dllimport) int sk_if_GetEncryptedPassword(const char *password, char *enc_password33Bytes );	
 	/*-------------------------------------------------------------------------------------------
 	   int sk_if_GetEncryptedPasswordB64(const char *pPassword, char *pOutBuf, int *nOutlen );
 
@@ -521,14 +525,33 @@ extern "C" {
 
 	/*-------------------------------------------------------------------------------------------
 
+	[9.9.9.3] [2021/10/21] 인증서 스마트폰 상호 이동 기능 서버ip, 포트 변경 가능 추가
+  
+	--------------------------------------------------------------------------------------------*/
+	__declspec(dllimport) int sk_if_Set_TradeSerVerIPNPort (char * IP, int PORT);
+	__declspec(dllimport) int sk_if_cert_export_ToMobile ();
+	__declspec(dllimport) int sk_if_cert_import_FromMobile ();
+
+	/*-------------------------------------------------------------------------------------------
+
 	[9.7.0.0]][2011/05/09] #122 인증서 관리기능 트레이 기능  */
   
 	__declspec(dllexport) void sk_if_show_tray(void);
     __declspec(dllexport) void sk_if_hide_tray(void);
-
+	
 	//[9.9.7.4] [2017/12/15] #222 통합인증앱 연동 임시키 생성 서명 기능 추가
 	__declspec(dllimport) int sk_if_Appcert_GenKeyAndSign
 		(HWND hwnd, SD_API_CONTEXT_NEW * Context, char * pUserDn, bool bUseVerifyCode, UString *pInputData, UString *pOutSignData,UString *pR);
+	//[9.9.9.0] [2021/03/03] 폴더 경로를 지정 해줄 수 있는 api 추가
+	__declspec(dllimport) int sk_if_SetEnvPath(char *pfolderPath, int nOption);
+
+	/*-------------------------------------------------------------------------------------------
+	[9.9.9.5] [2021/10/22] #255 통합인증앱 연동 기능 추가
+	--------------------------------------------------------------------------------------------*/
+	__declspec(dllimport) int sk_if_Set_AppSignServiceSerVerIPNPort(int nTestServer, char *IP, int PORT);
+	__declspec(dllimport) void sk_if_MsgGetToken(const char * oridata, char *tok, char **outdata);
+	__declspec(dllimport) int sk_if_MyPassApp_SignService
+		(HWND hwnd, REQUESTDATABOX reqdata, int tempKeyOption, SD_API_CONTEXT_NEW * Context, RESULTDATABOX * resultbox);
 	
 	/*==============================================================================================
 	ONLY FOR USED IN SKEURE 
@@ -551,6 +574,23 @@ extern "C" {
 
 	/*=============================================================================================*/
 #endif
+
+	/*-------------------------------------------------------------------------------------------
+	[10.0.0.1] [2021/11/29] #260 클라우드 인증 기능 추가
+	--------------------------------------------------------------------------------------------*/
+	__declspec(dllimport) int sk_if_Set_CloudConfig(CloudConfig cloud_config);		
+	__declspec(dllimport) int sk_if_Set_Show_OnlyValidateCloudCert_flag(int flag);
+	__declspec(dllimport) int sk_if_Cloud_KeyPadUse(int flag);
+	__declspec(dllimport) int sk_if_CloudCertSetSelectExt(SD_API_CONTEXT_NEW *pContext, int nOptionValue);
+	__declspec(dllimport) int sk_if_IssueCert_toCloud(SD_API_CONTEXT_NEW *pContext, int nOptionValue);
+	__declspec(dllimport) int sk_if_CertNew_toCloud(SD_API_CONTEXT_NEW *pContext, int nOptionValue);
+	__declspec(dllimport) int sk_if_DeleteCert_inCloud(int nOptionValue);
+	__declspec(dllimport) int sk_if_CertChangePin_inCloud(SD_API_CONTEXT_NEW *pContext, int nOptionValue);
+	__declspec(dllimport) int sk_if_UploadPCtoCloud(SD_API_CONTEXT_NEW *pContext, int nOptionValue);
+	__declspec(dllimport) int sk_if_DownloadCloudtoPC(int nOptionValue);
+	__declspec(dllimport) int sk_if_Connected_CloudUser_Confirm(int nOptionValue);
+	__declspec(dllimport) int sk_if_Cloud_AutoConnected_Device(int nOptionValue);
+	__declspec(dllimport) int sk_if_CloudUser_DeleteAccount(int nOptionValue);
 
 #ifdef __cplusplus
 }

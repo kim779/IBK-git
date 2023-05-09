@@ -6,11 +6,8 @@
 
 
 #include <afxmt.h>
-#ifdef LIB_CLOUDE
-#include "CaLib/new/interfaceDLL.h"
-#else
 #include "CaLib/interfaceDLL.h"
-#endif
+
 
 
 // CCertifyCtrl : 구현에 대해서는 CertifyCtrl.cpp을(를) 참조하세요.
