@@ -1,0 +1,16 @@
+// IBXXXX99.odl : type library source for IBXXXX99.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (IBXXXX99.tlb).
+
+[ uuid(341AD953-6793-450E-8268-4C26D74763C7), version(1.0) ]
+library IBXXXX99
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};
