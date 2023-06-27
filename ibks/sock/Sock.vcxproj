@@ -105,7 +105,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>.\Sock.def</ModuleDefinitionFile>
-      <OutputFile>../../exe/axSock.ocx</OutputFile>
+      <OutputFile>D:\IBKS_TEST\exe/axSock.ocx</OutputFile>
       <RegisterOutput>true</RegisterOutput>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>

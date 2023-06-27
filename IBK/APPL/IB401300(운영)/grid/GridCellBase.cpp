@@ -427,9 +427,9 @@ BOOL CGridCellBase::Draw(CDC* pDC, int nRow, int nCol, CRect rect,  BOOL bEraseB
     GetTextRect(rect);
     rect.right++;    
     rect.bottom++;
-
+    
     DrawText(pDC->m_hDC, GetText(), -1, rect, GetFormat() | DT_NOPREFIX);
-
+   
     pDC->RestoreDC(nSavedDC);
 
     return TRUE;

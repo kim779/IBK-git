@@ -699,7 +699,6 @@ void CObjMgr::DrawChart(CDC *pDC)
 	}
 
 
-
 	// Tick 을 먼저 그림
 	for (int ii = 0; ii < m_arGraphQue.GetSize(); ii++)  //일반적으로 봉차트와 거래량 차트 두가지면 2
 	{
@@ -718,7 +717,6 @@ void CObjMgr::DrawChart(CDC *pDC)
 		m_pwndPnChart->DrawStanLine(pDC, GetMainGraph());
 	}
 
-
 	if (m_analMode) 
 	{
 		DrawAnalArea(pDC);
@@ -727,6 +725,7 @@ void CObjMgr::DrawChart(CDC *pDC)
 	m_arGraphQueToDraw.RemoveAll();
 	m_arGraphQueToDraw.Copy(m_arGraphQue);
 
+	
 
 	// 메인범례를 먼저
 	for (int ii = 0; ii < m_arGraphQueToDraw.GetSize(); ii++)
@@ -734,31 +733,34 @@ void CObjMgr::DrawChart(CDC *pDC)
 		CIndcBase* pIndcBase = (CIndcBase *) m_arGraphQueToDraw.GetAt(ii);
 		if (pIndcBase == pindcMain && !pIndcBase->IsUnion())
 		{
-			pIndcBase->DrawLegend(pDC);
+			pIndcBase->DrawLegend(pDC);  // CBJugaChart::DrawLegend  //메인차트에 "가격차트"라고... 쓴다..
 			m_arGraphQueToDraw.RemoveAt(ii);
 			ii--;
 		}
 	}
-
+	
 	// 가격 이평 범례
 	for (int ii = 0; ii < m_arGraphQueToDraw.GetSize(); ii++)
 	{
 		CIndcBase* pIndcBase = (CIndcBase *) m_arGraphQueToDraw.GetAt(ii);
 		if (pIndcBase->GetGraphKind() == GK_PMA && !pIndcBase->IsUnion())
 		{
-			pIndcBase->DrawLegend(pDC);
+			pIndcBase->DrawLegend(pDC);    //CBMA::DrawLegend //이평선 정보 관련 
 			m_arGraphQueToDraw.RemoveAt(ii);
 			ii--;
 		}
 	}
 
+
+	//--------------------------------------------------------------------------------------------------------------
+	// 한글쓰고 이평그리고 수순같다 위에2개는 메인차트의 내용 아래2개는 
 	// 거래량 범례
 	for (int ii = 0; ii < m_arGraphQueToDraw.GetSize(); ii++)
 	{
 		CIndcBase* pIndcBase = (CIndcBase *) m_arGraphQueToDraw.GetAt(ii);
 		if (pIndcBase->GetGraphKind() == GK_VOL && !pIndcBase->IsUnion())
 		{
-			pIndcBase->DrawLegend(pDC);
+			pIndcBase->DrawLegend(pDC);  //CBVolume::DrawLegend  //"거래대금"이라 쓴다
 			m_arGraphQueToDraw.RemoveAt(ii);
 			ii--;
 		}
@@ -770,12 +772,13 @@ void CObjMgr::DrawChart(CDC *pDC)
 		CIndcBase* pIndcBase = (CIndcBase *) m_arGraphQueToDraw.GetAt(ii);
 		if (pIndcBase->GetGraphKind() == GK_VMA && !pIndcBase->IsUnion())
 		{
-			pIndcBase->DrawLegend(pDC);
+			pIndcBase->DrawLegend(pDC);       //이평선 정보 관련  CBMA::DrawLegend(CDC* pDC)
 			m_arGraphQueToDraw.RemoveAt(ii);
 			ii--;
 		}
 	}
 
+	//--------------------------------------------------------------------------------------------------------------
 	// 거래대금 범례
 	for (int ii = 0; ii < m_arGraphQueToDraw.GetSize(); ii++)
 	{
@@ -803,7 +806,7 @@ void CObjMgr::DrawChart(CDC *pDC)
 	m_arGraphQueToDraw.RemoveAll();
 	m_arGraphQueToDraw.Copy(m_arGraphQue);
 
-
+	//--------------------------------------------------------------------------------------------------------------
 	// 매물차트를 먼저
 	for (int ii = 0; ii < m_arGraphQueToDraw.GetSize(); ii++)
 	{
@@ -819,6 +822,7 @@ void CObjMgr::DrawChart(CDC *pDC)
 	if (m_patternUP || m_patternDN) 
 		DrawPattern(pDC, GetMainGraph());
 
+	//--------------------------------------------------------------------------------------------------------------
 	// 거래량 쪽을 다음에
 	for (int ii = 0; ii < m_arGraphQueToDraw.GetSize(); ii++)
 	{
@@ -834,7 +838,7 @@ void CObjMgr::DrawChart(CDC *pDC)
 		}
 	}
 
-
+	//--------------------------------------------------------------------------------------------------------------
 	// 그물차트를 다음에
 	for (int ii = 0; ii < m_arGraphQueToDraw.GetSize(); ii++)
 	{
@@ -847,7 +851,7 @@ void CObjMgr::DrawChart(CDC *pDC)
 		}
 	}
 
-
+	//--------------------------------------------------------------------------------------------------------------
 	// 드래그된 보조지표 (과매도, 과매수가 가능한 것만)
 	for (int ii = 0; ii < m_arGraphQueToDraw.GetSize(); ii++)
 	{
@@ -871,14 +875,21 @@ void CObjMgr::DrawChart(CDC *pDC)
 			break;
 		}
 	}
-
-	// 나머지
+	//--------------------------------------------------------------------------------------------------------------
+	
+	// 나머지    실제 메인 차트를 그리는 영역이다
 	for (int ii = 0; ii < m_arGraphQueToDraw.GetSize(); ii++)
 	{
 		CIndcBase* pIndcBase = (CIndcBase *) m_arGraphQueToDraw.GetAt(ii);
 		pIndcBase->DrawGraph(pDC);
 	}
+	//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+
+
+
+	
+	
 	// 오른쪽에 현재가 표시 (색깔 사각형)
 	if (pindcMain)
 	{
@@ -1209,6 +1220,7 @@ CIndcBase* CObjMgr::AddGraphQue(int iGrpCnt, char* pcData, bool bAppend, bool bU
 
 	if (!bAppend)
 	{
+		int igraphType = m_pDataFormat->GetMainGraph();
 		if(m_pDataFormat->GetMainGraph() == GK_AVOL)   //누적거래량(매물차트)
 		{
 			struct _graph *graph = m_pDataFormat->GetAVolGrp();

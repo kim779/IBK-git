@@ -1266,6 +1266,10 @@ void CGridWnd::ParseData(class CGridData *sdata)
 			price = IH::Parser(sztmp, PTAB);
 			name = IH::Parser(sztmp, PTAB);
 			strBookmark = IH::Parser(sztmp, PTAB);
+
+			if (strBookmark == "1")
+				OutputDebugString(strBookmark);
+
 			futureGubn = IH::Parser(sztmp, PTAB);
 			creditPrc = IH::Parser(sztmp, PTAB);
 			maeipPrc = IH::Parser(sztmp, PTAB);

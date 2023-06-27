@@ -380,6 +380,7 @@ public:
 
 	bool	GetFdsValue(CString trN, char* datB, int& datL);
 	long	CertifyFull(CString srcB, int srcL, char* desB, int& desL);
+	long CertifyCloude(int igubn);
 	long	CertifyName(char* datB);
 
 private:

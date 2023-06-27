@@ -233,6 +233,7 @@ BSTR CControlWnd::GetFilepath()
 void CControlWnd::SetFilepath(LPCTSTR lpszNewValue)
 {
 	// TODO: Add your property handler here
+	m_strFileName.Format("%s", lpszNewValue);
 }
 
 BSTR CControlWnd::GetFilePath()

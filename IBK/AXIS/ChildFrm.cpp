@@ -51,6 +51,8 @@ BEGIN_MESSAGE_MAP(CChildFrame, CMDIChildWnd)
 	ON_MESSAGE(WM_AXIS, OnAXIS)
 	ON_MESSAGE(WM_CHILDMSG, OnCHILDMSG)
 	ON_COMMAND_RANGE(ID_GROUP_BASE, ID_GROUP_END, OnGroup)
+	ON_WM_TIMER()
+	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -397,7 +399,7 @@ void CChildFrame::OnWindowPosChanged(WINDOWPOS FAR* lpwndpos)
 	}
 	CMDIChildWnd::OnWindowPosChanged(lpwndpos);
 }
-
+#define DF_RGN 1
 void CChildFrame::OnSize(UINT nType, int cx, int cy) 
 {
 	CMDIChildWnd::OnSize(nType, cx, cy);
@@ -407,6 +409,28 @@ void CChildFrame::OnSize(UINT nType, int cx, int cy)
 	form.NormalizeRect();
 	form.OffsetRect(-form.TopLeft());
 
+#ifdef DF_RGN
+	//form.DeflateRect(7, 7);
+	//form.right += 5;
+	//CRgn rgn;
+	//rgn.CreateRectRgn(form.left, form.top, form.right, form.bottom);
+	//SetWindowRgn(rgn, TRUE);
+	//DeleteObject(rgn);
+
+
+	const int xx = GetSystemMetrics(SM_CXFRAME) + GetSystemMetrics(SM_CXSIZEFRAME);  //4, 4
+	const int yy = GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYSIZEFRAME);  //4, 4
+
+	form.DeflateRect(xx , yy);
+	form.right += 4;
+	form.left -= 4;
+	form.bottom +=  1;
+
+	CRgn rgn;
+	rgn.CreateRectRgn(form.left, form.top, form.right, form.bottom);
+	SetWindowRgn(rgn, TRUE);
+	DeleteObject(rgn);
+#else
 	const int gap = 4;
 	const int xx = GetSystemMetrics(SM_CXFRAME) + GetSystemMetrics(SM_CXSIZEFRAME);
 	const int yy = GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYSIZEFRAME);
@@ -416,14 +440,14 @@ void CChildFrame::OnSize(UINT nType, int cx, int cy)
 	form.left -= 3;
 	form.bottom += 3;
 
-	//form.InflateRect(2, 2);
-	//form.top += 1;
+	form.InflateRect(2, 2);
+	form.top += 1;
 
 	CRgn rgn;
 	rgn.CreateRectRgn(form.left, form.top, form.right, form.bottom);
 	SetWindowRgn(rgn, TRUE);
 	DeleteObject(rgn);
-
+#endif
 	if (m_tView)
 	{
 		CView*	view = GetActiveView();
@@ -437,65 +461,94 @@ void CChildFrame::OnNcPaint()
 	CMDIChildWnd::OnNcPaint();
 		return;
 	**/
-	CWindowDC dc(this);
-	DrawFrame(&dc);  
+	//CWindowDC dc(this);
+
+	//KillTimer(9999);
+//SetTimer(9999, 5, nullptr);
+//	LOG_OUTP(2, "------------------------------CChildFrame", __FUNCTION__);
+	DrawFrame();    
 }
 
 BOOL CChildFrame::OnNcActivate(BOOL bActive) 
 {
+	m_slog.Format("bActive=%d map=[%s]", bActive, m_mapN);
+//	LOG_OUTP(3, "------------------------------CChildFrame", __FUNCTION__, m_slog);
+
 	m_xcaption.ActivateApp(bActive);
 	m_bActive = bActive;
 	
-	OnNcPaint();  
-	
-	//if (Axis::isVista) return true;
+	//OnNcPaint();
+	SetTimer(9999, 5, nullptr);
 	return CMDIChildWnd::OnNcActivate(bActive);
 }
 
-void CChildFrame::DrawFrame(CDC* pDC) 
+void CChildFrame::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	switch (nIDEvent)
+	{
+		case 9999:
+		{
+			KillTimer(9999);
+			DrawFrame();
+		}
+		break;
+	}
+	CMDIChildWnd::OnTimer(nIDEvent);
+}
+
+void CChildFrame::OnPaint()
+{
+	CPaintDC dc(this); // device context for painting
+					   // TODO: 여기에 메시지 처리기 코드를 추가합니다.
+					   // 그리기 메시지에 대해서는 CMDIChildWnd::OnPaint()을(를) 호출하지 마십시오.
+//	LOG_OUTP(2, "------------------------------CChildFrame", __FUNCTION__);
+	SetTimer(9999, 5, nullptr);
+}
+
+void CChildFrame::DrawFrame() 
 {
 	if (m_bBackGround) return;
 
-//	if (GetStyle() & WS_CAPTION)
+//	if (GetStyle() & WS_CAPTION)   //test
 //		SetWindowRgn(0, FALSE);
-
+	CWindowDC dc(this);
 	CRect rect;
 	GetWindowRect(rect);
 	rect.NormalizeRect();
 	rect.OffsetRect(-rect.left, -rect.top);
 
-	CRect top = rect;
-	CRect bottom = rect;
 	CRect right = rect;
 	CRect left = rect;
+	CRect bottom = rect;
 	COLORREF border{};
-
-	if (m_bActive == TRUE)
-		border = Axis::GetColor(64);
-	else
-		border = RGB(153, 153, 153);
-
-	top.bottom = GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYSIZEFRAME) - 1;
-	bottom.top = bottom.bottom - GetSystemMetrics(SM_CYFRAME) - GetSystemMetrics(SM_CYSIZEFRAME) - 2;
-	right.left = right.right - GetSystemMetrics(SM_CXFRAME) - GetSystemMetrics(SM_CXSIZEFRAME) - 1;
-	left.right = left.left + GetSystemMetrics(SM_CXFRAME) + GetSystemMetrics(SM_CXSIZEFRAME);
-
-	const CRect lside(left.left, top.bottom - 2, left.right, GetSystemMetrics(SM_CYCAPTION) + top.bottom + 1),
-		rside(right.left, top.bottom - 2, right.right, GetSystemMetrics(SM_CYCAPTION) + top.bottom + 1);
-
-	m_xcaption.DrawFrame(pDC, top);
-
-	CRect winRc;
-	GetWindowRect(winRc);
-	m_xcaption.DrawFrame(pDC, winRc);
-
 	
-	pDC->FillSolidRect(bottom, border);
-	pDC->FillSolidRect(left, border);
-	pDC->FillSolidRect(right, border);
-	InvalidateRect(bottom, 1);
-	InvalidateRect(left, 1);
-	InvalidateRect(right, 1);
+	if (m_xcaption.IsActive())
+	{
+	//	m_slog.Format("m_xcaption=%d map=[%s]", m_xcaption.IsActive(), m_mapN);
+	//	LOG_OUTP(3, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CChildFrame", __FUNCTION__, m_slog);
+		border = Axis::GetColor(64);
+	}
+	else
+	{
+	//	m_slog.Format("m_xcaption=%d map=[%s]", m_xcaption.IsActive(), m_mapN);
+	//	LOG_OUTP(3, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CChildFrame", __FUNCTION__, m_slog);
+		border = RGB(153, 153, 153);
+	}
+
+	right.left = right.right - GetSystemMetrics(SM_CXFRAME) - GetSystemMetrics(SM_CXSIZEFRAME) - 2;
+	left.right = left.left + GetSystemMetrics(SM_CXFRAME) + GetSystemMetrics(SM_CXSIZEFRAME);
+	bottom.top = bottom.bottom - GetSystemMetrics(SM_CXFRAME)  - GetSystemMetrics(SM_CXSIZEFRAME) - 1;
+
+//	dc.FillSolidRect(bottom, RGB(255,0,0));
+ 	   	dc.FillSolidRect(bottom, border);
+//	InvalidateRect(bottom, 1);
+
+	dc.FillSolidRect(left, border);
+	//InvalidateRect(left, 1);
+
+	dc.FillSolidRect(right, border);
+	//InvalidateRect(right, 1);
 }
 
 void CChildFrame::ChangeSkin(CString skinName)
@@ -870,3 +923,8 @@ BOOL CChildFrame::PreCreateWindow(CREATESTRUCT& cs)
 	cs.dwExStyle &= ~WS_EX_CLIENTEDGE | ~WS_EX_STATICEDGE;
 	return CMDIChildWnd::PreCreateWindow(cs);
 }
+
+
+
+
+

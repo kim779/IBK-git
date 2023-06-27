@@ -39,9 +39,6 @@
     <ClInclude Include="base64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ControlWnd.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="cx_upload.h">
       <Filter>Header Files</Filter>
     </ClInclude>

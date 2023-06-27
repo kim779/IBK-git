@@ -310,7 +310,7 @@ struct	_userWH	{
 						// variant : ca information
 						// HIWORD(kind) = ca information length
 #define	caFULLx			0x24		// full certify for main
-
+#define   caCLOUD			0x25
 
 #define	setTRACE		0x99		// set TRACE mode
 						// HIWORD(kind) = TRACE message ID
@@ -371,7 +371,7 @@ struct	_userWH	{
 #define	DI_CAEX			0x05		// BOOL  CertifyEx(char* pBytes, int nBytes)
 #define	DI_CAFULL		0x06		// int	 CertifyFull(char* pInB, int pInL, char* pOutB)
 #define	DI_CANAME		0x07		// int	 CertifyName(char* pBytes)
-
+#define	DI_CLOUD		0x08		// int	 CertifyCloud(long funcs)
 //
 //	AxisCode.dll
 //	bool axGetCode(int kind, char* code, int type)

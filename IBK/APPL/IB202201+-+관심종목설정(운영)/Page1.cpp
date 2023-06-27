@@ -7195,15 +7195,17 @@ void CPage1::receiveOub(int key, CString data)
 						int ii = 0;
 						for (const auto& item : booklist)
 						{
-							if (item.code[0] == 'm')
-							{
+						//	if (item.code[0] == 'm')
+						//	{
 								if (ii < (int)m_inters.size())
 								{
 									auto inter = m_inters.at(ii);
 									if (inter->code[0] == 'm')
 										inter->name = CString(item.name, 32).Trim();
+									inter->bookmark = item.bookmark[0];
 								}
-							}
+						//	}
+							//inter->bookmark = item.bookmark[0];
 							ii++;
 						}
 					}

@@ -147,7 +147,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../exe/AXISGVIEW.DLL</OutputFile>
+      <OutputFile>D:\IBKS_TEST\exe/AXISGVIEW.DLL</OutputFile>
       <ImportLibrary>.\Debug\AXISGVIEW.lib</ImportLibrary>
       <AdditionalDependencies>../AxMCtrl/Debug/AxMCtrl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\axisGView.def</ModuleDefinitionFile>

@@ -20,11 +20,10 @@
 #include "../h/axisfire.h"
 #include "../h/axisvar.h"
 
-#pragma	comment(lib, "CaLib/SKComdIF")
 
+#pragma	comment(lib, "CaLib/SKComdIF")
 #pragma	message("Automatically linking with SKComdIF library")
 
-#define DF_DEV
 #define DEV_CLOUDE_SERVER  "twas.signkorea.com"
 #define REAL_CLOUDE_SERVER "cert.signkorea.com"
 #define DEV_AGREEMENT_URL "https://tweb.signkorea.com:8700/notice/html/conditionsOfUse.txt"
@@ -98,12 +97,6 @@ IMPLEMENT_OLECTLTYPE(CCertifyCtrl, IDS_CERTIFY, _dwCertifyOleMisc)
 
 // CCertifyCtrl::CCertifyCtrlFactory::UpdateRegistry -
 // CCertifyCtrl에 대한 시스템 레지스트리 항목을 추가하거나 제거합니다.
-#define DF_DEV
-#define DEV_CLOUDE_SERVER  "twas.signkorea.com"
-#define REAL_CLOUDE_SERVER "cert.signkorea.com"
-#define DEV_AGREEMENT_URL "https://tweb.signkorea.com:8700/notice/html/conditionsOfUse.txt"
-#define REAL_AGREEMENT_URL "https://center.signkorea.com:8700/notice/html/conditionsOfUse.txt"
-
 
 BOOL CCertifyCtrl::CCertifyCtrlFactory::UpdateRegistry(BOOL bRegister)
 {
@@ -438,14 +431,15 @@ long CCertifyCtrl::OnCertify(long pBytes, long nBytes)
 				return NULL;
 			}
 
-			//m_slog.Format("%.1s", (char*)&pwdR->pwdn[0]);
 			char* pdata = new char[2];
 			memset(pdata, 0x00, 2);
 			memcpy(pdata, (char*)&pwdR->pwdn[0], 1);
 			CString sdata;
 			sdata.Format("%s", pdata); sdata.TrimRight();
-		//	idx = atoi((const char*)pwdR->pwdn[0]); // CString(pwdR->pwdn, sizeof(pwdR->pwdn)) );
 			idx = atoi(sdata);
+
+		//	idx = atoi((const char*)pwdR->pwdn[0]); // CString(pwdR->pwdn, sizeof(pwdR->pwdn)) );
+			
 
 			CCountPass countDlg(idx, retry);
 			switch (countDlg.DoModal())
@@ -594,28 +588,36 @@ BOOL CCertifyCtrl::Certify(long pBytes, long nBytes, long infos)
 		CopyMemory(encpass, m_encpass, sizeof(encpass));
 		pass = _T("");
 	}
-
-	m_sync.Lock();
-	m_nBytes = *(int*)nBytes;
-	src.length = m_nBytes;
-	src.value = (unsigned char*)pBytes;
-	if (sk_if_cert_SignData_notEncode(&m_context, encpass, &src, &des, NULL))
+	BOOL bCloude = CheckCloude();
+	if (bCloude)
 	{
-		m_sync.Unlock();
-		ZeroMemory(encpass, sizeof(encpass));
-		OnFire(FEV_CA, MAKELONG(guideCA, AE_ECERTIFY), 0);
-		return FALSE;
+		int iret = Cloude_ConTraction_sign(pBytes, nBytes);
+		return  iret == 1 ? TRUE : FALSE;
 	}
+	else
+	{
+		m_sync.Lock();
+		m_nBytes = *(int*)nBytes;
+		src.length = m_nBytes;
+		src.value = (unsigned char*)pBytes;
+		if (sk_if_cert_SignData_notEncode(&m_context, encpass, &src, &des, NULL))
+		{
+			m_sync.Unlock();
+			ZeroMemory(encpass, sizeof(encpass));
+			OnFire(FEV_CA, MAKELONG(guideCA, AE_ECERTIFY), 0);
+			return FALSE;
+		}
 
-	pBytes += m_nBytes;
-	m_nBytes += des.length;
+		pBytes += m_nBytes;
+		m_nBytes += des.length;
 
-	*(int*)nBytes = m_nBytes;
-	CopyMemory((void*)pBytes, des.value, des.length);
-	sk_if_cert_MemFree(des.value);
-	ZeroMemory(encpass, sizeof(encpass));
-	m_sync.Unlock();
-	return TRUE;
+		*(int*)nBytes = m_nBytes;
+		CopyMemory((void*)pBytes, des.value, des.length);
+		sk_if_cert_MemFree(des.value);
+		ZeroMemory(encpass, sizeof(encpass));
+		m_sync.Unlock();
+		return TRUE;
+	}
 }
 /*
 void CWizardCtrl::OnXecure(int encK, char* pBytes, int nBytes)
@@ -902,8 +904,8 @@ int CCertifyCtrl::queryDn(CString dn_name, int* nBytes, bool retry)
 		success = sk_if_CertSetSelect(&m_contextNew.sd);
 	}
 
-	if (!success)
-	{
+	if (!success)  
+	{//ID 로그인 방식에서 공동인증서 검증 할때..  인증서 비번오류상황
 		switch (sk_if_GetLastErrorCode())
 		{
 		case 2001:		// 만료
@@ -1021,129 +1023,44 @@ BOOL CCertifyCtrl::checkPasswd(CString pass)
 	return TRUE;
 }
 
-////주문낼때 여기 타고 온다
+////주문시
 CString CCertifyCtrl::checkPasswd()
 {
-	BOOL bCloude = CheckCloude();
+	CString	text, pass = _T("");
+	UString	src, des;
+	char	encpass[32 + 1];
+	int	pswdL;
 
-	m_slog.Format("[certify][CCertifyCtrl::checkPasswd]  m_ca=[%s] bCloude=[%d]\r\n", getStatus(), bCloude);
-	OutputDebugString(m_slog);
+	m_sync.Lock();
+	ZeroMemory(encpass, sizeof(encpass));
+	pswdL = sizeof(m_context.pInterfaceContext->szOldPasswd);
+	ZeroMemory(m_context.pInterfaceContext->szOldPasswd, pswdL);
 
-	if (bCloude)
+	src.length = 0;
+	src.value = NULL;
+	sk_if_SetKeySaferMode(1);
+	if (sk_if_cert_SignData_notEncode(&m_context, encpass, &src, &des, NULL))
 	{
-		CString	text, pass = _T("");
-	
-		SD_API_CONTEXT_NEW tContext; //구조체 선언(클라우드 인증서 정보를 담을)
-		memset(&tContext, 0x00, sizeof(SD_API_CONTEXT_NEW));
-		int rc = 0;
-
-		CString plain, strResult;
-		UString p1, p2, p3;
-
-		//간편비밀번호를 다시 입력 받고 싶다면
-		if (m_contextNew.sd.bOldStorage == 7)
+		if (sk_if_GetLastErrorCode() == 2417)
 		{
-			memcpy(&tContext, &m_contextNew, sizeof(SD_API_CONTEXT_NEW));
-			memset(&tContext.sd.szOldPasswd, 0x00, sizeof(tContext.sd.szOldPasswd)); //비밀번호 부분만 초기화
-
-			rc = sk_if_CloudCertSetSelectExt(&tContext, 1);
-
-			if (rc == 0)
-			{
-				memset(&m_contextNew, 0x00, sizeof(SD_API_CONTEXT_NEW));
-				memcpy(&m_contextNew, &tContext, sizeof(SD_API_CONTEXT_NEW));
-				sk_if_cert_preset_context(&m_context, &m_contextNew.sd);
-
-			}
-			else
-			{
-				int errorCode = sk_if_GetLastErrorCode();
-				MessageBox(sk_if_GetLastErrorMsg(), "전자 서명 오류", MB_OK);
-				return "";
-				//if (errorCode == 2501)   //일부러 취소했을때
-				//	*(int*)pOutL = -3;
-				//else
-				//	*(int*)pOutL = -2;
-				//return -1;
-			}
-			memset(&tContext, 0x00, sizeof(SD_API_CONTEXT_NEW));
+			m_ca = caPWDa;
+			m_string = _T("pswd\t");
+			OnFire(FEV_CA, MAKELONG(invokeCA, m_string.GetLength()), (long)(char*)m_string.operator LPCTSTR());
 		}
-	
-		plain = "abcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()-=";
-		p1.value = (unsigned char*)LPCTSTR(plain);
-		p1.length = plain.GetLength();
-
-		//p1 = 원문 , p2 결과값 , p3 = R값 결과
-		memset(&p3, 0x00, sizeof(UString));
-		rc = sk_if_cert_SignDataWithR(&m_context, "", &p1, &p2, &p3);
-
-		if (rc) {
-			MessageBox(sk_if_GetLastErrorMsg(), "전자서명 오류", MB_OK);
-			return "";
-			/*CString emsg;
-			emsg = sk_if_GetLastErrorMsg();
-			int iret = sk_if_GetLastErrorCode();
-			*(int*)pOutL = -2;
-			return iret;*/
-		}
-		else
-		{
-			//MessageBox("계좌이체 성공", "전자 서명", MB_OK);
-		//	CopyMemory((void*)pOutB, p2.value, p2.length);
-		/*	*(int*)pOutL = p2.length;
-		
-			if (m_ca == caNO)
-				m_ca = caOKx;
-			m_calogon = true;
-			savePasswd();
-
-			return 1;*/
-			
-			pass = CString(tContext.sd.szOldPasswd, 33);
-			return pass;
-		}
-/*		*/
-
-		return pass; 
-	}
-	else
-	{
-		CString	text, pass = _T("");
-		UString	src, des;
-		char	encpass[32 + 1];
-		int	pswdL;
-
-		m_sync.Lock();
 		ZeroMemory(encpass, sizeof(encpass));
-		pswdL = sizeof(m_context.pInterfaceContext->szOldPasswd);
-		ZeroMemory(m_context.pInterfaceContext->szOldPasswd, pswdL);
-
-		src.length = 0;
-		src.value = NULL;
-		sk_if_SetKeySaferMode(1);
-		if (sk_if_cert_SignData_notEncode(&m_context, encpass, &src, &des, NULL))
-		{
-			if (sk_if_GetLastErrorCode() == 2417)
-			{
-				m_ca = caPWDa;
-				m_string = _T("pswd\t");
-				OnFire(FEV_CA, MAKELONG(invokeCA, m_string.GetLength()), (long)(char*)m_string.operator LPCTSTR());
-			}
-			ZeroMemory(encpass, sizeof(encpass));
-			m_sync.Unlock();
-			return pass;
-		}
-		sk_if_cert_MemFree(des.value);
-
-		ZeroMemory(encpass, sizeof(encpass));
-		pass = CString(m_context.pInterfaceContext->szOldPasswd, pswdL);
 		m_sync.Unlock();
-
-		m_slog.Format("[certify][CCertifyCtrl::checkPasswd]  pass=[%s] \r\n", pass);
-		OutputDebugString(m_slog);
-
 		return pass;
 	}
+	sk_if_cert_MemFree(des.value);
+
+	ZeroMemory(encpass, sizeof(encpass));
+	pass = CString(m_context.pInterfaceContext->szOldPasswd, pswdL);
+	m_sync.Unlock();
+
+	m_slog.Format("[certify][CCertifyCtrl::checkPasswd]  pass=[%s] \r\n", pass);
+	OutputDebugString(m_slog);
+
+	return pass;
 }
 
 bool CCertifyCtrl::certify(bool reissue)
@@ -1288,15 +1205,21 @@ long CCertifyCtrl::CertifyFull(long pInB, long pInL, long pOutB, long pOutL)
 			{
 				CloudConfig config;
 				memset(&config, 0x00, sizeof(CloudConfig));
-				config.SITE_CODE[0] = "U1MwMDY4XzA2";
+
 				config.CUSTOMER_ID = "SS0068";
-	#ifdef DF_DEV
-				config.SERVER_HOST = DEV_CLOUDE_SERVER;
-				config.AGREEMENT_URL = DEV_AGREEMENT_URL;
-	#else
-				config.SERVER_HOST = REAL_CLOUDE_SERVER;
-				config.AGREEMENT_URL = REAL_AGREEMENT_URL;
-	#endif 
+				if (m_bDev)
+				{
+					config.SITE_CODE[0] = "U1MwMDY4XzA2";
+					config.SERVER_HOST = DEV_CLOUDE_SERVER;
+					config.AGREEMENT_URL = DEV_AGREEMENT_URL;
+				}
+				else
+				{
+					config.SITE_CODE[0] = "U1MwMDY4X0FYSVNfRA==";
+					config.SERVER_HOST = REAL_CLOUDE_SERVER;
+					config.AGREEMENT_URL = REAL_AGREEMENT_URL;
+				}
+
 				config.VERSION = "1.0.0";
 				config.SERVER_PORT = 8500;
 
@@ -1344,14 +1267,10 @@ long CCertifyCtrl::CertifyFull(long pInB, long pInL, long pOutB, long pOutL)
 						*(int*)pOutL = -3;
 						return 2501;
 					}
-					if (rc == -1) //-2면 연결끊기를 한것이다.
-					{
-						*(int*)pOutL = -3;
-						return 2501;
-					}
+				
 					int errorCode = sk_if_GetLastErrorCode();
-					MessageBox(sk_if_GetLastErrorMsg(), "클라우드 인증서 선택 오류", MB_OK);
-
+					*(int*)pOutL = -3;
+					
 					return errorCode;
 				}
 
@@ -1385,6 +1304,10 @@ long CCertifyCtrl::CertifyFull(long pInB, long pInL, long pOutB, long pOutL)
 						m_ca = caOKx;
 					m_calogon = true;
 					savePasswd();
+
+					memcpy(&m_appContext, (APP_CONTEXT*)&m_context, sizeof(APP_CONTEXT));
+					memcpy(&m_SDAPIContext, (SD_API_CONTEXT_NEW*)&Context.sd, sizeof(SD_API_CONTEXT_NEW));
+					sk_if_cert_preset_context(&m_appContext, &m_SDAPIContext.sd);
 				}
 
 				memcpy(&m_contextNew, &Context, sizeof(SD_API_CONTEXT_NEW));
@@ -1506,10 +1429,6 @@ long CCertifyCtrl::CertifyFull(long pInB, long pInL, long pOutB, long pOutL)
 		m_calogon = true;
 		savePasswd();
 
-
-		m_slog.Format("[certify][CCertifyCtrl::CertifyFull]  m_ca=[%s] len=[%d] pOutB=[%s] \r\n", getStatus(), des.length, pOutB);
-		OutputDebugString(m_slog);
-
 		return 0;
 	}
 }
@@ -1541,6 +1460,16 @@ BOOL CCertifyCtrl::CheckCloude()
 	spath += "tab\\axis.ini";
 
 	int readL;
+	memset(chfile, 0x00, 500);
+
+	GetPrivateProfileString("MODE", "DEV", "0", chfile, sizeof(chfile), spath);
+	stmp.Format("%s", chfile);
+	stmp.TrimRight();
+	if (stmp == "1")
+		m_bDev = TRUE;
+	else
+		m_bDev = FALSE;
+
 	memset(chfile, 0x00, 500);
 	GetPrivateProfileString("CLOUDELOGIN", "USE", "0", chfile, sizeof(chfile), spath);
 
@@ -1621,19 +1550,6 @@ int CCertifyCtrl::Cloude_Full_sign(long pOutB, long pOutL)
 	}
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 int CCertifyCtrl::Cloude_ConTraction_sign(long pOutB, long pOutL)
 {
 	int rc = 0;
@@ -1672,26 +1588,159 @@ int CCertifyCtrl::Cloude_ConTraction_sign(long pOutB, long pOutL)
 		{
 			int errorCode = sk_if_GetLastErrorCode();
 			MessageBox(sk_if_GetLastErrorMsg(), "축약서명 오류", MB_OK);
+			m_sync.Unlock();
 			return  -2;
 		}
 
 		memset(&tContext, 0x00, sizeof(SD_API_CONTEXT_NEW));
 	}
 
-	if (sk_if_cert_SignData_notEncode(&m_context, "", &p1, &p2, NULL))
+	m_sync.Lock();
+	m_nBytes = *(int*)pOutL;
+	p1.length = m_nBytes;
+	p1.value = (unsigned char*)pOutB;
+
+	if (sk_if_cert_SignData_notEncode(&m_appContext, "", &p1, &p2, NULL))
 	{
-		MessageBox("sk_if_GetLastErrorMsg()", "축약서명 오류", MB_OK);
+		m_slog.Format("축약서명 오류 Ecod =[%s]", sk_if_GetLastErrorMsg());
+		MessageBox(m_slog, "IBK 투자증권", MB_OK);
+		m_sync.Unlock();
 		return  -2;
 	}
 	else
 	{
-		MessageBox("주문 성공", "축약 서명", MB_OK);
-		*(int*)pOutL = p2.length;
+		pOutB += m_nBytes;
+		m_nBytes += p2.length;
+
+		*(int*)pOutL = m_nBytes;
 		CopyMemory((void*)pOutB, p2.value, p2.length);
 		sk_if_cert_MemFree(p2.value);
 		m_sync.Unlock();
+		return 1;
 	}
 	return 0;
 }
 
-
+//CString CCertifyCtrl::checkPasswd()
+//{
+//	BOOL bCloude = CheckCloude();
+//
+//	m_slog.Format("[certify][CCertifyCtrl::checkPasswd]  m_ca=[%s] bCloude=[%d]\r\n", getStatus(), bCloude);
+//	OutputDebugString(m_slog);
+//
+//	if (bCloude)
+//	{
+//		CString	text, pass = _T("");
+//
+//		SD_API_CONTEXT_NEW tContext; //구조체 선언(클라우드 인증서 정보를 담을)
+//		memset(&tContext, 0x00, sizeof(SD_API_CONTEXT_NEW));
+//		int rc = 0;
+//
+//		CString plain, strResult;
+//		UString p1, p2, p3;
+//
+//		//간편비밀번호를 다시 입력 받고 싶다면
+//		if (m_contextNew.sd.bOldStorage == 7)
+//		{
+//			memcpy(&tContext, &m_contextNew, sizeof(SD_API_CONTEXT_NEW));
+//			memset(&tContext.sd.szOldPasswd, 0x00, sizeof(tContext.sd.szOldPasswd)); //비밀번호 부분만 초기화
+//
+//			rc = sk_if_CloudCertSetSelectExt(&tContext, 1);
+//
+//			if (rc == 0)
+//			{
+//				memset(&m_contextNew, 0x00, sizeof(SD_API_CONTEXT_NEW));
+//				memcpy(&m_contextNew, &tContext, sizeof(SD_API_CONTEXT_NEW));
+//				sk_if_cert_preset_context(&m_context, &m_contextNew.sd);
+//
+//			}
+//			else
+//			{
+//				int errorCode = sk_if_GetLastErrorCode();
+//				MessageBox(sk_if_GetLastErrorMsg(), "전자 서명 오류", MB_OK);
+//				return "";
+//				//if (errorCode == 2501)   //일부러 취소했을때
+//				//	*(int*)pOutL = -3;
+//				//else
+//				//	*(int*)pOutL = -2;
+//				//return -1;
+//			}
+//			memset(&tContext, 0x00, sizeof(SD_API_CONTEXT_NEW));
+//		}
+//
+//		plain = "abcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()-=";
+//		p1.value = (unsigned char*)LPCTSTR(plain);
+//		p1.length = plain.GetLength();
+//
+//		//p1 = 원문 , p2 결과값 , p3 = R값 결과
+//		memset(&p3, 0x00, sizeof(UString));
+//		rc = sk_if_cert_SignDataWithR(&m_context, "", &p1, &p2, &p3);
+//
+//		if (rc) {
+//			MessageBox(sk_if_GetLastErrorMsg(), "전자서명 오류", MB_OK);
+//			return "";
+//			/*CString emsg;
+//			emsg = sk_if_GetLastErrorMsg();
+//			int iret = sk_if_GetLastErrorCode();
+//			*(int*)pOutL = -2;
+//			return iret;*/
+//		}
+//		else
+//		{
+//			//MessageBox("계좌이체 성공", "전자 서명", MB_OK);
+//		//	CopyMemory((void*)pOutB, p2.value, p2.length);
+//		/*	*(int*)pOutL = p2.length;
+//
+//			if (m_ca == caNO)
+//				m_ca = caOKx;
+//			m_calogon = true;
+//			savePasswd();
+//
+//			return 1;*/
+//
+//			pass = CString(tContext.sd.szOldPasswd, 33);
+//			return pass;
+//		}
+//		/*		*/
+//
+//		return pass;
+//	}
+//	else
+//	{
+//		CString	text, pass = _T("");
+//		UString	src, des;
+//		char	encpass[32 + 1];
+//		int	pswdL;
+//
+//		m_sync.Lock();
+//		ZeroMemory(encpass, sizeof(encpass));
+//		pswdL = sizeof(m_context.pInterfaceContext->szOldPasswd);
+//		ZeroMemory(m_context.pInterfaceContext->szOldPasswd, pswdL);
+//
+//		src.length = 0;
+//		src.value = NULL;
+//		sk_if_SetKeySaferMode(1);
+//		if (sk_if_cert_SignData_notEncode(&m_context, encpass, &src, &des, NULL))
+//		{
+//			if (sk_if_GetLastErrorCode() == 2417)
+//			{
+//				m_ca = caPWDa;
+//				m_string = _T("pswd\t");
+//				OnFire(FEV_CA, MAKELONG(invokeCA, m_string.GetLength()), (long)(char*)m_string.operator LPCTSTR());
+//			}
+//			ZeroMemory(encpass, sizeof(encpass));
+//			m_sync.Unlock();
+//			return pass;
+//		}
+//		sk_if_cert_MemFree(des.value);
+//
+//		ZeroMemory(encpass, sizeof(encpass));
+//		pass = CString(m_context.pInterfaceContext->szOldPasswd, pswdL);
+//		m_sync.Unlock();
+//
+//		m_slog.Format("[certify][CCertifyCtrl::checkPasswd]  pass=[%s] \r\n", pass);
+//		OutputDebugString(m_slog);
+//
+//		return pass;
+//	}
+//}

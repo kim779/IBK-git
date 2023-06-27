@@ -95,3 +95,46 @@ STDAPI DllRegisterServer(void)
 	COleObjectFactory::UpdateRegistryAll();
 	return S_OK;
 }
+
+#include "MainWnd.h"
+#include "ControlWnd.h"
+
+__declspec(dllexport) CWnd* WINAPI axCreate(CWnd* parent, void* pParam)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	//컴퓨터\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Edge\IEToEdge
+	LONG lResult{};
+	HKEY hKey{};
+
+	lResult = RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Edge\\IEToEdge"), 0, KEY_QUERY_VALUE, &hKey);
+	if (lResult == ERROR_SUCCESS)  //edge가 있으면..
+	{
+		CMainWnd* pControlWnd = new CMainWnd();
+		pControlWnd->m_pParent = parent;
+
+		pControlWnd->SetParam((struct _param*)pParam);
+		pControlWnd->Create(NULL, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, pControlWnd->m_Param.rect, parent, 100);
+
+		return pControlWnd;
+	}
+	else
+	{
+		ControlWnd* pControlWnd = new ControlWnd();
+	   pControlWnd->m_pParent = parent;
+
+		pControlWnd->SetParam((struct _param*)pParam);
+		pControlWnd->Create(NULL, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, pControlWnd->m_Param.rect, parent, 100);
+
+		return pControlWnd;
+	}
+
+	//DWORD keyValue[20];
+	//memset(keyValue, 0, sizeof(keyValue));
+	//DWORD dwType = REG_DWORD;
+	//DWORD dwSize = sizeof(keyValue);
+	//lResult = RegQueryValueEx(hKey, _T("SiteListUrlBucket"), 0, &dwType, (LPBYTE)keyValue, &dwSize);
+	//int ivalue = keyValue[0];
+
+
+
+}

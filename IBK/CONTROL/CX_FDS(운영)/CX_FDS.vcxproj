@@ -160,7 +160,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../dev/CX_FDS.dll</OutputFile>
+      <OutputFile>D:\IBKS_TEST/dev/CX_FDS.dll</OutputFile>
       <ImportLibrary>.\Debug\CX_FDS.lib</ImportLibrary>
       <ModuleDefinitionFile>.\CX_FDS.def</ModuleDefinitionFile>
     </Link>

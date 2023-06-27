@@ -6022,6 +6022,18 @@ char* CGuard::strtokx(char* str, const char delim, char** start)
 	return sbegin;
 }
 
+long CGuard::CertifyCloude(int igubn)
+{
+	if (!m_certify)
+		return -1;
+
+	long	retv, outL;
+	m_certify->InvokeHelper(DI_CLOUD, DISPATCH_METHOD, VT_I4, (void*)&retv,
+		(BYTE*)(VTS_I4 ), igubn);
+
+	return retv;
+}
+
 long CGuard::CertifyFull(CString srcB, int srcL, char* desB, int& desL)
 {
 	desL = 0;

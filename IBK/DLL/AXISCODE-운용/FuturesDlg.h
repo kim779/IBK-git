@@ -124,7 +124,9 @@ public:
 	void	MonthInit();
 	void	InitBtn();
 	void	SetCode(CString szCode){ m_szEditCode = m_szCode = szCode; }
-	void	SetName(CString szName){ m_szEditName = m_szName = szName; }
+	void	SetName(CString szName){ 
+		m_szEditName = m_szName = szName;
+	}
 	void	SetMgubn(CString szMgubn){ m_szMgubn = szMgubn; }
 	CString GetCode(){ return m_szCode; }
 	CString GetName(){ return m_szName; }

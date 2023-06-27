@@ -162,7 +162,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../dev/cx_symbol.dll</OutputFile>
+      <OutputFile>D:\IBKS_TEST\dev/cx_symbol.dll</OutputFile>
       <ImportLibrary>.\Debug\cx_symbol.lib</ImportLibrary>
       <ModuleDefinitionFile>.\CX_Symbol.def</ModuleDefinitionFile>
     </Link>

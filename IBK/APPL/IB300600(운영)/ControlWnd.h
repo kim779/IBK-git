@@ -140,7 +140,10 @@ public:
 	int m_nCurrTab;
 	CString m_sAccnDept;
 
-	CString m_sATMWeekCode;
+	CStringArray m_sArrTWeel;  //목요일
+	CStringArray m_sArrMWeel; //월요일
+//	CString m_sATMWeekCode;    
+//	CString m_sATMWeekMCode; 
 	bool	m_bClickInWeek;   //위클리 버튼 클릭한 상태에서 선물월물 버튼 클릭시... 일반버튼 전환되는거 막기 위해..
 
 protected:

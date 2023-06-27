@@ -99,8 +99,7 @@
 #include <lm.h>
 #include <assert.h>
 #pragma comment(lib, "Netapi32.lib")
-#pragma comment(lib, "lib/SKCommIF.lib")  //클라우드 인증 라이브러리
-#include "CDlg_Cloude.h"
+
 
 //** macho add end
 
@@ -1060,41 +1059,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	ResourceHelper()->LoadIcon();
 	SetIcon(ResourceHelper()->GetIcon(), TRUE);
 
-//#ifdef USE_AHNLAB_SECUREBROWSER
-//
-//	CString filename;
-//	filename.Format("%s\\%s\\%s", Axis::home, "exe", "NOAOS.TXT");
-//	FILE* fp;
-//	fopen_s(&fp, filename, "rb");
-//
-//	int nInternalMember;
-//
-//	nInternalMember = 0;
-//
-//	if (fp)
-//	{
-//		nInternalMember = 1;
-//		m_bNoProtect = TRUE;
-//		fclose(fp);
-//	}
-//	else
-//	{
-//		GetLocalIP();
-//
-//		if(isIPInRange(m_ipAddr,"172.17.0.0") || isIPInRange(m_ipAddr,"172.20.0.0"))
-//		{
-//			nInternalMember = 1;
-//			m_bNoProtect = TRUE;   
-//		}
-//	}
-//
-//	if(nInternalMember == 1)
-//	{
-//		AfxGetApp()->WriteProfileInt(INFORMATION, "AOS", 0);
-//		AfxGetApp()->WriteProfileInt(INFORMATION, "PCFirewall", 0);
-//	}
-//#endif
-
 	GetASTxInstall();
 	LoadNoTwoPOP_NoSaveLast();
 	m_slog.Format("[axis] oncreatend result=[%d]", result);
@@ -1325,7 +1289,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 		return FALSE;
 	return TRUE;
 }
-
+#include "CDlg_Cloude.h"
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg) 
 {//if (msg->wParam == VK_F8/*byte('P')*/ && (GetKeyState(VK_CONTROL) & 0x8000))
 	if(pMsg->message == WM_KEYDOWN)
@@ -1346,26 +1310,37 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				case 'f':
 				case 'F':
 					{
-					if (GetKeyState(VK_CONTROL) & 0x8000)
+				
+			
+					/*const BOOL pcAOS = AfxGetApp()->GetProfileInt(INFORMATION, "AOS", 1);
+					const BOOL pcFirewall = AfxGetApp()->GetProfileInt(INFORMATION, "PCFirewall", 0);
+					const BOOL pcKeyProtect = AfxGetApp()->GetProfileInt(ENVIRONMENT, "KeyProtect", 0);
+					if ((!pcFirewall || !pcKeyProtect || !pcAOS) && Axis::isCustomer)
 					{
-						if (GetKeyState(VK_SHIFT) & 0x8000)
-						{
-							CString	Path;
-							Path.Format("%s\\%s\\ACCNTDEPT.INI", Axis::home, "tab");
+						load_secure_agree(pcAOS, pcFirewall, pcKeyProtect);
+					}*/
+				//	CreateSubAxis();
+						CreateSharedMemory();
+					//if (GetKeyState(VK_CONTROL) & 0x8000)
+					//{
+					//	if (GetKeyState(VK_SHIFT) & 0x8000)
+					//	{
+					//		CString	Path;
+					//		Path.Format("%s\\%s\\ACCNTDEPT.INI", Axis::home, "tab");
 
-							char readB[1024];
-							int readL;
-							readL = GetPrivateProfileString("ACCNTDEPT", "DEPT", "811", readB, sizeof(readB), Path);
-							CString tDept(readB, readL);
-							tDept.TrimLeft(); tDept.TrimRight();
+					//		char readB[1024];
+					//		int readL;
+					//		readL = GetPrivateProfileString("ACCNTDEPT", "DEPT", "811", readB, sizeof(readB), Path);
+					//		CString tDept(readB, readL);
+					//		tDept.TrimLeft(); tDept.TrimRight();
 
-								//if (Axis::userID == "khs779")
-								{
-									ShowControlBar(m_TotalAcc, TRUE, FALSE);
-									m_TotalAcc->Refresh813(1);
-								}
-						}
-					}
+					//			//if (Axis::userID == "khs779")
+					//			{
+					//				ShowControlBar(m_TotalAcc, TRUE, FALSE);
+					//				m_TotalAcc->Refresh813(1);
+					//			}
+					//	}
+					//}
 					
 				/*	CString str, title;
 					str= "901	00110012107	902	devilswo \
@@ -1380,19 +1355,14 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				case 'x':
 				case 'X':
 					{
-					CString sdat;
-					sdat.Format("%s%s", "zPwd\t", "2345");
-					m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY, (void*)NULL,
-						(BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, m_activeKey), (LPARAM)(const char*)sdat);
-					  
+							PostMessage(WM_SECUREDLG, 0, 0);
+							
 					}
 					break;
 				case 'z':
 				case 'Z':
 					{
-						CDlg_Cloude dlg;
-						dlg.DoModal();
-						TRACE("end modal");
+				
 						return TRUE;
 					}
 					break;
@@ -2826,9 +2796,10 @@ m_slog.Format("[axis] axstart onaxis m_ip=[%s] m_port=[%s]\n", m_ip,m_port);
 WriteLog(m_slog);
 
 			((CAxisApp*)m_axis)->m_conIP = m_ip;
-
-			CString file, usnm = Axis::user;
+			
+			CString file, axisfile, usnm = Axis::user;
 			file.Format("%s\\%s\\%s\\%s.ini", Axis::home, USRDIR, usnm, usnm); 
+			axisfile.Format("%s\\%s\\Axis.ini", Axis::home, TABDIR);
 
 			if ((m_ip == "172.16.202.106") || (m_ip == "172.16.205.20") || (m_ip == "211.255.204.134")|| (m_ip == "211.255.204.19") ||  ( m_ip == "211.255.204.104") ||
 				m_ip=="172.16.205.30" || m_ip=="211.255.204.136" || m_ip=="211.255.204.85" || m_ip=="172.16.202.150" || m_ip=="172.16.202.171" || m_ip == "172.16.202.130")
@@ -2836,10 +2807,12 @@ WriteLog(m_slog);
 				Axis::devMode = TRUE;
 
 				WritePrivateProfileString("MODE", "DEV", "1", file);
+				WritePrivateProfileString("MODE", "DEV", "1", axisfile);
 			}
 			else
 			{
 				WritePrivateProfileString("MODE", "DEV", "0", file);
+				WritePrivateProfileString("MODE", "DEV", "0", axisfile);
 			}
 
 			WritePrivateProfileString("MODE", "PORT",m_port, file);
@@ -5044,9 +5017,11 @@ bool CMainFrame::CreateWizard()
 	if (!m_wizard->CreateControl("AxisWizard.WizardCtrl.IBK2019", NULL, WS_CHILD, CRect(0, 0, 0, 0), this, -1))
 	{
 		m_wizard = nullptr;
-		WriteLog("---------------[axis]createwizard fail---------------");
+		m_slog.Format("[axis]createwizard fail err=[%d]", GetLastError());
+		OutputDebugString(m_slog);
 		return -1;
 	}
+	return 1;
 }
 
 int CMainFrame::Initialize()
@@ -5093,6 +5068,7 @@ int CMainFrame::Initialize()
 #ifdef DF_USE_CPLUS17
 	if (!CreateWizard())
 	{
+		OutputDebugString("[axis] CreateWizard fail");
 		m_wizard = nullptr;
 		return -1;
 	}
@@ -7361,6 +7337,12 @@ void CMainFrame::showfname()
 	if (dlg.DoModal() == IDOK)
 	{
 		CString mapN = dlg.GetMapName();
+
+		if (mapN.Find("IBXXXX99") >= 0)
+		{
+		//	CreateSharedMemory();
+		}
+
 		if (mapN.GetLength() == L_MAPN)
 			m_mapHelper->ChangeChild(mapN);
 
@@ -26603,24 +26585,6 @@ BOOL CMainFrame::startAK()
 		return FALSE;
 	}
 	
-	// Protect Edit Ctrl1
-// 	HWND hwnd1 = m_axConnect->GetPassHwnd();
-// 	DWORD dwErr1 = g_pIAstxAkSDK->ProtectEditControl(hwnd1);
-// 	if( dwErr1 != 0 ) 
-// 	{
-// 		OutputDebugString("[ASTx] AK 비밀번호 에디트 초기화에 실패했습니다.");
-// 		return FALSE;
-// 	}
-// 
-// 	HWND hwnd2 = m_axConnect->GetCPassHwnd();
-// 	DWORD dwErr2 = g_pIAstxAkSDK->ProtectEditControl(hwnd2);
-// 	if( dwErr2 != 0 ) 
-// 	{
-// 		OutputDebugString("[ASTx] AK 인증번호 에디트 초기화에 실패했습니다.");
-// 		return FALSE;
-// 	}
-// 
-// 	m_axConnect->SetAK(g_pIAstxAkSDK);
 	WriteLog("[ASTx]방화벽 기능이 정상적으로 기동되었습니다. [키보드보안] startAK()");
 	return TRUE;
 }
@@ -27699,12 +27663,133 @@ void CMainFrame::PopUp7805()
 
 }
 
+
+HANDLE CMainFrame::ProcessFind(char* strProcessName)
+{
+	HANDLE         hProcessSnap = NULL;
+	BOOL           bRet = FALSE;
+	PROCESSENTRY32 pe32 = { 0 };
+	CString strProcess, strTarget;
+	strTarget.Format("%s", strProcessName);
+	strTarget.TrimRight();
+
+	hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+	if (hProcessSnap == (HANDLE)-1)
+		return false;
+
+	pe32.dwSize = sizeof(PROCESSENTRY32);
+	CString slog;
+	//프로세스가 메모리상에 있으면 첫번째 프로세스를 얻는다
+	if (Process32First(hProcessSnap, &pe32))
+	{
+		BOOL          bCurrent = FALSE;
+		MODULEENTRY32 me32 = { 0 };
+
+		do
+		{
+			//	bCurrent = GetProcessModule(pe32.th32ProcessID, strProcessName, pe32.szExeFile);
+			slog.Format("[MAC] [%s] \r\n", pe32.szExeFile);
+			OutputDebugString(slog);
+			OutputDebugString("\r\n-----------------------------------------------\r\n");
+			strProcess.Format("%s", pe32.szExeFile);
+			if (strProcess.Find(strTarget) >= 0)
+			{
+				HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pe32.th32ProcessID);
+				//if (hProcess)
+				//	TerminateProcess(hProcess, 0);
+				return hProcess;
+			}
+		} while (Process32Next(hProcessSnap, &pe32)); //다음 프로세스의 정보를 구하여 있으면 루프를 돈다.
+	}
+	CloseHandle(hProcessSnap);
+
+	return nullptr;
+}
+
+void CMainFrame::CreateSubAxis()
+{
+	if (ProcessFind("SubAxis"))
+		return;
+
+	CreateSharedMemory();
+
+	CString	aps, cmds, exes;
+	STARTUPINFO		si;
+	PROCESS_INFORMATION	pi;
+
+	ZeroMemory(&si, sizeof(STARTUPINFO));
+	ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
+
+	si.cb = sizeof(STARTUPINFO);
+	si.dwFlags = STARTF_USESHOWWINDOW;
+	si.wShowWindow = SW_SHOW;
+
+	char	buffer[1024];
+	GetClassName(m_hWnd, buffer, sizeof(buffer));
+	cmds.Format(" /c %s",  m_strSharedMName);
+	aps.Format("%s\\%s\\SubAxis.exe", Axis::home, RUNDIR);
+
+	const BOOL bRc = CreateProcess(
+		aps,				// application name
+		(char*)(const char*)cmds,// command line
+		NULL,				// process attribute
+		NULL,				// thread attribute
+		FALSE,				// is inherit handle
+		0,					// creation flags
+		NULL,				// environment
+		NULL,				// current directory
+		&si,				// STARTUPINFO
+		&pi);				// PROCESS_INFORMATION
+
+	if (bRc)
+	{
+
+	}
+}
+
+void CMainFrame::CreateSharedMemory()
+{
+	DWORD processID = GetCurrentProcessId();
+	m_strSharedMName.Format("%s%d", "Axis", processID);
+	m_hKeyFile = ::OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, m_strSharedMName);
+
+	if (m_hKeyFile == nullptr)
+	{
+		m_hKeyFile = CreateFileMapping((HANDLE)0xffffffff,
+			nullptr,
+			PAGE_READWRITE,
+			0,
+			1024 * 50,
+			m_strSharedMName);
+	}
+}
+
+void CMainFrame::CludeCertup()
+{
+	int ret{};
+	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
+		(BYTE*)(VTS_I4 VTS_I4), MAKELONG(caCLOUD, 1), 0);
+}
+void CMainFrame::CludeCertDown()
+{
+	int ret{};
+	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
+		(BYTE*)(VTS_I4 VTS_I4), MAKELONG(caCLOUD, 2), 0);
+}
+void CMainFrame::CludePschange()
+{
+	int ret{};
+	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
+		(BYTE*)(VTS_I4 VTS_I4), MAKELONG(caCLOUD, 3), 0);
+}
+
 //CString ip;
 //	ip.Format("%s", ipaddr);
 //	ip.TrimLeft(), ip.TrimRight();
 
    //int returnL = 12;
-   //FillMemory(data, returnL, ' '); data[returnL] = 0x00;
+   //FillMemory(data, returnL, 'f' '); data[returnL] = 0x00;
    //CString strRetrun;
 
    //IP_ADAPTER_INFO AdapterInfo[16];

@@ -147,6 +147,7 @@ BEGIN_MESSAGE_MAP(Cdepth, CWnd)
 	ON_MESSAGE(WM_USER, OnMessage)
 	ON_MESSAGE(WM_MBONG, OnMBong)
 	ON_MESSAGE(WM_MOUSELEAVE, OnMouseLeave)
+	ON_WM_CREATE()
 END_MESSAGE_MAP()
 
 BEGIN_DISPATCH_MAP(Cdepth, CWnd)
@@ -664,6 +665,85 @@ long Cdepth::OnMessage(WPARAM wParam, LPARAM lParam)
 		struct	_extTHx* exth;
 		exth = (struct _extTHx*)lParam;
 		m_sync.Lock();
+
+	
+		exth = (struct _extTHx*)lParam;
+		if (exth->size == 0)
+			break;
+
+		switch ((BYTE)exth->key)
+		{
+			case 255:
+			{
+				CString stmp;
+				stmp.Format("%s", (char*)exth->data);
+
+				struct MarketTime
+				{
+					char row1[30]; //장전시간외
+					char row2[30]; //동시호가
+					char row3[30]; //장내시간
+					char row4[30]; //동시호가
+					char row5[30]; //장후시간외
+					char row6[30]; //시간외 단일가
+				};
+
+				struct MarketTime* mkTime = (struct MarketTime*)exth->data;
+
+				CString strRow1, strRow2, strRow3, strRow4, strRow5, strRow6;
+				CString strTemp;
+
+				strRow1 = CString(mkTime->row1, 30); //장전시간외
+				strRow2 = CString(mkTime->row2, 30); //동시호가
+				strRow3 = CString(mkTime->row3, 30); //장내시간
+				strRow4 = CString(mkTime->row4, 30); //동시호가
+				strRow5 = CString(mkTime->row5, 30); //장후시간외
+				strRow6 = CString(mkTime->row6, 30); //시간외 단일가
+
+				//// KSJ 장운영시간 저장
+				CString strTime = strRow3;
+				CString strEndTime = strRow5;
+				if (!strTime.IsEmpty())
+				{
+					CString date;
+					CTime time;
+					time = CTime::GetCurrentTime();
+					date.Format("%04d%02d%02d", time.GetYear(), time.GetMonth(), time.GetDay());
+
+					strTime.Trim();
+					strTime.Replace("+", "");
+					strTime.Replace("-", "");
+					strTime.Replace(" ", "");
+
+					const char ch = 0x7e;
+					strTemp = strTime.Mid(0, strTime.Find(ch));
+					strTemp.Replace("시", "");
+					strTemp.Replace("분", "");
+					strTemp.Replace(" ", "");
+					//m_strBeginTime.Format("0%s%02s00", strTemp.Left(1), strTemp.Mid(1, 2));
+					CTime calTime(time.GetYear(), time.GetMonth(), time.GetDay(), atoi(strTemp.Left(1)), atoi(strTemp.Mid(1, 2)), 0);
+					CTimeSpan span(0, 0, 15, 0);
+					CTime resultTime = calTime - span;
+					m_strBeginTime.Format("%02d%02d00", resultTime.GetHour(), resultTime.GetMinute());
+
+					strEndTime.Replace("시", "");
+					strEndTime.Replace("분", "");
+					strEndTime.Replace("~", "");
+					strEndTime.Replace("+", "");
+					strEndTime.Replace("-", "");
+					strEndTime.Replace(" ", "");
+					
+					int ival = atoi(strEndTime.Mid(0, 2));
+					ival = atoi(strEndTime.Mid(2, 2));
+					CTime calETime(time.GetYear(), time.GetMonth(), time.GetDay(), atoi(strEndTime.Mid(0, 2)), atoi(strEndTime.Mid(2, 2)), 0);
+					resultTime = calETime + span;
+					m_strEndTime.Format("%02d%02d00", resultTime.GetHour(), resultTime.GetMinute());
+				}
+				return 0;
+			}
+			break;
+		}
+
 		dispatch(exth->data, exth->size);
 		m_sync.Unlock();
 		break;
@@ -1353,6 +1433,7 @@ void Cdepth::alert(struct _alertR* alertR)
 	if (alertR->code != m_code || alertR->size == 0)
 		return;
 
+	CString stmp;
 	CRect	rect;
 	CString	text;
 	int	key = 0, index = 0;
@@ -1420,6 +1501,17 @@ void Cdepth::alert(struct _alertR* alertR)
 		}
 		else if (key == MGJY)
 		{
+			stmp = (char*)data[0]; stmp.TrimRight();
+			
+			if (stmp == "@")
+			{
+			//	stmp = (char*)data[0]; stmp.TrimRight();
+				if (!CheckTime(""))
+					continue;
+				rect.UnionRect(rect, CRect(0, 0, 10, 10));
+				TRACE("1234");
+			}
+
 			std::shared_ptr<Citem>	pItem = nullptr;
 			double	koga = 0, jega = 0, jjga;
 			CString value;
@@ -1446,6 +1538,11 @@ void Cdepth::alert(struct _alertR* alertR)
 		}
 		if (item->m_data.CompareNoCase(text))
 		{
+			if (key == MGJY)
+			{
+				stmp.Format("[%s][%s]\r\n", (char*)data[0], (char*)data[key]);
+				OutputDebugString(stmp);
+			}
 			item->m_data = text;
 
 			rect.UnionRect(rect, item->m_fRc);
@@ -4992,7 +5089,138 @@ void Cdepth::OnTimer(UINT nIDEvent)
 {
 	//KillTimer(1000);
 
-	SendMingam();
+	switch (nIDEvent)
+	{
+		case 1000:
+		{
+			KillTimer(nIDEvent);
+			SendMingam();
+		}
+		break;
+		case 1001:
+		{
+			KillTimer(nIDEvent);
+			SearchMarketTime();
+		}
+		break;
+	}
+	
 	
 	CWnd::OnTimer(nIDEvent);
+}
+
+
+int Cdepth::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CWnd::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+	SetTimer(1001, 2000, nullptr);
+	return 0;
+}
+
+void Cdepth::SearchMarketTime()
+{
+	// TODO:  여기에 특수화된 작성 코드를 추가합니다.
+	//test 미결제
+	//SendTR("bo221199", "1", US_KEY, 98);
+	CString strName;
+	strName = "bo221199";
+	/*
+	CString data;
+	data = "1";
+	const	int	datl = data.GetLength();
+	std::unique_ptr<char[]> datb = std::make_unique<char[]>(L_userTH + datl + 128);
+	struct	_userTH	udat {};
+	int	idx = 0;
+
+	// control name
+	CopyMemory(datb.get(), m_szName, m_szName.GetLength());
+	idx += m_szName.GetLength();
+	datb[idx++] = '\t';
+
+	// userTH
+	CopyMemory(udat.trc, strName, strName.GetLength());
+	udat.key = m_key;
+	udat.stat = US_OOP;
+	CopyMemory(&datb[idx], &udat, L_userTH);
+	idx += L_userTH;
+
+	// data
+	CopyMemory(&datb[idx], data, datl);
+
+	int ret = m_parent->SendMessage(WM_USER, MAKEWPARAM(invokeTRx, datl), (LPARAM)datb.get());
+	datb.reset();
+	*/
+	
+	struct _userTH	udat {};
+	int	index = 0;
+	std::unique_ptr<TCHAR[]> buff = std::make_unique<TCHAR[]>(L_userTH + 1 + 128);
+
+	CopyMemory(udat.trc, strName, strName.GetLength());
+	udat.stat =  US_KEY;
+	udat.key = m_key;
+
+	buff[index++] = 255;		//TRKEY_GROUP;
+	CopyMemory(&buff[index], (char*)m_szName.GetString(), m_szName.GetLength());
+	index += m_szName.GetLength();
+	buff[index++] = '\t';
+
+
+	CopyMemory(&buff[index], &udat, L_userTH);
+	index += L_userTH;
+	CopyMemory(&buff[index], "1", 1);
+
+	index = m_parent->SendMessage(WM_USER, MAKEWPARAM(invokeTRx, 1), (LPARAM)buff.get());
+	buff.reset();
+	
+}
+
+CString Cdepth::CalMaketTime(CString strTime, bool bEnd)
+{
+	CString strData;
+
+	strTime.Replace("시", "");
+	strTime.Replace("분", "");
+
+	CString strTemp;
+
+	if (bEnd)
+	{
+		if (strTime.IsEmpty())
+			strTime = "90";
+
+		int nTime = atoi(strTime) - 1;
+
+		strData.Format("%04d59", nTime); // 085959, 092959, 095959
+	}
+	else
+	{
+		if (strTime.IsEmpty())
+			strTime = "80";
+
+		strData.Format("%03d000", atoi(strTime) + 4); // 081000, 084000, 09100
+	}
+
+	return strData;
+}
+
+BOOL Cdepth::CheckTime(CString strTime)
+{
+	int iTime{};
+	if (strTime.IsEmpty())
+	{
+		CString date;
+		CTime time;
+		time = CTime::GetCurrentTime();
+		date.Format("%02d%02d%02d", time.GetHour(), time.GetMinute(), time.GetSecond());
+		iTime = atoi(date);
+	}
+	else
+		iTime = atoi(strTime);
+
+	if (iTime > atoi(m_strBeginTime) && iTime < atoi(m_strEndTime))  //장중일 경우
+		return FALSE;
+
+	return TRUE;
 }

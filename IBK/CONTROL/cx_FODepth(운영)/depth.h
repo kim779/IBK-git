@@ -261,7 +261,10 @@ protected:
 	double   Str2Double(const StringProxy &sp) { return Str2Double(sp.first, sp.second-sp.first); }
 
 	void	SendMingam();
-
+	void SearchMarketTime();
+	CString m_strBeginTime{}, m_strEndTime{};
+	BOOL CheckTime(CString strTime);
+	CString CalMaketTime(CString strTime, bool bEnd);
 	///////////////////////////////////////////////////
 	// Extra Window
 	bool	m_bMBPrice;
@@ -344,6 +347,8 @@ protected:
 	//}}AFX_DISPATCH
 	DECLARE_DISPATCH_MAP()
 	DECLARE_INTERFACE_MAP()
+public:
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 };
 
 inline void Cdepth::parseString(LPCSTR st, LPCSTR ed, CHAR del, vector<StringProxy> &retval)

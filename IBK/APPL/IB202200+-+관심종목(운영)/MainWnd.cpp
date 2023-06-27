@@ -1015,6 +1015,13 @@ COLORREF CMainWnd::getAxColor(int color)
 
 void CMainWnd::sendTR(CString trCode, char *datB, int datL, int key)
 { 
+	CString slog;
+	if (trCode.Find("pidomyst") >= 0)
+	{
+		slog.Format("\r\n-------------------------[202200] %50s", datB);
+		OutputDebugString(slog);
+	}
+
 	std::string sendB;
 	sendB.resize(L_userTH + datL + 1);
 	struct _userTH *uTH{};

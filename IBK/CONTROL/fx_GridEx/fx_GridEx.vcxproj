@@ -114,7 +114,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../dev/fx_GridEx.dll</OutputFile>
+      <OutputFile>D:\IBKS_TEST\dev/fx_GridEx.dll</OutputFile>
       <ImportLibrary>.\Debug\fx_GridEx.lib</ImportLibrary>
       <ModuleDefinitionFile>.\fx_GridEx.def</ModuleDefinitionFile>
     </Link>

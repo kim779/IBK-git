@@ -39,3 +39,4 @@ extern CComModule _Module;
 #include <atlcom.h>
 
 #include <AxStd.hpp>
+//#include "../../H/axislog.h"

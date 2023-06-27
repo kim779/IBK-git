@@ -16,6 +16,7 @@ public:
     ViewComponent(
         CMainWnd* appWindow,
         IDCompositionDevice* dcompDevice,
+        
 #ifdef USE_WEBVIEW2_WIN10
         winrtComp::Compositor wincompCompositor,
 #endif
@@ -49,7 +50,11 @@ private:
     void SetTransform(TransformType transformType);
     void ShowWebViewBounds();
     void ShowWebViewZoom();
-
+public:
+    wil::com_ptr<ICoreWebView2Controller> getController() {
+        return m_controller;
+    }
+private:
     CMainWnd* m_appWindow = nullptr;
 
     wil::com_ptr<ICoreWebView2Controller> m_controller;

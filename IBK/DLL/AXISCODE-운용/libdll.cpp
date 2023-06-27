@@ -797,7 +797,7 @@ __declspec(dllexport) bool WINAPI axGetName(int kind, char* code, char* name, in
 		}		
 		else if (szCode[0] == '2' || szCode[0] == '3' || szCode[0] == 'B' || szCode[0] == 'C')  //파생상품 코드개편
 		{
-			if (szCode[1] == '0')
+			if (szCode[1] == '0' || (szCode[1] == 'A' && szCode[2] == 'F'))
 			{
 				*type = 3;
 				kind = optionNAME;

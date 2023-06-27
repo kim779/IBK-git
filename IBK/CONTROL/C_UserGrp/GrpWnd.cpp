@@ -352,7 +352,7 @@ int CGrpWnd::DispatchData(WPARAM wParam, LPARAM lParam)
 
 	if (nHead <= 0)	//|| nData <= 0)
 	{
-		SetError("Graph Count is 0");
+		SetError("Graph Count is 0"); 
 
 		Invalidate(FALSE);
 		return sz_DNHEAD;
@@ -757,9 +757,10 @@ void CGrpWnd::DrawEmpty(CDC *pDC, bool bInit)
 
 		if (!m_sError.IsEmpty())
 		{
-			const	int	sColor = pDC->SetTextColor(RGB(128, 0, 0));
+			/*const	int	sColor = pDC->SetTextColor(RGB(128, 0, 0));
 			pDC->DrawText(m_sError, &m_GrpRect, DT_SINGLELINE|DT_CENTER|DT_VCENTER);
-			pDC->SetTextColor(sColor);
+			pDC->SetTextColor(sColor);*/
+			OutputDebugString("[C_userGraph]  " + m_sError);
 		}
 		else if (m_RgnCnt > 1)
 		{

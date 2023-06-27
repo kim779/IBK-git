@@ -161,7 +161,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../dev/IB877000.DLL</OutputFile>
+      <OutputFile>D:\IBKS_TEST\dev/IB877000.DLL</OutputFile>
       <ImportLibrary>.\Debug\IB877000.lib</ImportLibrary>
       <AdditionalDependencies>Msimg32.lib;../../control/fx_misc/Debug/fx_misc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\IB877000.def</ModuleDefinitionFile>

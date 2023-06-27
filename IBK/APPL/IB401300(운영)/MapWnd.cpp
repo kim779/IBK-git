@@ -1471,12 +1471,22 @@ void CMapWnd::DrawFutureData( FUTURE_DATA *pfd /*= NULL*/, CDC *pDC /*= NULL*/ )
 
 	if (pfd->is_code())
 	{
+		DWORD      colFormat{};   //fixs_a
+		colFormat = pg->GetItemFormat(row, 0);
+		colFormat = colFormat ^ DT_LEFT;
+		colFormat = colFormat | DT_CENTER;
+		pg->SetItemFormat(row, 0, colFormat);  //fixe_a
 		pg->SetItemText(row, 0, pfd->code);
 		pg->RedrawCell(row, 0, pDC);
 	}
 
 	if (pfd->is_name())
 	{
+		DWORD      colFormat{};   //fixs_a
+		colFormat = pg->GetItemFormat(row, 0);
+		colFormat = colFormat ^ DT_LEFT;
+		colFormat = colFormat | DT_CENTER;
+		pg->SetItemFormat(row, 1, colFormat);  //fixe_a
 		pg->SetItemText(row, 1, pfd->hnam);
 		pg->RedrawCell(row, 1, pDC);
 	}

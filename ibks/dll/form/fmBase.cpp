@@ -1337,6 +1337,7 @@ void CfmBase::drawPolygonText(CDC* dc, CRect rect, CString str, BYTE align, BYTE
 	}
 	tRc.left   = max(tRc.left, rect.left);
 	tRc.right  = min(tRc.right, rect.right);
+
 	dc->DrawText(str, tRc, format);
 }
 

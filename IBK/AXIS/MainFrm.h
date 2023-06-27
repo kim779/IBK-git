@@ -1486,6 +1486,18 @@ public:
 
 	//7805ÆË¾÷
 	void PopUp7805();
+
+	//SubAxis 
+	HANDLE m_hKeyFile{};
+	CString m_strSharedMName{};
+	void CreateSubAxis();
+	HANDLE ProcessFind(char* strProcessName);
+	void CreateSharedMemory();
+
+	//CLOUDE
+	void CludeCertup();
+	void CludeCertDown();
+	void CludePschange();
 protected:
 // #ifdef USE_AHNLAB_SECUREBROWSER
 // 	IAosSB *m_pAosSB;

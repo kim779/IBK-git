@@ -20,8 +20,6 @@ class CCertifyCtrl : public COleControl
 public:
 	CCertifyCtrl();
 	CString m_slog;
-	int selectoption;
-	int keypaduse;
 	CString m_root;
 	BOOL CheckCloude();
 	int Cloude_ConTraction_sign(long pOutB, long pOutL);
@@ -70,7 +68,12 @@ private:
 	bool	guideMsg(msgNO msgno, CString guide = _T(""), CString title = _T(""));
 	BOOL	isMustCertify(CString maps);
 	
-	char* m_pCloudeDn{};
+
+	void GetLocalIP();
+	CString m_ipAddr;
+	APP_CONTEXT m_appContext;
+	SD_API_CONTEXT_NEW m_SDAPIContext;
+	BOOL	m_bDev;
 protected:
 	~CCertifyCtrl();
 

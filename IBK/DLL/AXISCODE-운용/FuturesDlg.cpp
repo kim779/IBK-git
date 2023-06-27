@@ -1178,7 +1178,7 @@ BOOL CFuturesDlg::loadPjCode()			//현물 코드 종목...
 	CMapStringToPtr pcodemap;
 	CQArray	<CString, CString>	qKindArr;
   	
-	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\pjcode.dat";  //주식옵션 
+	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\pjcode.dat";  //주식옵션
 
 	if (!file.Open(path, CFile::modeRead|CFile::typeBinary))
 	{
@@ -1286,7 +1286,7 @@ BOOL CFuturesDlg::loadSfCode()
 
 	CString path, sztmp = _T("");
   	
-	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\sfcode.dat"; //주식선물
+	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\sfcode.dat";
 
 	if (!file.Open(path, CFile::modeRead|CFile::typeBinary))
 	{	
@@ -1561,7 +1561,7 @@ BOOL CFuturesDlg::loadFjCode()
 BOOL CFuturesDlg::loadWCode()
 {
 //writelogs("AXISCODE loadWCode start");
-	CString stmp, stmp1, stmp2;  //sWfname, sWlname
+	CString stmp, stmp1, stmp2, sWfname, sWlname;
 	m_arrayOcode.RemoveAll();
 	int	codeN{}, len{};
 	
@@ -1581,20 +1581,13 @@ BOOL CFuturesDlg::loadWCode()
 	}
 	len = file.Read(&OJCodh, sizeof(struct ojcodh));
 
-	for (int jj = 0; jj < STANDARDNUM; jj++)  
-//	for (int jj = 0; jj < STANDARDNUM - 2; jj++)
+	for (int jj = 0; jj < STANDARDNUM; jj++)  //위클리 이름 
 	{
 		CString str = CString(OJCodh.cjym[jj], 6).Right(4);
-		stmp.Format("[%d] %s\n",jj,  str);
+		stmp.Format("\r\n[%d] %s\n",jj,  str);
+		OutputDebugString(stmp);
 		m_ArrayMonth.Add(str);
 	}
-
-/*	 //위클리 이름 
-	if (m_pCheck->GetSafeHwnd())
-		m_pCheck->SetArray();
-	
-	m_ArrayMonth.RemoveAll();
-*/	
 
 	codeN = gsl::narrow_cast<int>((file.GetLength() - len) / sizeof(struct ojcode));  //weekly 43   //기존 83
 	
@@ -1603,26 +1596,20 @@ BOOL CFuturesDlg::loadWCode()
 	{
 		file.Read(&OJCode, sizeof(struct ojcode));
 
-		stmp.Format("[%d] [%.5s] \r\n",ii, OJCode.price);
-	//	OutputDebugString(stmp);
+		stmp.Format("[%d] [%.5s] \n",ii, OJCode.price);
 		for(int ii = 0 ; ii < 11 ; ii++)
 		{
-			stmp1.Format("----<%d>", ii);
-		//	OutputDebugString(stmp1 + "\r\n");
-
-			stmp1.Format("%s [%s] [%d]", OJCode.call[ii].cod2, OJCode.call[ii].hnam, OJCode.call[ii].yorn);
+			stmp1.Format("%s [%s] [%c]", OJCode.call[ii].cod2, OJCode.call[ii].hnam, OJCode.call[ii].yorn);
 			stmp1.TrimRight();
-		//	OutputDebugString(stmp1 + "\r\n");
-	
-			stmp2.Format("%s [%s] [%d]", OJCode.put[ii].cod2, OJCode.put[ii].hnam, OJCode.put[ii].yorn);
+		//	if(stmp1.GetLength() == 0)
+		//		stmp1 = "        ";
+			
+			stmp2.Format("%s [%s] [%c]", OJCode.put[ii].cod2, OJCode.put[ii].hnam, OJCode.put[ii].yorn);
 			stmp2.TrimRight();
-		//	OutputDebugString(stmp2 + "\r\n");
-
-		//	stmp2 = "-------------------------------------------------";
-		//	OutputDebugString(stmp2 + "\r\n");
 		//	if(stmp2.GetLength() == 0)
 		//	stmp2 = "        ";
 
+		//	stmp.Format("[%d] %s   %s \n",ii, stmp1,  stmp2);
 			/*if(ii == 9)   
 			{
 				stmp.Format("%s", OJCode.call[ii].hnam);
@@ -1641,8 +1628,8 @@ BOOL CFuturesDlg::loadWCode()
 		m_arrayOcode.Add(OJCode);
 	}
 	
-	//m_ArrayMonth.Add(sWlname);
-	//m_ArrayMonth.Add(sWfname);
+//	m_ArrayMonth.Add(sWlname);
+//	m_ArrayMonth.Add(sWfname);
 
 	if (m_pCheck->GetSafeHwnd())
 		m_pCheck->SetArray();
@@ -1766,7 +1753,7 @@ BOOL CFuturesDlg::loadMoCode()
 	
 	CString path;
 	
-	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\mocode.dat";  //선옵 스타
+	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\mocode.dat";
 	
 	if (!file.Open(path, CFile::modeRead|CFile::typeBinary))
 	{	
@@ -1802,7 +1789,6 @@ BOOL CFuturesDlg::loadMoCode()
 	{
 		file.Read(&OJCode, sizeof(struct ojcode));
 		stmp.Format("[%d] [%.5s] \n",ii, OJCode.price);
-		OutputDebugString(stmp);
 		for(int ii = 0 ; ii < 11 ; ii++)
 		{
 			stmp1.Format("%s [%c]", OJCode.call[ii].cod2, OJCode.call[ii].yorn);
@@ -1816,7 +1802,6 @@ BOOL CFuturesDlg::loadMoCode()
 			//	stmp2 = "        ";
 			
 			stmp.Format("%s   %s \n", stmp1,  stmp2);
-			OutputDebugString(stmp);
 		}
 		m_arrayOcode.Add(OJCode);
 	}
@@ -2287,7 +2272,7 @@ BOOL CFuturesDlg::FindCode(int kind, CString szCode)		// GetName()에서 사용.
 		{
 			m_jongmuk = 0;
 
-			if(szCode.Mid(1, 2) == "09")
+			if(szCode.Mid(1, 2) == "09" || szCode.Mid(1, 2) == "AF")
 			{
 				loadFjCode();
 				loadWCode();
@@ -2447,7 +2432,7 @@ BOOL CFuturesDlg::FindCode(int kind, CString szCode)		// GetName()에서 사용.
 		*/
 	case optionNAME:
 		{
-			if(szCode.Mid(1, 2) == "09")
+			if(szCode.Mid(1, 2) == "09" || szCode.Mid(1, 2) == "AF")
 			{
 				loadWCode();
 			}
@@ -2536,7 +2521,7 @@ BOOL CFuturesDlg::FindCode(int kind, CString szCode)		// GetName()에서 사용.
 		break;
 	case getCODEcall:
 		{
-			if(szCode.Mid(1, 2) == "09")
+			if(szCode.Mid(1, 2) == "09" || szCode.Mid(1, 2) == "AF")
 			{
 				loadWCode();
 			}
@@ -2571,7 +2556,7 @@ BOOL CFuturesDlg::FindCode(int kind, CString szCode)		// GetName()에서 사용.
 		break;
 	case getCODEput:
 		{
-			if(szCode.Mid(1, 2) == "09")
+			if(szCode.Mid(1, 2) == "09" || szCode.Mid(1, 2) == "AF")
 			{
 				loadWCode();
 			}
@@ -3028,7 +3013,7 @@ void CFuturesDlg::SetFutureCodes()
 		code = m_arrayFcode[jj].code;
 		code.TrimLeft(); code.TrimRight();
 		/*if (m_bKostar) // Kostar 취급 하지 않으므로 주석 처리 2010.02.24
-			if (code.GetLength() <= 3 || code[2] != '3')   //주석
+			if (code.GetLength() <= 3 || code[2] != '3')
 				continue;*/
 
 		CString month = code.Mid(4,1);
@@ -3047,7 +3032,7 @@ void CFuturesDlg::SetFutureCodes()
 		{
 // 			if (btnCnt > 7) // 지수 선물일 경우 에만 
 // 				break;
-			if (!code.IsEmpty() && (code[0] == '4' || code[0] == 'D')) // 스프레드 일 때   //파생상품 코드개편
+			if (!code.IsEmpty() && (code[0] == '4' || code[0] == 'D')) // 스프레드 일 때   파생상품 코드개편
 			{
 				((CButton*)GetDlgItem(IDC_BUTTON_SPMONTH3 + ib))->SetWindowText(code);
 				ib++;
@@ -4068,9 +4053,12 @@ void CFuturesDlg::OnBtnWeekop()
 				icheck++;
 				data.flag = TRUE;
 				data.code = OJCode.call[jj].cod2;
+				data.code.TrimLeft();
+				data.code.TrimRight();
 				szTemp = OJCode.call[jj].hnam;
 				szTemp = szTemp.Left(18);
 				szTemp.TrimRight();
+				szTemp.TrimLeft();
 				data.name = szTemp;
 				
 				if (OJCode.atmg == 1)

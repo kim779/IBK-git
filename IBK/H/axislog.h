@@ -34,3 +34,37 @@ static void LOG_OUTP(int scnt, ...)
 
 	OutputDebugString("\r\n" + sResult);
 }
+
+void FileLog(LPCSTR log, ...)
+{
+#if 1
+	TRY
+	{
+		char buf[256]{};
+		GetCurrentDirectory(256, buf);
+		CString spath;
+		spath.Format("%s\\%s", buf, "axis.log");
+		spath.TrimRight();
+
+		FILE* fp;
+		fopen_s(&fp, spath, "a+");
+		if (!fp) return;
+
+		const CTime time = CTime::GetCurrentTime();
+		fprintf(fp, (LPCSTR)time.Format("[%Y-%m-%d %H:%M:%S] "));
+
+		va_list argptr;
+		va_start(argptr, log);
+		vfprintf(fp, log, argptr);
+		va_end(argptr);
+		fprintf(fp, "\n");
+
+		fclose(fp);
+	}
+		CATCH(CMemoryException, e)
+	{
+
+	}
+	END_CATCH
+#endif
+}

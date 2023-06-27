@@ -39,6 +39,8 @@
 #include <wrl.h>
 #include "WebView2EnvironmentOptions.h"
 #include "WebView2.h"
+#include "../../H/axisfire.h"
+#include <AxStd.hpp>
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 

@@ -883,8 +883,32 @@ void CControlWnd::SetControlWindow()
 	
 }
 
-void CControlWnd::SetWeelyBtnSHOW()
+void CControlWnd::SetWeelyBtnSHOW()  //**
 {
+	
+	m_pBtnOption[0]->ShowWindow(SW_HIDE);
+	m_pBtnOption[1]->ShowWindow(SW_HIDE);
+	m_pBtnOption[2]->ShowWindow(SW_HIDE);
+	m_pBtnOption[3]->ShowWindow(SW_HIDE);
+	m_pBtnOption[4]->ShowWindow(SW_HIDE);
+
+	int icntbtn = 0;
+	for (int ii = 0; ii <11;  ii++)
+	{
+		CString str(m_ophead.pjym[ii], sizeof(m_ophead.pjym[ii]));
+		if (str != "000000")
+		{
+			m_pBtnOption[icntbtn]->SetWindowText(str.Right(4));
+			m_pBtnOption[icntbtn]->ShowWindow(SW_SHOW);
+			m_pBtnOption[icntbtn]->Invalidate();
+			icntbtn++;
+		}
+
+		if (icntbtn == 5)
+			break;
+	}
+	
+	/*
 	CString str(m_ophead.pjym[0], sizeof(m_ophead.pjym[0]));
 	m_pBtnOption[0]->SetWindowText(str.Right(4));
 	if(str == "000000")
@@ -900,6 +924,7 @@ void CControlWnd::SetWeelyBtnSHOW()
 	m_pBtnOption[2]->ShowWindow(FALSE);   //위클리인경우 월물이2개라 남은 두개는 안보여준다
 	m_pBtnOption[3]->ShowWindow(FALSE);
 	m_pBtnOption[4]->ShowWindow(FALSE);
+	*/
 }
 
 CfxImgButton* CControlWnd::CreateImgButton(LPCSTR caption, int nID, CBitmap **bmp)
@@ -1125,7 +1150,7 @@ void CControlWnd::OnChkMulti()
 
 void CControlWnd::LoadMaster(int igubn)
 {
-	CString slog;
+	CString slog, stmp;
 //	slog.Format("IB300600 [CControlWnd:LoadMaster]  [%d]\n", igubn);
 //	OutputDebugString(slog);
 
@@ -1180,6 +1205,10 @@ void CControlWnd::LoadMaster(int igubn)
 		ed = m_opcode.end();
 		int isize =m_opcode.size();
 		int icnt = 0;
+
+		m_sArrTWeel.RemoveAll();
+		m_sArrMWeel.RemoveAll();
+
 		for(int n=0;st!=ed; ++st)
 		{
 			for(int i=0; i<11; ++i)
@@ -1192,12 +1221,29 @@ void CControlWnd::LoadMaster(int igubn)
 					sprintf(row.call_code, "%.8s", st->call[10-i].cod2);
 					sprintf(row.put_code, "%.8s", st->put[i].cod2);
 					sprintf(row.hsga, "%.3s.%.2s", &st->price[0], &st->price[3]);
+
+					slog.Format("\r\n[%s][%s]", row.call_code, row.put_code);
+					OutputDebugString(slog);
 					
 					m_dtOption[i].push_back(row);
 					isize = m_dtOption[i].size();
 
-					if(row.atmg && igubn == WEEKBTN)
-						m_sATMWeekCode = row.call_code;
+					if (row.atmg && igubn == WEEKBTN)
+					{
+						if (row.call_code[1] == 'A' && row.call_code[2] == 'F')
+						{
+							stmp.Format("%s", row.call_code);
+							stmp.Trim();
+							m_sArrMWeel.Add(stmp);
+						}
+						else if (row.call_code[1] == '0' && row.call_code[2] == '9')
+						{
+							stmp.Format("%s", row.call_code);
+							stmp.Trim();
+							m_sArrTWeel.Add(stmp);
+						}
+						
+					}
 				}
 			}
 
@@ -1210,12 +1256,16 @@ void CControlWnd::LoadMaster(int igubn)
 	//OutputDebugString(slog);
 		
 		m_OptionMap.clear();
+		CString stmp;
 		for(int n=0; n<11; ++n)
 		{
 			reverse(m_dtOption[n].begin(), m_dtOption[n].end());
+			int isize = m_dtOption[n].size();
 			for(size_t j=0; j<m_dtOption[n].size(); ++j)
 			{
-				m_OptionMap[ m_dtOption[n][j].call_code ] = OptionIdxRow(n, j+1);
+				stmp.Format("\r\n[%s][%s] n=[%d] j=[%d]", m_dtOption[n][j].call_code, m_dtOption[n][j].put_code, n, j);
+				OutputDebugString(stmp);
+				m_OptionMap[ m_dtOption[n][j].call_code ] = OptionIdxRow(n, j+1);   //**test
 				m_OptionMap[ m_dtOption[n][j].put_code  ] = OptionIdxRow(n, j+1);
 				//m_OptionMap[string(st->call[3-i].cod2, 8)] = OptionIdxRow(i, m_dtOption[i].size()-1);
 			}
@@ -1455,7 +1505,7 @@ void CControlWnd::SetWOptionData(int idx, bool bWeekClick)
 		m_pBtnOption[n]->Invalidate(FALSE);
 	}
 
-	if(idx == 0)
+	/*if(idx == 0)
 	{
 		m_pBtnOption[0]->SetImgBitmap(m_hBtn2[1]->operator HBITMAP(), m_hBtn2[1]->operator HBITMAP(), m_hBtn2[1]->operator HBITMAP());
 		m_pBtnOption[1]->SetImgBitmap(m_hBtn2[0]->operator HBITMAP(), m_hBtn2[1]->operator HBITMAP(), m_hBtn2[2]->operator HBITMAP());
@@ -1464,13 +1514,25 @@ void CControlWnd::SetWOptionData(int idx, bool bWeekClick)
 	{
 		m_pBtnOption[1]->SetImgBitmap(m_hBtn2[1]->operator HBITMAP(), m_hBtn2[1]->operator HBITMAP(), m_hBtn2[1]->operator HBITMAP());
 		m_pBtnOption[0]->SetImgBitmap(m_hBtn2[0]->operator HBITMAP(), m_hBtn2[1]->operator HBITMAP(), m_hBtn2[2]->operator HBITMAP());
+	}*/
+
+	for (int n = 0; n < 4; ++n)
+	{
+		if (n == idx)
+			m_pBtnOption[n]->SetImgBitmap(m_hBtn2[1]->operator HBITMAP(), m_hBtn2[1]->operator HBITMAP(), m_hBtn2[1]->operator HBITMAP());
+		else
+			m_pBtnOption[n]->SetImgBitmap(m_hBtn2[0]->operator HBITMAP(), m_hBtn2[1]->operator HBITMAP(), m_hBtn2[2]->operator HBITMAP());
+		m_pBtnOption[n]->Invalidate(FALSE);
 	}
+
 
 	m_pBtnOption[0]->Invalidate(FALSE);
 	m_pBtnOption[1]->Invalidate(FALSE);
 
-	//잔고 보여주기
-	DisplayAllJango();
+	//m_dtOptionIdx = idx;  //weekm
+
+	////잔고 보여주기
+	//DisplayAllJango();
 	
 //행사가 관련 그리드 세팅 과정 
 //옵션 행사가 배열m_dtOption 참조
@@ -1484,7 +1546,7 @@ void CControlWnd::SetWOptionData(int idx, bool bWeekClick)
 		return;
 	}
 	
-	m_dtOptionIdx = idx;
+	//m_dtOptionIdx = idx;
 	m_pOptGrid->SetRowCount(rows.size()+1);
 	int atmRow = -1;
 	OptionRows::iterator st, ed;
@@ -1514,11 +1576,36 @@ void CControlWnd::SetWOptionData(int idx, bool bWeekClick)
 #endif
 		m_pOptGrid->PostMessage(WM_VSCROLL, 0, 0);
 	}
+
+	m_dtOptionIdx = idx;  //weekm
+	////잔고 보여주기
+	DisplayAllJango();
 	
 	m_pOptGrid->Refresh();
 
-	if(bWeekClick)
-		GetParent()->PostMessage(WM_APP_SIG, WP_CODE_CHANGE, (LPARAM)(LPCSTR)m_sATMWeekCode);
+	if (m_iKind == WEEKBTN)
+	{
+		if (idx == 0)  //월요일 만기 위클리
+		{
+			if(m_sArrMWeel.GetSize() > 0)
+				GetParent()->PostMessage(WM_APP_SIG, WP_CODE_CHANGE, (LPARAM)(LPCSTR)m_sArrMWeel.GetAt(0));
+		}
+		else if (idx == 1)
+		{
+			if (m_sArrTWeel.GetSize() > 0)
+				GetParent()->PostMessage(WM_APP_SIG, WP_CODE_CHANGE, (LPARAM)(LPCSTR)m_sArrTWeel.GetAt(0));
+		}
+		else if (idx == 2)  //월요일 만기 위클리
+		{
+			if (m_sArrMWeel.GetSize() > 1)
+				GetParent()->PostMessage(WM_APP_SIG, WP_CODE_CHANGE, (LPARAM)(LPCSTR)m_sArrMWeel.GetAt(1));
+		}
+		else if (idx == 3)
+		{
+			if (m_sArrTWeel.GetSize() > 1)
+				GetParent()->PostMessage(WM_APP_SIG, WP_CODE_CHANGE, (LPARAM)(LPCSTR)m_sArrTWeel.GetAt(1));
+		}
+	}
 }
 
 void CControlWnd::SetOptionData( int idx)
@@ -1924,9 +2011,13 @@ void CControlWnd::DisplayJango( Jango *pj )
 	}
 	else
 	{
+		tmp.Format("\r\n########  잔고 =   [%s]",  pj->code);
+		OutputDebugString(tmp);
+
 		OptionIdxMap::iterator pos = m_OptionMap.find(pj->code) ;
-		if (pos != m_OptionMap.end())
+		if (pos != m_OptionMap.end())  //**test
 		{
+			int inum = pos->second.second;
 			if (m_dtOptionIdx==pos->second.first)
 			{
 				CCellID id;
@@ -1939,6 +2030,9 @@ void CControlWnd::DisplayJango( Jango *pj )
 				else 
 					return;
 				
+				tmp.Format("\r\n@@@@@@@@  row=[%d] col=[%d]  [%s]", id.row, id.col, pj->code);
+				OutputDebugString(tmp);
+
 				if (m_pOptGrid->GetItemText(id.row, id.col)!=text)
 				{
 					m_pOptGrid->SetItemText(id.row, id.col, text);

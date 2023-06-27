@@ -3700,95 +3700,7 @@ int CPage1::loadingInterest(int gno)  //수정완료
 	return 0;
 }
 #else
-int CPage1::loadingInterest(int gno)  //수정완료
-{
-	ClearInterest();
 
-	CString	filePath, fileBook;
-
-	if (ExistFile(gno))
- 		filePath.Format("%s/%s/%s/portfolio.i%02d", m_root, USRDIR, m_name, gno);
-	else
-		return 0;
-	
-	fileBook.Format("%s/%s/%s/bookmark.i%02d", m_root, USRDIR, m_name, gno);
-
-	UINT	readL{};
-	struct	_inters* pinter{};
-	struct  _bookmarkinfo* bInfo{};
-
-	bool    isFile = true;
-
-	CFile	fileH(filePath, CFile::modeRead);
-	CFile	fileB;
-
-	if( !fileB.Open(fileBook, CFile::modeRead) )
-	{
-		isFile = false;		//파일 없을경우
-	}
-
-	for (int ii = 0; ii < maxJONGMOK; ii++)
-	{
-		pinter = (_inters *) new char[sz_inters];
-		ZeroMemory(pinter, sz_inters);
-
-
-		readL = fileH.Read(pinter, sz_inters);
-		if (readL < sz_inters)
-		{
-			delete pinter;
-			break;
-		}
-		
-		if(isFile == true)
-		{
-			
-			bInfo = (_bookmarkinfo *) new char[sizeof(_bookmarkinfo)];
-			ZeroMemory(bInfo, sizeof(_bookmarkinfo));
-
-			readL = fileB.Read(bInfo, sizeof(_bookmarkinfo));
-
-		
-
-			if(readL < sizeof(_bookmarkinfo))
-			{
-				delete bInfo;
-			}
-			else
-			{
-				CString temp = CString((pinter->code));
-				temp = temp.Left(12);
-				temp.TrimRight();
-				CString temp2 = CString(bInfo->code);
-				temp2.TrimRight();
-				
-				if(strcmp(temp, temp2) == 0)
-				{
-					if (pinter->code[0] == 'm')
-					{
-						CopyMemory(pinter->name, bInfo->name, sizeof(bInfo->name));
-					}
-					
-					pinter->bookmark[0] = bInfo->bookmark[0] == '1' ? '1':'0';//2015.04.03 KSJ 1이아니면 0으로 해준다.
-				}
-			}
-		}
-
-		pinter->name[31] = 0;	//2016.01.25 KSJ 225050 같은경우는 33byte이므로 널값이 들어가지 않아 오류발생한다.
-
-		m_inters.Add(pinter);
-	}
-	
-	if(isFile == true)
-	{
-		fileB.Close();
-	}
-
-	
-
-	fileH.Close();
-	return m_inters.GetSize();
-}
 #endif
 
 void CPage1::savingInterest(int gno)
@@ -3838,88 +3750,7 @@ void CPage1::savingInterest(int gno)
 		fileB.Write(bInfo, sz_bookmark);
 	}
 #else
-	CString	filePath, fileBook;
-	filePath.Format("%s/%s/%s/portfolio.i%02d", m_root, USRDIR, m_name, gno);
-	fileBook.Format("%s/%s/%s/bookmark.i%02d", m_root, USRDIR, m_name, gno);
-
-	struct	_inters* pinter{};
-	struct  _bookmarkinfo* bInfo{};
-
-	bool	isfile = false;
 	
-	::DeleteFile(filePath);
-	CFile	fileH(filePath, CFile::modeWrite|CFile::modeCreate);
-	::DeleteFile(fileBook);
-	CFile	fileB(fileBook, CFile::modeWrite|CFile::modeCreate);
-
-	if (fileH.m_hFile == CFile::hFileNull) return;
-
-	if (fileB.m_hFile == CFile::hFileNull) 
-	{
-		isfile = true;
-	}
-
-
-	for (int ii = 0; ii < m_inters.GetSize(); ii++)// 
-	{
-		pinter = m_inters.GetAt(ii);
-
-		bInfo = (_bookmarkinfo *) new char[sz_bookmark];
-		ZeroMemory(bInfo, sz_bookmark);
-
-		int len = 0;
-		CString temp = CString((pinter->code), sizeof(pinter->code));
-		temp = temp.Left(12);
-		len = temp.GetLength();
-		temp.TrimRight();
-
-		//SPACE 삽입
-		char *nullcode = "            ";
-
-		if(temp.IsEmpty())
-		{
-			CopyMemory(pinter->code, nullcode, min(strlen(nullcode), sizeof(pinter->code)));
-			CopyMemory(pinter->name, nullcode, min(strlen(nullcode), sizeof(pinter->code)));
-		}
-		else
-		{
-			CopyMemory(pinter->code, temp, min(strlen(temp),sizeof(pinter->code)));
-		}
-		
-
-		fileH.Write(pinter, sizeof(_inters));
-		
-		//북마크 기능 추가
-		if(strlen(pinter->code) == 0)
-		{
-			CopyMemory(bInfo->code, nullcode, min(strlen(nullcode), sizeof(bInfo->code)));
-			bInfo->bookmark[0] = '0';
-		}
-		else
-		{
-			
-			CopyMemory(bInfo->code, temp, min(sizeof(pinter->code), sizeof(bInfo->code)));
-			
-
-			if (pinter->code[0] == 'm')
-			{
-				CopyMemory(bInfo->name, pinter->name, min(sizeof(pinter->name), sizeof(bInfo->name)));
-			}
-
-			bInfo->bookmark[0] = pinter->bookmark[0] == '1' ? '1':'0';//2015.04.03 KSJ 1이아니면 0으로 해준다.
-		}
-		
-
-		if(isfile == false)
-			fileB.Write(bInfo, sz_bookmark);
-
-		delete bInfo;
-	}
-
-	fileH.Close();
-
- 	if(isfile == false)
- 		fileB.Close();
 #endif
 }
 
@@ -3928,15 +3759,7 @@ void CPage1::savingGroupFile(int gno, CString gname)
 #ifdef DF_SEARCH
 	savingInterest(gno);
 #else
-	CString tempN; 
-	tempN.Format("%s/%s/%s/%s", m_root, USRDIR, m_name, saveFILE);
-
-	CString	section; 
-	section.Format("%02d", gno);
-	WritePrivateProfileString("GROUPNAME", section, gname, tempN);
-	WritePrivateProfileString(nullptr, nullptr, nullptr, tempN);
 	
-	savingInterest(gno);
 #endif
 }
 
@@ -3968,70 +3791,7 @@ bool CPage1::savingGroupOrder(CString gname)
 	}
 	return false;
 #else
-	int	ttL = 0;
-	char	ttB[1024]{};
-	CString	strOrder = _T(""), string;
-	
-	CString filePath; 
-	filePath.Format("%s/%s/%s/%s", m_root, USRDIR, m_name, saveFILE);
-	ttL = GetPrivateProfileString(_T("GROUPORDER"), "00", "", ttB, sizeof(ttB), filePath);
-	if (ttL > 0) strOrder = CString(ttB, ttL);
-	
-	CString temp, tempIndex[100], grpNum;
-	int iGrpNum = 0;
 
-	temp = strOrder;
-	int ii = 0;
-	for(ii = 0 ; ii<100 ; ii++)
-	{
-		tempIndex[ii] = "";
-	}
-	
-	ii = 0;
-
-	while (!temp.IsEmpty())
-	{
-		tempIndex[ii] = parseX(temp, ";");
-		ii++;
-	}
-	
-	temp = "";
-
-	for(int ii=0; ii<100 ; ii++)
-	{
-		temp = tempIndex[ii];
-		
-		if(!temp.IsEmpty())
-			continue;
-
-		if (ii > 1)
-			grpNum = tempIndex[ii-1];
-		
-		iGrpNum = atoi(grpNum) +1;
-		string.Format("%02d", iGrpNum);
-		break;
-	}
-
-	if (iGrpNum >= maxGROUP)
-		return false;
-
-	if (!gname.IsEmpty())
-	{
-		const int idx = m_gname.AddString(gname);
-		m_gname.SetItemData(idx, iGrpNum);
-		
-		string.Format("%02d;", iGrpNum); 
-		strOrder += string;
-		WritePrivateProfileString(_T("GROUPORDER"), "00", strOrder, filePath);
-		WritePrivateProfileString(nullptr, nullptr, nullptr, filePath);
-
-		m_gname.SetCurSel(idx); 
-		m_activegno = iGrpNum;
-
-		return true;
-	}
-
-	return false;
 #endif
 }
 

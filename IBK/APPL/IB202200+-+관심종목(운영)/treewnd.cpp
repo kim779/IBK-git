@@ -2487,6 +2487,9 @@ void CTreeWnd::receiveOub(CString& data, int keys)
 		code = CString(item.code, codelen).Trim();
 		name = GetCodeName(CString(item.code, codelen).Trim());
 
+		if (bookmark == "1")
+			OutputDebugString(name);
+
 //AxStd::_Msg("종목코드[%s]", code);
 		if (code.IsEmpty())
 			code = "          ";

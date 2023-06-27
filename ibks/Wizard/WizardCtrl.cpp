@@ -539,6 +539,14 @@ long CWizardCtrl::axWizard(long kind, long variant)
 	case delHISTORY:
 		m_guard->RemoveCode((char*)variant, false);
 		break;
+	case  caCLOUD:
+	{
+		CString str;
+		value = HIWORD(kind);
+		value = m_guard->CertifyCloude(value);
+		return value;
+	}
+	break;
 	case caFULL:
 	{
 		char	wb[1024*8] = {0, };
@@ -1033,6 +1041,10 @@ void CWizardCtrl::OnAxis(struct _axisH* axisH, char* pBytes, int nBytes)
 	char	mapN[L_MAPN + 1];
 	CopyMemory(mapN, axisH->trxC, L_MAPN);
 	mapN[L_MAPN] = '\0';
+
+
+	m_slog.Format("----[CWizardCtrl][OnAxis] %.50s\r\n", pBytes);
+	OutputDebugString(m_slog);
 
 	CWorks* works;
 	if (!m_guard->GetClient(axisH->winK, works))

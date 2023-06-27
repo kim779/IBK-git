@@ -114,7 +114,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../dev/CX_UPLOAD.dll</OutputFile>
+      <OutputFile>D:\IBKS_TEST\dev/CX_UPLOAD.dll</OutputFile>
       <ImportLibrary>.\Debug\CX_UPLOAD.lib</ImportLibrary>
       <ModuleDefinitionFile>.\cx_upload.def</ModuleDefinitionFile>
     </Link>
@@ -195,7 +195,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base64.h" />
-    <ClInclude Include="ControlWnd.h" />
     <ClInclude Include="cx_upload.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="StdAfx.h" />

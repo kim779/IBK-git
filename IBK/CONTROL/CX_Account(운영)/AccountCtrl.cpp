@@ -320,6 +320,8 @@ BEGIN_DISPATCH_MAP(CAccountCtrl, CWnd)
 	DISP_FUNCTION(CAccountCtrl, "GetAgentNameList", GetAgentNameList, VT_BSTR, VTS_NONE)
 	DISP_FUNCTION(CAccountCtrl, "ReHistroy", ReHistroy, VT_EMPTY, VTS_BSTR VTS_BSTR)
 	//}}AFX_DISPATCH_MAP
+	DISP_FUNCTION_ID(CAccountCtrl, "GetShowHideAcc", dispidGetShowHideAcc, GetShowHideAcc, VT_BSTR, VTS_BSTR VTS_BSTR)
+	DISP_FUNCTION_ID(CAccountCtrl, "GetShowHideAccName", dispidGetShowHideAccName, GetShowHideAccName, VT_BSTR, VTS_BSTR VTS_BSTR)
 END_DISPATCH_MAP()
 
 // Note: we add support for IID_IAccountCtrl to support typesafe binding
@@ -744,13 +746,14 @@ BOOL CAccountCtrl::Initialize(BOOL bDLL)
 			nMapNo == 1204 || nMapNo == 1205 || nMapNo == 1206 || nMapNo == 1207 || nMapNo == 1208 || nMapNo == 1212 ||
 			nMapNo == 1301 || nMapNo == 1306 || nMapNo == 1307 || nMapNo == 1308 || nMapNo == 1302 || nMapNo == 1303 ||
 			nMapNo == 1304 || nMapNo == 1305 || nMapNo == 1707 || nMapNo == 1101 || nMapNo == 1102 || nMapNo == 1106 ||
-			nMapNo == 1103 || nMapNo == 1107 || nMapNo == 1104 || nMapNo == 8220 || nMapNo == 1709)
+			nMapNo == 1103 || nMapNo == 1107 || nMapNo == 1104 || nMapNo == 8220 || nMapNo == 1709 || nMapNo == 8215)
 		{
 			bISETF_SAVE_ACC = TRUE;
 		}
 
 		Path.Format("%s\\user\\%s\\%s", m_strRoot, Variant(nameCC), "userconf.ini");
 		m_nSort = GetPrivateProfileInt(_T("IB0000A4"), _T("SORT"), 0, Path);
+
 
 		while (!strData.IsEmpty())
 		{
@@ -767,7 +770,7 @@ BOOL CAccountCtrl::Initialize(BOOL bDLL)
 			pAcc->m_bDelegation = (aflg & 0x01) ? TRUE : FALSE;
 			pAcc->m_bWrap = (aflg & 0x02) ? TRUE : FALSE;
 
-			if (pAcc->m_strAccntNum.Find("15") >= 0)
+			if (pAcc->m_strAccntNum.Find("00112") >= 0 )
 				TRACE("test");
 
 			if (!(aflg & 0x01))
@@ -2313,12 +2316,13 @@ void CAccountCtrl::AccountInputComplete(CString strAccount)
 		m_strAccName = pAcc->m_strAccntName;
 		PushAccHistory(strAccount, _T(""), m_strAccName);
 	}
-
+#ifndef _DEBUG
 	if (m_pParent)
 	{
 		m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnChange/*Change*/)),   //해외 일반고객
 				(LPARAM)m_Param.name.GetString());
 	}
+#endif
 
 	SaveHistory();
 }
@@ -3920,6 +3924,8 @@ void CAccountCtrl::InitAllowDept()
 //초기화시 유효계좌 체크   2008.07.22 추가분
 BOOL CAccountCtrl::IsFirstValidAcc(CString strAccount, BOOL bOrderCheck)
 {
+	if (strAccount.Find("00112") >= 0)
+		TRACE("!23");
 
 	if (!m_bOrderEnable && bOrderCheck)
 		return FALSE;
@@ -4705,11 +4711,13 @@ void CAccountCtrl::LoadAccountType()
 		{ "AN95", { "10", "11", "12", "15", "30", "31", "32", "37", "50", "51", "52", "60", "20", "21", NULL } },
 		{ "AN97", { "10", "11", "12", "30", "31", "32", "37", "50", "51", "52", "60", "70", "20", "21", NULL } },	
 		{ "AN98", { "10", "11", "12", "30", "31", "32", "37", "50", "51", "52", "60", "70", "20", "21", "53", "55", "57", NULL } },
+	//	{ "AN98", { "10", "11", "12", "15", "30", "31", "32", "37", "50", "51", "52", "60", "70", "20", "21", "53", "55", "57", NULL } },
 		{ "AN51", { "10", "37", "52", NULL } },
 		{ "AN1C", { "10", "37", "30", NULL } },
 		{ "AN2A", { "10", "37", "30", "31", "32", "51", "52", NULL } },
 		{ "AM99", { "00", NULL } },
 		{ "AN3A", { "10", NULL } },
+		{ "AN1F", { "10", "11", "15", "30", "31", "32", "37", "91", NULL } },
 		{ NULL, { NULL } },
 	};
 
@@ -4752,10 +4760,17 @@ void CAccountCtrl::LoadAccountType()
 					continue;
 				else if (m_mapName == "IB100800" && (cmp == "37" || cmp == "57"))  //권리공매도주문  AN1A
 					continue; 
-				else if (m_mapName == "IB650100" && (cmp == "37" || cmp == "57"))  //장내채권주문 AN1A
+				else if (m_mapName == "IB650100" && (cmp == "57"))  //장내채권주문 AN1A
 					continue;
-				else if (m_mapName == "IB630100" && (cmp == "37" || cmp == "57"))  //소액채권주문 AN1A
+				else if (m_mapName == "IB630100" && (cmp == "57"))  //소액채권주문 AN1A
 					continue;
+				else if (m_mapName == "IB662000" && (cmp == "37" || cmp == "12"))
+				{
+					CString slog;
+					slog.Format("[cx_account] m_mapName=[%s] cmp=[%s]\r\n", m_mapName, cmp) ;
+					OutputDebugString(slog);
+					continue;
+				}
 			//	else if (m_mapName == "IB821500" && m_Param.name == "AN98" && (cmp == "37" || cmp == "57"))  //MY계좌정보계별계좌현황 AN98
 			//		continue;
 				else if ((cmp != "12"))
@@ -4771,9 +4786,14 @@ void CAccountCtrl::LoadAccountType()
 			}
 			else
 			{
+				if (info[ii].name == "AN1A")
+					OutputDebugString(info[ii].type[jj]);
+
 				v.push_back(info[ii].type[jj]);
 			}
 		}
+		if (m_mapName == "IB821500" && info[ii].name == "AN98")
+			v.push_back("15");
 		m_AccTypeMap[info[ii].name] = v;
 	}
 }
@@ -5602,4 +5622,193 @@ void CAccountCtrl::OnAccNameChanged()
 {
 	// TODO: Add notification handler code
 
+}
+
+
+BSTR CAccountCtrl::GetShowHideAcc(BSTR strShow,  BSTR strHide)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	CStringArray arrShow, arrHide;
+	CString strtmp{}, strResult{};
+
+//보여줘야할 계좌 ------------------------------------------------------
+	strtmp.Format("%s", strShow);
+	int startPos = 0;
+	int endPos = 0;
+	while ((endPos = strtmp.Find(',', startPos)) != -1) {
+		CString subStr = strtmp.Mid(startPos, endPos - startPos);
+		arrShow.Add(subStr);
+		startPos = endPos + 1;
+	}
+	// 마지막 구분자 이후의 문자열 추가
+	CString lastSubStr = strtmp.Mid(startPos);
+	if (!lastSubStr.IsEmpty())
+		arrShow.Add(lastSubStr);
+
+
+//보여주지 않아야 할 계좌------------------------------------------------
+	strtmp.Format("%s", strHide);
+	startPos = 0;
+	endPos = 0;
+	while ((endPos = strtmp.Find(',', startPos)) != -1) {
+		CString subStr = strtmp.Mid(startPos, endPos - startPos);
+		arrHide.Add(subStr);
+		startPos = endPos + 1;
+	}
+	// 마지막 구분자 이후의 문자열 추가
+	lastSubStr = strtmp.Mid(startPos);
+	if (!lastSubStr.IsEmpty())
+		arrHide.Add(lastSubStr);
+
+	CString strData = Variant(accountCC);
+	CString strName, strAccInfo, strAccnum, strpass, strGubn, strAccText, strType;
+	CMapStringToString tmpAcc;
+
+	while (!strData.IsEmpty())
+	{
+		strAccInfo = Parser(strData, _T("\n"));
+		strAccnum = Parser(strAccInfo, _T("\t"));
+		strpass = Parser(strAccInfo, _T("\t"));
+		strName = Parser(strAccInfo, _T("|"));
+
+		strAccnum.Trim();
+		strName.Trim();
+	
+		strType = strAccnum.Mid(3, 2);
+		switch (_ttoi(strType))
+		{
+		case 10:	strGubn = _T("위탁");			break;
+		case 11:	strGubn = _T("ELW전용");			break;
+		case 12:	strGubn = _T("코넥스");			break;
+		case 15:	strGubn = _T("연금");			break;
+		case 20:	strGubn = _T("선물옵션");			break;
+		case 21:	strGubn = _T("옵션전용");			break;
+		case 30:	strGubn = _T("일반저축");			break;
+		case 51:	strGubn = _T("CMA전용");			break;
+		case 52:	strGubn = _T("RP전용");			break;
+		case 53:	strGubn = _T("수익증권");			break;
+		case 55:	strGubn = _T("연금");			break;
+		case 70:	strGubn = _T("신탁");			break;
+		default:  	strGubn = _T("              ");			break;
+		}
+		strAccText = strAccnum;
+		strAccText.Insert(ACC_DEPT, _T("-"));
+		strAccText.Insert(ACC_DEPT + ACC_TYPE + 1, _T("-"));
+	
+		BOOL bAddfind = FALSE;
+		BOOL bRemovefind = FALSE;
+		for (int ii = 0; ii < arrShow.GetSize(); ii++)
+		{
+			strtmp = arrShow.GetAt(ii);
+			if (strtmp == strType)
+				bAddfind = TRUE;
+		}
+
+		for (int ii = 0; ii < arrHide.GetSize(); ii++)
+		{
+			strtmp = arrHide.GetAt(ii);
+			if (strtmp == strType)
+				bRemovefind = TRUE;
+		}
+
+		if(arrShow.GetSize() == 0 && arrHide.GetSize() == 0)  //파라미터가 공백으로 올경우 전부 추가
+			strResult += _T("\t") + strAccnum + strAccText + _T("   ") + strGubn + _T("   ") + strName;
+		else if (arrShow.GetSize() == 0 && arrHide.GetSize() > 0)  //안보여주는 계좌만 들어올 경우
+		{
+			if (!bRemovefind)
+				strResult += _T("\t") + strAccnum + strAccText + _T("   ") + strGubn + _T("   ") + strName;
+		}
+		else if (arrHide.GetSize() == 0 && arrShow.GetSize() > 0)  //보여줄 계좌만 들어올 경우
+		{
+			if (bAddfind)
+				strResult += _T("\t") + strAccnum + strAccText + _T("   ") + strGubn + _T("   ") + strName;
+		}
+	}
+	
+	return strResult.AllocSysString();
+}
+
+
+BSTR CAccountCtrl::GetShowHideAccName(BSTR strShow, BSTR strHide)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	CStringArray arrShow, arrHide;
+	CString strtmp{}, strResult{};
+
+	//보여줘야할 계좌 ------------------------------------------------------
+	strtmp.Format("%s", strShow);
+	int startPos = 0;
+	int endPos = 0;
+	while ((endPos = strtmp.Find(',', startPos)) != -1) {
+		CString subStr = strtmp.Mid(startPos, endPos - startPos);
+		arrShow.Add(subStr);
+		startPos = endPos + 1;
+	}
+	// 마지막 구분자 이후의 문자열 추가
+	CString lastSubStr = strtmp.Mid(startPos);
+	if (!lastSubStr.IsEmpty())
+		arrShow.Add(lastSubStr);
+
+
+	//보여주지 않아야 할 계좌------------------------------------------------
+	strtmp.Format("%s", strHide);
+	startPos = 0;
+	endPos = 0;
+	while ((endPos = strtmp.Find(',', startPos)) != -1) {
+		CString subStr = strtmp.Mid(startPos, endPos - startPos);
+		arrHide.Add(subStr);
+		startPos = endPos + 1;
+	}
+	// 마지막 구분자 이후의 문자열 추가
+	lastSubStr = strtmp.Mid(startPos);
+	if (!lastSubStr.IsEmpty())
+		arrHide.Add(lastSubStr);
+
+	CString strData = Variant(accountCC);
+	CString strName, strAccInfo, strAccnum, strpass, strGubn, strAccText, strType;
+	CMapStringToString tmpAcc;
+
+	while (!strData.IsEmpty())
+	{
+		strAccInfo = Parser(strData, _T("\n"));
+		strAccnum = Parser(strAccInfo, _T("\t"));
+		strpass = Parser(strAccInfo, _T("\t"));
+		strName = Parser(strAccInfo, _T("|"));
+
+		strAccnum.Trim();
+		strName.Trim();
+
+		strType = strAccnum.Mid(3, 2);
+		
+		BOOL bAddfind = FALSE;
+		BOOL bRemovefind = FALSE;
+		for (int ii = 0; ii < arrShow.GetSize(); ii++)
+		{
+			strtmp = arrShow.GetAt(ii);
+			if (strtmp == strType)
+				bAddfind = TRUE;
+		}
+
+		for (int ii = 0; ii < arrHide.GetSize(); ii++)
+		{
+			strtmp = arrHide.GetAt(ii);
+			if (strtmp == strType)
+				bRemovefind = TRUE;
+		}
+
+		if (arrShow.GetSize() == 0 && arrHide.GetSize() == 0)  //파라미터가 공백으로 올경우 전부 추가
+			strResult += _T("\t") + strName;
+		else if (arrShow.GetSize() == 0 && arrHide.GetSize() > 0)  //안보여주는 계좌만 들어올 경우
+		{
+			if(!bRemovefind)
+				strResult += _T("\t") + strName;
+		}
+		else if (arrHide.GetSize() == 0 && arrShow.GetSize() > 0)  //보여줄 계좌만 들어올 경우
+		{
+			if (bAddfind)
+				strResult += _T("\t") + strName;
+		}
+	}
+
+	return strResult.AllocSysString();
 }

@@ -142,6 +142,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AxBrowser.cpp" />
+    <ClCompile Include="ControlWnd.cpp" />
     <ClCompile Include="CX_WEBEDGE.cpp" />
     <ClCompile Include="MainWnd.cpp" />
     <ClCompile Include="StdAfx.cpp">
@@ -169,7 +171,9 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AxBrowser.h" />
     <ClInclude Include="ComponentBase.h" />
+    <ClInclude Include="ControlWnd.h" />
     <ClInclude Include="CX_WEBEDGE.h" />
     <ClInclude Include="MainWnd.h" />
     <ClInclude Include="Resource.h" />

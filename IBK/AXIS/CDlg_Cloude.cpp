@@ -65,14 +65,10 @@ BOOL CDlg_Cloude::OnInitDialog()
 	CloudConfig config;
 	memset(&config, 0x00, sizeof(CloudConfig));
 	config.SITE_CODE[0] = "U1MwMDY4XzA2";
-	config.CUSTOMER_ID = "SS0068";
-#ifdef DF_DEV
 	config.SERVER_HOST = DEV_CLOUDE_SERVER;
 	config.AGREEMENT_URL = DEV_AGREEMENT_URL;
-#else
-	config.SERVER_HOST = REAL_CLOUDE_SERVER;
-	config.AGREEMENT_URL = REAL_AGREEMENT_URL;
-#endif 
+	config.CUSTOMER_ID = "SS0068";
+
 	config.VERSION = "1.0.0";
 	config.SERVER_PORT = 8500;
 

@@ -47,6 +47,8 @@ library CX_Account
 			[id(19)] BSTR GetAgentNameList();
 			[id(20)] void ReHistroy(BSTR accdata, BSTR accnmdata);
 			//}}AFX_ODL_METHOD
+			[id(21)] BSTR GetShowHideAcc(BSTR strAdd,  BSTR strDel);
+			[id(22)] BSTR GetShowHideAccName(BSTR strShow, BSTR strHide);
 	};
 
 	//  Class information for CAccountCtrl

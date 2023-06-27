@@ -383,4 +383,13 @@ private:
 	CString m_sHideTradeAgent;	//20200924 주문대리인계좌 삭제
 
 	std::unique_ptr<CToolTipCtrl> m_pTipCtrl;
+protected:
+	BSTR GetShowHideAcc(BSTR strAdd,  BSTR strDel);
+
+	enum
+	{
+		dispidGetShowHideAccName = 22L,
+		dispidGetShowHideAcc = 21L
+	};
+	BSTR GetShowHideAccName(BSTR strShow, BSTR strHide);
 };

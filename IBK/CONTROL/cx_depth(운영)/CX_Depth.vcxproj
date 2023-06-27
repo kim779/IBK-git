@@ -163,7 +163,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../dev/CX_Depth.dll</OutputFile>
+      <OutputFile>D:\IBKS_TEST\dev/CX_Depth.dll</OutputFile>
       <ImportLibrary>.\Debug\CX_Depth.lib</ImportLibrary>
       <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\CX_Depth.def</ModuleDefinitionFile>

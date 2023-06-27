@@ -304,6 +304,9 @@ struct	_userWH	{
 #define	encSHA			0x22		// encrypt password using SHA256
 						// variant : password 
 #define	caFULL			0x23		// full certify
+#define	caFULLx			0x24		// full certify for main
+#define    caCLOUD			0x25		// cloud functino
+						// variant : cloud information
 // variant : ca information
 // HIWORD(kind) = ca information length
 

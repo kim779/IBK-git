@@ -3,7 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerCommand>D:\IBKS_TEST\exe\axis.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>/k IBK_TEST</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>/k IBK_TEST /a 211.255.204.134</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup>
     <RESOURCE_FILE>CX_WebLink.rc</RESOURCE_FILE>

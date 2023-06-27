@@ -324,9 +324,6 @@
     <ClCompile Include="whdump.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CDlg_Cloude.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="axis.rc">
@@ -668,9 +665,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sk_pc_identity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CDlg_Cloude.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1079,8 +1073,5 @@
     <CustomBuild Include="xptheme.bin">
       <Filter>Resource Files</Filter>
     </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\APPL\IB202700\IB202700.dsw" />
   </ItemGroup>
 </Project>

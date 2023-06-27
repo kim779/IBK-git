@@ -69,6 +69,8 @@ protected:
 	void Draw();
 	void DrawWeek();
 	void weeklbtnClick(UINT nFlags, CPoint point);
+	int m_nWCallSelect{};		
+	int m_nWPutSelect{};		
 	
 protected:
 	void SetMonth(int row);	//2014.07.29 KSJ 선택한 월물을 보여준다.

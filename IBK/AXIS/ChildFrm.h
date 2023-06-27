@@ -69,7 +69,7 @@ public:
 			 int fontsize, bool bCaption = true);
 	void	HideButton(DWORD dwHide)	{ m_xcaption.HideButton(dwHide); }
 	void	ChangeSkin(CString skinName);
-	void	DrawFrame(CDC* pDC);
+	void	DrawFrame();
 	void	actionCaption(int action, CPoint pt);
 // Overrides
 	// ClassWizard generated virtual function overrides
@@ -128,6 +128,11 @@ public:
 	void ShowBackGround(bool f_show);
 	void	SetMinMaxInfo(MINMAXINFO* lpMinMaxInfo);
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+
+public:
+	CString m_slog{};
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnPaint();
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -130,7 +130,10 @@ protected:
 
 	void Navigate(BSTR url);
 	void Navigatesrc(BSTR src);
+	void Navigate_strUrl();
 	void closeEdge();
+public:
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 
 template <class ComponentType, class... Args> void CMainWnd::NewComponent(Args&&... args)

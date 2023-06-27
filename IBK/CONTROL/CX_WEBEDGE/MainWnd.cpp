@@ -14,23 +14,46 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+#define TM_IB2023 9999
+
 static constexpr UINT s_runAsyncWindowMessage = WM_APP;
 
 /////////////////////////////////////////////////////////////////////////////
 // CMainWnd
 
-__declspec(dllexport) CWnd* WINAPI axCreate(CWnd* parent, void* pParam)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-  CMainWnd* pControlWnd = new CMainWnd();
-	pControlWnd->m_pParent = parent;
-
-	pControlWnd->SetParam((struct _param*)pParam);
-	pControlWnd->Create(NULL, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, pControlWnd->m_Param.rect, parent, 100);
-
-	return pControlWnd;
-}
+//__declspec(dllexport) CWnd* WINAPI axCreate(CWnd* parent, void* pParam)
+//{
+//	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+//	//컴퓨터\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Edge\IEToEdge
+//	LONG lResult{};
+//	HKEY hKey{};
+//	
+//	lResult = RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Edge\\IEToEdge"), 0, KEY_QUERY_VALUE, &hKey);
+//	if (lResult == ERROR_SUCCESS)  //edge가 있으면..
+//	{
+//		CMainWnd* pControlWnd = new CMainWnd();
+//		pControlWnd->m_pParent = parent;
+//
+//		pControlWnd->SetParam((struct _param*)pParam);
+//		pControlWnd->Create(NULL, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, pControlWnd->m_Param.rect, parent, 100);
+//
+//		return pControlWnd;
+//	}
+//	else
+//	{
+//
+//	}
+//
+//	//DWORD keyValue[20];
+//	//memset(keyValue, 0, sizeof(keyValue));
+//	//DWORD dwType = REG_DWORD;
+//	//DWORD dwSize = sizeof(keyValue);
+//	//lResult = RegQueryValueEx(hKey, _T("SiteListUrlBucket"), 0, &dwType, (LPBYTE)keyValue, &dwSize);
+//	//int ivalue = keyValue[0];
+//
+//
+//
+//}
 
 
 CMainWnd::CMainWnd()
@@ -59,6 +82,7 @@ BEGIN_MESSAGE_MAP(CMainWnd, CWnd)
 	//}}AFX_MSG_MAP
 	ON_WM_CREATE()
 	ON_WM_SIZE()
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -213,6 +237,12 @@ void CMainWnd::ResizeEverything()
 	if (auto view = GetComponent<ViewComponent>())
 	{
 		view->SetBounds(availableBounds);
+		wil::com_ptr<ICoreWebView2Controller> controller = view->getController();
+		BOOL bvisiable;
+		controller->get_IsVisible(&bvisiable);
+		TRACE("!!!!!!!!!!");
+		if (!bvisiable)
+			controller->put_IsVisible(TRUE);
 	}
 }
 
@@ -229,18 +259,18 @@ void CMainWnd::OnSize(UINT nType, int cx, int cy)
 	ResizeEverything();
 }
 
-
-
-
-
-
-
 void CMainWnd::Navigate(BSTR url)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	KillTimer(TM_IB2023);
 	m_strurl.Format("%s", url);
+	if (m_webView == nullptr)
+	{
+		SetTimer(TM_IB2023, 1000, nullptr);
+		return;
+	}
+	
 	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
-
 	wchar_t strUnicode[256] = { 0, };
 	char    strMultibyte[256] = { 0, };
 	strcpy_s(strMultibyte, 256, m_strurl);
@@ -253,6 +283,35 @@ void CMainWnd::Navigate(BSTR url)
 	{
 		OutputDebugString("[cx_edge]Web Page Opened Successfully");
 		ResizeEverything();
+	}
+}
+
+void CMainWnd::Navigate_strUrl()
+{
+	KillTimer(TM_IB2023);
+	if (m_webView == nullptr)
+	{
+		SetTimer(TM_IB2023, 1000, nullptr);
+		return;
+	}
+
+	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
+	wchar_t strUnicode[256] = { 0, };
+	char    strMultibyte[256] = { 0, };
+	strcpy_s(strMultibyte, 256, m_strurl);
+	int nLen = MultiByteToWideChar(CP_ACP, 0, strMultibyte, strlen(strMultibyte), NULL, NULL);
+	MultiByteToWideChar(CP_ACP, 0, strMultibyte, strlen(strMultibyte), strUnicode, nLen);
+
+	HRESULT hresult = m_webView->Navigate(strUnicode);
+
+	if (hresult == S_OK)
+	{
+		OutputDebugString("[cx_edge]Web Page Opened Successfully");
+		ResizeEverything();
+	}
+	else
+	{
+		TRACE("Navigate_strUrl navigate fail!!!!!!!!!!!!!!!");
 	}
 }
 
@@ -307,18 +366,17 @@ void CMainWnd::SetParam(_param* pParam)
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void CMainWnd::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	switch (nIDEvent)
+	{
+		case TM_IB2023:
+		{
+			KillTimer(nIDEvent);
+			Navigate_strUrl();
+		}
+			break;
+	}
+	CWnd::OnTimer(nIDEvent);
+}

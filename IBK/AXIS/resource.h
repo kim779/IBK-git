@@ -292,6 +292,7 @@
 #define IDC_CLUDE_PSCHANGE              1156
 #define IDC_BN_CA                       1157
 #define IDC_CLUDE_CERTDOWN              1157
+#define IDC_CLUDE_DOWN                  1157
 #define IDC_BN_REMOTE                   1158
 #define IDC_CLUDE_PC                    1158
 #define IDC_BN_BREAK                    1159

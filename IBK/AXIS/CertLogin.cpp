@@ -13,7 +13,7 @@
 #include "../dll/sm/TransparentMgr.h"
 #include "../dll/sm/EnBitmap.h"
 
-#include "cloude/InterfaceDLL.h"   
+//#include "cloude/InterfaceDLL.h"   
 
 
 #include "MainFrm.h"
@@ -105,7 +105,7 @@ CCertLogin::CCertLogin(CWnd* pParent, CString userID /*=NULL*/)
 				DEFAULT_PITCH | FF_SWISS,  // nPitchAndFamily
 				fontName);                   // lpszFacename
 	m_pToolTip = NULL;
-	
+
 	for (int i = 0; i < MAX_SHAPE; i++)
 		m_shapeButtons[i] = NULL;
 
@@ -238,7 +238,6 @@ BOOL CCertLogin::OnInitDialog()
 	
 	CDialog::OnInitDialog();
 
-
 	SetWindowText("IBK hot Trading");
 	CEdit* edit = (CEdit*)GetDlgItem(IDC_DUSER);
 	edit->SetPasswordChar('*');
@@ -284,7 +283,7 @@ BOOL CCertLogin::OnInitDialog()
 
 	BOOL bChkPosChange = FALSE;
 
-//	m_bitmap = CEnBitmap::LoadImageFile(imgN, RGB(255, 255, 255));
+//	m_bitmap = CEnBitmap::LoadImageFile(imgN, RGB(255, 255, 255"CLOUDELOGIN"
 	CString file, usnm = Axis::user;
 	file.Format("%s\\%s\\%s\\%s.ini", Axis::home, USRDIR, usnm, usnm); 
 
@@ -296,13 +295,12 @@ BOOL CCertLogin::OnInitDialog()
 		CString sfile;
 		sfile.Format("%s\\%s\\AXIS.ini", Axis::home, TABDIR);
 		WritePrivateProfileString("CLOUDELOGIN", "USE", "0", sfile);
-		m_bCloudeUSE = TRUE;
+		m_bCloudeUSE = FALSE;
 	}
 	else
 		m_bCertLogin = TRUE;
 
 	//CString s;
-	// 
 	//s.Format("PASSWORD 22 TYPE [%d] [%d]n",m_bCertLogin,loginType);
 	//OutputDebugString(s);
 	
@@ -324,13 +322,13 @@ BOOL CCertLogin::OnInitDialog()
 		if(Axis::isCustomer)
 		{
 			if(!m_bCertLogin)
-				imgN.Format("%s\\%s\\new_login_bg_bagic_01.bmp", Axis::home, IMAGEDIR);
+				imgN.Format("%s\\%s\\new_login_bg_bagic_01_CLOUDE.bmp", Axis::home, IMAGEDIR);
 			else
-				imgN.Format("%s\\%s\\new_login_bg_bagic_02.bmp", Axis::home, IMAGEDIR);
+				imgN.Format("%s\\%s\\new_login_bg_bagic_02_CLOUDE.bmp", Axis::home, IMAGEDIR);
 		}
 		else
 		{
-			imgN.Format("%s\\%s\\new_staff_login_bg_bagic.bmp", Axis::home, IMAGEDIR);
+			imgN.Format("%s\\%s\\new_staff_login_bg_bagic_CLOUDE.bmp", Axis::home, IMAGEDIR);
 		}
 
 // 		CFileFind ff;
@@ -344,8 +342,10 @@ BOOL CCertLogin::OnInitDialog()
 	
 		m_bmpBg = Axis::GetBitmap(imgN);
 	}
+	
 
-	m_btnBanner = CreateBmpButton(IDC_BANNER, "NEW_LOGIN_BANNER");
+
+	m_btnBanner = CreateBmpButton(IDC_BANNER, "NEW_LOGIN_BANNER_CLOUDE");
 
 	if(!m_btnBanner || !m_btnBanner->GetSafeHwnd())
 	{
@@ -371,7 +371,7 @@ BOOL CCertLogin::OnInitDialog()
 	if (!m_btnExit || !m_btnExit->GetSafeHwnd())
 		m_btnExit = CreateBmpButton(IDC_DEXIT, "LOGIN_BTN_CANCEL");
 
-	m_btnCert = CreateBmpButton(IDC_CERT, "NEW_LOGIN_TAB_01_OFF");  
+	m_btnCert = CreateBmpButton(IDC_CERT, "NEW_LOGIN_TAB_01_OFF");
 
 	if (!m_btnCert || !m_btnCert->GetSafeHwnd())	
 		m_btnCert = CreateBmpButton(IDC_CERT, "LOGIN_TAB_01");
@@ -385,24 +385,20 @@ BOOL CCertLogin::OnInitDialog()
 	m_btnGen->SetWindowPos(NULL, 459, 75, 320, 36, SWP_NOZORDER);
 
 	//clude 클라우드 버튼생성  m_btnClude
-	m_btn_pc_Clude = CreateBmpButton(IDC_CLOUDE_PCBTN, "NEW_LOGIN_PC_ON",0 ,2);
-	m_btn_pc_Clude->SetWindowPos(m_bmpInput, 300, 130, 160, 36, 0);  
-	
+	m_btn_pc_Clude = CreateBmpButton(IDC_CLOUDE_PCBTN, "NEW_LOGIN_PC_ON", 0, 2);
+	m_btn_pc_Clude->SetWindowPos(m_bmpInput, 300, 118, 160, 36, 0);
+
 	m_btnClude = CreateBmpButton(IDC_CLUDE, "NEW_LOGIN_CLOUDE_ON", 0, 2);
-	m_btnClude->SetWindowPos(m_bmpInput, 460, 130, 160, 36, 0);
+	m_btnClude->SetWindowPos(m_bmpInput, 460, 118, 160, 36, 0);
 
-	m_btn_upcert_Clude = CreateBmpButton(IDC_CLUDE_CERTUP, "NEW_CLOUDE_CERT_UP", 0,2);     
-	m_btn_upcert_Clude->SetWindowPos(m_bmpInput, 300, 180, 106, 29, 0);
-	m_btn_downcert_Clude = CreateBmpButton(IDC_CLUDE_CERTDOWN, "NEW_CLOUDE_CERT_DOWN", 0, 2);
-	m_btn_downcert_Clude->SetWindowPos(m_bmpInput, 406, 180, 106, 29, 0);
+	m_btn_upcert_Clude = CreateBmpButton(IDC_CLUDE_CERTUP, "NEW_CLOUDE_CERT_UP", 0, 2);
+	m_btn_upcert_Clude->SetWindowPos(m_bmpInput, 300, 170, 106, 29, 0);
+	m_btn_downcert_Clude = CreateBmpButton(IDC_CLUDE_DOWN, "NEW_CLOUDE_CERT_DOWN", 0, 2);
+	m_btn_downcert_Clude->SetWindowPos(m_bmpInput, 406, 170, 106, 29, 0);
 	m_btn_PSchange_Clude = CreateBmpButton(IDC_CLUDE_PSCHANGE, "NEW_CLOUDE_PASSCHANGE", 0, 2);
-	m_btn_PSchange_Clude->SetWindowPos(m_bmpInput, 512, 180, 106, 29, 0);
+	m_btn_PSchange_Clude->SetWindowPos(m_bmpInput, 512, 170, 106, 29, 0);
 
-
-	//m_btnCert->SetWindowPos(NULL, 300, 75, 320, 36, SWP_NOZORDER);
-    //m_btnGen->SetWindowPos(NULL, 459, 75, 320, 36, SWP_NOZORDER);
-
-	if(Axis::isCustomer)
+	if (Axis::isCustomer)
 	{
 		m_btnCert->ShowWindow(SW_SHOW);
 		m_btnGen->ShowWindow(SW_SHOW);
@@ -472,13 +468,13 @@ BOOL CCertLogin::OnInitDialog()
 		const int editX = 310;
 		const int editYGap = 44;
 		//int editY = 309;
-		int editY = 145;
+		int editY = 138;
 		
 		const int checkWidth = 152;
 		const int checkHeight = 15;
 		const int checkX = 445;
 		const int checkYGap = 45;
-		int checkY = 141;
+		int checkY = 136;
    
 		GetDlgItem(IDC_BANNER)->SetWindowPos(NULL,0,0,270,404, SWP_NOZORDER);
 		
@@ -506,9 +502,7 @@ BOOL CCertLogin::OnInitDialog()
 		checkY += checkYGap-2;
 		GetDlgItem(IDC_DSAVEPASS)->SetWindowPos(NULL, checkX, checkY+2, checkWidth, checkHeight, SWP_NOZORDER);
 
-		//clude
-		//GetDlgItem(IDC_DCSTART)->SetWindowPos(NULL, 297, 139, checkWidth, checkHeight, SWP_NOZORDER);
-		GetDlgItem(IDC_DCSTART)->SetWindowPos(NULL, 298, 189, checkWidth, checkHeight, SWP_NOZORDER);
+		GetDlgItem(IDC_DCSTART)->SetWindowPos(NULL, 297, 171, checkWidth, checkHeight, SWP_NOZORDER);
 		
 		GetDlgItem(IDC_DRUN)->SetWindowPos(m_bmpInput ? m_bmpInput: &m_static,   300, 276, 256, 39, 0);
 		GetDlgItem(IDC_DSETUP)->SetWindowPos(m_bmpInput ? m_bmpInput: &m_static, 566, 276,  56, 39, 0);
@@ -672,7 +666,14 @@ BOOL CCertLogin::OnInitDialog()
 	tp.SetTPWnd(GetSafeHwnd(), 10, TRUE);
 	**/
 	//SetTimer(IDT_LEFTMOTION, 100, NULL);
-	
+
+	if (m_bCertLogin)
+		ShowCloudeBtn(m_bCloudeUSE, TRUE);
+	else
+		ShowCloudeBtn(m_bCloudeUSE, FALSE);
+
+	//InitCloude();
+
 	if (m_auto)
 	{
 		if (!m_user.IsEmpty() && m_pass.IsEmpty())
@@ -699,13 +700,6 @@ BOOL CCertLogin::OnInitDialog()
 
 	ModifyStyleEx(0, WS_EX_APPWINDOW, SWP_FRAMECHANGED);
 
-	if (m_bCertLogin)
-		ShowCloudeBtn(m_bCloudeUSE, TRUE);
-	else
-		ShowCloudeBtn(m_bCloudeUSE, FALSE);
-
-	//dateData(FALSE);
-	InitCloude();
 	return FALSE;
 }
 
@@ -716,14 +710,24 @@ void CCertLogin::initStaff()
 
 void CCertLogin::OnRun() 
 {
+
+	//OutputDebugString("CERT START ONRUN.......................................\n");
 	HideToolTip();
 	
 	int iLoginVerUP = 0;
 	const int tmp_mod = AfxGetApp()->GetProfileInt(WORKSTATION, "VerMode", 1);
 
+	
 	CString sip = ((CMainFrame*)m_frame)->m_ipAddr;
 	if (tmp_mod >= 4)
 	{
+		//m_frame->PostMessage(WM_CLOSE);
+		//설치파일이 는 상황
+		//ShellExecute(NULL, _T("open"), "IBKS_setup.exe", NULL, NULL, SW_SHOWNORMAL);
+	//}
+	//else if (tmp_mod == 5)
+	//{
+		//설치된 리소스가 없는 상황 
 		bLoginVerUp = false;
 		iLoginVerUP = 0;
 	}
@@ -731,6 +735,7 @@ void CCertLogin::OnRun()
 	{	
 		if (true)
 		{
+//			OutputDebugString("START UPDATE.EXE.......................................\n");
 			RunUpdate();
 			m_frame->PostMessage(WM_CLOSE);
 			EndDialog(IDCANCEL);
@@ -746,6 +751,20 @@ void CCertLogin::OnRun()
 
 	SetCurrentDirectory(Axis::home + "\\exe");
 	UpdateData(TRUE);
+	//업데이트 에이전트 관련
+// 	CString updatepath;
+// 	updatepath.Format("%s\\%s\\update.ini",Axis::home,TABDIR);
+// 
+// 	int nUseUpdate = GetPrivateProfileInt("UPDATE","RSCDNENABLE",0,updatepath);
+// 
+// 	if(nUseUpdate)
+// 	{
+// 		SetGuide("업데이트 에이젼트가 리소스 다운중입니다.잠시 후 다시 사용해주세요.");
+// 		((CEdit*) GetDlgItem(IDC_DUSER))->SetSel(0,-1);
+// 		GetDlgItem(IDC_DUSER)->SetFocus();
+// 		
+// 		return;
+// 	}
 
 	// 고객직원 구분 로직
 	if(!m_bCertLogin)
@@ -1282,14 +1301,14 @@ void CCertLogin::OnCert()
 
 	CString imgN;
 
-	imgN.Format("%s\\%s\\new_login_bg_bagic_02.bmp", Axis::home, IMAGEDIR);
+	imgN.Format("%s\\%s\\new_login_bg_bagic_02_CLOUDE.bmp", Axis::home, IMAGEDIR);
 
 	m_bmpBg = Axis::GetBitmap(imgN);
 
 	m_btnCert->SetImgBitmap("NEW_LOGIN_TAB_01_ON",2);
 	
 	m_btnGen->SetImgBitmap("NEW_LOGIN_TAB_02_OFF",2);
-
+	
 	if (!m_btnGen || !m_btnGen->GetSafeHwnd())
 		m_btnGen = CreateBmpButton(IDC_DRUN, "LOGIN_TAB_02");
 
@@ -1317,7 +1336,7 @@ void CCertLogin::OnCert()
 	GetDlgItem(IDC_DONLYSISE)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_DSAVEPASS)->ShowWindow(SW_HIDE);
 
-	ShowCloudeBtn(m_bCloudeUSE); //clude
+	ShowCloudeBtn(m_bCloudeUSE);
 
 	SetGuide("");
 
@@ -1332,7 +1351,7 @@ void CCertLogin::OnCert()
 		s.Format("CERT AUTO FALSE [%d]\n",m_bCertStart);
 		OutputDebugString(s);
 		
-		if(m_bCertStart)
+		if(m_bCertStart && !m_bCloudeUSE)
 		{
 			/*OnRun();*/
 			SetTimer(2000,1000,NULL);
@@ -1344,25 +1363,26 @@ void CCertLogin::OnGen()
 {
 	CString file, usnm = Axis::user;
 	file.Format("%s\\%s\\%s\\%s.ini", Axis::home, USRDIR, usnm, usnm); 
+
 	WritePrivateProfileString("LOGINTYPE", "TYPE", "1", file);
 
 	CString sfile;
 	sfile.Format("%s\\%s\\AXIS.ini", Axis::home, TABDIR);
 	WritePrivateProfileString("CLOUDELOGIN", "USE", "0", sfile);
-	m_bCloudeUSE = TRUE;
+	m_bCloudeUSE = FALSE;
 
 	CString imgN;
 
 	m_pass = "";
 	
-	imgN.Format("%s\\%s\\new_login_bg_bagic_01.bmp", Axis::home, IMAGEDIR);
+	imgN.Format("%s\\%s\\new_login_bg_bagic_01_CLOUDE.bmp", Axis::home, IMAGEDIR);
 
 	m_bCertLogin = FALSE;
 
 	m_btnCert->SetImgBitmap("NEW_LOGIN_TAB_01_OFF",2);
 	
 	m_btnGen->SetImgBitmap("NEW_LOGIN_TAB_02_ON",2);
-
+	
 	m_bmpBg = Axis::GetBitmap(imgN);
 
 	GetDlgItem(IDC_DUSER)->ShowWindow(SW_SHOW);
@@ -1375,8 +1395,6 @@ void CCertLogin::OnGen()
 
 	GetDlgItem(IDC_DCSTART)->ShowWindow(SW_HIDE);
 
-	ShowCloudeBtn(m_bCloudeUSE, FALSE); //clude
-	
 	m_ckSAVEID.DrawTransparent();
 	m_ckSAVEPASS.DrawTransparent();
 	m_ckSISEONLY.DrawTransparent();
@@ -2186,11 +2204,11 @@ HBRUSH CCertLogin::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	return CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
 }
 
-CBmpButton* CCertLogin::CreateBmpButton(UINT buttonID, const char* bmpFileName, BOOL check, int statusCount)  //clude
+CBmpButton* CCertLogin::CreateBmpButton(UINT buttonID, const char* bmpFileName, BOOL check, int statusCount)
 {
 	CBmpButton* btn = new CBmpButton;
 
-	btn->SetImgBitmap(bmpFileName, statusCount);  //clude
+	btn->SetImgBitmap(bmpFileName, statusCount);
 	btn->SubclassWindow(GetDlgItem(buttonID)->m_hWnd);
 	if (check)
 	{
@@ -2273,7 +2291,7 @@ void CCertLogin::SetEventBitmap(int index)
 	}
 
 	CString fileName;
-	fileName.Format("%s\\%s\\NEW_LOGIN_BANNER.bmp", Axis::home, IMAGEDIR);
+	fileName.Format("%s\\%s\\NEW_LOGIN_BANNER_CLOUDE.bmp", Axis::home, IMAGEDIR);
 
 	m_bitmapEvent = CEnBitmap::LoadImageFile(fileName, RGB(255, 255, 255));
 
@@ -2921,55 +2939,17 @@ OutputDebugString(m_slog);
 //	EndDialog(IDCANCEL);
 //}
 
-void CCertLogin::OnBnClickedClude()  //clude
+void CCertLogin::OnBnClickedClude()
 {
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CString sfile;
 	sfile.Format("%s\\%s\\AXIS.ini", Axis::home, TABDIR);
 	WritePrivateProfileString("CLOUDELOGIN", "USE", "1", sfile);
 
 	m_bCloudeUSE = TRUE;
-	/*m_bCertLogin = TRUE;
-
-	CString imgN;
-
-	imgN.Format("%s\\%s\\new_login_bg_bagic_03.bmp", Axis::home, IMAGEDIR);
-
-	m_bmpBg = Axis::GetBitmap(imgN);
-
-	m_btnCert->SetImgBitmap("NEW_LOGIN_TAB_01_OFF", 2);
-
-	m_btnGen->SetImgBitmap("NEW_LOGIN_TAB_02_OFF", 2);
-
-	m_btnClude->SetImgBitmap("NEW_LOGIN_TAB_03_ON", 2);
-
-	if (!m_btnGen || !m_btnGen->GetSafeHwnd())
-		m_btnGen = CreateBmpButton(IDC_DRUN, "LOGIN_TAB_02");
-
-	Invalidate();
-
-	GetDlgItem(IDC_DCSTART)->ShowWindow(SW_HIDE);
-
-	GetDlgItem(IDC_DUSER)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_DPASS)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_DCPASS)->ShowWindow(SW_HIDE);
-
-	GetDlgItem(IDC_DSAVEID)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_DONLYSISE)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_DSAVEPASS)->ShowWindow(SW_HIDE);*/
-
-
+	
 	ShowCloudeBtn(m_bCloudeUSE);
 
 	SetGuide("");
-
-	/*if (!m_auto)
-	{
-		if (m_bCertStart)
-		{
-			SetTimer(2000, 1000, NULL);
-		}
-	}*/
 }
 
 void CCertLogin::OnBnClickedCloudePcbtn()
@@ -3011,49 +2991,45 @@ void CCertLogin::ShowCloudeBtn(BOOL bShow, BOOL AllShow)
 		m_btn_upcert_Clude->ShowWindow(bShow);
 		m_btn_downcert_Clude->ShowWindow(bShow);
 		m_btn_PSchange_Clude->ShowWindow(bShow);
-
 	}
-	
-
 	Invalidate();
 }
 
-
 void CCertLogin::InitCloude()
 {
-	CloudConfig config;
-	memset(&config, 0x00, sizeof(CloudConfig));
-	config.SITE_CODE[0] = "U1MwMDY4XzA2";
-	config.CUSTOMER_ID = "SS0068";
-#ifdef DF_DEV
-	config.SERVER_HOST = DEV_CLOUDE_SERVER;
-	config.AGREEMENT_URL = DEV_AGREEMENT_URL;
-#else
-	config.SERVER_HOST = REAL_CLOUDE_SERVER;
-	config.AGREEMENT_URL = REAL_AGREEMENT_URL;
-#endif 
-	config.VERSION = "1.0.0";
-	config.SERVER_PORT = 8500;
+	//CloudConfig config;
+	//memset(&config, 0x00, sizeof(CloudConfig));
+	//config.CUSTOMER_ID = "SS0068"; 
+	//
+	//if(Axis::devMode == TRUE)
+	//{
+	//	config.SITE_CODE[0] = "U1MwMDY4XzA2";
+	//	config.SERVER_HOST = DEV_CLOUDE_SERVER;
+	//	config.AGREEMENT_URL = DEV_AGREEMENT_URL;
+	//}
+	//else
+	//{
+	//	config.SITE_CODE[0] = "U1MwMDY4XzA1";
+	//	config.SERVER_HOST = REAL_CLOUDE_SERVER;
+	//	config.AGREEMENT_URL = REAL_AGREEMENT_URL;
+	//}
 
-	//타임아웃 기간을 설정합니다 1~10초 (msec 단위)
-	config.TIMEOUT_MSEC = 3000;
+	//config.VERSION = "1.0.0";
+	//config.SERVER_PORT = 8500;
 
-	sk_if_Set_CloudConfig(config);
-	sk_if_DialogModalMode(m_hWnd); //모달 모드
+	////타임아웃 기간을 설정합니다 1~10초 (msec 단위)
+	//config.TIMEOUT_MSEC = 3000;
+
+	//sk_if_Set_CloudConfig(config);
+	//sk_if_DialogModalMode(m_hWnd); //모달 모드
 }
 
-//인증서 올리기
-void CCertLogin::OnBnClickedCludeCertup()  
+void CCertLogin::OnBnClickedCludeCertup()
 {
-	int rc = 0;
+	((CMainFrame*)m_frame)->CludeCertup();
+	/*int rc = 0;
 	SD_API_CONTEXT_NEW Context;
 	memset(&Context, 0x00, sizeof(Context));
-
-	/*CString cstrDn;
-	GetDlgItemText(IDC_EDIT_DN, cstrDn);
-
-	if (cstrDn.GetLength() > 0)
-		strncpy(Context.sd.szUserId, cstrDn.GetBuffer(), cstrDn.GetLength());*/
 
 	rc = sk_if_UploadPCtoCloud(&Context, 0);
 	if (rc == 0)
@@ -3064,21 +3040,31 @@ void CCertLogin::OnBnClickedCludeCertup()
 	{
 		MessageBox(sk_if_GetLastErrorMsg(), "클라우드로 인증서 올리기 오류", MB_OK);
 		return;
-	}
+	}*/
 }
 
-//간편인증번호 변경
+void CCertLogin::OnBnClickedCludeCertDown()
+{
+	((CMainFrame*)m_frame)->CludeCertDown();
+	/*int rc = 0;
+	rc = sk_if_DownloadCloudtoPC(0);
+	if (rc == 0)
+	{
+		MessageBox("성공", "클라우드에서 인증서리 내려받기", MB_OK);
+	}
+	else
+	{
+		MessageBox(sk_if_GetLastErrorMsg(), "클라우드에서 인증서리 내려받기 오류", MB_OK);
+		return;
+	}*/
+}
+
 void CCertLogin::OnBnClickedCludePschange()
 {
-	int rc = 0;
+	((CMainFrame*)m_frame)->CludePschange();
+	/*int rc = 0;
 	SD_API_CONTEXT_NEW Context;
 	memset(&Context, 0x00, sizeof(Context));
-
-	/*CString cstrDn;
-	GetDlgItemText(IDC_EDIT_DN, cstrDn);
-
-	if (cstrDn.GetLength() > 0)
-		strncpy(Context.sd.szUserId, cstrDn.GetBuffer(), cstrDn.GetLength());*/
 
 	rc = sk_if_CertChangePin_inCloud(&Context, 0);
 	if (rc == 0)
@@ -3089,21 +3075,5 @@ void CCertLogin::OnBnClickedCludePschange()
 	{
 		MessageBox(sk_if_GetLastErrorMsg(), "클라우드 인증서 간편비밀번호 변경 오류", MB_OK);
 		return;
-	}
-}
-
-//인증서 내려받기
-void CCertLogin::OnBnClickedCludeCertDown()
-{
-	int rc = 0;
-	rc = sk_if_DownloadCloudtoPC(0);
-	if (rc == 0)
-	{
-		MessageBox("성공", "클라우드에서 인증서리 내려받기", MB_OK);
-	}
-	else
-	{
-		MessageBox(sk_if_GetLastErrorMsg(), "클라우드에서 인증서리 내려받기 오류", MB_OK);
-		return;
-	}
+	}*/
 }

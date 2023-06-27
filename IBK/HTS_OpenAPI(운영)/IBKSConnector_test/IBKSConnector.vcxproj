@@ -293,7 +293,7 @@ echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg" </Command>
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>D:\HTS\exe\IBKSConnector.ocx</OutputFile>
+      <OutputFile>D:\IBKS_TEST\exe\IBKSConnector.ocx</OutputFile>
       <ImportLibrary>.\Debug\IBKSConnector.lib</ImportLibrary>
       <ModuleDefinitionFile>.\IBKSConnector.def</ModuleDefinitionFile>
     </Link>

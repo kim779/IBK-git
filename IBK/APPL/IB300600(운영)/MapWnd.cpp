@@ -1420,7 +1420,7 @@ CODE_TYPE CMapWnd::GetCodeType( LPCSTR code )
 		{
 			if(strCode.Mid(1,2) == "05")
 				return CT_MOPTION;
-			else if(strCode.Mid(1,2) == "09") //week
+			else if(strCode.Mid(1,2) == "09" || strCode.Mid(1, 2) == "AF") //week
 				return CT_WEEK;
 			else
 				return CT_OPTION;
@@ -1468,7 +1468,7 @@ void CMapWnd::req_pibofchg(LPCSTR acno, LPCSTR pswd, BOOL bNext, LPCSTR nkey)
 	SendTR("PIBOFCHG", US_ENC, &data[0], data.size(), TK_PIBOFCHG);
 }
 
-void CMapWnd::res_pibofchg( LPCSTR data, int size )
+void CMapWnd::res_pibofchg( LPCSTR data, int size )  //**미체결조회
 {
 	struct _ledgerH *ledger = (struct _ledgerH *)data;
 	pibofchg_mod *mod = (pibofchg_mod*)(data+L_ledgerH);
@@ -2046,7 +2046,7 @@ void CMapWnd::ChangeCode( LPCSTR code , BOOL bTrigger /*=TRUE*/)
 	if (_code.IsEmpty()) return;
 
 	//미니선옵 마스터 파일 로드
-	if(_code.Mid(1,2) == "09")   //week
+	if(_code.Mid(1,2) == "09" || _code.Mid(1, 2) == "AF")   //week
 	{
 		m_pControl->SetFOType(2);
 	}

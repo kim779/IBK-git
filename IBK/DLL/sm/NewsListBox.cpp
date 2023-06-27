@@ -163,15 +163,22 @@ void NewsListBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	dc.SelectObject(oldPen);
 
 	// date
-	dc.DrawText(item->date, CRect(3, rcItem.top, grid1 - 2, rcItem.bottom), 
+	CString stmp;
+	stmp.Format("%s%c", item->date, 0x00);
+	//dc.DrawText(item->date, CRect(3, rcItem.top, grid1 - 2, rcItem.bottom), 
+	dc.DrawText(stmp, CRect(3, rcItem.top, grid1 - 2, rcItem.bottom),
 		DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 
 	// source
-	dc.DrawText(item->source, CRect(grid1 + 3, rcItem.top, grid2 - 2, rcItem.bottom),
+	stmp.Format("%s%c", item->source, 0x00);
+	dc.DrawText(stmp, CRect(grid1 + 3, rcItem.top, grid2 - 2, rcItem.bottom),
+	//dc.DrawText(item->source, CRect(grid1 + 3, rcItem.top, grid2 - 2, rcItem.bottom),
 		DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 
 	// title
-	dc.DrawText(item->title, CRect(grid2 + 3, rcItem.top, rcItem.right - 2, rcItem.bottom),
+	stmp.Format("%s%c", item->title, 0x00);
+	dc.DrawText(stmp, CRect(grid2 + 3, rcItem.top, rcItem.right - 2, rcItem.bottom),
+	//dc.DrawText(item->title, CRect(grid2 + 3, rcItem.top, rcItem.right - 2, rcItem.bottom),
 		DT_SINGLELINE | DT_LEFT | DT_VCENTER);
 
 

@@ -4630,7 +4630,7 @@ BOOL CGridCtrl::SetItemText(int nRow, int nCol, LPCTSTR str)
     CGridCellBase* pCell = GetCell(nRow, nCol);
     if (!pCell)
         return FALSE;
-
+   
     pCell->SetText(str);
 
     SetModified(TRUE, nRow, nCol);

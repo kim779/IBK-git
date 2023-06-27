@@ -89,31 +89,10 @@ BOOL CExitD::OnInitDialog()
 	
 	if(m_bUseNewLogin)
 	{
-		m_bitmap = Axis::GetBitmap("NEW_LOGOUT_BG_BAGIC");
-		//test
-		/*
-		HBITMAP hBitmap;
-		CString bmpName, fileName;
-		bmpName = "NEW_LOGOUT_BG_BAGIC"; 
-		CString path(bmpName);
-		path.MakeUpper();
-		if (path.Find(".BMP") < 0)
-			fileName.Format("%s\\image\\%s.bmp", Axis::home, bmpName);
+		if (Axis::isCustomer)
+			m_bitmap = Axis::GetBitmap("NEW_LOGOUT_BG_BAGIC");
 		else
-			fileName = path;
-
-		hBitmap = (HBITMAP)::LoadImage(AfxGetInstanceHandle(), fileName,
-			IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-		if (hBitmap)
-		{
-			//TRACE("Loaded File Bitmap NAME = %s\n", bmpName);
-			TRACE("SUCCESS !!!!! = %s\n", bmpName);
-			CBitmap* bmp = new CBitmap;
-			bmp->Attach(hBitmap);
-			m_bitmap = bmp;
-		}
-		//test
-		*/
+			m_bitmap = Axis::GetBitmap("NEW_STAFF_LOGOUT_BG_BAGIC");
 	}
 	else
 	{
@@ -126,7 +105,7 @@ BOOL CExitD::OnInitDialog()
 
 	BITMAP bm;
 	m_bitmap->GetBitmap(&bm);
-	SetWindowPos(NULL, 0, 0, bm.bmWidth - 200, bm.bmHeight, SWP_NOMOVE | SWP_NOZORDER);
+	SetWindowPos(NULL, 0, 0, bm.bmWidth, bm.bmHeight, SWP_NOMOVE | SWP_NOZORDER);
 	
 	HRGN hWndRgn = DIBToRgn((HBITMAP)m_bitmap->m_hObject, Axis::maskColor, FALSE);
 	if(hWndRgn)
@@ -194,16 +173,16 @@ BOOL CExitD::OnInitDialog()
 	ASSERT(m_btnOK && m_btnCancel);
 
 	if(m_bUseNewLogin)
-	{
-		m_btnOK->SetWindowPos(NULL,  300, 276, 256, 39, SWP_NOSIZE | SWP_NOZORDER);
-		m_btnCancel->SetWindowPos(NULL, 566, 276,  56, 39, SWP_NOSIZE | SWP_NOZORDER);
+	{																	
+		m_btnOK->SetWindowPos(NULL,  338, 276, 259, 39, SWP_NOSIZE | SWP_NOZORDER);
+		m_btnCancel->SetWindowPos(NULL, 603, 276,  56, 39, SWP_NOSIZE | SWP_NOZORDER);
 	}
 	else
 	{
 		m_btnOK->SetWindowPos(NULL,  228, 248, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 		m_btnCancel->SetWindowPos(NULL, 329, 248, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 	}
-
+	//m_btnCancel->ShowWindow(SW_HIDE);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE

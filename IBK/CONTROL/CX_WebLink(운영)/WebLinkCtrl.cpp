@@ -17,6 +17,8 @@
 
 #include "../../h/axisfire.h"
 
+
+
 #pragma comment(lib, "psapi.lib")
 #pragma comment (lib, "ws2_32.lib")
 
@@ -1710,6 +1712,8 @@ int WebLinkCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	int ddata = atoi(sWnd);
 	HWND hWnd = (HWND)ddata;
 	m_pMainFrame = CWnd::FromHandle(hWnd);
+
+	//WriteLog("test");
 	
 	return 0;
 }

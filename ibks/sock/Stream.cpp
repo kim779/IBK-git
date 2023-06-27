@@ -346,6 +346,8 @@ bool CStream::ResponseFM(unsigned char fmC)
 bool CStream::WriteData(char *data, int ndat, bool wait)
 {
 	CString text;
+	text.Format("[axSock][CStream][WriteData] [%.100s] \r\n", data);
+	OutputDebugString(text);
 
 	_fmH *fmh = (_fmH *) m_pBytesToData;
 	fmh->fmF[0] = fmF_FS;

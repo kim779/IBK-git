@@ -1496,6 +1496,15 @@ CString CMapWnd::Variant(int comm, CString data)
 
 void CMapWnd::sendTR(CString trCode, char* datB, int datL, int key)
 {
+	CString slog;
+	if (trCode.Find(trUPDOWN) >= 0)
+	{
+		slog.Format("\r\n-----------[202201] %.50s", datB);
+		OutputDebugString(slog);
+	}
+	
+
+
 	std::string sendB;
 	sendB.resize(L_userTH + datL + 1);
 	struct	_userTH* uTH = (struct _userTH *) sendB.data();

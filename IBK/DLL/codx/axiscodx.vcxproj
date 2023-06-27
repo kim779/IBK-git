@@ -159,7 +159,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../exe/axiscodx.dll</OutputFile>
+      <OutputFile>D:\IBKS_TEST\exe/axiscodx.dll</OutputFile>
       <ImportLibrary>.\Debug\axiscodx.lib</ImportLibrary>
       <ModuleDefinitionFile>.\axiscodx.def</ModuleDefinitionFile>
     </Link>
