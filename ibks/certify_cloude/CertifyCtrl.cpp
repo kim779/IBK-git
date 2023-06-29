@@ -29,6 +29,7 @@
 #define DEV_CLOUDE_SERVER  "twas.signkorea.com"
 #define REAL_CLOUDE_SERVER "cert.signkorea.com"
 #define DEV_AGREEMENT_URL "https://tweb.signkorea.com:8700/notice/html/conditionsOfUse.txt"
+//#define DEV_AGREEMENT_URL "https://211.175.81.112:8700/notice/html/conditionsOfUse.txt"
 #define REAL_AGREEMENT_URL "https://center.signkorea.com:8700/notice/html/conditionsOfUse.txt"
 
 #ifdef _DEBUG

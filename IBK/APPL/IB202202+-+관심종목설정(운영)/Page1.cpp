@@ -3709,6 +3709,7 @@ void CPage1::savingInterest(int gno)
 	CString	filePath, fileBook;
 	fileBook.Format("%s/%s/%s/bookmark.i%02d", m_root, USRDIR, m_name, gno);
 
+	BOOL bExistBook = FALSE;
 	struct	_inters* pinter{};
 	struct  _bookmarkinfo* bInfo{};
 	bool	isfile = false;
@@ -3746,6 +3747,8 @@ void CPage1::savingInterest(int gno)
 				CopyMemory(bInfo->name, pinter->name, min(sizeof(pinter->name), sizeof(bInfo->name)));
 		
 			bInfo->bookmark[0] = pinter->bookmark[0] == '1' ? '1' : '0';//2015.04.03 KSJ 1이아니면 0으로 해준다.
+			if (pinter->bookmark[0] == '1')
+				bExistBook = TRUE;
 		}
 		fileB.Write(bInfo, sz_bookmark);
 	}

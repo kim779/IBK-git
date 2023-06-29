@@ -1737,6 +1737,9 @@ void CMainWnd::ChangeGroup(short nIndex)
 	m_pGroupWnd->SendMessage(WM_MANAGE, MK_NOSELECT);
 
 m_iGroup = nIndex;
+m_slog.Format("[cx_interest] @@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ");
+OutputDebugString(m_slog);
+
 m_slog.Format("[cx_interest][CMainWnd][remove][ChangeGroup]  nIndex=[%d]------------------------ ", nIndex);
 OutputDebugString(m_slog);
 

@@ -1678,6 +1678,47 @@ BOOL CMapWnd::ExistFile(CString fullfile)
 	return true;
 }
 
+BOOL CMapWnd::ChangeBookFile(CString strFileO, CString strFileN, CStringArray& strarr) //bookmark fix
+{
+
+	if (ExitBookFile(strFileO) == FALSE && ExitBookFile(strFileN) == FALSE)
+	{
+		m_slog.Format("\r\n [IB202201] [O=N, N=F]  strFileO=[%s]  strFileN=[%s] ", strFileO.Right(12), strFileN.Right(12));
+		OutputDebugString(m_slog);
+		return FALSE;
+	}
+	else if (ExitBookFile(strFileO) == TRUE && ExitBookFile(strFileN) == FALSE)
+	{//O 는 북마크 파일이 있고 N는 없다  원래 북마크 있던 그룹인덱스가 새로운 그룹인덱스로 복사
+		CopyFile(strFileO, strFileN + "tmp", false);
+		m_slog.Format("\r\n [IB202201] [O=T, N=F] strFileO=[%s]  strFileN=[%s] ", strFileO.Right(12), strFileN.Right(12));
+		OutputDebugString(m_slog);
+		strarr.Add(strFileO);
+		return TRUE;
+	}
+	else if (ExitBookFile(strFileO) == FALSE && ExitBookFile(strFileN) == TRUE)
+	{
+		m_slog.Format("\r\n [IB202201] [O=F, N=T] strFileO=[%s]  strFileN=[%s] ", strFileO.Right(12), strFileN.Right(12));
+		OutputDebugString(m_slog);
+		return FALSE;
+	}
+	else if (ExitBookFile(strFileO) == TRUE && ExitBookFile(strFileN) == TRUE)
+	{
+		m_slog.Format("\r\n [IB202201] [O=T, N=T] strFileO=[%s]  strFileN=[%s] ", strFileO.Right(12), strFileN.Right(12));
+		OutputDebugString(m_slog);
+		CopyFile(strFileO, strFileN + "tmp", false);
+		strarr.Add(strFileO);
+		return TRUE;
+	}
+}
+
+BOOL CMapWnd::ExitBookFile(CString strBookFile) //bookmark fix
+{
+	if (ExistFile(strBookFile))
+		return TRUE;
+	else
+		return FALSE;
+}
+
 void CMapWnd::initSaveFile(char* datB, bool isSequence)
 {
 	#define MAX_JM    120             /* 최대 관심그룹 갯수   */
@@ -1696,7 +1737,7 @@ void CMapWnd::initSaveFile(char* datB, bool isSequence)
 
 ////////////////////////////////////////////////////////////////////
 
-	CString saveFile, saveN, moveN, portFile, saveportN, savemoveN;
+	CString saveFile, saveN, moveN, portFile, saveportN, savemoveN, stmp;
 	CString m_root, m_name;
 	m_root = Variant(homeCC, "");
 	m_name = Variant(nameCC, "");
@@ -1708,6 +1749,8 @@ void CMapWnd::initSaveFile(char* datB, bool isSequence)
 		struct grpfold* gFold;
 		gFold = (struct grpfold *)(datB);
 
+	
+		CStringArray strArrDelFile{};
 		CString oldFile, newFile, tempFile, oldTempFile, newTempFile;
 		
 		char nrec[4];
@@ -1721,38 +1764,15 @@ void CMapWnd::initSaveFile(char* datB, bool isSequence)
 			m_sheet->setManageGroup(datB);
 			const int groupCount = m_sheet->getManageCount();
 
-
 			CString	string = _T(""), gnoS, oldnoS, gnameS, saveS, saveTempS, saveBookS, bookS;			
-			//1베이스 이므로 save에 일단 복사
-			for(int i=1 ; i<= groupCount ; i++)
-			{
-//				saveS.Format("%s\\%s\\%s\\portfolio.i%02d.save", m_root, "user", m_name, i);
-				saveBookS.Format("%s\\%s\\%s\\bookmark.i%02d.save", m_root, "user", m_name, i);
-//				oldFile.Format("%s\\%s\\%s\\portfolio.i%02d", m_root, "user", m_name, i);
-				bookS.Format("%s\\%s\\%s\\bookmark.i%02d", m_root, "user", m_name, i);
-					
-				//if(ExistFile(oldFile))
-				//	CopyFile(oldFile, saveS, false);
-				if(ExistFile(bookS))
-					CopyFile(bookS, saveBookS, false);
 
-				//if(isSequence == true)
-				/*{
-					saveTempS.Format("%s\\%s\\%s\\portfolio.i%02d.savetmp", m_root, "user", m_name, i);
-					oldTempFile.Format("%s\\%s\\%s\\portfolio.i%02d.tmp", m_root, "user", m_name, i);
-					
-					if(ExistFile(oldTempFile))
-					CopyFile(oldTempFile, saveTempS, false);
-				}*/
-			}
-	
 			for(int i= 0 ; i< nCount ; i++)
 			{
 				memcpy(&list, &gFold->glist[i], sizeof(glist));
 				
-				gnoS.Format("%.2s", list.ngrs);
-				oldnoS.Format("%.2s", list.ogrs);
-				gnameS.Format("%.30s", list.gnam);
+				gnoS.Format("%.2s", list.ngrs);     //new group sequence
+				oldnoS.Format("%.2s", list.ogrs);  //original group sequence
+				gnameS.Format("%.30s", list.gnam);  // 그룹명
 				gnameS.TrimRight();
 
 				gnoS.TrimLeft(); gnoS.TrimRight();
@@ -1762,219 +1782,63 @@ void CMapWnd::initSaveFile(char* datB, bool isSequence)
 				string += gnoS; 
 				string += ";";
 				
-				
-				//oldFile.Format("%s\\%s\\%s\\portfolio.i%s.save", m_root, "user", m_name, oldnoS);
-				//newFile.Format("%s\\%s\\%s\\portfolio.i%s", m_root, "user", m_name, gnoS);
-				
-			//	oldTempFile.Format("%s\\%s\\%s\\portfolio.i%s.savetmp", m_root, "user", m_name, oldnoS);
-			//	newTempFile.Format("%s\\%s\\%s\\portfolio.i%s.tmp", m_root, "user", m_name, gnoS);
-
-				if(atoi(oldnoS) != atoi(gnoS))
+				if (atoi(oldnoS) != atoi(gnoS))  //그룹순서가 바뀌었을때 북마크파일도 복사해주는 용도
 				{
-					//if (ExistFile(oldFile))
-					//{	
-					//	//save - > new
-					//	CopyFile(oldFile, newFile, false);
-					//	DeleteFile(oldFile);
-					//}
-					//
-
-					////그룹 위치가 변경되었을때 tmp도 같이 바꿔주기
-					//if(isSequence == true)
-					//{
-					//	if (ExistFile(oldTempFile))
-					//	{	
-					//		CopyFile(oldTempFile, newTempFile, false);
-					//		DeleteFile(oldTempFile);
-					//	}
-					//}
-
 					//bookmark도 변경
-					oldFile.Format("%s\\%s\\%s\\bookmark.i%s.save", m_root, "user", m_name, oldnoS);
-					newFile.Format("%s\\%s\\%s\\bookmark.i%s", m_root, "user", m_name, gnoS);
-					
-					if (ExistFile(oldFile))
-					{
-						CopyFile(oldFile, newFile, false);
-						DeleteFile(oldFile);
-					}
-				}
+					oldTempFile.Format("%s\\%s\\%s\\bookmark.i%s", m_root, "user", m_name, oldnoS);
+					newTempFile.Format("%s\\%s\\%s\\bookmark.i%s", m_root, "user", m_name, gnoS);
 
-				//newFile.Format("%s\\%s\\%s\\portfolio.i%s", m_root, "user", m_name, gnoS);
-				
-				//if(ExistFile(newFile))
-				//{
-				//	if(isSequence == true)
-				//	{
-				//		WritePrivateProfileString(_T("GROUPNAME"), gnoS, gnameS, tempP);
-				//	}
-				//	else
-				//	{
-				//		WritePrivateProfileString(_T("GROUPNAME"), gnoS, gnameS, saveP);
-				//	}
-				//}
-
-				
+					ChangeBookFile(oldTempFile, newTempFile, strArrDelFile);
+				}	
 			}
 
-			//WritePrivateProfileString(_T("GROUPORDER"), "00", string, saveP);
-			//WritePrivateProfileString(nullptr, nullptr, nullptr, saveP);			
-
-
-			CString dele, book, deleFile, deletempFile, delbookFile, tempdel;
-			
-			for(int i=1 ; i<=groupCount ; i++)
-			{	
-				//saveS.Format("%s\\%s\\%s\\portfolio.i%02d.save", m_root, "user", m_name, i);
-				//saveTempS.Format("%s\\%s\\%s\\portfolio.i%02d.savetmp", m_root, "user", m_name, i);
-				saveBookS.Format("%s\\%s\\%s\\bookmark.i%02d.save", m_root, "user", m_name, i);
-
-				/*
-				if(ExistFile(saveS))
-				{
-					DeleteFile(saveS);
-				}
-				if(ExistFile(saveTempS))
-				{
-					DeleteFile(saveTempS);
-				}
-				*/
-				
-				if(ExistFile(saveBookS))
-					DeleteFile(saveBookS);
-			}
-
-			for (int i=nCount+1; i<=100; i++)
+			for (int ii = 0; ii < strArrDelFile.GetSize(); ii++)
 			{
-				//count 보다 큰수의 파일은 삭제한다
-			//	dele.Format("portfolio.i%02d", i);
-				book.Format("bookmark.i%02d", i);
-			//	deleFile.Format("%s\\%s\\%s\\%s", m_root, "user", m_name, dele);
-				delbookFile.Format("%s\\%s\\%s\\%s", m_root, "user", m_name, book);
-
-				/*	
-				if(ExistFile(deleFile))
-				{
-					DeleteFile(deleFile);
-				}
-				*/
-				if(ExistFile(delbookFile))
-				{
-					DeleteFile(delbookFile);
-				}
+				m_slog.Format("\r\n [IB202201] DeleteFile=[%s]", strArrDelFile.GetAt(ii));
+				OutputDebugString(m_slog);
+				DeleteFile(strArrDelFile.GetAt(ii));
 			}
 
-			return;
-
+			for (int ii = 1; ii <= groupCount; ii++)
+			{
+				oldTempFile.Format("%s\\%s\\%s\\bookmark.i%02dtmp", m_root, "user", m_name, ii);
+				newTempFile.Format("%s\\%s\\%s\\bookmark.i%02d", m_root, "user", m_name, ii);
+				if (ExistFile(oldTempFile))
+				{
+					m_slog.Format("\r\n [IB202201] oldTempFile=[%s] newTempFile=[%s]]", oldTempFile.Right(12), newTempFile.Right(12));
+					OutputDebugString(m_slog);
+					CopyFile(oldTempFile, newTempFile, false);
+					DeleteFile(oldTempFile);
+				}
+			}
 		}
-		else	
+		else	//nCount > 0
 		{
 			m_sheet->setManageGroup(datB);
 			CString	string = _T(""), gnoS, oldnoS, gnameS, saveS, saveTempS, saveBookS, bookS;
 			const int groupCount = m_sheet->getManageCount();
 			for(int i=1 ; i<= groupCount ; i++)
 			{
-				//saveS.Format("%s\\%s\\%s\\portfolio.i%02d.save", m_root, "user", m_name, i);
 				saveBookS.Format("%s\\%s\\%s\\bookmark.i%02d.save", m_root, "user", m_name, i);
-				//oldFile.Format("%s\\%s\\%s\\portfolio.i%02d", m_root, "user", m_name, i);
 				bookS.Format("%s\\%s\\%s\\bookmark.i%02d", m_root, "user", m_name, i);
-				
-				//if(ExistFile(oldFile))
-				//	CopyFile(oldFile, saveS, false);
+
 				if(ExistFile(bookS))
 					CopyFile(bookS, saveBookS, false);
-				
-				//if(isSequence == true)
-				//{
-				//	saveTempS.Format("%s\\%s\\%s\\portfolio.i%02d.savetmp", m_root, "user", m_name, i);
-				//	oldTempFile.Format("%s\\%s\\%s\\portfolio.i%02d.tmp", m_root, "user", m_name, i);
-				//	
-				//	if(ExistFile(oldTempFile))
-				//		CopyFile(oldTempFile, saveTempS, false);
-				//}
-			}
-
-//			WritePrivateProfileString(_T("GROUPORDER"), "00", string, saveP);
-//			WritePrivateProfileString(nullptr, nullptr, nullptr, saveP);		
 			
+			}
 			CString dele, book, deleFile, deletempFile, delbookFile, tempdel;
 
 			for (int i=nCount+1; i<=100; i++)
 			{
-				//count 보다 큰수의 파일은 삭제한다
-			//	dele.Format("portfolio.i%02d", i);
 				book.Format("bookmark.i%02d", i);
-			//	deleFile.Format("%s\\%s\\%s\\%s", m_root, "user", m_name, dele);
 				delbookFile.Format("%s\\%s\\%s\\%s", m_root, "user", m_name, book);
 				
-			/*	if(ExistFile(deleFile))
-				{
-					DeleteFile(deleFile);
-				}*/
 				if(ExistFile(delbookFile))
 				{
 					DeleteFile(delbookFile);
 				}
 			}
-			
-			return;
-		}
-	}
-
-
-	for (int ii=1; ii<=100; ii++)
-	{
-		saveFile.Format("bookmark.i%02d.save", ii);
-		saveN.Format("%s\\%s\\%s\\%s", m_root, "user", m_name, saveFile);
-		if (ExistFile(saveN))
-		{
-			moveN = saveN.Left(saveN.GetLength()-5);
-			CopyFile(saveN, moveN, false);
-		}
-
-		//portFile.Format("portfolio.i%02d.save", ii);
-		//saveportN.Format("%s\\%s\\%s\\%s", m_root, "user", m_name, portFile);
-		//if (ExistFile(saveportN))
-		//{
-		//	savemoveN = saveportN.Left(saveportN.GetLength()-5);
-		//	CopyFile(saveportN, savemoveN, false);
-		//}
-	}
-
-	for (int ii=1; ii<=100; ii++)
-	{
-		saveFile.Format("bookmark.i%02d.save", ii);
-		saveN.Format("%s\\%s\\%s\\%s", m_root, "user", m_name, saveFile);
-
-		if (ExistFile(saveN))
-		{
-			moveN = saveN.Left(saveN.GetLength()-5);
-			DeleteFile(saveN);
-			DeleteFile(moveN+".tmp");
-		}
-
-		//portFile.Format("portfolio.i%02d.save", ii);
-		//saveportN.Format("%s\\%s\\%s\\%s", m_root, "user", m_name, portFile);
-		//
-		//if (ExistFile(saveportN))
-		//{
-		//	moveN = saveportN.Left(saveportN.GetLength()-5);
-		//	DeleteFile(saveportN);
-		//	DeleteFile(moveN+".tmp");
-		//}
-
-		////count 보다 큰수의 파일은 삭제한다
-		//if(ii>count) 
-		//{
-		//	CString dele, deleFile;
-		//	dele.Format("portfolio.i%02d", ii);
-		//	deleFile.Format("%s\\%s\\%s\\%s", m_root, "user", m_name, dele);
-		//	
-		//	if(ExistFile(deleFile))
-		//	{
-		//		DeleteFile(deleFile);
-		//	}		
-		//}
+		} //else
 	}
 }
 

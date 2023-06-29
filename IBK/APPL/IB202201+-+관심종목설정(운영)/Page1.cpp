@@ -2980,7 +2980,10 @@ int CPage1::FindPBCode(CString code)
 void CPage1::savingInterest(int gno)
 {	
 	struct  _bookmarkinfo* bInfo{};
-	
+m_slog.Format("[IB202201] savingInterest gno[%d]", gno);
+OutputDebugString(m_slog);
+
+	BOOL bExistBook = FALSE;
 	CString	fileBook = AxStd::FORMAT("%s/%s/%s/bookmark.i%02d", m_root, USRDIR, m_name, gno);	
 	::DeleteFile(fileBook);
 	CFile	fileB(fileBook, CFile::modeWrite|CFile::modeCreate|CFile::shareDenyNone);
@@ -3005,12 +3008,16 @@ void CPage1::savingInterest(int gno)
 				if (pinter->code[0] == 'm')
 					CopyMemory(bInfo->name, pinter->name, min(pinter->name.GetLength(), sizeof(bInfo->name)));
 				bInfo->bookmark[0] = pinter->bookmark == '1' ? '1':'0';	//2015.04.03 KSJ 1이아니면 0으로 해준다.
+				if (pinter->bookmark == '1')
+					bExistBook = TRUE;
 			}
 			
 			fileB.Write(bInfo.get(), sz_bookmark);		
 		}
 	}		
  	fileB.Close();
+	if(bExistBook == FALSE) //bookmark fix
+		::DeleteFile(fileBook);
 }
 
 /*

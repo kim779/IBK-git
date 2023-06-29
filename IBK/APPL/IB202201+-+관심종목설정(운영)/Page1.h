@@ -152,7 +152,7 @@ class CPage1 : public CPropertyPage
 public:
 	CPage1(CWnd *parent = nullptr);
 	~CPage1();
-
+	CString m_slog;
 	// Dialog Data
 	//{{AFX_DATA(CPage1)
 	enum

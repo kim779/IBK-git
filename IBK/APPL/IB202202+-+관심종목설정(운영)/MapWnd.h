@@ -11,7 +11,7 @@ class CMapWnd : public CWnd
 // Construction
 public:
 	CMapWnd(CWnd* parent);
-
+	CString m_slog;
 // Attributes
 public:
 	CWnd* m_parent{};
@@ -140,5 +140,7 @@ protected:
 private:
 	void initSaveFile(char* datB = nullptr, bool isSequence = false);
 	BOOL ExistFile(CString fullfile);
+	BOOL ChangeBookFile(CString strFileA, CString strFileB, CStringArray& strarr);
+	BOOL ExitBookFile(CString strBookFile);
 };
 

@@ -12,7 +12,9 @@ class CMapWnd : public CWnd
 public:
 	CMapWnd(CWnd* parent);
 	virtual ~CMapWnd();
-
+	CString m_slog;
+	BOOL ChangeBookFile(CString strFileA, CString strFileB, CStringArray& strarr);
+	BOOL ExitBookFile(CString strBookFile);
 // Attributes
 public:
 	CString _sDomino;

@@ -1853,6 +1853,47 @@ BOOL CMapWnd::ExistFile(CString fullfile)
 	return true;
 }
 
+BOOL CMapWnd::ChangeBookFile(CString strFileO, CString strFileN, CStringArray& strarr) //bookmark fix
+{
+
+	if (ExitBookFile(strFileO) == FALSE && ExitBookFile(strFileN) == FALSE)
+	{
+		m_slog.Format("\r\n [IB202202] [O=N, N=F]  strFileO=[%s]  strFileN=[%s] ", strFileO.Right(12), strFileN.Right(12));
+		OutputDebugString(m_slog);
+		return FALSE;
+	}
+	else if (ExitBookFile(strFileO) == TRUE && ExitBookFile(strFileN) == FALSE)
+	{//O 는 북마크 파일이 있고 N는 없다  원래 북마크 있던 그룹인덱스가 새로운 그룹인덱스로 복사
+		CopyFile(strFileO, strFileN + "tmp", false);
+		m_slog.Format("\r\n [IB202202] [O=T, N=F] strFileO=[%s]  strFileN=[%s] ", strFileO.Right(12), strFileN.Right(12));
+		OutputDebugString(m_slog);
+		strarr.Add(strFileO);
+		return TRUE;
+	}
+	else if (ExitBookFile(strFileO) == FALSE && ExitBookFile(strFileN) == TRUE)
+	{
+		m_slog.Format("\r\n [IB202202] [O=F, N=T] strFileO=[%s]  strFileN=[%s] ", strFileO.Right(12), strFileN.Right(12));
+		OutputDebugString(m_slog);
+		return FALSE;
+	}
+	else if (ExitBookFile(strFileO) == TRUE && ExitBookFile(strFileN) == TRUE)
+	{
+		m_slog.Format("\r\n [IB202202] [O=T, N=T] strFileO=[%s]  strFileN=[%s] ", strFileO.Right(12), strFileN.Right(12));
+		OutputDebugString(m_slog);
+		CopyFile(strFileO, strFileN + "tmp", false);
+		strarr.Add(strFileO);
+		return TRUE;
+	}
+}
+
+BOOL CMapWnd::ExitBookFile(CString strBookFile) //bookmark fix
+{
+	if (ExistFile(strBookFile))
+		return TRUE;
+	else
+		return FALSE;
+}
+
 void CMapWnd::initSaveFile(char* datB, bool isSequence)
 {
 	#define MAX_JM  120             /* 최대 관심그룹 갯수   */
@@ -1869,7 +1910,110 @@ void CMapWnd::initSaveFile(char* datB, bool isSequence)
 		struct  glist   glist[MAX_JM];
 	};
 
+	////////////////////////////////////////////////////////////////////
 
+	CString saveFile, saveN, moveN, portFile, saveportN, savemoveN, stmp;
+	CString m_root, m_name;
+	m_root = Variant(homeCC, "");
+	m_name = Variant(nameCC, "");
+
+	//서버에서 받은 Output이 있으면 portfolio 갱신
+	if (datB != nullptr)
+	{
+		struct grpfold* gFold;
+		gFold = (struct grpfold*)(datB);
+
+
+		CStringArray strArrDelFile{};
+		CString oldFile, newFile, tempFile, oldTempFile, newTempFile;
+
+		char nrec[4];
+		CopyMemory(nrec, gFold->nrec, sizeof(gFold->nrec));
+
+		const int nCount = atoi(nrec);
+		struct glist list {};
+
+		if (nCount > 0)
+		{
+			m_sheet->setManageGroup(datB);
+			const int groupCount = m_sheet->getManageCount();
+
+			CString	string = _T(""), gnoS, oldnoS, gnameS, saveS, saveTempS, saveBookS, bookS;
+
+			for (int i = 0; i < nCount; i++)
+			{
+				memcpy(&list, &gFold->glist[i], sizeof(glist));
+
+				gnoS.Format("%.2s", list.ngrs);     //new group sequence
+				oldnoS.Format("%.2s", list.ogrs);  //original group sequence
+				gnameS.Format("%.30s", list.gnam);  // 그룹명
+				gnameS.TrimRight();
+
+				gnoS.TrimLeft(); gnoS.TrimRight();
+
+				if (gnoS.IsEmpty() || atoi(gnoS) == 0) break;	//2015.04.09 KSJ 빈값이 들어오면 거기서 멈춘다.
+
+				string += gnoS;
+				string += ";";
+
+				if (atoi(oldnoS) != atoi(gnoS))  //그룹순서가 바뀌었을때 북마크파일도 복사해주는 용도
+				{
+					//bookmark도 변경
+					oldTempFile.Format("%s\\%s\\%s\\bookmark.i%s", m_root, "user", m_name, oldnoS);
+					newTempFile.Format("%s\\%s\\%s\\bookmark.i%s", m_root, "user", m_name, gnoS);
+
+					ChangeBookFile(oldTempFile, newTempFile, strArrDelFile);
+				}
+			}
+
+			for (int ii = 0; ii < strArrDelFile.GetSize(); ii++)
+			{
+				m_slog.Format("\r\n [IB202202] DeleteFile=[%s]", strArrDelFile.GetAt(ii));
+				OutputDebugString(m_slog);
+				DeleteFile(strArrDelFile.GetAt(ii));
+			}
+
+			for (int ii = 1; ii <= groupCount; ii++)
+			{
+				oldTempFile.Format("%s\\%s\\%s\\bookmark.i%02dtmp", m_root, "user", m_name, ii);
+				newTempFile.Format("%s\\%s\\%s\\bookmark.i%02d", m_root, "user", m_name, ii);
+				if (ExistFile(oldTempFile))
+				{
+					m_slog.Format("\r\n [IB202202] oldTempFile=[%s] newTempFile=[%s]]", oldTempFile.Right(12), newTempFile.Right(12));
+					OutputDebugString(m_slog);
+					CopyFile(oldTempFile, newTempFile, false);
+					DeleteFile(oldTempFile);
+				}
+			}
+		}
+		else	//nCount > 0
+		{
+			m_sheet->setManageGroup(datB);
+			CString	string = _T(""), gnoS, oldnoS, gnameS, saveS, saveTempS, saveBookS, bookS;
+			const int groupCount = m_sheet->getManageCount();
+			for (int i = 1; i <= groupCount; i++)
+			{
+				saveBookS.Format("%s\\%s\\%s\\bookmark.i%02d.save", m_root, "user", m_name, i);
+				bookS.Format("%s\\%s\\%s\\bookmark.i%02d", m_root, "user", m_name, i);
+
+				if (ExistFile(bookS))
+					CopyFile(bookS, saveBookS, false);
+
+			}
+			CString dele, book, deleFile, deletempFile, delbookFile, tempdel;
+
+			for (int i = nCount + 1; i <= 100; i++)
+			{
+				book.Format("bookmark.i%02d", i);
+				delbookFile.Format("%s\\%s\\%s\\%s", m_root, "user", m_name, book);
+
+				if (ExistFile(delbookFile))
+				{
+					DeleteFile(delbookFile);
+				}
+			}
+		} //else
+	}
 }
 
 void CMapWnd::testSaveFile3(CString code, CString datB)
