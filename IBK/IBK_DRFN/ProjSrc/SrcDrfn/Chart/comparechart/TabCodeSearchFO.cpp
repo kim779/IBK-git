@@ -21,6 +21,8 @@ static char THIS_FILE[] = __FILE__;
 #define COL_CENTER 1
 #define TITLE_ROW 1
 enum		{EXERCISE, FIRST, SECOND, THIRD, FOURTH};	// 콜 옵션 종목 
+const LPCTSTR	FUTOPT_COMBO[] = { "KOSPI200", "M KOSPI200", "W KOSPI200" };
+
 
 CTabCodeSearchFO::CTabCodeSearchFO(CWnd* pParent /*=NULL*/)
 	: CTabDlg(CTabCodeSearchFO::IDD, pParent)
@@ -32,7 +34,7 @@ CTabCodeSearchFO::CTabCodeSearchFO(CWnd* pParent /*=NULL*/)
 	m_strCodeNName = "";
 	m_strSelCodeNName = "";
 
-	m_nRadioSel = 1;
+	//m_nRadioSel = 1;
 	//}}AFX_DATA_INIT
 }
 
@@ -41,6 +43,7 @@ void CTabCodeSearchFO::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CTabCodeSearchFO)
+	DDX_Control(pDX, IDC_COMBO_FO, m_ctrlComboFOType);
 	DDX_Control(pDX, IDC_COMBO_MONTH, m_ctrlComboMonth);
 	DDX_Control(pDX, IDC_LIST_FUTURE, m_listFuture);
 	DDX_Control(pDX, IDC_RADIO_KOSPI200, m_ctrlRadioKospi200);
@@ -54,6 +57,7 @@ BEGIN_MESSAGE_MAP(CTabCodeSearchFO, CDialog)
 	//{{AFX_MSG_MAP(CTabCodeSearchFO)
 	ON_WM_SIZE()
 	ON_WM_DESTROY()
+	ON_CBN_SELCHANGE(IDC_COMBO_FO, OnSelchangeComboFO)
 	ON_CBN_EDITCHANGE(IDC_COMBO_MONTH, OnEditchangeComboMonth)
 	ON_CBN_SELCHANGE(IDC_COMBO_MONTH, OnSelchangeComboMonth)
 	ON_WM_CTLCOLOR()
@@ -81,6 +85,13 @@ BOOL CTabCodeSearchFO::OnInitDialog()
 	// TODO: Add extra initialization here
 	int	nID = 12; // Data 디렉토리
 	m_strDataDirPath = (LPCTSTR)(LPCSTR)AfxGetPctrData(nID);
+
+	m_nComboSel = 0;
+	m_ctrlComboFOType.ResetContent();
+	for (int nCount = 0; nCount < _countof(FUTOPT_COMBO); ++nCount)
+		m_ctrlComboFOType.AddString(FUTOPT_COMBO[nCount]);
+	m_ctrlComboFOType.SetCurSel(m_nComboSel);
+
 	InitMasterData();
 	InitGrid();
 	InsertMasterData(m_nIndex);			// master file data로 grid edit여부/color값 setting
@@ -99,9 +110,9 @@ CRect CTabCodeSearchFO::GetRectOfCtrl(INT nID,BOOL bInit/*=FALSE*/)
 	case IDC_LIST_FUTURE:
 //		rect.top = rect.top + HEIGHTOFCOMBO + GAP_TABDLG;
 		rect.left += 1;
-		rect.top = rect.top + HEIGHTOFCOMBO * 2 + GAP_TABDLG * 2 + 4;
+		rect.top = rect.top + HEIGHTOFCOMBO + GAP_TABDLG * 2 + 4;
 		//rect.bottom = rect.bottom - HEIGHTOFJONGSTATUS - GAP_TABDLG - HEIGHTOFBUTTON - GAP_TABDLG;
-		rect.bottom = rect.top + 100;
+		rect.bottom = rect.top + 120;
 		break;		
 	case ID_GRIDCTRL:
 		rect.left += 1;
@@ -434,6 +445,9 @@ BOOL CTabCodeSearchFO::InitMasterData()
 	for (int i=1; i<12; i++)
 		m_nMonth.nYear[i] = -1;
 
+	for (int i = 1; i < 12; i++)
+		m_bMonday[i] = FALSE;
+
 //003 2006.06.30 
 	// 옵션
 	CStringArray* pastrJongCode;	// 옵션 종목 코드 
@@ -451,12 +465,12 @@ BOOL CTabCodeSearchFO::InitMasterData()
 	pastrValueGubun = new CStringArray;
 	int nIndex = 0;
 
-	if( m_nRadioSel == 1 )
+	if (m_nComboSel == 0)
 	{
 		m_ctrlRadioKospi200.SetCheck(TRUE);
 		m_pDataManager->GetOptionJongMst(pastrJongCode, pastrJongName, pastrJongEngName, pastrEventPrice, pastrFinalYM, pastrValueGubun);
 	}
-	else if( m_nRadioSel == 2 )
+	else if (m_nComboSel == 2)
 	{
 		m_ctrlRadioWeeklyKospi.SetCheck(TRUE);
 		m_pDataManager->GetWeeklyOptionJongMst(pastrJongCode, pastrJongName);
@@ -491,7 +505,7 @@ BOOL CTabCodeSearchFO::InitMasterData()
 
 //	if (pListP == NULL)		return FALSE;
 	CString  strCode, strMonth, strCodeName;
-	int		 nMonth, nExercise, nMonthNow; 
+	int		 nMonth, nExercise, nMonthNow, nMondayMonth, nMondayMonthNow;
 	int		 nIndexMonth = EXERCISE;
 	BOOL	 bFind;
 
@@ -501,6 +515,8 @@ BOOL CTabCodeSearchFO::InitMasterData()
 	int nPrevExercise = 0;
 	//<--
 	nMonthNow = 0;
+	nMondayMonth = 0;
+	nMondayMonthNow = 0;
 	int MaxExercise = 0;
 //	codeinfo oldInfo; oldInfo.nInfo[EXERCISE]=0;
 	for(nIndex=0; nIndex < pastrJongCode->GetSize(); nIndex++)
@@ -519,9 +535,12 @@ BOOL CTabCodeSearchFO::InitMasterData()
 			//@Solomon if (nGubun == 3)	 break;		// 콜 마스터만 read
 			//if (nGubun == 3)	 continue;		// 콜 마스터만 read
 
-			if( m_nRadioSel == 2 )
+			if(m_nComboSel == 2 )
 			{
-				nMonth = atoi( strCodeName.Mid( 4, 2) );
+				if(strCode.Find("AF") >= 0)
+					nMondayMonth = atoi(strCodeName.Mid(6, 2));
+				else
+					nMonth = atoi(strCodeName.Mid(4, 2));
 			}
 			else
 			{
@@ -534,14 +553,27 @@ BOOL CTabCodeSearchFO::InitMasterData()
 			if (MaxExercise < nExercise)		MaxExercise = nExercise;
 
 			char cMCode = strCode.GetAt(3); // 0024696: 파생상품 코드체계 변경 제도개선
-			if ( (m_nRadioSel != 2 && (nMonthNow != nMonth || strncmp(&m_cYear[nIndexMonth], &cMCode, 1)) && nIndexMonth < 11) || (m_nRadioSel == 2 && nMonthNow != nMonth))
+
+			if (strCode.Find("AF") >= 0 && m_nComboSel == 2 && nMondayMonth != nMondayMonthNow)
+			{
+				nIndexMonth++;
+				if (nIndexMonth == 12) break;
+
+				m_nMonth.nInfo[nIndexMonth] = nMondayMonthNow = nMondayMonth;
+				
+				m_nMonth.nYear[nIndexMonth] = atoi(strCodeName.Mid(4, 2));
+				m_cYear[nIndexMonth] = strCodeName.GetAt(9);
+				m_strWeeklyNo[nIndexMonth] = strCode.Mid(3, 2); // 0024696: 파생상품 코드체계 변경 제도개선
+				m_bMonday[nIndexMonth] = TRUE;
+			}
+			else if ( (m_nComboSel != 2 && (nMonthNow != nMonth || strncmp(&m_cYear[nIndexMonth], &cMCode, 1)) && nIndexMonth < 11) || (m_nComboSel == 2 && nMonthNow != nMonth))
 			{	
 				nIndexMonth++;
 				if(nIndexMonth==12) break;
 
 				m_nMonth.nInfo[nIndexMonth] = nMonthNow = nMonth;
 
-				if( m_nRadioSel == 2 )
+				if(m_nComboSel == 2 )
 				{
 					m_nMonth.nYear[nIndexMonth] = atoi( strCodeName.Mid( 2, 2) );
 					m_cYear[nIndexMonth] = strCodeName.GetAt(7);
@@ -584,7 +616,7 @@ BOOL CTabCodeSearchFO::InitMasterData()
 				m_listMaster.AddTail(info);
 
 				//--> 0024696: 파생상품 코드체계 변경 제도개선
-				if (m_nRadioSel != 2)
+				if (m_nComboSel != 2)
 				{
 					if (nPrevExercise > 0 && abs(nExercise - nPrevExercise) > 3) m_nJumpCnt++;
 					nPrevExercise = nExercise;
@@ -596,7 +628,7 @@ BOOL CTabCodeSearchFO::InitMasterData()
 		}
 	}
 
-	if( m_nRadioSel == 1 )
+	if(m_nComboSel == 0 )
 	{
 		for(int i=1; i<12; i++)
 		{
@@ -606,13 +638,18 @@ BOOL CTabCodeSearchFO::InitMasterData()
 			m_ctrlComboMonth.AddString(strCode);
 		}
 	}
-	else if( m_nRadioSel == 2 )
+	else if(m_nComboSel == 2 )
 	{
 		for(int i=1; i<12; i++)
 		{			
 			if (m_nMonth.nYear[i] < 0)
 				continue;
-			strCode.Format("%02d월%c주", m_nMonth.nInfo[i], m_cYear[i]);
+			if (m_bMonday[i] == TRUE)
+				strCode.Format("%02d.MW%c", m_nMonth.nInfo[i], m_cYear[i]);
+			else
+				strCode.Format("%02d.W%c", m_nMonth.nInfo[i], m_cYear[i]);
+
+			
 			m_ctrlComboMonth.AddString(strCode);
 		}
 	}
@@ -641,13 +678,13 @@ BOOL CTabCodeSearchFO::InitMasterData()
 	pastrJongName->RemoveAll();
 	pastrJongEngName->RemoveAll();
 
-	if( m_nRadioSel == 2 )
+	if(m_nComboSel == 2 )
 		return TRUE;
 
-	if( m_nRadioSel )
-		m_pDataManager->GetFutureJongMst(pastrJongCode, pastrJongName, pastrJongEngName);
-	else
+	if(m_nComboSel == 1)
 		m_pDataManager->GetMiniFutureJongMst(pastrJongCode, pastrJongName, pastrJongEngName);
+	else
+		m_pDataManager->GetFutureJongMst(pastrJongCode, pastrJongName, pastrJongEngName);
 
 	int iIdx = 0;
 	CString strName;
@@ -755,9 +792,9 @@ LRESULT CTabCodeSearchFO::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 					CStringArray* pastrFinalYM = new CStringArray;
 					CStringArray* pastrValueGubun = new CStringArray;
 
-					if( m_nRadioSel == 1 )
+					if(m_nComboSel == 0 )
 						m_pDataManager->GetOptionJongMst(pastrJongCode, pastrJongName, pastrJongEngName, pastrEventPrice, pastrFinalYM, pastrValueGubun);
-					else if( m_nRadioSel == 2 )
+					else if(m_nComboSel == 2 )
 						m_pDataManager->GetWeeklyOptionJongMst(pastrJongCode, pastrJongName);
 					else
 						m_pDataManager->GetMiniOptionJongMst(pastrJongCode, pastrJongName);
@@ -879,10 +916,18 @@ BOOL CTabCodeSearchFO::GetCodeInfo(int nType, int& row, int& col, CString& strCo
 				//nYear = m_cYear[m_nIndex];
 				nExercise = GetGridExercise(row);
 
-				if( m_nRadioSel == 1 )
+				if(m_nComboSel == 0 )
 					strCode.Format("%1c%02d%1c%1X%03d", cPCode, 1, m_cYear[m_nIndex], nMonth, nExercise); // 0024696: 파생상품 코드체계 변경 제도개선
-				else if( m_nRadioSel == 2 )
-					strCode.Format("%1c%02d%02s%03d", cPCode, 9, m_strWeeklyNo[m_nIndex], nExercise); // 0024696: 파생상품 코드체계 변경 제도개선
+				else if (m_nComboSel == 2)
+				{
+					CString strWeek;
+					m_ctrlComboMonth.GetLBText(m_ctrlComboMonth.GetCurSel(), strWeek);
+					
+					if(strWeek.Find("M") >= 0)
+						strCode.Format("%1cAF%02s%03d", cPCode, m_strWeeklyNo[m_nIndex], nExercise);
+					else
+						strCode.Format("%1c%02d%02s%03d", cPCode, 9, m_strWeeklyNo[m_nIndex], nExercise); // 0024696: 파생상품 코드체계 변경 제도개선
+				}
 				else
 					strCode.Format("%1c%02d%1c%1X%03d", cPCode, 5, m_cYear[m_nIndex], nMonth, nExercise); // 0024696: 파생상품 코드체계 변경 제도개선
 
@@ -909,10 +954,11 @@ void CTabCodeSearchFO::OnSelchangeListFuture()
 	pastrJongName = new CStringArray;
 	pastrJongEngName = new CStringArray;
 
-	if( m_nRadioSel )
-		m_pDataManager->GetFutureJongMst(pastrJongCode, pastrJongName, pastrJongEngName);
-	else
+	if( m_nComboSel == 1 )
 		m_pDataManager->GetMiniFutureJongMst(pastrJongCode, pastrJongName, pastrJongEngName);
+	else
+		m_pDataManager->GetFutureJongMst(pastrJongCode, pastrJongName, pastrJongEngName);
+		
 
 	strCodeSelected = pastrJongCode->GetAt(nSel);
 
@@ -953,10 +999,10 @@ void CTabCodeSearchFO::OnDblclkListFuture()
 		pastrJongCode = new CStringArray;
 		pastrJongName = new CStringArray;
 		pastrJongEngName = new CStringArray;
-		if( m_nRadioSel )
-			m_pDataManager->GetFutureJongMst(pastrJongCode, pastrJongName, pastrJongEngName);
-		else
+		if(m_nComboSel == 1)
 			m_pDataManager->GetMiniFutureJongMst(pastrJongCode, pastrJongName, pastrJongEngName);
+		else
+			m_pDataManager->GetFutureJongMst(pastrJongCode, pastrJongName, pastrJongEngName);
 
 		strCodeSelected = pastrJongCode->GetAt(nSel);
 		strNameSelected = pastrJongName->GetAt(nSel);
@@ -1004,6 +1050,13 @@ void CTabCodeSearchFO::OnClickRadioMiniKospi()
 void CTabCodeSearchFO::OnClickRadioWeeklyKospi()
 {
 	m_nRadioSel = 2;
+	InitMasterData();
+	OnSelchangeComboMonth();
+}
+
+void CTabCodeSearchFO::OnSelchangeComboFO()
+{
+	m_nComboSel = m_ctrlComboFOType.GetCurSel();
 	InitMasterData();
 	OnSelchangeComboMonth();
 }

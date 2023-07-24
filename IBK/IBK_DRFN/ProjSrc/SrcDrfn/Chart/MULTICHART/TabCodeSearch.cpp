@@ -19,8 +19,8 @@
 
 #include "../chart_common/Grid/ColorTable.h"
 #define ROW_HEIGHT 15
-#define GRID_CALLPUT_WIDTH	33
-#define GRID_CENTER_WIDTH	83
+#define GRID_CALLPUT_WIDTH	31
+#define GRID_CENTER_WIDTH	87
 #define COL_CENTER 1
 #define TITLE_ROW 1
 enum	{EXERCISE, FIRST, SECOND, THIRD, FOURTH};	// 콜 옵션 종목 
@@ -2764,6 +2764,7 @@ void CTabCodeSearch::SetMasterData(LIST_CCodeTypeA* pCodeType)
 
 	int nRow = 1;
 	CString strCenter;
+	CString strKey, strMonth, strWeek;
 	POSITION jp;
 	for(jp=m_cpHelper.m_ListData.GetHeadPosition(); jp;)
 	{
@@ -2776,8 +2777,16 @@ void CTabCodeSearch::SetMasterData(LIST_CCodeTypeA* pCodeType)
 				CCallPutItemData* pItem = pMonthData->m_ListData.GetNext(pos);
 				TRACE("%s [%d] [%d]\n", pItem->m_szPrice, pItem->m_isCall, pItem->m_isPut);
 
+				strMonth = (pMonthData->m_szKey).Mid(2, 2);
+				strWeek = (pMonthData->m_szKey).Mid(4, 2);
+
+				if ((pItem->m_strCallCode).Mid(1, 2) == "AF" && (pItem->m_strPutCode).Mid(1, 2) == "AF")
+					strKey.Format("%s.M%s", strMonth, strWeek);
+				else
+					strKey.Format("%s.%s", strMonth, strWeek);
+
 				pItem->m_szPrice.Remove(' ');
-				strCenter.Format("%s %s", pMonthData->m_szKey, pItem->m_szPrice);
+				strCenter.Format("%s %s", strKey, pItem->m_szPrice);
 				m_pGridCtrl->SetItemFormat(nRow, 0, DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS|DT_NOPREFIX|DT_CENTER);
 				m_pGridCtrl->SetItemText(nRow, 0, pItem->m_isCall ? "O" : "X");
 				m_pGridCtrl->SetItemData(nRow, 0, (LPARAM)(LPCSTR)pItem->m_strCallCode);

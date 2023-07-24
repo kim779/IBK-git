@@ -2781,6 +2781,25 @@ BOOL CMasterDataManager::GetJPMaster(CStringArray &arrCode, CStringArray &arrNam
 	return TRUE;
 }
 
+BOOL CMasterDataManager::GetWPMaster(CStringArray& arrCode, CStringArray& arrName)
+{
+	arrCode.RemoveAll();
+	arrName.RemoveAll();
+
+	HWND hWinixWnd = GetCodeMasterHWND();
+	if (!hWinixWnd) return FALSE;
+
+	struct _codeR codeR;
+	ZeroMemory(codeR.code, sizeof(codeR.code));
+	codeR.kind = CDKIND_WEEKLY_OPTION;
+	codeR.type = CDTYPE_CODE | CDTYPE_NAME;
+	CString strRet = (char*)::SendMessage(hWinixWnd, WM_USER, MAKEWPARAM(getCODE, NULL), (LPARAM)&codeR);
+
+	_DoParsingCode(strRet, arrCode, arrName, true);
+
+	return TRUE;
+}
+
 // 	BOOL CMasterDataManager::GetFreeBoardMst(CStringArray &arrCode, CStringArray &arrName)
 // 	{
 // 		arrCode.RemoveAll();
@@ -3403,10 +3422,17 @@ void CMasterDataManager::_DoParsingCodeWeeklyMaster(CString& szCodeList, CString
 			nPos2 = szTmp.Find(' ');	if(nPos2<0) continue;
 			
 			int nTemp = 2;
-			if( strncmp( szTmp , "M ", nTemp ) == 0 )			// 행사가에 'M'(Mini)가 추가되어 'M'을 자르는 처리
+			if (strncmp(szTmp, "M ", nTemp) == 0)
+			{
 				szTmp = szTmp.Mid(nTemp);
-			szTmpA[i] = szTmp.Left(nPos2);
-			szTmp = szTmp.Mid(nPos2); szTmp.TrimLeft();
+				szTmpA[i] = "M " + szTmp.Left(nPos2);
+				szTmp = szTmp.Mid(nPos2); szTmp.TrimLeft();
+			}			
+			else
+			{
+				szTmpA[i] = szTmp.Left(nPos2);
+				szTmp = szTmp.Mid(nPos2); szTmp.TrimLeft();
+			}
 		}
 		
 		nPos2 = szTmp.Find('\t');	if(nPos2<0) continue;
@@ -3424,7 +3450,7 @@ void CMasterDataManager::_DoParsingCodeWeeklyMaster(CString& szCodeList, CString
 			if(nOptIndex>=nMaxOption) nOptIndex=0;
 		}
 		
-		szCodeName.Format("%c %-7.7s %-9.9s", cCallPut, szTmpA[1], szTmpA[2]);
+		szCodeName.Format("%s %-7.7s %-9.9s", szTmpA[0], szTmpA[1], szTmpA[2]);
 		szCodeName.TrimRight();
 		tmpArrCode[nOptIndex].InsertAt(0, szCode);
 		tmpArrName[nOptIndex].InsertAt(0, szCodeName);

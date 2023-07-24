@@ -1032,6 +1032,7 @@ public:
 	STDMETHOD_(BOOL, GetStockCodeWithType)(int nType, CStringArray &arrCode, CStringArray &arrName);		// 2008.11.11 -hidden		
 	STDMETHOD_(BOOL, GetJFMaster)(CStringArray &arrCode, CStringArray &arrName) ;
 	STDMETHOD_(BOOL, GetJPMaster)(CStringArray &arrCode, CStringArray &arrName) ;
+	STDMETHOD_(BOOL, GetWPMaster)(CStringArray& arrCode, CStringArray& arrName);
 //	STDMETHOD_(BOOL, GetFreeBoardMst)(CStringArray &arrCode, CStringArray &arrName) ;
 	STDMETHOD_(BOOL, GetELWIndexMaster)(CStringArray &arrCode, CStringArray &arrName) ;
 	STDMETHOD_(BOOL, GetELWIssueMaster)(CStringArray &arrCode, CStringArray &arrName) ;

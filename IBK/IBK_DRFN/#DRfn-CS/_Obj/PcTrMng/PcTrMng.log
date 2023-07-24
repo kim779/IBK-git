@@ -427,9 +427,9 @@ D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\IDebugData.h(94,16): warning C5208: 
 D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(303,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
 D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\inc\LoadDRDebuger.h(324,10): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
 D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\CodeOcx.h(49): warning C4091: 'typedef ': 변수를 선언하지 않으면 'CDispCodeOcx::<unnamed-enum-IIx_GetBase>' 왼쪽은 무시됩니다.
-D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_MasterDataManager.cpp(3181,17): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'const CString'입니다.
-D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_MasterDataManager.cpp(3181,17): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'const CString'입니다.
-D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_MasterDataManager.cpp(3181,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_MasterDataManager.cpp(3200,17): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'const CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_MasterDataManager.cpp(3200,17): warning C4477: 'sprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'const CString'입니다.
+D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\DrCommon\PcTrMng\_MasterDataManager.cpp(3200,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   _NewSignalManager.cpp
 D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4477: 'sscanf' : 서식 문자열 '%X'에 'unsigned int *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'HWND *'입니다.
 D:\git\src\IBK\IBK_DRFN\ProjSrc\SrcDrfn\Inc\IBaseDefine.h(245,2): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.

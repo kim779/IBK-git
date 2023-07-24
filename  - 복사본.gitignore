@@ -1,0 +1,11 @@
+**/#DRfn-CS/
+*.pdb
+**/Debug
+**/Release
+**/ipch
+**/.vs
+*.back
+**/*.tlog
+**/*.vcxproj
+*/*.obj
+**/*.lib

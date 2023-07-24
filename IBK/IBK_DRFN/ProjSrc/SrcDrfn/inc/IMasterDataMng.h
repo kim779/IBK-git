@@ -411,6 +411,7 @@ DECLARE_INTERFACE_(IMasterDataManager080902, IMasterDataManager)
 	STDMETHOD_(BOOL, GetELWIssueMaster)(CStringArray &arrCode, CStringArray &arrName) PURE ;
 	STDMETHOD_(BOOL, GetJFMaster)(CStringArray &arrCode, CStringArray &arrName) PURE;
 	STDMETHOD_(BOOL, GetJPMaster)(CStringArray &arrCode, CStringArray &arrName) PURE;
+	STDMETHOD_(BOOL, GetWPMaster)(CStringArray& arrCode, CStringArray& arrName) PURE;
 	STDMETHOD_(BOOL, GetELWIndexCode)(CString strELWCode, CString& strIndexCode, CString& strIndexName) PURE;
 	STDMETHOD_(CString, GetCodeName)(LPCTSTR lpszItemCode) PURE;
 	STDMETHOD_(CString, GetItemExpCode)(LPCTSTR lpszCode) PURE;

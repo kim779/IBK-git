@@ -1804,43 +1804,85 @@ int CTreeListManager::RequestData_GroupMASTER(CItemLongData* pILData, ITLMCallba
 			CStringArray arrCode;
 			CStringArray arrName;
 
-			arrName.Copy(*arName);
-
-			SortFileName(arrName);
-
-			for(int i = 0; i < arrName.GetSize(); i++)
+			if (!pILData->m_szTR.CompareNoCase("WEEKLY"))
 			{
-				for(int j = 0; j < arName->GetSize(); j++)
+				CStringArray arrNameTemp;
+				arrNameTemp.Copy(*arName);
+
+				SortFileName(arrNameTemp);
+
+
+				BOOL bMondayWeelky = FALSE;
+				if ((pILData->m_szTitle).Find("M") >= 0)
+					bMondayWeelky = TRUE;
+
+				CString strName, strTemp;
+				int nTemp = 2;
+				for (int i = 0; i < arrNameTemp.GetSize(); i++)
 				{
-					if(arrName.GetAt(i) == arName->GetAt(j))
+					for (int j = 0; j < arName->GetSize(); j++)
 					{
-						arrCode.Add(arCode->GetAt(j));
-						break;
+						strTemp = arrNameTemp.GetAt(i);
+						strName = arName->GetAt(j);
+						if (arrNameTemp.GetAt(i) == strName &&
+							((bMondayWeelky && strName.Find("M") >= 0) || (!bMondayWeelky && strName.Find("M") < 0)))
+						{
+							if (bMondayWeelky)
+							{
+								if (strncmp(strName, "M ", nTemp) == 0)			// 'M'이 추가되어 'M'을 자르는 처리
+									strName = strName.Mid(nTemp);
+							}
+
+							arrCode.Add(arCode->GetAt(j));
+							arrName.Add(strName);
+							break;
+						}
 					}
 				}
-			}
-			
-			arCode->RemoveAll();
-			arName->RemoveAll();
 
-			if (szInputData.GetLength() == 6)
-			{
-				CString strName;
-				for (int i=0; i<arrName.GetSize(); i++)
-				{
-					strName = arrName.GetAt(i);
-					if (strName.Find(szInputData) >= 0)
-					{
-						arCode->Add(arrCode.GetAt(i));
-						arName->Add(strName);
-					}
-				}
-			}
-			else
-			{
 				arCode->Copy(arrCode);
 				arName->Copy(arrName);
 			}
+			else
+			{
+				arrName.Copy(*arName);
+
+				SortFileName(arrName);
+
+				for (int i = 0; i < arrName.GetSize(); i++)
+				{
+					for (int j = 0; j < arName->GetSize(); j++)
+					{
+						if (arrName.GetAt(i) == arName->GetAt(j))
+						{
+							arrCode.Add(arCode->GetAt(j));
+							break;
+						}
+					}
+				}
+
+				arCode->RemoveAll();
+				arName->RemoveAll();
+
+				if (szInputData.GetLength() == 6)
+				{
+					CString strName;
+					for (int i = 0; i < arrName.GetSize(); i++)
+					{
+						strName = arrName.GetAt(i);
+						if (strName.Find(szInputData) >= 0)
+						{
+							arCode->Add(arrCode.GetAt(i));
+							arName->Add(strName);
+						}
+					}
+				}
+				else
+				{
+					arCode->Copy(arrCode);
+					arName->Copy(arrName);
+				}
+			}			
 
 			delete pastrJongEngName;
 			delete pastrEventPrice;
@@ -1968,6 +2010,7 @@ int CTreeListManager::LoadTreeConfig_Master(CTreeResItemEx* pList, CTreeCtrl* pT
 	else if(!szSection.CompareNoCase("JFMASTER"))	return LoadTree_JFMaster (pList ,pTree ,hParentTree ,szTr ,szInputData, dwKey1);
 	else if(!szSection.CompareNoCase("JPMASTER"))	return LoadTree_JPMaster (pList ,pTree ,hParentTree ,szTr ,szInputData, dwKey1);
 	else if(!szSection.CompareNoCase("PMASTER"))	return LoadTree_PMaster (pList ,pTree ,hParentTree ,szTr ,szInputData, dwKey1);
+	else if(!szSection.CompareNoCase("WPMASTER"))	return LoadTree_WPMaster(pList, pTree, hParentTree, szTr, szInputData, dwKey1);
 	else
 	{
 		int nKind = 0;
@@ -3778,3 +3821,61 @@ void CTreeListManager::RevData_AccountInfo(char* buf, long len)
 	}
 }
 // 2012.5.8 박성경: 보유종목 로드 <<
+
+int CTreeListManager::LoadTree_WPMaster(CTreeResItemEx* pList, CTreeCtrl* pTree, HTREEITEM hParentTree, LPCSTR szTr, LPCSTR szInputData, long dwKey1)
+{
+	if (m_pMDMng)
+	{
+		CString strInputData = szInputData;
+		CString strInput, strName, strCode;
+		CStringArray arWeekly;
+		CStringArray* arCode;
+		CStringArray* arName;
+		arCode = new CStringArray;
+		arName = new CStringArray;
+		int nIndex = 0;
+		int ret = 0;
+
+		m_pMDMng->GetWPMaster(*arCode, *arName);
+
+		for (nIndex = 0; nIndex < arCode->GetSize(); nIndex++)
+		{
+			strName = arName->GetAt(nIndex);
+			strCode = arCode->GetAt(nIndex);
+	
+			/*C 2306W3 302.5, M C 2307W4 182.5,	209BH302*/
+			if (strName.Find("M") == 0)
+				strName.Format("%s.M%s", strName.Mid(4, 4), strName.Mid(8, 2));
+			else
+				strName.Format("%s.%s", strName.Mid(2, 4), strName.Mid(6, 2));
+
+			BOOL bFind = FALSE;
+			for (int i = 0; i < arWeekly.GetCount(); i++)
+			{
+				if (arWeekly[i].Compare(strName) == 0)
+				{
+					bFind = TRUE;
+					break;
+				}
+			}
+
+			if (bFind == FALSE)
+			{
+				HTREEITEM hTree = pTree->InsertItem(strName, hParentTree);
+
+				strInput.Format("%s", arCode->GetAt(nIndex));
+				CItemLongData* pNew = new CItemLongData(strName, "SUB_NO", "GROUPMASTER", "PMASTER", strInput, "WEEKLY", dwKey1, 0);
+				pNew->m_pITrComm = (long)pList->m_pTrComm;	pTree->SetItemData(hTree, (DWORD)pNew);
+				pList->m_pItemList->AddTail(pNew);
+				arWeekly.Add(strName);
+			}
+		}
+		ret = arCode->GetSize();
+
+		delete arCode;
+		delete arName;
+
+		return ret;
+	}
+	return 0;
+}

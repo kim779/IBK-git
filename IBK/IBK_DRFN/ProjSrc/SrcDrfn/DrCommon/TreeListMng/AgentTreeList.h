@@ -142,6 +142,7 @@ public:
 	int	 LoadTree_JFMaster(CTreeResItemEx* pList, CTreeCtrl* pTree, HTREEITEM hParentTree	 ,LPCSTR szTr ,LPCSTR szInputData ,long dwKey1);
 	int	 LoadTree_JPMaster(CTreeResItemEx* pList, CTreeCtrl* pTree, HTREEITEM hParentTree	 ,LPCSTR szTr ,LPCSTR szInputData ,long dwKey1);
 	int  LoadTree_PMaster(CTreeResItemEx* pList, CTreeCtrl* pTree, HTREEITEM hParentTree	 ,LPCSTR szTr ,LPCSTR szInputData ,long dwKey1);
+	int  LoadTree_WPMaster(CTreeResItemEx* pList, CTreeCtrl* pTree, HTREEITEM hParentTree, LPCSTR szTr, LPCSTR szInputData, long dwKey1);
 	int  LoadTree_FolderMaster(int nKind, CString strKind, CTreeResItemEx* pList, CTreeCtrl* pTree, HTREEITEM hParentTree, LPCSTR szTr, LPCSTR szInputData, long dwKey1);
 
 	void RequestDataOfOneClick(CItemLongData* pILData, ITLMCallback* pCallback, char cDataType, char cSort, long dwReserved=0);

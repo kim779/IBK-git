@@ -35,6 +35,7 @@ public:
 // Dialog Data
 	//{{AFX_DATA(CTabCodeSearchFO)
 	enum { IDD = IDD_TABCODESEARCH_FO };
+	CExComboBox	m_ctrlComboFOType;
 	CExComboBox	m_ctrlComboMonth;
 	CListBox		m_listFuture;
 	CButton			m_ctrlRadioKospi200;
@@ -47,6 +48,7 @@ public:
 	CString				m_strWeeklyNo[12]; // 0024696: 파생상품 코드체계 변경 제도개선
 	//int					m_nWeeklyNo[12];		// 위클리옵션 만기정보
 	char				m_cYear[12];			// 콜 옵션 연도 정보
+	BOOL				m_bMonday[12];	
 	long				m_lMaxLimit;			// max 행사가
 	int					m_nIndex;
 	//char				m_cYear;
@@ -57,6 +59,7 @@ public:
 	CString m_strSelCodeNName;
 
 	int					m_nRadioSel;
+	int					m_nComboSel;
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CTabCodeSearchFO)
@@ -90,6 +93,7 @@ protected:
 	afx_msg void OnDestroy();
 	afx_msg void OnEditchangeComboMonth();
 	afx_msg void OnSelchangeComboMonth();
+	afx_msg void OnSelchangeComboFO();
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	afx_msg void OnSelchangeListFuture();
 	afx_msg void OnDblclkListFuture();

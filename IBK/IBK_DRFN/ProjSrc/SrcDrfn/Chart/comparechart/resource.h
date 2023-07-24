@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
-// Used by CompareChart.rc
+// Microsoft Visual C++에서 생성한 포함 파일입니다.
+// CompareChart.rc에서 사용되고 있습니다.
 //
 #define IDAPPLY                         3
 #define ID_BTNEWFOLDER                  3
@@ -89,6 +89,7 @@
 #define IDC_EDIT4                       6037
 #define IDC_EDITCBFOURTH                6037
 #define IDC_EDITFILENAME                6037
+#define IDC_COMBO_FO                    6037
 #define IDC_SPIN4                       6038
 #define IDC_EDITCBFIFTH                 6038
 #define IDC_EDITCBSIXTH                 6039
@@ -464,7 +465,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        6092
+#define _APS_NEXT_RESOURCE_VALUE        6093
 #define _APS_NEXT_COMMAND_VALUE         32801
 #define _APS_NEXT_CONTROL_VALUE         6291
 #define _APS_NEXT_SYMED_VALUE           6022
