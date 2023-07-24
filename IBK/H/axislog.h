@@ -40,11 +40,13 @@ void FileLog(LPCSTR log, ...)
 #if 1
 	TRY
 	{
-		char buf[256]{};
-		GetCurrentDirectory(256, buf);
+		char buf[500]{};
+		GetModuleFileName(nullptr, buf, 260);
+
 		CString spath;
 		spath.Format("%s\\%s", buf, "axis.log");
 		spath.TrimRight();
+		spath.Replace("axis.exe\\", "");
 
 		FILE* fp;
 		fopen_s(&fp, spath, "a+");

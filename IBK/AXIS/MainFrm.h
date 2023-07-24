@@ -1493,11 +1493,17 @@ public:
 	void CreateSubAxis();
 	HANDLE ProcessFind(char* strProcessName);
 	void CreateSharedMemory();
+	void KillMySelf();
 
 	//CLOUDE
 	void CludeCertup();
 	void CludeCertDown();
 	void CludePschange();
+	void CludeUSE(bool bUseCloude);
+	void CludeFuncCall(int igubn);
+
+
+	void FileMove();
 protected:
 // #ifdef USE_AHNLAB_SECUREBROWSER
 // 	IAosSB *m_pAosSB;

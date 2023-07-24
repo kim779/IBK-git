@@ -92,6 +92,8 @@ protected:
 public:
 	BOOL	 HasStanLine();
 	void	 DrawStanLine(CDC* dc, CIndcBase* indc);
+
+	CString m_slog;
 };
 
 /////////////////////////////////////////////////////////////////////////////

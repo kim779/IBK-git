@@ -27,6 +27,8 @@
 #define DEV_AGREEMENT_URL "https://tweb.signkorea.com:8700/notice/html/conditionsOfUse.txt"
 #define REAL_AGREEMENT_URL "https://center.signkorea.com:8700/notice/html/conditionsOfUse.txt"
 
+#define DF_CLOUDE_USE 11
+#define DF_CLOUDE_NOUSE 12
 
 #define	KEY_RETURN_TEST		// 엔터키로 로그인
 
@@ -283,19 +285,19 @@ BOOL CCertLogin::OnInitDialog()
 
 	BOOL bChkPosChange = FALSE;
 
-//	m_bitmap = CEnBitmap::LoadImageFile(imgN, RGB(255, 255, 255"CLOUDELOGIN"
 	CString file, usnm = Axis::user;
 	file.Format("%s\\%s\\%s\\%s.ini", Axis::home, USRDIR, usnm, usnm); 
 
 	const int loginType = GetPrivateProfileInt("LOGINTYPE", "TYPE", 1, file);
 
-	if (loginType == 1)
+	if (loginType == 1)  //ID 로그인
 	{
 		m_bCertLogin = FALSE;
 		CString sfile;
 		sfile.Format("%s\\%s\\AXIS.ini", Axis::home, TABDIR);
 		WritePrivateProfileString("CLOUDELOGIN", "USE", "0", sfile);
 		m_bCloudeUSE = FALSE;
+		((CMainFrame*)m_frame)->CludeUSE(m_bCloudeUSE);
 	}
 	else
 		m_bCertLogin = TRUE;
@@ -412,11 +414,13 @@ BOOL CCertLogin::OnInitDialog()
 	if (bCludeUse == 1)
 	{
 		m_bCloudeUSE = TRUE;
+		((CMainFrame*)m_frame)->CludeUSE(m_bCloudeUSE);
 		ShowCloudeBtn(TRUE);
 	}
 	else
 	{
 		m_bCloudeUSE = FALSE;
+		((CMainFrame*)m_frame)->CludeUSE(m_bCloudeUSE);
 		ShowCloudeBtn(FALSE);
 	}
 	
@@ -1370,6 +1374,7 @@ void CCertLogin::OnGen()
 	sfile.Format("%s\\%s\\AXIS.ini", Axis::home, TABDIR);
 	WritePrivateProfileString("CLOUDELOGIN", "USE", "0", sfile);
 	m_bCloudeUSE = FALSE;
+	((CMainFrame*)m_frame)->CludeUSE(m_bCloudeUSE);
 
 	CString imgN;
 
@@ -1803,6 +1808,24 @@ BOOL CCertLogin::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->message == WM_KEYDOWN)
 	{
+		if (pMsg->wParam == '4' || pMsg->wParam == '5' || pMsg->wParam == '6' || pMsg->wParam == '7' || pMsg->wParam == '8' 
+			|| pMsg->wParam == '9' )
+		{
+			if (GetKeyState(VK_CONTROL) & 0x8000 && GetKeyState(VK_SHIFT) & 0x8000 && m_bCloudeUSE)
+			{
+				CString sfile;
+				sfile.Format("%s\\%s\\AXIS.ini", Axis::home, TABDIR);
+				const int bCludeUse = GetPrivateProfileInt("CLOUDEFUNC", "USE", 0, sfile);
+				if (bCludeUse == 1)
+				{
+					CString stmp;
+					stmp.Format("%c", pMsg->wParam);
+					int igubn = atoi(stmp);
+					((CMainFrame*)m_frame)->CludeFuncCall(igubn);
+					return TRUE;
+				}
+			}
+		}
 		if (pMsg->wParam == VK_CAPITAL)
 		{
 			const short	val = GetKeyState(VK_CAPITAL);
@@ -2944,8 +2967,8 @@ void CCertLogin::OnBnClickedClude()
 	CString sfile;
 	sfile.Format("%s\\%s\\AXIS.ini", Axis::home, TABDIR);
 	WritePrivateProfileString("CLOUDELOGIN", "USE", "1", sfile);
-
 	m_bCloudeUSE = TRUE;
+	((CMainFrame*)m_frame)->CludeUSE(m_bCloudeUSE);
 	
 	ShowCloudeBtn(m_bCloudeUSE);
 
@@ -2958,6 +2981,7 @@ void CCertLogin::OnBnClickedCloudePcbtn()
 	sfile.Format("%s\\%s\\AXIS.ini", Axis::home, TABDIR);
 	WritePrivateProfileString("CLOUDELOGIN", "USE", "0", sfile);
 	m_bCloudeUSE = FALSE;
+	((CMainFrame*)m_frame)->CludeUSE(m_bCloudeUSE);
 	ShowCloudeBtn(m_bCloudeUSE);
 }
 

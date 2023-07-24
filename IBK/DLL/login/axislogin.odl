@@ -101,6 +101,8 @@ library Axislogin
 			//{{AFX_ODL_METHOD(CLedger)
 			//}}AFX_ODL_METHOD
 
+			[id(25), propget] BSTR LoginType();
+			[id(25), propput] void LoginType(BSTR newVal);
 	};
 
 	//  Class information for CLedger

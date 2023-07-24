@@ -128,7 +128,7 @@ private:
 	CString m_strUrl;
 	void openhtml();
 	int GetOSversion();
-
+	BOOL CheckCloude();
 public:
 	LRESULT SendTR(CString strName, BYTE type, CString strData, BYTE key);
 	BOOL IsDev();

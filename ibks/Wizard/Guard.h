@@ -72,7 +72,7 @@ class CGuard
 public:
 	CGuard();
 	virtual ~CGuard();
-
+	CString m_slog;
 public:
 	CWinApp*	m_app;
 	CString		m_keys;			// copyrights/registry keys

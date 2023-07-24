@@ -3752,6 +3752,9 @@ void CPage1::savingInterest(int gno)
 		}
 		fileB.Write(bInfo, sz_bookmark);
 	}
+	fileB.Close();
+	if (bExistBook == FALSE) //bookmark fix
+		::DeleteFile(fileBook);
 #else
 	
 #endif

@@ -399,7 +399,9 @@ LRESULT CPnChart::OnChartEvent(WPARAM wParam, LPARAM lParam)
 			break;
 		case changePosition:
 			{
-			LOG_OUTP(4, "axisgmain", __FUNCTION__, "chartCtrl", "changePosition");
+			
+			m_slog.Format("changePosition dispPos=[%d] dispEnd=[%d]", LOWORD(lParam), HIWORD(lParam));
+			LOG_OUTP(4, "axisgmain", __FUNCTION__, "CPnChart", m_slog);
 				int dispPos = LOWORD(lParam);
 				int dispEnd = HIWORD(lParam);
 				if (m_pObjMgr)
@@ -618,7 +620,8 @@ void CPnChart::OnDestroy()
 void CPnChart::OnPaint() 
 {
 	CPaintDC dc(this);
-
+	m_slog.Format("m_pObjMgr=[%x]", m_pObjMgr);
+	LOG_OUTP(3, "axisgmain", __FUNCTION__, m_slog);
 	if (m_pObjMgr)
 	{
 		m_pObjMgr->DrawGraphObject();

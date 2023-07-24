@@ -26,11 +26,15 @@ void CBJugaChart::DrawGraph(CDC* pDC)
 	if (!m_pDataMgr->GetData(m_iDataKey, pOrgData))
 	{
 		TRACE("Invalid JugaChart Data\n");
+		LOG_OUTP(3, "gIndc", __FUNCTION__, "Invalid JugaChart Data");
 		return;
 	}
 
 	if (pOrgData->GetPattern() != dpBASIC)
+	{
+		LOG_OUTP(3, "gIndc", __FUNCTION__, "pOrgData->GetPattern() != dpBASIC");
 		return;
+	}
 
 	if (CIndcBase::m_pCoDraw && CIndcBase::m_pCoDraw->coWork == MC_PRC)
 	{
@@ -38,7 +42,10 @@ void CBJugaChart::DrawGraph(CDC* pDC)
 		m_dYMin = m_pCoDraw->PMin;
 	}
 	if (m_dYMax == DBL_MIN || m_dYMin == DBL_MAX)
+	{
+		LOG_OUTP(3, "gIndc", __FUNCTION__, "m_dYMax == DBL_MIN || m_dYMin == DBL_MAX");
 		return;
+	}
 
 //	CBongBase::DrawTick(pDC);
 
@@ -113,6 +120,8 @@ void CBJugaChart::DrawBong(CDC* pDC)
 
 void CBJugaChart::DrawBongJPN(CDC* pDC)
 {
+	LOG_OUTP(3, "gIndc", __FUNCTION__, "DrawBongJPN");
+
 	if (m_bEqui && !m_piVol)
 		return;
 
@@ -124,7 +133,10 @@ void CBJugaChart::DrawBongJPN(CDC* pDC)
 
 	class COrgData *pOrgData;
 	if (!m_pDataMgr->GetData(m_iDataKey, pOrgData))
+	{
+		LOG_OUTP(3, "gIndc", __FUNCTION__, "!m_pDataMgr->GetData(m_iDataKey, pOrgData)");
 		return;
+	}
 
 	CGrpBasic* gBasic;
 	CGrpBasic* rBasic;
@@ -137,7 +149,10 @@ void CBJugaChart::DrawBongJPN(CDC* pDC)
 
 	int iPointCnt = m_iDispEPos - m_iDispSPos - ii;
 	if (iPointCnt <= 0)
+	{
+		LOG_OUTP(3, "gIndc", __FUNCTION__, "iPointCnt <= 0");
 		return;
+	}
 
 	ppointRgn = new CPoint[iPointCnt * 2];
 
@@ -189,6 +204,14 @@ void CBJugaChart::DrawBongJPN(CDC* pDC)
 
 	double dLeft;
 	double dRight = m_rectGrp.left;
+
+	//m_rectGrp.left
+	m_slog.Format("left=[%d] iDrawWidth=[%d] m_iDispDtCnt=[%d]", m_rectGrp.left, iDrawWidth, m_iDispDtCnt);
+	LOG_OUTP(3, "gIndc", __FUNCTION__, m_slog);
+
+	m_slog.Format("START ii[%d]+m_iDispSPos[%d] = [%d]", ii, m_iDispSPos, ii + m_iDispSPos);
+	LOG_OUTP(3, "gIndc", __FUNCTION__, m_slog);
+
 	for (; ii < m_iDispEPos - m_iDispSPos; ii++)
 	{
 		gBasic = pOrgData->GetGraphData(ii+m_iDispSPos);
@@ -226,6 +249,9 @@ void CBJugaChart::DrawBongJPN(CDC* pDC)
 			dValue = double(iDrawWidth * (ii+1)) / double(m_iDispDtCnt);
 			pointClose.x += int(dValue);
 			pointClose.x -= DISTANCE_GAP;	// 그래프간 간격
+
+			m_slog.Format("ii=[%d] pointOpen=[%d] pointClosepointClose=[%d]", ii, pointOpen.x, pointClose.x);
+			LOG_OUTP(3, "gIndc", __FUNCTION__, m_slog);
 
 			// 2006.06.08 schbang : 날씬한 봉
 //			if (pointClose.x - pointOpen.x < 3)
@@ -403,6 +429,9 @@ void CBJugaChart::DrawBongJPN(CDC* pDC)
 	pDC->SelectObject(ppenOld);
 	pDC->SelectObject(pbrushOld);
 //	pDC->SetROP2(iRopOld);
+
+	m_slog.Format("End   ii[%d]+m_iDispSPos[%d] = [%d]", ii, m_iDispSPos, ii + m_iDispSPos);
+	LOG_OUTP(3, "gIndc", __FUNCTION__, m_slog);
 
 	if (m_RgnInfo.Rgn[m_RgnInfo.iCount].pRgn)
 	{
@@ -1257,12 +1286,12 @@ CString CBJugaChart::GetDisplayPosHeader(CPoint pt, bool bGrid)
 
 	if (!m_bEqui)
 	{
-		int DrawWidth = m_rectGrp.Width();
-		int xPosition = pt.x - m_rectGrp.left;
+		int DrawWidth = m_rectGrp.Width();   //차트의 영역
+		int xPosition = pt.x - m_rectGrp.left;   //마우스 포인터의 x좌표에서 차트 left 빼기
 
-		double szOneDay = double(DrawWidth) / double(m_iDispDtCnt);
-		int dataPos = int(double(xPosition) / szOneDay);
-		dataPos += m_iDispSPos;
+		double szOneDay = double(DrawWidth) / double(m_iDispDtCnt);  //m_iDispDtCnt 화면에서 보이는 봉의 갯수
+		int dataPos = int(double(xPosition) / szOneDay);  //차트 영역 내의 x 좌표에서 봉하나의 폭을 나누면 몇번째 봉의 위치인지 알수 있다.
+		dataPos += m_iDispSPos;  //화면내의 봉의 위치 더하기 전체 봉의 몇번째부터 화면에 표시되는지 값을 더하면 전체봉값 배열에서 몇번째 봉인지 알수 있다.
 		if (dataPos < 0)
 			return _T("");
 		if (dataPos >= m_iTtlDtCnt)

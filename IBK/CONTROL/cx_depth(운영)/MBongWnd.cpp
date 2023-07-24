@@ -143,6 +143,27 @@ void CMBongWnd::OnPaint()
 	if (!m_pFont)
 		return;
 
+#ifdef _DEBUG
+	dc.FillSolidRect(&m_rcBase, RGB(255, 255, 255));
+
+	if (m_nCandle > 0)
+		calcuMinMax();
+	CRect rc; GetClientRect(&rc);
+	calcuArea(rc.Width(), rc.Height());
+
+	drawGraph(&dc);
+
+	CPen* cPen = m_pApp->GetPen(m_pWizard, m_clrLine);
+	CPen* sPen = dc.SelectObject(cPen);
+
+	dc.MoveTo(m_rcBase.left, m_rcBase.top);
+	dc.LineTo(m_rcBase.left, m_rcBase.bottom);
+	dc.LineTo(m_rcBase.right, m_rcBase.bottom);
+	dc.LineTo(m_rcBase.right, m_rcBase.top);
+	dc.LineTo(m_rcBase.left, m_rcBase.top);
+
+	dc.SelectObject(sPen);
+#else
 	xxx::CMemDC	mdc(&dc);
 	mdc.FillSolidRect(&m_rcBase, RGB(255,255,255));
 
@@ -163,6 +184,7 @@ void CMBongWnd::OnPaint()
 	mdc.LineTo(m_rcBase.left, m_rcBase.top);
 
 	mdc.SelectObject(sPen);
+#endif
 }
 
 void CMBongWnd::Init(bool bPrice, bool bVolume, bool bLine)

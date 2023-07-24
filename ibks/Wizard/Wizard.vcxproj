@@ -173,7 +173,7 @@
       <OptimizeReferences>
       </OptimizeReferences>
       <ModuleDefinitionFile>.\Wizard.def</ModuleDefinitionFile>
-      <OutputFile>D:\IBKS_TEST\exe/axWizard.ocx</OutputFile>
+      <OutputFile>D:\IBKS_TEST\release/axWizard.ocx</OutputFile>
       <RegisterOutput>false</RegisterOutput>
       <AdditionalDependencies>ws2_32.lib;imm32.lib;version.lib;winmm.lib;../dll/lib/release/axislib.lib;../dll/form/release/axisform.lib;../dll/vbs/release/axisvbs.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration />

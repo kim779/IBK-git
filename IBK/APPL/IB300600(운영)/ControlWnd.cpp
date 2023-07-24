@@ -803,7 +803,7 @@ void CControlWnd::SetControlWindowWEEK(bool bInit)
 //CString slog;
 //slog.Format("IB300600 <<<SetControlWindowWEEK>>>  ");
 //OutputDebugString(slog);
-	if(!bInit)
+//	if(!bInit)  //check
 		SetWOptionData(0, true);
 }
 
@@ -1583,29 +1583,29 @@ void CControlWnd::SetWOptionData(int idx, bool bWeekClick)
 	
 	m_pOptGrid->Refresh();
 
-	if (m_iKind == WEEKBTN)
-	{
-		if (idx == 0)  //월요일 만기 위클리
-		{
-			if(m_sArrMWeel.GetSize() > 0)
-				GetParent()->PostMessage(WM_APP_SIG, WP_CODE_CHANGE, (LPARAM)(LPCSTR)m_sArrMWeel.GetAt(0));
-		}
-		else if (idx == 1)
-		{
-			if (m_sArrTWeel.GetSize() > 0)
-				GetParent()->PostMessage(WM_APP_SIG, WP_CODE_CHANGE, (LPARAM)(LPCSTR)m_sArrTWeel.GetAt(0));
-		}
-		else if (idx == 2)  //월요일 만기 위클리
-		{
-			if (m_sArrMWeel.GetSize() > 1)
-				GetParent()->PostMessage(WM_APP_SIG, WP_CODE_CHANGE, (LPARAM)(LPCSTR)m_sArrMWeel.GetAt(1));
-		}
-		else if (idx == 3)
-		{
-			if (m_sArrTWeel.GetSize() > 1)
-				GetParent()->PostMessage(WM_APP_SIG, WP_CODE_CHANGE, (LPARAM)(LPCSTR)m_sArrTWeel.GetAt(1));
-		}
-	}
+	//if (m_iKind == WEEKBTN)
+	//{
+	//	if (idx == 0)  //월요일 만기 위클리
+	//	{
+	//		if(m_sArrMWeel.GetSize() > 0)
+	//			GetParent()->PostMessage(WM_APP_SIG, WP_CODE_CHANGE, (LPARAM)(LPCSTR)m_sArrMWeel.GetAt(0));
+	//	}
+	//	else if (idx == 1)
+	//	{
+	//		if (m_sArrTWeel.GetSize() > 0)
+	//			GetParent()->PostMessage(WM_APP_SIG, WP_CODE_CHANGE, (LPARAM)(LPCSTR)m_sArrTWeel.GetAt(0));
+	//	}
+	//	else if (idx == 2)  //월요일 만기 위클리
+	//	{
+	//		if (m_sArrMWeel.GetSize() > 1)
+	//			GetParent()->PostMessage(WM_APP_SIG, WP_CODE_CHANGE, (LPARAM)(LPCSTR)m_sArrMWeel.GetAt(1));
+	//	}
+	//	else if (idx == 3)
+	//	{
+	//		if (m_sArrTWeel.GetSize() > 1)
+	//			GetParent()->PostMessage(WM_APP_SIG, WP_CODE_CHANGE, (LPARAM)(LPCSTR)m_sArrTWeel.GetAt(1));
+	//	}
+	//}
 }
 
 void CControlWnd::SetOptionData( int idx)

@@ -1042,10 +1042,6 @@ void CWizardCtrl::OnAxis(struct _axisH* axisH, char* pBytes, int nBytes)
 	CopyMemory(mapN, axisH->trxC, L_MAPN);
 	mapN[L_MAPN] = '\0';
 
-
-	m_slog.Format("----[CWizardCtrl][OnAxis] %.50s\r\n", pBytes);
-	OutputDebugString(m_slog);
-
 	CWorks* works;
 	if (!m_guard->GetClient(axisH->winK, works))
 	{

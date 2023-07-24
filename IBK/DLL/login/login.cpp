@@ -6,6 +6,7 @@
 #include "login.h"
 #include "../../h/axis.h"
 
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -109,7 +110,7 @@ CString CLogin::SetLogin(char* data)
 	}
 
 	int	pos;
-	CString	string, text;
+	CString	string, text, stmp;
 	struct	_signR*	signR = (struct _signR *)data;
 	CAxisloginApp* app = (CAxisloginApp *)AfxGetApp();
 
@@ -176,11 +177,15 @@ CString CLogin::SetLogin(char* data)
 		case 16: m_day2 = string;	break;
 		case 17: m_nick = string;	break;
 		}
+		stmp.Format("[%d] [%s]", ii, string);
+		LOG_OUTP(3, "axislogin", __FUNCTION__, stmp);
 	}
 	app->m_cogb = m_cogb;
 	app->m_brno = m_brno;
 	if (m_user.IsEmpty() || m_name.IsEmpty())
 		setDefault(data);
+
+	//ChekcLoginType();
 	return m_returns;
 }
 
@@ -333,4 +338,33 @@ BSTR CLogin::_getMisf()
 BSTR CLogin::_getNick() 
 {
 	return m_nick.AllocSysString();
+}
+
+void CLogin::ChekcLoginType()
+{
+	CString strroot;
+	char chfile[500]{};
+	GetModuleFileName(nullptr, chfile, 260);
+
+	CString spath, stmp;
+	spath.Format("%s", chfile);
+	spath.TrimRight();
+
+	int iFind = spath.Find("exe");
+	spath = spath.Left(iFind);
+	strroot = spath;
+	spath += "tab\\axis.ini";
+
+	int readL;
+	memset(chfile, 0x00, 500);
+
+	GetPrivateProfileString("CLOUDELOGIN", "USE", "0", chfile, sizeof(chfile), spath);
+
+	stmp.Format("%s", chfile);
+	stmp.TrimRight();
+	CAxisloginApp* app = (CAxisloginApp*)AfxGetApp();
+	if (stmp == "1")
+		app->m_logintype = 'A';
+	else
+		app->m_logintype = 'A';
 }

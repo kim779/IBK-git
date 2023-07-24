@@ -72,7 +72,12 @@ public:
 	LPCTSTR	GetCvol()	{ return m_strCvol; };
 	LPCTSTR	GetGamt()	{ return m_strGamt; };
 	LPCTSTR	GetMgjy()	{ return m_strMgjy; };
-	void	SetCurr(CString strTCurr)	{ m_strCurr = strTCurr; };
+	void	SetCurr(CString strTCurr)	{ 
+		CString stmp;
+		stmp.Format("gData  SetCurr =[%s]", strTCurr);
+		OutputDebugString(stmp);
+		m_strCurr = strTCurr; 
+	};
 	void	SetSiga(CString strSiga)	{ m_strSiga = strSiga; };
 	void	SetKoga(CString strKoga)	{ m_strKoga = strKoga; };
 	void	SetJega(CString strJega)	{ m_strJega = strJega; };

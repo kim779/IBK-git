@@ -487,6 +487,8 @@ bool CObjMgr::RealtimeProc(CString sCode, CString sData)
 		RealTableData(false);
 		break;
 	case RTM_SHIFT:
+		m_slog.Format("m_arGraphQue size=[%d] bIncrease=[%d]", m_arGraphQue.GetCount(), bIncrease);
+		LOG_OUTP(3, "axisgmain", __FUNCTION__, m_slog);
 		for (ii = 0; ii <= m_arGraphQue.GetUpperBound(); ii++)
 		{
 			pIndcBase = (CIndcBase *) m_arGraphQue.GetAt(ii);
@@ -502,6 +504,9 @@ bool CObjMgr::RealtimeProc(CString sCode, CString sData)
 					//m_pwndPnChart->SendMessage(GEV_CTRL, MAKEWPARAM(CTRL_ENV, CTRL_SET_EDIT), iDispCount);
 					m_pwndPnChart->SendMessage(GEV_INPUT, MAKEWPARAM(INPUT_CHANGE, ipSetDisplay), iDispCount);
 				}
+				m_slog.Format("iDispCount =[%d] ", iDispCount);
+				LOG_OUTP(3, "axisgmain", __FUNCTION__, m_slog);
+
 			}
 // 수정 끝
 			pIndcBase->IsChangeMinMaxRTM(true, bIncrease);
@@ -516,6 +521,10 @@ bool CObjMgr::RealtimeProc(CString sCode, CString sData)
 		ReviseMinMax();
 
 		m_bDrawAll = true;
+
+		m_slog.Format("case RTM_SHIFT");
+		LOG_OUTP(3, "axisgmain", __FUNCTION__, m_slog);
+
 		m_pwndPnChart->Invalidate();
 		RealTableData(true);
 		break;
@@ -638,7 +647,7 @@ void CObjMgr::DrawGraphObject()
 
 	if (m_psdcBitmap->IsValid())
 	{
-		if (m_bDrawAll)
+		if (m_bDrawAll)  //check test
 		{
 			DrawChart(m_psdcBitmap);
 			m_psdcBitmap->SBitBlt(&dc);
@@ -646,6 +655,8 @@ void CObjMgr::DrawGraphObject()
 		}
 		else
 		{
+			m_slog.Format("m_psdcBitmap->IsValid()=[%d] m_bDrawAll=[%d]", m_psdcBitmap->IsValid(), m_bDrawAll);
+			LOG_OUTP(3, "axisgmain", __FUNCTION__, m_slog);
 			m_psdcBitmap->SBitBlt(&dc);
 			DrawEtc(&dc);
 		}
@@ -675,10 +686,16 @@ void CObjMgr::DrawChart(CDC *pDC)
 	DrawEmpty(pDC, rectC);
 
 	if (DrawCntIsZero())
+	{
+		LOG_OUTP(3, "axisgmain", __FUNCTION__, "RETURN DrawCntIsZero");
 		return;
+	}
 
 	if (m_arGraphQue.GetSize() < 1)
+	{
+		LOG_OUTP(3, "axisgmain", __FUNCTION__, "RETURN m_arGraphQue.GetSize() < 1");
 		return;
+	}
 
 	for (int ii = 0; ii < m_iCoDrawCnt; ii++)
 	{
@@ -1021,13 +1038,16 @@ void CObjMgr::DrawCrossStr(CDC *pDC)
 void CObjMgr::ReDrawGraphObject(bool bAll, bool bMouse)
 {
 	m_bDrawAll = bAll;
+
+	m_slog.Format("m_bDrawAll =[%d]", m_bDrawAll);
+	LOG_OUTP(3, "axisgmain", __FUNCTION__, m_slog);
 //	m_bDrawMouse = bMouse;
 	DrawGraphObject();
 }
 
 bool CObjMgr::AddGraphData(struct _trData* pTD, int& riValidDataCount)
 {
-	LOG_OUTP(2,  "axisgmain", __FUNCTION__);
+	LOG_OUTP(2,  "axisgmain", __FUNCTION__);                                                                                                                                                                                                                                                                                                         
 
 	int iGDataLen = pTD->iLen[0] - pTD->iSiseLen[0];
 	//if (iGDataLen - SZ_DATAH <= 2)
@@ -1036,6 +1056,20 @@ bool CObjMgr::AddGraphData(struct _trData* pTD, int& riValidDataCount)
 
 	char* pcGData = pTD->pcData[0] + pTD->iSiseLen[0];
 	struct _dataH* pDataH = (struct _dataH*)pcGData;
+
+	CString slog;
+	slog.Format("일자수 = [%.6s]", pDataH->count);
+	LOG_OUTP(3, "axisgmain", __FUNCTION__, slog);
+	slog.Format("더미 = [%.6s]", pDataH->dummy);
+	LOG_OUTP(3, "axisgmain", __FUNCTION__, slog);
+	slog.Format("기준일자 = [%.8s]", pDataH->pday);
+	LOG_OUTP(3, "axisgmain", __FUNCTION__, slog);
+	slog.Format("일주월 = [%x]", pDataH->dunit);
+	LOG_OUTP(3, "axisgmain", __FUNCTION__, slog);
+	slog.Format("분틱 = [%.4s]", pDataH->lgap);
+	LOG_OUTP(3, "axisgmain", __FUNCTION__, slog);
+	slog.Format("코드 = [%.16s]", pDataH->rcode);
+	LOG_OUTP(3, "axisgmain", __FUNCTION__, slog);
 
 	int iDtKey = pDataH->dkey;
 	int iCount = 0;
@@ -1210,6 +1244,7 @@ void CObjMgr::RemoveGraphData()
 
 CIndcBase* CObjMgr::AddGraphQue(int iGrpCnt, char* pcData, bool bAppend, bool bUnion)
 {
+	CString slog;
 	LOG_OUTP(6, "axisgmain", __FUNCTION__, Int2CString("iGrpCnt", iGrpCnt), Int2CString("bAppend", bAppend), 
 		Int2CString("bUnion",bUnion), CString(pcData, 100));
 	struct _graph* pGraph = (struct _graph*)pcData;
@@ -2740,6 +2775,9 @@ void CObjMgr::ChangeEnvInfo()
 
 int CObjMgr::ChangeDisplayScale(int scale)
 {
+	m_slog.Format("scale =[%d]", scale);
+	LOG_OUTP(3, "axisgmain", __FUNCTION__, m_slog);
+
 	int dispDay = 0;
 	CIndcBase* pIndcBase;
 
@@ -2748,6 +2786,10 @@ int CObjMgr::ChangeDisplayScale(int scale)
 		pIndcBase = (CIndcBase *) m_arGraphQue.GetAt(ii);
 		dispDay = pIndcBase->SetDisplayScale(scale);
 	}
+
+	CString slog;
+	slog.Format("dispDay=[%d]", dispDay);
+	LOG_OUTP(2, "axisgmain", __FUNCTION__, slog);
 
 	if (dispDay)
 	{
@@ -2762,6 +2804,9 @@ int CObjMgr::ChangeDisplayScale(int scale)
 
 bool CObjMgr::ChangeDisplayShift(int shift)
 {
+	m_slog.Format("shift =[%d] ", shift);
+	LOG_OUTP(3, "axisgmain", __FUNCTION__, m_slog);
+
 	bool bReturn = false;
 	CIndcBase* pIndcBase;
 
@@ -2782,6 +2827,9 @@ bool CObjMgr::ChangeDisplayShift(int shift)
 
 bool CObjMgr::ChangeDisplayPos(int dispPos, int dispEnd)
 {
+	m_slog.Format("dispPos =[%d]  dispEnd=[%d]", dispPos, dispEnd);
+	LOG_OUTP(3, "axisgmain", __FUNCTION__, m_slog);
+
 	CIndcBase* pIndcBase;
 	for (int ii = 0; ii <= m_arGraphQue.GetUpperBound(); ii++)
 	{
@@ -3602,7 +3650,7 @@ void CObjMgr::ReviseMinMax()
 	{
 		m_pCoDraw[ii].PMax = DBL_MIN;
 		m_pCoDraw[ii].PMin = DBL_MAX;
-		m_pCoDraw[ii].VMax = DBL_MIN;
+		m_pCoDraw[ii].VMax = DBL_MIN; 
 		m_pCoDraw[ii].VMin = DBL_MAX;
 		m_pCoDraw[ii].AMax = DBL_MIN;
 		m_pCoDraw[ii].AMin = DBL_MAX;

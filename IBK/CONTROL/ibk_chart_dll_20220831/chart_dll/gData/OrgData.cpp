@@ -1,4 +1,4 @@
-// OrgData.cpp: implementation of the COrgData class.
+ // OrgData.cpp: implementation of the COrgData class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -9,6 +9,7 @@
 #include "../../h/axisgenv.h"
 #include <float.h>
 #include  <math.h>
+
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -92,6 +93,12 @@ COrgData::COrgData(char *pData, class CDataMgr *pDataMgr)
 	m_iRyy = CharToInt(&date[0], 4);
 	m_iRmm = CharToInt(&date[4], 2);
 	m_iRdd = CharToInt(&date[6], 2);
+
+	CString slog;
+
+	slog.Format("[%s]  m_iDtUnit=[%d] 일1,주2,월3,분4,틱5=[%d] 분봉갭=[%d] 틱갭=[%d] ", __FUNCTION__, 
+		m_iDtUnit, m_iDtIndex, m_iMGap, m_iTGap);
+	LOG_OUTP(3, "gData", __FUNCTION__, slog);
 }
 
 COrgData::~COrgData()
@@ -124,6 +131,7 @@ bool COrgData::AttachGraphData(int iCount, int iDummy, char* pcData, int& riData
 	if (iCount * 6 > riDataL) 
 		return false;
 
+	CString strtmp, tmp;
 	if (iCount > 0)
 	{
 		char	token[128]{ 0, };
@@ -156,6 +164,9 @@ bool COrgData::AttachGraphData(int iCount, int iDummy, char* pcData, int& riData
 		pgbData = m_arDataQue.GetAt(ii);
 		pgbData->m_bDummy = true;
 	}
+
+	strtmp.Format("[%s]    -----  iDummy = [%d] ------", __FUNCTION__, iDummy);
+	LOG_OUTP(3, "gData", __FUNCTION__, strtmp);
 
 	char	token[128];
 	int	index = 0;
@@ -303,28 +314,65 @@ bool COrgData::AttachGraphData(int iCount, int iDummy, char* pcData, int& riData
 					pgbData->m_index.date.yy = short(CharToInt(&token[0], 4));
 					pgbData->m_index.date.mm = unsigned char(CharToInt(&token[4], 2));
 					pgbData->m_index.date.dd = unsigned char(CharToInt(&token[6], 2));
+
+					strtmp.Format("[%s] -- [%d] --%d년 %d월 %d일", __FUNCTION__, ii,
+						pgbData->m_index.date.yy, pgbData->m_index.date.mm, pgbData->m_index.date.dd);
+					//LOG_OUTP(3, "gData", __FUNCTION__, strtmp);
+					tmp.Empty();
+					tmp += "<년월일> ";
+					tmp += strtmp;
+					
 					break;
 				case 1:
 					pgbData->m_index.time.hh = unsigned char(CharToInt(&token[0], 2));
 					pgbData->m_index.time.mm = unsigned char(CharToInt(&token[2], 2));
 					pgbData->m_index.time.ss = unsigned char(CharToInt(&token[4], 2));
+
+					strtmp.Format(" %d시 %d분 %d초", pgbData->m_index.time.hh, pgbData->m_index.time.mm, pgbData->m_index.time.ss);
+				//	LOG_OUTP(3, "gData", __FUNCTION__, strtmp);
+					tmp += " <시분초> ";
+					tmp += strtmp;
+					
 					break;
 				case 2:	pgbData->m_iOpen = atoi(token);
+					tmp += " <시가> ";
+					strtmp.Format("%d", pgbData->m_iOpen);
+					tmp += strtmp;
 					break;
 				case 3:	pgbData->m_iHigh = atoi(token);
+					tmp += " <고가> ";
+					strtmp.Format("%d", pgbData->m_iHigh);
+					tmp += strtmp;
 					break;
 				case 4:	pgbData->m_iLow = atoi(token);
+					tmp += " <저가> ";
+					strtmp.Format("%d", pgbData->m_iLow);
+					tmp += strtmp;
 					break;
 				case 5:	pgbData->m_iClose = atoi(token);
+					tmp += " <종가> ";
+					strtmp.Format("%d", pgbData->m_iClose);
+					tmp += strtmp;
 					break;
 				case 6:	pgbData->m_dVolume = atof(token);
+					tmp += " <거래량> ";
+					strtmp.Format("%f", pgbData->m_dVolume);
+					tmp += strtmp;
 					break;
 				case 7:	pgbData->m_dTrdMoney = atof(token);
+					tmp += " <거래대금> ";
+					strtmp.Format("%f", pgbData->m_dTrdMoney);
+					tmp += strtmp;
 					break;
 				case 8:	pgbData->m_iMgjy = atoi(token);
+					tmp += " <미결제약정> ";
+					strtmp.Format("%d", pgbData->m_iMgjy);
+					tmp += strtmp;
 					break;
 				}
 			}
+			LOG_OUTP(3, "gData", __FUNCTION__, tmp);
+			tmp.Empty();
 		}
 	}
 	
@@ -421,16 +469,24 @@ bool COrgData::AttachGraphData(int iCount, int iDummy, char* pcData, int& riData
 		m_iCdd = m_iRdd;
 	}
 
-	if (strlen(pcCurDate) >= 12)
+	/*if (strlen(pcCurDate) >= 12)
 	{
 		m_iShh = short(CharToInt(&pcCurDate[8], 2));
-		m_iSmm = unsigned char(CharToInt(&pcCurDate[10], 2));
+		m_iSmm = unsigned char(CharToInt(&pcCurDate[10], 2));  //fix
+	}*/
+	if (strlen(pcCurDate) >= 4)  //fix weekly
+	{
+		m_iShh = short(CharToInt(&pcCurDate[0], 2));   //fix
+		m_iSmm = unsigned char(CharToInt(&pcCurDate[2], 2));
 	}
 	else
 	{
 		m_iShh = 9;
 		m_iSmm = 0;
 	}
+
+	strtmp.Format("start H=[%d]start M=[%d] pcCurDate=[%s]", m_iShh, m_iSmm, pcCurDate);
+	LOG_OUTP(3, "gData", __FUNCTION__, strtmp);
 
 	// 업종 & 일봉
 	if (m_iDtUnit == GU_INDEX && m_iDtIndex == GI_DAY)
@@ -700,6 +756,7 @@ bool COrgData::CreateDataQue(int date)
 int COrgData::UpdateRTM(bool& rbIncrease)
 {
 	int iResponse = RTM_NO;
+	CString strtmp;
 
 	if (!m_bRealtime)
 		return iResponse;
@@ -731,12 +788,17 @@ int COrgData::UpdateRTM(bool& rbIncrease)
 
 	CGrpBasic* pgbEnd = m_arDataQue.GetAt(iEndIdx - 1);
 
-	int iCheckGap = (iRtmHH - pgbEnd->m_index.time.hh) * 3600;
+	int iCheckGap = (iRtmHH - pgbEnd->m_index.time.hh) * 3600;  //실시간 시간에서 조회시간을 뺀것이다.
 	iCheckGap += (iRtmMM - pgbEnd->m_index.time.mm) * 60;
 	iCheckGap += (iRtmSS - pgbEnd->m_index.time.ss);
 
 	double dVal;
 	CString strTemp;
+
+	strtmp.Format("--UpdateRTM[%x]--m_iDtUnit =[%d] m_iDtIndex=[%d] iCheckGap=[%d], pgbEnd->m_bDummy=[%d] acIndexRtm=[%s]  iEndIdx=[%d]  h=[%d] m=[%d] s=[%d] ",
+		this, m_iDtUnit, m_iDtIndex, iCheckGap, pgbEnd->m_bDummy, acIndexRtm, iEndIdx, pgbEnd->m_index.time.hh, pgbEnd->m_index.time.mm, pgbEnd->m_index.time.ss);
+	LOG_OUTP(3, "gData", __FUNCTION__, strtmp);
+
 	switch (m_iDtUnit)
 	{
 	case GU_CODE:
@@ -820,9 +882,13 @@ int COrgData::UpdateRTM(bool& rbIncrease)
 		pgbNew->m_index.date.yy = m_iCyy;
 		pgbNew->m_index.date.mm = m_iCmm;
 		pgbNew->m_index.date.dd = m_iCdd;
-		pgbNew->m_index.time.hh = 0;
+		pgbNew->m_index.time.hh = 0;  //m_bDateAdd
 		pgbNew->m_index.time.mm = 0;
 		pgbNew->m_index.time.ss = 0;
+
+		strtmp.Format("##### UpdateRTM[%x] m_bDateAdd =[%d]  !!!iCheckGap = [% d], pgbEnd->m_bDummy = [% d] acIndexRtm = [% s]  iEndIdx = [% d]  h = [% d] m = [% d] s = [% d] ",
+			this, m_bDateAdd, iCheckGap, pgbEnd->m_bDummy, acIndexRtm, iEndIdx, pgbEnd->m_index.time.hh, pgbEnd->m_index.time.mm, pgbEnd->m_index.time.ss);
+		LOG_OUTP(3, "gData", __FUNCTION__, strtmp);
 
 		pgbNew->m_iClose = pgbNew->m_iOpen = pgbNew->m_iHigh = pgbNew->m_iLow = atoi(m_pDataMgr->GetCurr());
 		pgbNew->m_dVolume = atof(m_pDataMgr->GetGvol());
@@ -850,8 +916,12 @@ int COrgData::UpdateRTM(bool& rbIncrease)
 	{
 	case GI_MINUTE:
 		//if (iCheckGap > 0 || pgbEnd->m_index.date.dd != m_iCdd || pgbEnd->m_bDummy)	// add
-		if (iCheckGap > 0 || iCheckGap < -7200 || pgbEnd->m_bDummy)	// add
-		{
+		if (iCheckGap > 0 || iCheckGap < -7200 || pgbEnd->m_bDummy)	// add  //check  
+		{ //실시간 시간에서 봉시간(조회시간)을 뺀값이 양수라는 건 분틱이 시간을 앞당겨서 만들어 놨는데 그 시간을 지나서 실시간이 왔으니 추가 shift다
+			strtmp.Format("@@@@ UpdateRTM setTime 되는[%x] !!!iCheckGap = [% d], pgbEnd->m_bDummy = [% d] acIndexRtm = [% s]  iEndIdx = [% d]  h = [% d] m = [% d] s = [% d] ",
+				this,  iCheckGap, pgbEnd->m_bDummy, acIndexRtm, iEndIdx, pgbEnd->m_index.time.hh, pgbEnd->m_index.time.mm, pgbEnd->m_index.time.ss);
+			LOG_OUTP(3, "gData", __FUNCTION__, strtmp);
+
 			pgbNew = new CGrpBasic;
 
 			pgbNew->m_index.date.yy = m_iCyy;
@@ -868,8 +938,12 @@ int COrgData::UpdateRTM(bool& rbIncrease)
 			pgbNew->m_iHigh = pgbNew->m_iClose;
 			pgbNew->m_iLow = pgbNew->m_iClose;
 		}
-		else
+		else 
 		{
+			strtmp.Format("!!!! UpdateRTM setTime 안되는[%x] !!! iCheckGap=[%d], pgbEnd->m_bDummy=[%d] acIndexRtm=[%s]  iEndIdx=[%d]  h=[%d] m=[%d] s=[%d] ",
+				this, iCheckGap, pgbEnd->m_bDummy, acIndexRtm, iEndIdx, pgbEnd->m_index.time.hh, pgbEnd->m_index.time.mm, pgbEnd->m_index.time.ss);
+			LOG_OUTP(3, "gData", __FUNCTION__, strtmp);
+
 			pgbEnd->m_dVolume += atof(m_pDataMgr->GetCvol());
 			pgbEnd->m_iMgjy = atoi(m_pDataMgr->GetMgjy());
 			pgbEnd->m_iClose = atoi(m_pDataMgr->GetCurr());
@@ -901,7 +975,7 @@ int COrgData::UpdateRTM(bool& rbIncrease)
 			pgbNew->m_index.date.yy = m_iCyy;
 			pgbNew->m_index.date.mm = m_iCmm;
 			pgbNew->m_index.date.dd = m_iCdd;
-			pgbNew->m_index.time.hh = iRtmHH;
+			pgbNew->m_index.time.hh = iRtmHH;      //GI_TICK
 			pgbNew->m_index.time.mm = iRtmMM;
 			pgbNew->m_index.time.ss = iRtmSS;
 
@@ -981,7 +1055,11 @@ int COrgData::UpdateRTM(bool& rbIncrease)
 	// insert new data at last index
 	if (pgbNew)
 	{
+		strtmp.Format("--BEFORE INSERT-- iEndIdx =[%d] size=[%d] ", iEndIdx, m_arDataQue.GetSize());
+		LOG_OUTP(3, "gData", __FUNCTION__, strtmp);
 		m_arDataQue.InsertAt(iEndIdx, pgbNew);
+		strtmp.Format("--AFTER INSERT-- iEndIdx =[%d] size=[%d] ", iEndIdx, m_arDataQue.GetSize());
+		LOG_OUTP(3, "gData", __FUNCTION__, strtmp);
 		//if (m_arDataQue.GetSize() > MAX_DATA_COUNT)
 		{
 			CGrpBasic* pgbDel = m_arDataQue.GetAt(0);
@@ -1310,6 +1388,7 @@ int COrgData::GetToken(char *pData, char *token)
 
 void COrgData::SetTime(int min, int cHH, int cMM, int cSS, unsigned char &nHH, unsigned char &nMM, unsigned char &nSS)
 {
+	CString strtmp;
 	int	gap = (cHH - m_iShh)*60 + (cMM - m_iSmm);
 	if (min > 900)	// 30초봉
 	{
@@ -1325,6 +1404,10 @@ void COrgData::SetTime(int min, int cHH, int cMM, int cSS, unsigned char &nHH, u
 		gap = m_iSmm + gap;
 		nHH = m_iShh + gap/60;
 		nMM = gap%60;
+
+		strtmp.Format("min > 900 30초봉  min=[%d] cHH=[%d] cMM=[%d] cSS=[%d] | nHH=[%c] nMM=[%c] nSS=[%c] gap=[%d]",
+			min, cHH, cMM, cSS, nHH, nMM, nSS, gap);
+		LOG_OUTP(3, "gData", __FUNCTION__, strtmp);
 
 		return;
 	}
@@ -1344,4 +1427,8 @@ void COrgData::SetTime(int min, int cHH, int cMM, int cSS, unsigned char &nHH, u
 	nHH = m_iShh + gap/60;
 	nMM = gap%60;
 	nSS = 0;	
+
+	strtmp.Format("나머지? min=[%d] cHH=[%d] cMM=[%d] cSS=[%d] | nHH=[%d] nMM=[%d] nSS=[%d] gap=[%d]",
+		min, cHH, cMM, cSS, nHH, nMM, nSS, gap);
+	LOG_OUTP(3, "gData", __FUNCTION__, strtmp);
 }

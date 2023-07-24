@@ -29,7 +29,6 @@
 #define DEV_CLOUDE_SERVER  "twas.signkorea.com"
 #define REAL_CLOUDE_SERVER "cert.signkorea.com"
 #define DEV_AGREEMENT_URL "https://tweb.signkorea.com:8700/notice/html/conditionsOfUse.txt"
-//#define DEV_AGREEMENT_URL "https://211.175.81.112:8700/notice/html/conditionsOfUse.txt"
 #define REAL_AGREEMENT_URL "https://center.signkorea.com:8700/notice/html/conditionsOfUse.txt"
 
 #ifdef _DEBUG
@@ -758,7 +757,7 @@ int CCertifyCtrl::queryDn(CString dn_name, int* nBytes, bool retry)
 	m_contextNew.sd.bForceAllCaSearchMode = 1;
 	strcpy_s(m_contextNew.sd.szUserId, E_BUFLEN, (char*)dn_name.GetString());
 	ZeroMemory(m_contextNew.sd.szOldPasswd, sizeof(m_contextNew.sd.szOldPasswd));
-	sk_if_SetKeySaferMode(1);
+	sk_if_SetKeySaferMode(9);
 	if (retry || m_encpass[0] == NULL)
 	{
 		if (pWnd && IsWindow(pWnd->GetSafeHwnd()))
@@ -893,7 +892,7 @@ CString CCertifyCtrl::checkPasswd()
 
 	src.length = 0;
 	src.value = NULL;
-	sk_if_SetKeySaferMode(1);
+	sk_if_SetKeySaferMode(9);
 	if (sk_if_cert_SignData_notEncode(&m_context, encpass, &src, &des, NULL))
 	{
 		if (sk_if_GetLastErrorCode() == 2417)
@@ -1077,7 +1076,7 @@ long CCertifyCtrl::CertifyFull(long pInB, long pInL, long pOutB, long pOutL)
 			memset(&Context, 0x00, sizeof(Context)); //구조체 선언
 			memset(&m_context, 0, sizeof(APP_CONTEXT));
 			sk_if_cert_InitContextApp(&m_context, NULL, (int)false); //초기화
-
+			
 			////sk_if_SetPolicyFilter(0, NULL); //인증서 OID 필터 기능 적용
 			////sk_if_SetExipreCheckSkip(TRUE); //인증서 갱신안내 스킵옵션
 			////sk_if_Set_Show_OnlyValidateCloudCert_flag(1); //클라우드 인증서 유효한것만 보이기(컴퓨터시간 기준)
@@ -1197,7 +1196,7 @@ long CCertifyCtrl::CertifyFull(long pInB, long pInL, long pOutB, long pOutL)
 			m_contextNew.sd.bForceAllCaSearchMode = 1;
 			strcpy_s(m_contextNew.sd.szUserId, E_BUFLEN, (char*)m_name.GetString());
 			ZeroMemory(m_contextNew.sd.szOldPasswd, sizeof(m_contextNew.sd.szOldPasswd));
-			sk_if_SetKeySaferMode(1);
+			sk_if_SetKeySaferMode(9);
 			if (pWnd && IsWindow(pWnd->GetSafeHwnd()))
 				sk_if_DialogModalMode(pWnd->GetSafeHwnd());
 			success = sk_if_CertSetSelectExt(&m_contextNew, CONTEXT_SELECT2, SEARCH_ALLMEDIA);
@@ -1350,7 +1349,7 @@ int CCertifyCtrl::Cloude_Full_sign(long pOutB, long pOutL)
 		else
 		{
 			int errorCode = sk_if_GetLastErrorCode();
-			MessageBox(sk_if_GetLastErrorMsg(), "전자 서명 오류", MB_OK);
+			
 			if (errorCode == 2501)   //일부러 취소했을때
 				*(int*)pOutL = -3;
 			else
@@ -1369,7 +1368,6 @@ int CCertifyCtrl::Cloude_Full_sign(long pOutB, long pOutL)
 	rc = sk_if_cert_SignDataWithR(&m_context, "", &p1, &p2, &p3);
 
 	if (rc) {
-		MessageBox(sk_if_GetLastErrorMsg(), "전자서명 오류", MB_OK);
 		m_slog.Format(" 전자서명 오류 sk_if_cert_SignDataWithR rc = [%d]  errorCode=[%d]", rc, sk_if_GetLastErrorCode());
 		FileLog(m_slog);
 		CString emsg;
@@ -1429,7 +1427,8 @@ int CCertifyCtrl::Cloude_ConTraction_sign(long pOutB, long pOutL)
 		else
 		{
 			int errorCode = sk_if_GetLastErrorCode();
-			MessageBox(sk_if_GetLastErrorMsg(), "축약서명 오류", MB_OK);
+			m_slog.Format(" 축약서명 오류 sk_if_CloudCertSetSelectExt rc = [%d]  errorCode=[%d]", rc, sk_if_GetLastErrorCode());
+			FileLog(m_slog);
 			m_sync.Unlock();
 			return  -2;
 		}
@@ -1445,7 +1444,7 @@ int CCertifyCtrl::Cloude_ConTraction_sign(long pOutB, long pOutL)
 	if (sk_if_cert_SignData_notEncode(&m_cpContext, "", &p1, &p2, NULL))
 	{
 		m_slog.Format("축약서명 오류 Ecod =[%s]", sk_if_GetLastErrorMsg());
-		MessageBox(m_slog, "IBK 투자증권", MB_OK);
+		FileLog(m_slog);
 		m_sync.Unlock();
 		return  -2;
 	}
@@ -1468,11 +1467,13 @@ LONG CCertifyCtrl::CertifyCloud(LONG func)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
+	m_bCloudeUse = CheckCloude();
 	InitCloude();
+	
 	int rc = 0;
 	switch (func)
 	{
-		case 1:
+		case 1:  //인증서 올리기
 		{
 			SD_API_CONTEXT_NEW Context;
 			memset(&Context, 0x00, sizeof(Context));
@@ -1485,11 +1486,11 @@ LONG CCertifyCtrl::CertifyCloud(LONG func)
 				m_slog.Format(" 클라우드로 인증서 올리기 오류 sk_if_UploadPCtoCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
 					rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
 				FileLog(m_slog);
-				return rc;
+				return sk_if_GetLastErrorCode();
 			}
 		}
 			break;
-		case 2:
+		case 2:  //인증서 내려받기
 		{
 			rc = sk_if_DownloadCloudtoPC(0);
 			if (rc == 0)
@@ -1503,7 +1504,7 @@ LONG CCertifyCtrl::CertifyCloud(LONG func)
 			}
 		}
 			break;
-		case 3:
+		case 3:  //간편비밀번호 변경
 		{
 			SD_API_CONTEXT_NEW Context;
 			memset(&Context, 0x00, sizeof(Context));
@@ -1513,11 +1514,121 @@ LONG CCertifyCtrl::CertifyCloud(LONG func)
 				return rc;
 			else
 			{
-				m_slog.Format("클라우드에서 인증서리 내려받기 오류 sk_if_DownloadCloudtoPC rc = [%d]  errorCode=[%d] error  msg = [%s]",
+				m_slog.Format("간편비밀번호 변경 오류 sk_if_DownloadCloudtoPC rc = [%d]  errorCode=[%d] error  msg = [%s]",
 					rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
 				FileLog(m_slog);
 				return sk_if_GetLastErrorCode();
 			}
+		}
+		break;
+		case 4:  //인증서 발급
+		{
+			SD_API_CONTEXT_NEW Context;
+			memset(&Context, 0x00, sizeof(Context));
+
+			int rc = 0;
+			rc = sk_if_IssueCert_toCloud(&Context, 0);
+			if (rc == 0)
+				FileLog("클라우드 인증서 발급");
+			else
+			{
+				m_slog.Format("클라우드 인증서 발급 오류 sk_if_IssueCert_toCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
+					rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
+				FileLog(m_slog);
+				return sk_if_GetLastErrorCode();
+			}
+			return 0;
+		}
+		break;
+		case 5:  //인증서 갱신
+		{
+			SD_API_CONTEXT_NEW Context;
+			memset(&Context, 0x00, sizeof(Context));
+
+			int rc = 0;
+			rc = sk_if_CertNew_toCloud(&Context, 0);
+			if (rc == 0)
+				FileLog("클라우드 인증서 갱신");
+			else
+			{
+				m_slog.Format("클라우드 인증서 갱신 오류 sk_if_CertNew_toCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
+					rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
+				FileLog(m_slog);
+				return sk_if_GetLastErrorCode();
+			}
+
+			return 0;
+		}
+		break;
+		case 6:  //인증서 삭제
+		{
+			int rc = 0;
+			rc = sk_if_DeleteCert_inCloud(0);
+			if (rc == 0)
+				FileLog("클라우드 인증서 삭제");
+			else
+			{
+				m_slog.Format("클라우드 인증서 삭제 오류 sk_if_DeleteCert_inCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
+					rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
+				FileLog(m_slog);
+				return sk_if_GetLastErrorCode();
+			}
+				
+			return 0;
+		}
+		break;
+		case 7: //연결확인
+		{
+			int rc = 0;
+			rc = sk_if_Connected_CloudUser_Confirm(0); //1 : 화면을 보지않고 연결확인 된 것만 알겠다
+			if (rc == 1)
+				FileLog("클라우드 연결 끊기 성공");
+
+			if (rc < 0)
+			{
+				{
+					m_slog.Format("클라우드에 연결된 정보 확인 rc = [%d]  errorCode=[%d] error  msg = [%s]",
+						rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
+					FileLog(m_slog);
+					return sk_if_GetLastErrorCode();
+				}
+			}
+			FileLog("클라우드에 연결된 정보 확인");
+	
+			return 0;
+		}
+		break;
+		case 8: //자동연결된 기기 조회
+		{
+			int rc = 0;
+			rc = sk_if_Cloud_AutoConnected_Device(0);
+			return 0;
+		}
+		break;
+		case 9:  //회원탈퇴
+		{
+			int rc = 0;
+			rc = sk_if_CloudUser_DeleteAccount(0);
+			return 0;
+		}
+		break;
+		case 10: //설정
+		{
+			return 0;
+		}
+		break;
+		case 11: //클라우드 사용
+		{
+			m_bCloudeUse = TRUE;
+			FileLog("클라우드 사용");
+			return 0;
+		}
+		break;
+		case 12: //클라우드 미사용
+		{
+			m_bCloudeUse = FALSE;
+			FileLog("클라우드 미사용");
+			return 0;
 		}
 		break;
 		default:
@@ -1556,9 +1667,13 @@ void CCertifyCtrl::InitCloude()
 
 	//타임아웃 기간을 설정합니다 1~10초 (msec 단위)
 	config.TIMEOUT_MSEC = 3000;
-
+	sk_if_Cloud_KeyPadUse(1);
 	sk_if_Set_CloudConfig(config);
 	sk_if_DialogModalMode(m_hWnd); //모달 모드
+	int ret = sk_if_SetKeySaferMode(9);
+	CString slog;
+	slog.Format("--InitCloude-- sk_if_SetKeySaferMode ret=[%d] ", ret);
+	FileLog(slog);
 	
 	m_bCloudeInit = TRUE;
 }

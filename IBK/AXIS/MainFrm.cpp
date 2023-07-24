@@ -1355,7 +1355,8 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				case 'x':
 				case 'X':
 					{
-							PostMessage(WM_SECUREDLG, 0, 0);
+						if(m_axMisc->NewRunVers(verRETRY))
+							KillMySelf();
 							
 					}
 					break;
@@ -2939,6 +2940,8 @@ slog.Format("[MIAN_MONITOR] iFull_width[%d] < x[%d]  or  iFull_height[%d] < y[%d
 					}
 					else	
 					{
+						x -= GetSystemMetrics(SM_CXFRAME);
+						y -= GetSystemMetrics(SM_CYFRAME);
 						SetWindowPos(&wndTop, x, y, cx, cy, SWP_SHOWWINDOW);
 					}
 				}
@@ -10906,6 +10909,7 @@ void CMainFrame::KillUpdateAgent()
 
 void CMainFrame::load_eninfomation(bool first)
 {
+	FileMove();
 	CString		file, key, mapN, userN;
 	int		value{};
 	long		rc = 0;
@@ -19392,6 +19396,9 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
 
 	lpMMI->ptMaxSize.y = nMaxHeight + GetSystemMetrics(SM_CYFRAME)-3;
 	lpMMI->ptMaxSize.x = nMaxWidth + GetSystemMetrics(SM_CXFRAME);
+
+	lpMMI->ptMaxSize.x += GetSystemMetrics(SM_CXFRAME) * 2;
+	lpMMI->ptMaxSize.y += GetSystemMetrics(SM_CYFRAME) * 2;
 	//if (Axis::isVista && Axis::WinTheme == 0)	lpMMI->ptMaxPosition.y += VistaFrame;
 	
 	CMDIFrameWnd::OnGetMinMaxInfo(lpMMI);
@@ -27663,6 +27670,48 @@ void CMainFrame::PopUp7805()
 
 }
 
+void CMainFrame::KillMySelf()
+{
+	HANDLE         hProcessSnap = NULL;
+	BOOL           bRet = FALSE;
+	PROCESSENTRY32 pe32 = { 0 };
+	CString strProcess, strTarget;
+	strTarget.Format("%s", "axis.exe");
+	strTarget.TrimRight();
+
+	hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+	if (hProcessSnap == (HANDLE)-1)
+		return ;
+
+	pe32.dwSize = sizeof(PROCESSENTRY32);
+	CString slog;
+	//프로세스가 메모리상에 있으면 첫번째 프로세스를 얻는다
+	if (Process32First(hProcessSnap, &pe32))
+	{
+		BOOL          bCurrent = FALSE;
+		MODULEENTRY32 me32 = { 0 };
+
+		do
+		{
+			//	bCurrent = GetProcessModule(pe32.th32ProcessID, strProcessName, pe32.szExeFile);
+			slog.Format("[MAC] [%s] \r\n", pe32.szExeFile);
+			OutputDebugString(slog);
+			OutputDebugString("\r\n-----------------------------------------------\r\n");
+			strProcess.Format("%s", pe32.szExeFile);
+			if (strProcess.Find(strTarget) >= 0)
+			{
+				HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pe32.th32ProcessID);
+				if (hProcess && pe32.th32ProcessID == GetCurrentProcessId())
+				{
+					TerminateProcess(hProcess, 0);
+					return;
+				}
+			}
+		} while (Process32Next(hProcessSnap, &pe32)); //다음 프로세스의 정보를 구하여 있으면 루프를 돈다.
+	}
+	CloseHandle(hProcessSnap);
+}
 
 HANDLE CMainFrame::ProcessFind(char* strProcessName)
 {
@@ -27782,6 +27831,61 @@ void CMainFrame::CludePschange()
 	int ret{};
 	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
 		(BYTE*)(VTS_I4 VTS_I4), MAKELONG(caCLOUD, 3), 0);
+	if (ret == 0)
+		m_axConnect->SetGuide(_T("클라우드 인증서 간편비밀번호 변경!!"));
+}
+
+void CMainFrame::CludeFuncCall(int igubn)
+{
+	int ret{};
+	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
+		(BYTE*)(VTS_I4 VTS_I4), MAKELONG(caCLOUD, igubn), 0);
+}
+
+void CMainFrame::CludeUSE(bool bUseCloude)
+{
+	int ret{};
+	int igubn = 0;
+	if (bUseCloude)
+		igubn = 11;
+	else
+		igubn = 12;
+
+//	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
+//		(BYTE*)(VTS_I4 VTS_I4), MAKELONG(caCLOUD, igubn), 0);
+}
+
+void CMainFrame::FileMove()
+{
+	char buff[128];
+	CString iniConf = Axis::home +  "\\tab\\axis.ini";
+	GetPrivateProfileString("move", "file", "", buff, sizeof(buff) - 1, iniConf);
+
+	CString strpath, strfile;
+	strpath.Format("%s", buff);
+	strpath.TrimRight();
+
+	strfile = Parser(strpath, ";");
+
+	iniConf = Axis::home +  + "\\tab\\";
+	iniConf += strfile;
+	CString strOripath;
+	strOripath = iniConf;
+
+	CFileFind cfFind;
+	BOOL bFind = cfFind.FindFile(iniConf);
+
+	if (bFind)
+	{
+		int ifind = iniConf.ReverseFind('\\');
+		iniConf = iniConf.Left(ifind);
+		iniConf += "\\";
+		iniConf += strfile;
+		iniConf.Replace("tab", strpath);
+		CopyFile(strOripath, iniConf, FALSE);
+		DeleteFile(strOripath);
+	}
+
 }
 
 //CString ip;

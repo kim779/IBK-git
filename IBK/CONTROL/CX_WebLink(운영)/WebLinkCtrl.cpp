@@ -1485,6 +1485,7 @@ LRESULT WebLinkCtrl::OnBrowser( WPARAM wParam, LPARAM lParam )
 	{
 		if (m_pIEApp)
 		{
+			OutputDebugString("webctrl------------------1test-------------");
 			CString url;
 			//url = (char*)lParam;
 			url = m_finalurl;
@@ -1539,9 +1540,10 @@ LRESULT WebLinkCtrl::OnBrowser( WPARAM wParam, LPARAM lParam )
 				m_pIEApp->put_Visible(true);
 
 				pwnd->BringWindowToTop();
-
+				OutputDebugString("webctrl------------------2test-------------");
 				if ( m_bCertLogin)
 				{
+					OutputDebugString("webctrl------------------3test-------------");
 					CString surl(m_baseURL);
 					m_baseURL.Replace("http","https");
 	// 				surl += "?";
@@ -1562,6 +1564,8 @@ LRESULT WebLinkCtrl::OnBrowser( WPARAM wParam, LPARAM lParam )
 
 					CString sParam;
 					CString stmp;
+					BOOL bCloude{};
+					bCloude  = CheckCloude();
 					if (m_sMapName == "IB831300")  //온라인계좌개설
 					{
 						stmp = m_sUrl;
@@ -1569,11 +1573,25 @@ LRESULT WebLinkCtrl::OnBrowser( WPARAM wParam, LPARAM lParam )
 						if (ifind > 0)
 							stmp = m_sUrl.Left(ifind);
 						
-						sParam.Format("url=%s&cflag=1&auth=%s",stmp,m_sCert);
+						if(bCloude)
+							sParam.Format("url=%s&cflag=1&certType=%s&auth=%s",stmp, "cloud", m_sCert);
+						else
+							sParam.Format("url=%s&cflag=1&certType=%s&auth=%s", stmp, "", m_sCert);
+						//	sParam.Format("url=%s&cflag=1&auth=%s", stmp, m_sCert);
 					}
 					else
 					{
-						sParam.Format("url=%s&cflag=1&auth=%s",m_sUrl,m_sCert);
+						//sParam.Format("url=%s&cflag=1&auth=%s",m_sUrl,m_sCert);
+						if (bCloude)
+						{
+							OutputDebugString("webctrl------------------3test-------------");
+							sParam.Format("url=%s&cflag=1&certType=%s&auth=%s", m_sUrl, "cloud", m_sCert);
+						}
+						else
+						{
+							OutputDebugString("webctrl------------------3cloude-------------");
+							sParam.Format("url=%s&cflag=1&certType=%s&auth=%s", m_sUrl, "", m_sCert);
+						}
 					}
 					
 					
@@ -1779,4 +1797,43 @@ void WebLinkCtrl::SetHeight(LONG height)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	m_height = (int)height;
+}
+
+BOOL WebLinkCtrl::CheckCloude()
+{
+	OutputDebugString("webctrl------------------CheckCloude-------------");
+	char chfile[500]{};
+	GetModuleFileName(nullptr, chfile, 260);
+
+	CString spath, stmp;
+	spath.Format("%s", chfile);
+	spath.TrimRight();
+
+	int iFind = spath.Find("exe");
+	spath = spath.Left(iFind);
+	m_sRoot = spath;
+	spath += "tab\\axis.ini";
+
+	int readL;
+	memset(chfile, 0x00, 500);
+	
+	GetPrivateProfileString("CLOUDELOGIN", "USE", "0", chfile, sizeof(chfile), spath);
+
+	stmp.Format("%s", chfile);
+	stmp.TrimRight();
+
+	
+
+	if (atoi(stmp) == 1)
+	{
+		stmp.Format("webctrl------------------11111111 ---\r\n");
+		OutputDebugString(stmp);
+		return TRUE;
+	}
+	else
+	{
+		stmp.Format("webctrl------------------2222222 ---\r\n");
+		OutputDebugString(stmp);
+		return FALSE;
+	}
 }

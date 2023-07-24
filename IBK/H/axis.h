@@ -16,22 +16,24 @@
 //		 01.00	2000-07	Initial version
 // *****************************************************************************
 
-#pragma once
+#ifndef	_AXIS_H_
+#define	_AXIS_H_
+
 #pragma pack(1)
 
 struct	_axisH	{
-	unsigned char	msgK{};		// kind of msg
-	unsigned char	stat{};		// state
-	unsigned char	auxs{};		// aux state
+	unsigned char	msgK;		// kind of msg
+	unsigned char	stat;		// state
+	unsigned char	auxs;		// aux state
 
-	unsigned char	winK{};		// kind of window
-	unsigned char	unit{};		// unit window
-	unsigned char	trxK{};		// TR key code (INB)
-	unsigned char	trxS{};		// TR key state (OUB)
+	unsigned char	winK;		// kind of window
+	unsigned char	unit;		// unit window
+	unsigned char	trxK;		// TR key code (INB)
+	unsigned char	trxS;		// TR key state (OUB)
 
-	char	svcN[4]{};		// service name
-	char	trxC[8]{};		// TR code
-	char	datL[5]{};		// following data length
+	char	svcN[4];		// service name
+	char	trxC[8];		// TR code
+	char	datL[5];		// following data length
 };
 
 #define	L_axisH		sizeof(struct _axisH)
@@ -58,6 +60,7 @@ struct	_axisH	{
 #define	msgK_ENC	0x80		// encription key data
 #define	msgK_XCA	0x81		// certify data
 #define	msgK_SIGN	0x82		// sign on/off msg
+#define	msgK_SIGNx	0x83		// sign on/off msg (certify login)
 
 #define	msgK_TICK	0x90		// tick pane(notice...)
 #define	msgK_POP	0x91		// modalless dialog (ascii control data)
@@ -83,6 +86,7 @@ struct	_axisH	{
 //	axisH.auxs
 //
 #define	auxsMAP		0x01		// request MAP change
+#define	auxsFDS		0x02		// include fds data (for IBK 20151221)
 #define	auxsCA		0x08		// CA data
 #define	auxsOOP		0x10		// symbol data interface
 #define	auxsCLOSE	0x20 		// window closed (only valid axisH.winK)
@@ -106,6 +110,7 @@ struct	_axisH	{
 #define	trxK_SCUP	0x10		// ScrollUp
 #define	trxK_SCDN	0x20		// ScrollDown
 #define	trxK_FIRST	0x40		// First
+#define	trxK_XRTM	0x80		// no RTM (axisH.trxS)
 
 //
 //	axisH.msgK == msgK_AXIS
@@ -117,10 +122,10 @@ struct	_axisH	{
 					// else value ... unit window key
 
 struct	_fileH {
-	unsigned char	fileK{};
-	unsigned char	fileF{};
-	char	fileN[64+1]{};
-	char	datL[5]{};
+	unsigned char	fileK;
+	unsigned char	fileF;
+	char	fileN[64+1];
+	char	datL[5];
 };
 
 #define	L_fileH		sizeof(struct _fileH)
@@ -132,6 +137,7 @@ struct	_fileH {
 #define	fileK_VER	0x02		// update MAP version
 #define	fileK_XLS	0x03		// excel
 #define	fileK_FILE	0x04		// files
+#define	fileK_ERR	0x40		// error
 
 //
 //	_fileH.fileF
@@ -142,10 +148,16 @@ struct	_fileH {
 #define	fileF_ONLY	0x04		// only chain
 
 
+#define	L_VERS		12
 struct	_verM	{
-	char	name[8]{};
-	unsigned char ver{};
+	char	name[32];
+	char	vers[L_VERS];		// time stamp
+	char	path[32];
+	bool	request;		// for internal use
+	char	rsvb[4];
 };
+
+#define	L_verM		sizeof(struct _verM)
 
 //
 //	axisH.msgK == msgK_ENC
@@ -153,36 +165,37 @@ struct	_verM	{
 //
 #define	encENC		0x01		// encryption
 #define	encERR		0x02		// error
+#define	encOK		0x03		// pass mode...OK!
 
 //
 //	axisH.msgK == msgK_SIGN
 //
 
 struct	_signR	{
-	unsigned char	signK{};		// sign
-	unsigned char	mask{};		// security mask
-	unsigned char	absS{};		// absolute
-	unsigned char	incS[4]{};	// inclusive
-	unsigned char	excS[4]{};	// exclusive
+	unsigned char	signK;		// sign
+	unsigned char	mask;		// security mask
+	unsigned char	absS;		// absolute
+	unsigned char	incS[4];	// inclusive
+	unsigned char	excS[4];	// exclusive
 
-	char	termN[8]{};		// terminal name;
-	unsigned char	flag{};		// terminal flag
-	unsigned char	dev{};		// device flag
+	char	termN[8];		// terminal name;
+	unsigned char	flag;		// terminal flag
+	unsigned char	dev;		// device flag
 	
-	char	mapN[8]{};		// map name
-	char	sign[12]{};		// sign identification
-	char	name[20]{};		// sign name
-	char	menu[12]{};		// menu
+	char	mapN[8];		// map name
+	char	sign[12];		// sign identification
+	char	name[20];		// sign name
+	char	menu[12];		// menu
 
-	char	trx[3]{};			// transaction timeout(sec.)
-	char	usage[3]{};		// usage time (min.)
-	char	idle[3]{};		// idle timeout (min.)
-	char	guide[70]{};		// guide msg
-	char	service[10]{};		// service#
+	char	trx[3];			// transaction timeout(sec.)
+	char	usage[3];		// usage time (min.)
+	char	idle[3];		// idle timeout (min.)
+	char	guide[70];		// guide msg
+	char	service[10];		// service#
 
-	char	info[64]{};		// information
+	char	info[64];		// information
 					// server time + '\t' + ....
-	char	infox[192]{};		// information
+	char	infox[192];		// information
 };
 #define	L_signR		sizeof(struct _signR)
 
@@ -206,13 +219,14 @@ struct	_signR	{
 //
 //	signR.flag
 //
-#define	flagENC		0x01		// data encription terminale
+#define	flagENC		0x01		// data encription terminal
 #define	flagVER		0x02		// MAP version check
 #define	flagACN		0x04		// edit account#
 #define	flagCA		0x08		// CA enable
 #define	flagENX		0x10		// prohibit ENC
 #define	flagCAX		0x20		// prohibit CA
 #define	flagXXX		0x40		// prohibit ENC, CA
+#define	flagXCS		0x80		// securuties CA ser. Error : client login CA only
 
 //
 //	signR.dev
@@ -224,8 +238,8 @@ struct	_signR	{
 
 
 struct	_regH {				// internal registry
-	unsigned char	regK{};		// registry kind
-	unsigned char	regL{};		// regK/group size
+	unsigned char	regK;		// registry kind
+	char	regL[4];		// regK/group size
 };
 
 #define	regK_COMBO	0x01		// combo
@@ -236,17 +250,18 @@ struct	_regH {				// internal registry
 
 
 struct	_caH	{
-	char	ecode[5]{};		// error code
-	unsigned char	pwdn{};		// invalid password count
-	char	dns[200]{};		// dns or error msg.
+	char	ecode[5];		// error code
+	unsigned char	pwdn;		// invalid password count
+	char	dns[200];		// dns or error msg.
+	char	map[256];		// must check CA passwd
 };
 
 
 struct	_auxH	{
-	char	cursor[8]{};		// cursor pos form
+	char	cursor[8];		// cursor pos form
 					// if (axisH.stat & statNOC), ignored
-	char	type{};			// guide msg type
-	unsigned char	datL{};		// following guide msg size
+	char	type;			// guide msg type
+	unsigned char	datL;		// following guide msg size
 };
 
 #define	L_auxH		sizeof(struct _auxH)
@@ -262,9 +277,9 @@ struct	_auxH	{
 
 #define	FCC		0x1a		// FCC
 struct	_FCC	{			// FORM control command
-	unsigned char	fcc{};		// RCC
-	unsigned char	scc{};		// set control command
-	unsigned char	rcc{};		// reset control command
+	unsigned char	fcc;		// RCC
+	unsigned char	scc;		// set control command
+	unsigned char	rcc;		// reset control command
 };
 #define	L_FCC		sizeof(struct _FCC)
 
@@ -277,10 +292,10 @@ struct	_FCC	{			// FORM control command
 
 #define	RCC		0x1b		// RCC
 struct	_RCC	{			// RESOURCE control command
-	unsigned char	rcc{};		// RCC
-	unsigned char	ccs{};		// control command state
-	char	name[16]{};		// FORM name
-	unsigned char	ccl{};		// following data unit size
+	unsigned char	rcc;		// RCC
+	unsigned char	ccs;		// control command state
+	char	name[16];		// FORM name
+	unsigned char	ccl;		// following data unit size
 };
 #define	L_RCC		sizeof(struct _RCC)
 
@@ -298,11 +313,14 @@ struct	_RCC	{			// RESOURCE control command
 
 #define	SCC		0x1c		// SCC
 struct	_SCC	{			// SET color command
-	unsigned char	scc{};		// SCC
-	unsigned char	back{};		// background color (0 ~ 254)
-	unsigned char	text{};		// text color
+	unsigned char	scc;		// SCC
+	unsigned char	back;		// background color (0 ~ 254)
+	unsigned char	text;		// text color
 };
 #define	L_SCC		sizeof(struct _SCC)
 
 #define	SC_NOP		0xff		// no operation color
-#pragma pack()
+
+#pragma	pack()
+
+#endif

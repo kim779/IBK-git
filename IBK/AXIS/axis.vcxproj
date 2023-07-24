@@ -153,7 +153,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>D:\IBKS_TEST\exe/axis.exe</OutputFile>
+      <OutputFile>D:\IBKS_TEST\exe\axis.exe</OutputFile>
       <AdditionalDependencies>../dll/axiscm/Debug/axiscm.lib;../dll/sm/Debug/axissm.lib;Imm32.lib;../dll/axiscp/Debug/axiscp.lib;Msimg32.lib;wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>

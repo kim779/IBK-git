@@ -114,7 +114,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../../../exe/AxMCtrl.dll</OutputFile>
+      <OutputFile>D:\IBKS_TEST\exe/AxMCtrl.dll</OutputFile>
       <ImportLibrary>.\Debug\AxMCtrl.lib</ImportLibrary>
       <AdditionalDependencies>msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\AxMCtrl.def</ModuleDefinitionFile>

@@ -35,7 +35,7 @@ protected:
 	double	m_dTotal;
 	double	m_dUnit;
 //	int	m_nLine;
-
+	CString m_slog;
 protected:
 	CString	GetYposValue(CPoint pt, bool bGrid);
 	double	GetYposOrgValue(CPoint pt);

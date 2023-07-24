@@ -85,7 +85,7 @@ public:
 	CMap	<int, int, struct _xRegion*, struct _xRegion*> m_mapRegion;
 	CArray	<class CIndcBase *, class CIndcBase *> m_arGraphQue;	// Graph Array
 
-
+	CString m_slog;
 private:
 	bool	m_bDrawAll;
 //	bool	m_bDrawMouse;

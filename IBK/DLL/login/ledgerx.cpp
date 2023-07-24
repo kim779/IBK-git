@@ -5,6 +5,7 @@
 #include "axislogin.h"
 #include "ledgerx.h"
 #include "../../h/mapform.h"
+//#include "../../../ibks/h/mapform.h"
 
 
 #ifdef _DEBUG
@@ -26,7 +27,11 @@ CLedger::CLedger(void* data)
 	FillMemory(m_ledger, L_ledgerH, ' ');
 	parseParam((char *)data);
 
+	int isize = L_ledgerH;
 	m_text.Empty();
+
+	//CAxisloginApp* app = (CAxisloginApp*)AfxGetApp();
+	//m_ledger[216] = app->m_logintype;
 }
 
 CLedger::~CLedger()
@@ -79,6 +84,7 @@ BEGIN_DISPATCH_MAP(CLedger, CCmdTarget)
 	DISP_PROPERTY_EX(CLedger, "Skip", _getSkip, _setSkip, VT_BSTR)
 	DISP_PROPERTY_EX(CLedger, "Term", _getTerm, SetNotSupported, VT_BSTR)
 	//}}AFX_DISPATCH_MAP
+	DISP_PROPERTY_EX_ID(CLedger, "LoginType", dispidLoginType, GetLoginType, SetNotSupported, VT_BSTR)
 END_DISPATCH_MAP()
 
 // Note: we add support for IID_ILedger to support typesafe binding
@@ -119,7 +125,7 @@ BSTR CLedger::_getSvcd()
 void CLedger::_setSvcd(LPCTSTR lpszNewValue) 
 {
 	struct	_ledgerH* ledgerH;
-
+	//ledgerH->fil2
 	ledgerH = (struct _ledgerH *)m_ledger;
 	CopyMemory(ledgerH->svcd, lpszNewValue, min(sizeof(ledgerH->svcd), strlen(lpszNewValue)));
 }
@@ -425,8 +431,12 @@ CString CLedger::GetLedger(int pos, int length)
 	}
 
 	m_text.Empty();
-	if (pos >= 0 && length >= 0 && pos+length <= L_ledgerH)
+	if (pos >= 0 && length >= 0 && pos + length <= L_ledgerH)
+	{
 		m_text = CString(&m_ledger[pos], length);
+	//	m_text
+	}
+	//	m_text = CString(&m_ledger[pos], length);
 
 	return m_text;
 }
@@ -481,6 +491,7 @@ void CLedger::parseParam(void* param)
 	mapH = (struct _mapH *)param;
 	ledgerH = (struct _ledgerH *)m_ledger;
 	CopyMemory(ledgerH->svcd, &mapH->trxH[3], sizeof(ledgerH->svcd));
+	//CopyMemory(ledgerH->svcd, "pibopbxq", 8);
 	CopyMemory(ledgerH->usid, app->m_user, min(app->m_user.GetLength(), sizeof(ledgerH->usid)));
 	CopyMemory(ledgerH->pcip, app->m_host, min(app->m_host.GetLength(), sizeof(ledgerH->pcip)));
 	CopyMemory(ledgerH->brno, app->m_brno, min(app->m_brno.GetLength(), sizeof(ledgerH->brno)));
@@ -489,4 +500,16 @@ void CLedger::parseParam(void* param)
 	ledgerH->fkey[0] = mapH->trxH[2];
 	ledgerH->mkty[0] = mapH->trxH[0];
 	ledgerH->odrf[0] = mapH->trxH[1];
+
+
+}
+
+BSTR CLedger::GetLoginType()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	CString strResult;
+
+	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
+	return strResult.AllocSysString();
 }

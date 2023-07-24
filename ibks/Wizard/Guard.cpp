@@ -25,6 +25,8 @@
 #include <future>
 #include <thread>
 
+#include "../../IBK/H/axislog.h"
+
 #ifdef _DEBUG
 #undef THIS_FILE
 static char THIS_FILE[]=__FILE__;
@@ -4934,6 +4936,10 @@ bool CGuard::Modal(int kind, CString keys, CString& currents, CString defs)
 
 CCmdTarget* CGuard::GetLedger(void* mapH)
 {
+	struct	_mapH* pmapH;
+	pmapH = (struct _mapH*)mapH;
+	m_slog.Format("trx=[%s] trxC=[%s] mapN=[%s]", pmapH->trxH, pmapH->trxC, pmapH->mapN);
+	LOG_OUTP(3, "CGuard", __FUNCTION__, m_slog);
 	if (axLedger)
 		return (CCmdTarget *)axLedger(mapH);
 	return NULL;
@@ -4944,6 +4950,8 @@ CString CGuard::GetLedger(CCmdTarget* ledger, int pos, int length)
 	if (axGetLedger)
 	{
 		char*	ptr = (char *)axGetLedger((void *)ledger, pos, length);
+		m_slog.Format("[axGetLedger]  pos=[%d] length=[%d] ptr=[%s]", pos, length, ptr);
+		LOG_OUTP(3, "CGuard", __FUNCTION__, m_slog);
 		if (ptr)
 			return CString(ptr);
 	}
@@ -4955,6 +4963,8 @@ CString CGuard::GetLedger(CCmdTarget* ledger, int id)
 	if (axGetLedgerEx)
 	{
 		char*	ptr = (char *)axGetLedgerEx((void *)ledger, id);
+		m_slog.Format("[axGetLedgerEx] id=[%d] ptr=[%s]", id, ptr);
+		LOG_OUTP(3, "CGuard", __FUNCTION__, m_slog);
 		if (ptr)
 			return CString(ptr);
 	}
@@ -4966,6 +4976,8 @@ CString CGuard::GetLedger(CCmdTarget* ledger, char* data, int id)
 	if (axGetLedgerData)
 	{
 		char*	ptr = (char *)axGetLedgerData((void *)ledger, (void *)data, id);
+		m_slog.Format("[axGetLedgerData] id=[%d] ptr=[%s]", id, ptr);
+		LOG_OUTP(3, "CGuard", __FUNCTION__, m_slog);
 		if (ptr)
 			return CString(ptr);
 	}
@@ -4975,19 +4987,31 @@ CString CGuard::GetLedger(CCmdTarget* ledger, char* data, int id)
 void CGuard::SetLedger(CCmdTarget* ledger, int pos, int length, char* data)
 {
 	if (axSetLedger)
-		axSetLedger((void *)ledger, pos, length, data);
+	{
+	//	m_slog.Format("[SetLedger] pos=[%d] length=[%d] data=[%s]", pos, length, data);
+	//	LOG_OUTP(3, "CGuard", __FUNCTION__, m_slog);
+		axSetLedger((void*)ledger, pos, length, data);
+	}
 }
 
 void CGuard::SetLedger(CCmdTarget* ledger, CString data)
 {
 	if (axLedgerEx)
-		axLedgerEx(ledger, (void *)data.operator LPCTSTR());
+	{
+		m_slog.Format("[SetLedger] data=[%s]", data);
+		LOG_OUTP(3, "CGuard", __FUNCTION__, m_slog);
+		axLedgerEx(ledger, (void*)data.operator LPCTSTR());
+	}
 }
 
 void CGuard::Ledger(char* ledger)
 {
 	if (axLoginLedger)
-		axLoginLedger((void *)ledger);
+	{
+		m_slog.Format("[Ledger] ledger=[%s]", ledger);
+		LOG_OUTP(3, "CGuard", __FUNCTION__, m_slog);
+		axLoginLedger((void*)ledger);
+	}
 }
 
 CString CGuard::GetLoginData(int id)
@@ -4995,6 +5019,8 @@ CString CGuard::GetLoginData(int id)
 	if (axLoginData)
 	{
 		char*	ptr = (char *)axLoginData(id);
+		m_slog.Format("[axLoginData] ptr=[%s]", ptr);
+		LOG_OUTP(3, "CGuard", __FUNCTION__, m_slog);
 		if (ptr)
 			return CString(ptr);
 	}

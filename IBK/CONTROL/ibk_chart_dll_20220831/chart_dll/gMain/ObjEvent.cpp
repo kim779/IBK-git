@@ -1405,6 +1405,7 @@ void CObjEvent::SelectTable(CPoint pt)
 CString CObjEvent::GetTipStr(CPoint pt)
 {
 	CString	strTip = _T("");
+	CString stmp;
 
 	if (!m_bShowTip)
 		return strTip;
@@ -1430,6 +1431,11 @@ CString CObjEvent::GetTipStr(CPoint pt)
 		CIndcBase *pMainIndc = m_pObjMgr->GetMainGraph();
 		str1 = pMainIndc->GetDisplayPosHeader(pt, false);
 		str2 = _T("");
+
+stmp.Format("\r\n[%s] m_mapRegion size=[%d] str1=[%s] m_arGraphQue size = [%d] iSelRgn = [%d]",
+	__FUNCTION__, m_pObjMgr->m_mapRegion.GetCount(), str1, m_pObjMgr->m_arGraphQue.GetSize(), iSelRgn);
+//OutputDebugString(stmp);
+
 		for (int ii =0; ii < m_pObjMgr->m_arGraphQue.GetSize(); ii++)
 		{
 			CIndcBase *pIndcBase = m_pObjMgr->m_arGraphQue.GetAt(ii);
@@ -1447,6 +1453,9 @@ CString CObjEvent::GetTipStr(CPoint pt)
 			return strTip;
 
 		strTip = str1 + str2;
+
+		stmp.Format("\r\n[%s] strTip  = [%s]", __FUNCTION__, strTip);
+		//OutputDebugString(stmp);
 	}
 	else	// 종합차트
 	{

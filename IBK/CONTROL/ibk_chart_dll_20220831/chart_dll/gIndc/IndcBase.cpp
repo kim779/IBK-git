@@ -1065,6 +1065,9 @@ int CIndcBase::SetDisplayScale(int& scaleUpDn)
 	m_iDispSPos -= scaleUpDn;
 	CalculateMinMax();
 
+	m_slog.Format("m_iDispDtCnt=[%d] m_iDispSPos=[%d]", m_iDispDtCnt, m_iDispSPos);
+	LOG_OUTP(3, "gIndc", __FUNCTION__, m_slog);
+
 	return m_iDispDtCnt;
 }
 

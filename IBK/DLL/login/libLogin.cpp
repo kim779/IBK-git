@@ -3,9 +3,13 @@
 #include "axislogin.h"
 #include "ledgerx.h"
 
+
+CString m_slog;
 __declspec(dllexport) void* APIENTRY axLogin(void* data)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	m_slog.Format("%s", data);
+	LOG_OUTP(3, "axislogin", __FUNCTION__, m_slog);
 
 	CAxisloginApp* app = (CAxisloginApp *)AfxGetApp();
 	if (data == NULL)
@@ -23,6 +27,8 @@ __declspec(dllexport) void* APIENTRY axLogin(void* data)
 __declspec(dllexport) void APIENTRY axLoginLedger(void* ledger)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	m_slog.Format("%s", (char*)ledger);
+	LOG_OUTP(3, "axislogin", __FUNCTION__, m_slog);
 
 	CAxisloginApp* app = (CAxisloginApp *)AfxGetApp();
 	struct	_ledgerH* ledgerH = (struct _ledgerH *)ledger;
@@ -36,6 +42,8 @@ __declspec(dllexport) void APIENTRY axLoginLedger(void* ledger)
 __declspec(dllexport) void* APIENTRY axLedger(void* data)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	m_slog.Format("%s", (char*)data);
+	LOG_OUTP(3, "axislogin", __FUNCTION__, m_slog);
 
 	CAxisloginApp* app = (CAxisloginApp *)AfxGetApp();
 	CLedger* ledger = new CLedger(data);
@@ -45,13 +53,16 @@ __declspec(dllexport) void* APIENTRY axLedger(void* data)
 __declspec(dllexport) void APIENTRY axLedgerEx(void* ledger, void* data)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
+	m_slog.Format("ledger=[%s] data=[%s]", (char*)ledger, (char*)data);
+	LOG_OUTP(3, "axislogin", __FUNCTION__, m_slog);
 	((CLedger *)ledger)->LedgerEx(data);
 }
 
 __declspec(dllexport) void* APIENTRY axGetLedger(void* ledger, int pos, int length)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	m_slog.Format("pos=[%d] length=[%d] ledger=[%s]", pos, length, (char*)ledger);
+	LOG_OUTP(3, "axislogin", __FUNCTION__, m_slog);
 
 	return (void *)((CLedger *)ledger)->GetLedger(pos, length).operator LPCTSTR();
 }
@@ -59,6 +70,8 @@ __declspec(dllexport) void* APIENTRY axGetLedger(void* ledger, int pos, int leng
 __declspec(dllexport) void APIENTRY axSetLedger(void* ledger, int pos, int length, void* data)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	//m_slog.Format("pos=[%d] length=[%d]  ledger=[%s] data=[%s]", pos, length, (char*)ledger, (char*)data);
+	//LOG_OUTP(3, "axislogin", __FUNCTION__, m_slog);
 
 	((CLedger *)ledger)->SetLedger(pos, length, data);
 }
@@ -66,13 +79,19 @@ __declspec(dllexport) void APIENTRY axSetLedger(void* ledger, int pos, int lengt
 __declspec(dllexport) void* APIENTRY axGetLedgerEx(void* ledger, int id)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
+	m_slog.Format("id=[%d] ledger=[%s]", id, (char*)ledger);
+	LOG_OUTP(3, "axislogin", __FUNCTION__, m_slog);
+//	m_slog.Format("[%s]", ((CLedger*)ledger)->GetClassledger());
+//	LOG_OUTP(3, "axislogin", __FUNCTION__, m_slog);
 	return (void *)((CLedger *)ledger)->GetLedgerEx(id, NULL).operator LPCTSTR();
 }
 
 __declspec(dllexport) void* APIENTRY axGetLedgerData(void* ledger, void* data, int id)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	m_slog.Format("id=[%d] ret=[%d]  ledger=[%s] data=[%s] ", 
+		id, (char*)((CLedger*)ledger)->GetLedgerEx(id, data).operator LPCTSTR(), (char*)ledger, data);
+	LOG_OUTP(3, "axislogin", __FUNCTION__, m_slog);
 
 	return (void *)((CLedger *)ledger)->GetLedgerEx(id, data).operator LPCTSTR();
 }
@@ -80,7 +99,10 @@ __declspec(dllexport) void* APIENTRY axGetLedgerData(void* ledger, void* data, i
 __declspec(dllexport) void* APIENTRY axLoginData(int id)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
 	CAxisloginApp* app = (CAxisloginApp *)AfxGetApp();
+
+	m_slog.Format("id=[%d] ret=[%s] ", id, (char*)app->m_login->GetLogin(id).operator LPCTSTR());
+	LOG_OUTP(3, "axislogin", __FUNCTION__, m_slog);
+
 	return (void *)(app->m_login->GetLogin(id).operator LPCTSTR());
 }

@@ -148,7 +148,9 @@ public:
 	int	GetDisplayDay() { return m_iDispDtCnt; }
 	int	GetDisplayPos() { return m_iDispSPos; }
 	int	GetDisplayEnd() { return m_iDispEPos; }
-	void	SetDisplayDay(int day) { m_iDispDtCnt = day; }
+	void	SetDisplayDay(int day) { 
+		m_iDispDtCnt = day; 
+	}
 	void	SetDisplayPos(int pos) { m_iDispSPos = pos; }
 	void	SetDisplayEnd(int end) { m_iDispEPos = end; }
 	bool	SetDisplay(int iDisDay);
@@ -219,6 +221,7 @@ protected:
 	COLORREF GetColor(int index);
 public:
 	CRect	GetChartRect() const { return m_rectChart; }
+	CString m_slog;
 };
 
 #endif // !defined(AFX_INDCBASE_H__1EEF3B5D_F940_48A3_AF0F_52814B5B97E2__INCLUDED_)

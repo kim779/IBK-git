@@ -30,6 +30,8 @@ public:
 	virtual	CString	ExcelData(int idx) { return ""; }
 
 	virtual void	DrawLegend(CDC* pDC);
+
+	CString m_slog;
 };
 
 #endif // !defined(AFX_BJUGACHART_H__37AD8BEE_6618_4A50_AF26_5ED94B831F61__INCLUDED_)

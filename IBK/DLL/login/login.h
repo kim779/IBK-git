@@ -16,7 +16,7 @@ class CLogin : public CCmdTarget
 
 	CLogin();           // protected constructor used by dynamic creation
 	virtual ~CLogin();
-
+	void ChekcLoginType();
 // Attributes
 private:
 	CString	m_returns;

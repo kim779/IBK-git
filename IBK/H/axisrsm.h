@@ -16,19 +16,22 @@
 //		 01.00	2000-07	Initial version
 // *****************************************************************************
 
-#pragma once
+#ifndef	_AXISRSM_
+#define	_AXISRSM_
+
 #pragma pack(1)
+
 //
 //	AXIS resource message format
 //
 struct	_rsmH {
-	unsigned char	dirF{};		// direction flow
-	unsigned char	resK{};		// resource kind
-	unsigned char	resC{};		// resource control
-	unsigned char	resF{};		// resource flow
-	char	resN[64+1]{};		// resource name, path + name
-	char	rsvB[4]{};		// reserved byte for future
-	char	datL[5]{};		// following resource data length
+	unsigned char	dirF;		// direction flow
+	unsigned char	resK;		// resource kind
+	unsigned char	resC;		// resource control
+	unsigned char	resF;		// resource flow
+	char	resN[128+1];		// resource name, path + name
+	char	rsvB[4];		// reserved byte for future
+	char	datL[5];		// following resource data length
 };
 
 #define	L_rsmH	sizeof(struct _rsmH)
@@ -48,11 +51,13 @@ struct	_rsmH {
 
 #define	resK_SYMB	0x04		// symbol table
 #define	resK_UINFO	0x05		// user object relation information
+#define	resK_TRX	0x06		// trx information
 
 #define	resK_REQ	0x80		// request runtime module information
 #define	resK_REQ2	0x81		// request resource information
 #define	resK_REQ3	0x82		// request MAP category
 #define	resK_RSP	0x83		// resource end response
+#define	resK_REQ4	0x84		// request trx module information
 
 #define	resK_ERR	0x90		// resource error indicator
 #define	resK_ERR2	0x99		// error ... terminate
@@ -63,8 +68,11 @@ struct	_rsmH {
 #define	resC_ASCII	0x01		// ascii resource (default bin)
 #define	resC_DIR	0x02		// directory resource (default file)
 #define	resC_INFO	0x04		// information resource (not file)
+#define	resC_EXT	0x08		// resN size = 128+1 (64 -> 128)
 #define	resC_RSP	0x10		// resquest RSP
 #define	resC_ZIP	0x20		// zip file format
+#define	resC_MAKHDR	0x40		// make header
+#define	resC_EXPORT	0x80		// export
 
 //
 //	_rsmH.resF
@@ -75,4 +83,12 @@ struct	_rsmH {
 #define	resF_ONLY	0x04		// only chain resource
 #define	resF_RM		0x80		// resource remove
 
-#pragma pack()
+
+//
+//	_rsmH.rsvB
+//
+#define	rsvB_NEW	0x01		// rsvB[0] : new(VS2019) resource download request
+
+#pragma	pack()
+
+#endif

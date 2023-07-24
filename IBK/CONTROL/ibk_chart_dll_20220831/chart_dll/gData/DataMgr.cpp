@@ -63,8 +63,6 @@ static char THIS_FILE[]=__FILE__;
 
 CDataMgr::CDataMgr(CWnd *pParent)
 {
-	LOG_OUTP(2, "AXISGDATA", __FUNCTION__);
-
 	m_pParent = pParent;
 	m_dDollar = 0;
 }
@@ -431,7 +429,14 @@ int CDataMgr::ParseRealtime(CString sCode, CString strRTData, bool& rbIncrease)
 		strRTData = strRTData.Mid(iPos);
 	}
 	
-
+	CString slog, stmp;
+	
+	if (mapRtmStore.Lookup("000", strVal))
+	{
+		stmp.Format("000 심볼=[%s]  ", strVal);
+		slog += stmp;
+	}
+	
 	CString	astrSymbol[10] = { R_CTIM, R_CURR, R_DIFF, R_UDYL, R_GVOL, R_MDGA, R_MSGA, R_SIGA, R_KOGA, R_JEGA};
 	CString	astrBasicVal[10] = { "", "", "", "", "", "", "", "", "", ""};
 	for (int ii = 0; ii < 10; ii++)
@@ -442,6 +447,59 @@ int CDataMgr::ParseRealtime(CString sCode, CString strRTData, bool& rbIncrease)
 			if (strSymbol == astrSymbol[ii])
 			{
 				astrBasicVal[ii].Format(_T("%s"), strVal.GetString());
+
+
+				if (strSymbol == R_CTIM)
+				{
+					stmp.Format("체결시간=[%s]  ", strVal);
+					slog += stmp;
+				}
+				else if (strSymbol == R_CURR)
+				{
+					stmp.Format("현재가=[%s]  ", strVal);
+					slog += stmp;
+				}
+				else if (strSymbol == R_DIFF)
+				{
+					stmp.Format("전일대비=[%s]  ", strVal);
+					slog += stmp;
+				}
+				else if (strSymbol == R_UDYL)
+				{
+					stmp.Format("등락률=[%s]  ", strVal);
+					slog += stmp;
+				}
+				else if (strSymbol == R_GVOL)
+				{
+					stmp.Format("거래량=[%s]  ", strVal);
+					slog += stmp;
+				}
+				else if (strSymbol == R_MDGA)
+				{
+					stmp.Format("매도호가=[%s]  ", strVal);
+					slog += stmp;
+				}
+				else if (strSymbol == R_MSGA)
+				{
+					stmp.Format("매수호가=[%s]  ", strVal);
+					slog += stmp;
+				}
+				else if (strSymbol == R_SIGA)
+				{
+					stmp.Format("시가=[%s]  ", strVal);
+					slog += stmp;
+				}
+				else if (strSymbol == R_KOGA)
+				{
+					stmp.Format("고가=[%s]  ", strVal);
+					slog += stmp;
+				}
+				else if (strSymbol == R_JEGA)
+				{
+					stmp.Format("저가=[%s]  ", strVal);
+					slog += stmp;
+				}
+
 				break;
 			}
 		}
@@ -480,13 +538,32 @@ int CDataMgr::ParseRealtime(CString sCode, CString strRTData, bool& rbIncrease)
 			if (strSymbol == astrSymbol[ii])
 			{
 				astrBasicVal[ii].Format(_T("%s"), strVal.GetString());
+				if (ii == 0)
+				{
+					stmp.Format("체결수량=[%s]  ", strVal.GetString());
+					slog += stmp;
+				}
+				else if (ii == 1)
+				{
+					stmp.Format("거래대금=[%s]  ", strVal.GetString());
+					slog += stmp;
+				}
 				break;
 			}
 		}
 	}
 
+	
+	LOG_OUTP(3, "gData", __FUNCTION__, " ");
+	LOG_OUTP(3, "gData", __FUNCTION__, " ");
+	LOG_OUTP(3, "gData", __FUNCTION__, slog);
+
 	if (m_strCtim.GetLength() < 6 || astrBasicVal[0].IsEmpty())
+	{
+		slog.Format("34심볼 체결시간이 이상하다 m_strCtim = [%s]", m_strCtim);  //check
+		LOG_OUTP(3, "gData", __FUNCTION__, slog);
 		return iResponse;
+	}
 	
 	CString	strCurr = m_strCurr;
 	if (sCode.GetLength() == 5)	// 업종은 체결부호 심볼이 안들어옴
@@ -514,6 +591,13 @@ int CDataMgr::ParseRealtime(CString sCode, CString strRTData, bool& rbIncrease)
 
 	mapRtmStore.RemoveAll();
 
+	if(iResponse == RTM_UPDATE)
+		slog.Format("iResponse = RTM_UPDATE");  //check
+	else if(iResponse == RTM_ALL)
+		slog.Format("iResponse = RTM_ALL");  //check
+	else if (iResponse == RTM_SHIFT)
+		slog.Format("iResponse = RTM_SHIFT");  //check
+	LOG_OUTP(3, "gData", __FUNCTION__, slog);
 	return iResponse;
 }
 

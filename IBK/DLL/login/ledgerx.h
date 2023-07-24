@@ -30,7 +30,7 @@ public:
 	CString	GetLedger(int pos, int length);
 	CString	GetLedgerEx(int id, void* data);
 	void	SetLedger(int pos, int length, void* data);
-
+	CString GetClassledger() { return m_ledger; };
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CLedger)
@@ -86,6 +86,12 @@ protected:
 	//}}AFX_DISPATCH
 	DECLARE_DISPATCH_MAP()
 	DECLARE_INTERFACE_MAP()
+	BSTR GetLoginType();
+
+	enum
+	{
+		dispidLoginType = 25
+	};
 };
 
 /////////////////////////////////////////////////////////////////////////////

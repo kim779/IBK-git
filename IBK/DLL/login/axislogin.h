@@ -32,7 +32,7 @@ public:
 	CString	m_term;
 	CString	m_brno;
 	CString	m_cogb;
-
+	char	m_logintype;
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CAxisloginApp)
