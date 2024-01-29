@@ -134,7 +134,24 @@ LONG CGroupWnd::OnManage(WPARAM wParam, LPARAM lParam)
 	case MK_CLOSEGRID:
 		CloseGrid(HIWORD(wParam));
 
+		//((CMainWnd*)m_pMainWnd)->SendMinMaxInfo();
 		break;
+// 	case MK_TURNCODE:
+// 		{
+// 			int	nsec = HIWORD(wParam);
+// 			if (nsec == 0)
+// 			{
+// 				for ( int ii = 0 ; ii < m_nGroup ; ii++ )
+// 				{
+// 					m_GridWnd[ii]->SendMessage(WM_MANAGE, MK_TURNCODE);
+// 				}
+// 			}
+// 			else
+// 			{
+// 				m_GridWnd[m_nCurSel]->SendMessage(WM_MANAGE, MAKEWPARAM(MK_TURNCODE, nsec));
+// 			}
+// 		}
+// 		break;
 
 	case MK_SETUPOK:	
 		{
@@ -152,10 +169,6 @@ LONG CGroupWnd::OnManage(WPARAM wParam, LPARAM lParam)
 			m_GridWnd[m_nCurSel]->SendMessage(WM_MANAGE, MK_TURNCODE);
 
 			SelectOper();
-
-m_slog.Format("[cx_interest][CGroupWnd][OnManage][remove]<%s>", m_sMap);
-OutputDebugString(m_slog);
-
 			ReSetupGrid();
 
 			if(((CMainWnd*)m_pMainWnd)->m_bRemain)
@@ -248,6 +261,8 @@ OutputDebugString(m_slog);
 		else
 			ret = GroupMinus((BOOL)lParam);
 
+		//((CMainWnd*)m_pMainWnd)->SendMinMaxInfo();
+
 		InitGrid();
 		break;
 	case MK_ENDDRAG:
@@ -265,6 +280,7 @@ OutputDebugString(m_slog);
 			const int	nOver = (int)pWnd->SendMessage(WM_MANAGE, MK_INPUTOVER);
 			if (nOver == MO_VISIBLE)
 			{
+//				ret = (m_nGroup - m_nCurSel) * GetRowCount();
 				ret = (m_nGroup - m_nCurSel) * MAX_LINE;
 			}
 			else if (nOver == MO_FULL)
@@ -289,7 +305,8 @@ OutputDebugString(m_slog);
 		break;
 	case MK_CHANGERECOMMANDFIELD:
 		{
-
+// 			m_isRecommand = true;
+// 			SetEqualizerField(3);
 		}
 		break;
 	case MK_TREEDATA:
@@ -300,15 +317,24 @@ OutputDebugString(m_slog);
 		break;
 	case MK_SAVEFOROUB:
 		{
+// 			CGridData*	pGridData = (CGridData*)lParam;
+// 			
+// 			m_GridWnd[0]->SendMessage(WM_MANAGE, MK_SAVEFOROUB, (LPARAM)&pGridData);
 			m_GridWnd[0]->SendMessage(WM_MANAGE, MK_SAVEFOROUB);
 		}
 		break;
-
+// 	case MK_UPJONGDATA:
+// 		{
+// 			CGridData*	pGridData = (CGridData*)lParam;
+// 			SendUpjnGrid(pGridData);
+// 		}	
+// 		break;
 	case MK_RECVDATA:
 		RecvOper(HIWORD(wParam), (CRecvData*)lParam);
 		break;
 	case MK_RTSDATA:
-		RecvRTS((CRecvData*)lParam);
+		//RecvRTS((CRecvData*)lParam);
+		//RecvRTS(lParam);
 		break;
 	case MK_SELINT:
 		SendGrid(m_nCurSel, (int)lParam);
@@ -488,7 +514,6 @@ void CGroupWnd::RecvOper(int kind, CRecvData* rdata)
 			m_GridWnd[0]->SendMessage(WM_MANAGE, MAKEWPARAM(MK_RECVDATA2, 0), (LPARAM)rdata);
 			m_GridWnd[1]->m_SendKey = TRKEY_GRIDNEW;
 			m_GridWnd[1]->SendMessage(WM_MANAGE, MAKEWPARAM(MK_RECVDATA2, m_GridWnd[0]->GetRowcount() * 100), (LPARAM)rdata);
-			((CMainWnd*)m_pMainWnd)->m_bChangeGroup = FALSE;  //test 20230223
 		}
 	}
 	else
@@ -760,7 +785,7 @@ void CGroupWnd::savecfg()
 void CGroupWnd::OperInit()
 {
 	((CMainWnd*)m_pMainWnd)->GetParamRect();
-	m_sMap = ((CMainWnd*)m_pMainWnd)->m_strMap;
+	
 	loadcfg();
 	CreateGrid();
 
@@ -781,6 +806,8 @@ void CGroupWnd::InitSetGroup()
 	const UINT   val = MAKE_TREEID(xINTEREST, 0, 2, gIndex, TD_ITEM);
 }
 
+
+//관심그룹 index 저장
 void CGroupWnd::saveGroupIndex(int index)
 {
 
@@ -794,6 +821,7 @@ void CGroupWnd::SetInitSortingValue()
 		m_GridWnd[ii]->SetInitSortingValue();
 	}
 }
+// KSJ
 
 void CGroupWnd::InitGrid()
 {
@@ -866,6 +894,8 @@ void CGroupWnd::InitGrid()
 			else
 				max = MAX_LINE;
 
+			//pWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_TREEDATA, max), (LPARAM)&sdata);  //1
+			
 			int i = 0;
 			isFind = false;
 
@@ -933,9 +963,6 @@ void CGroupWnd::InitGrid()
 
 void CGroupWnd::RefreshGrid()
 {
-	m_slog.Format("[cx_interest][CGroupWnd][RefreshGrid][remove]<%s>", m_sMap);
-	OutputDebugString(m_slog);
-
 	CWnd*	pWnd = (CWnd*)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_TOOL));
 	UINT	kind = 0;
 	CMapWordToPtr	mapNews;
@@ -987,8 +1014,6 @@ void CGroupWnd::RefreshGrid()
 
 void CGroupWnd::ReSetupGrid()
 {
-m_slog.Format("[cx_interest][CGroupWnd][ReSetupGrid][remove]<%s>", m_sMap);
-OutputDebugString(m_slog);
 	CWnd*	pWnd = (CWnd*)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_TOOL));
 	class CGridData	sdata;
 	UINT	kind = 0;
@@ -1012,7 +1037,10 @@ OutputDebugString(m_slog);
 		
 		if(kind == 0)
 		{
-
+// 			MessageBox("선택한 화면은 빈 공간입니다. 원하시는 그룹을 선택하신 후 버튼을 클릭하여 주세요.", "IBK투자증권");
+// 			CWnd* pToolWnd = (CWnd*)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_TOOL));
+// 			pToolWnd->SendMessage(WM_COMMAND, IDC_BT_ADDSELECT);
+// 			return;
 		}
 	}
 
@@ -1150,6 +1178,9 @@ int CGroupWnd::getTotalSize()
 	return total;
 }
 
+
+
+
 void CGroupWnd::MakeGridRect(CRect rcFull)
 {
 	m_arRECT.RemoveAll();
@@ -1184,8 +1215,11 @@ void CGroupWnd::MakeGridRect(CRect rcFull)
 		rcUp.left = rcGrid.right;
 		rcDn.left = rcGrid.right;
 
+//		rcGrid.left += SIZE_DIVIDE;		
+		//if (i == m_nGroup - 1)
 		if (i == m_nGroup - 1 )//BUFFET +1
 			nWidth = rcFull.Width() - (nWidth * (m_nGroup - 1));
+//			nWidth = rcFull.Width() - nWidth;
 
 		rcGrid.right = rcGrid.left + nWidth ;
 
@@ -1196,6 +1230,7 @@ void CGroupWnd::MakeGridRect(CRect rcFull)
 
 		rcDivide.right = rcGrid.left;
 		
+		//if (i < m_nGroup - 1)
 		if (i < m_nGroup+1 )//BUFFET +1
 			m_arDIVIDE.Add(rcDivide);// 
 
@@ -1208,8 +1243,138 @@ void CGroupWnd::MakeGridRect(CRect rcFull)
 			m_arRATE.SetAt(i, rcGrid.Width());
 		}
 	}
-}
 
+/*
+	int nCount = m_arRECT.GetSize();
+	m_arDIVIDE.RemoveAll();
+
+	if (nCount == 0)
+		return;
+
+	int nHeight = m_rect.Height();
+	int nPrevWidth = 0;
+	int nCurWidth = rcFull.Width() - (m_nGroup - 1) * SIZE_DIVIDE;
+	int nCalcWidth = 0;
+	int nAvgWidth = 0;
+	int nFindCount = 0;
+	int nGridWidth = 0;
+	CRect rcPrev(0, 0, 0, 0);
+	CRect rcCur;
+	CRect rcDivide = rcFull;
+
+	BOOL bIncrease = FALSE;
+	BOOL bFind = TRUE;
+	BOOL bOK = FALSE;
+	
+	for (int i = 0; i < nCount; i++)
+		nPrevWidth += m_arRECT.GetAt(i).Width();
+
+	if (nPrevWidth < nCurWidth)
+		bIncrease = TRUE;
+	else if (nPrevWidth == nCurWidth)
+		return;
+
+	nCalcWidth = nCurWidth;
+
+	while (bFind)
+	{
+		bFind = FALSE;
+
+		if (nCount == nFindCount)
+			break;
+
+		nAvgWidth = nCalcWidth / (nCount - nFindCount);
+
+		nCalcWidth = nCurWidth;
+		nFindCount = 0;
+
+		for (int i = 0; i < nCount; i++)
+		{
+			rcCur = m_arRECT.GetAt(i);
+
+			if ((bIncrease && nAvgWidth > rcCur.Width()) || (!bIncrease && nAvgWidth < rcCur.Width()))
+				bOK = TRUE;
+			else
+				bOK = FALSE;
+
+			if (bOK)
+			{
+				bFind = TRUE;
+				nFindCount++;
+				nCalcWidth -= rcCur.Width();
+			}
+
+			bOK = FALSE;
+		}
+	}
+
+	for (i = 0; i < nCount; i++)
+	{
+		rcCur = m_arRECT.GetAt(i);
+		nGridWidth = rcCur.Width();
+
+		rcCur.left = rcPrev.right;
+		
+		if (i > 0)
+			rcCur.left += SIZE_DIVIDE;
+
+		if ((bIncrease && nAvgWidth > nGridWidth) || (!bIncrease && nAvgWidth < nGridWidth))
+			rcCur.right = rcCur.left + nAvgWidth;
+		else
+			rcCur.right = rcCur.left + nGridWidth;
+		
+		rcDivide.left = rcCur.right;
+		rcDivide.right = rcDivide.left + SIZE_DIVIDE;
+
+		if (i < m_nGroup - 1)
+			m_arDIVIDE.Add(rcDivide);
+
+		rcPrev = rcCur;
+
+		if (rcCur.Height() == 0)
+			rcCur.bottom += nHeight;
+
+		m_arRECT.SetAt(i, rcCur);
+		m_arRATE.SetAt(i, rcCur.Width());
+	}
+
+*/
+/*
+
+	int	total = getTotalSize();
+	int	nGapsize = SIZE_DIVIDE * (m_nGroup - 1);
+	int	nWidth = rcFull.Width();
+	int	nReal = nWidth - nGapsize;
+	CRect	rect(rcFull.left, rcFull.top, 0, rcFull.bottom);
+	CRect	rcDivide = rect;
+	CRect	rcGroup;
+	int	val = 0;
+	
+	for ( int ii = 0 ; ii < m_nGroup ; ii++ )
+	{
+		if (ii == (m_nGroup - 1))
+		{
+			rect.right = rcFull.right;
+			rcGroup = rect;
+		}
+		else
+		{
+			val = m_arRATE.GetAt(ii);
+			rect.right = (int)((double)rect.left + ((double)(nReal * val) / (double)total));
+//			if (rect.Width() <= SIZE_GROUPMINX)
+//				rect.right = rect.left + SIZE_GROUPMINX;
+			rcGroup = rect;
+			rcDivide.left = rect.right; 
+			rcDivide.right = rcDivide.left + SIZE_DIVIDE + 1;
+			rect.left = rcDivide.right;
+			m_arDIVIDE.Add(rcDivide);
+		}
+
+		m_arRECT.Add(rcGroup);					
+	}
+*/
+}
+/* fdgdgfdgfdg */
 void CGroupWnd::OperResize(int cx, int cy)
 {
 	const CRect	rect(0, 0, cx, cy);
@@ -1253,12 +1418,10 @@ void CGroupWnd::OperResize(int cx, int cy)
 		m_GridWnd[ii]->ShowWindow(SW_HIDE);
 	}
 
-	//test 20230203
+	//test 20230209
 	for (int ii = 0; ii < m_cntGroup; ii++)
-	{
 		m_GridWnd[ii]->m_iIndex = ii;
-	}
-
+	
 	InvalidateDivide();
 }
 
@@ -1325,6 +1488,17 @@ void CGroupWnd::CreateGrid()
 
 		//TRACE("CREATE GRID %d HANDLE %d",ii,m_GridWnd[ii]);
 	}
+
+	// 업종만 볼 목적으로 추가 생성
+// 	m_GridWndUpjn = new CGridWnd(m_pMainWnd, ii);
+// 	
+// 	m_GridWndUpjn->m_bWaveApply  = m_bWaveApply;
+// 	m_GridWndUpjn->m_strWaveFile = m_strWaveFile;
+// 	m_GridWndUpjn->m_bPopupDlg   = m_bPopupDlg;
+// 	m_GridWndUpjn->m_bDispCode   = m_bDispCode;
+// 	
+// 	m_GridWndUpjn->Create(nullptr, nullptr, WS_CHILD, CRect(0, 0, 0, 0), this, IDC_GRIDWND + ii);
+
 }
 
 void CGroupWnd::DestroyGrid()
@@ -1334,6 +1508,7 @@ void CGroupWnd::DestroyGrid()
 
 void CGroupWnd::OperDestory()
 {
+
 	savecfg();
 	DestroyGrid();
 }
@@ -1362,7 +1537,8 @@ void CGroupWnd::DrawDivide(CDC* pDC)
 		
 		DrawHigV(pDC,rect,clrLight,clrLight);
 	}
-
+	// END MODIFY
+	
 	ncnt = m_arDIVIDE.GetSize();
 
 	for (int ii = 0 ; ii < ncnt ; ii++ )
@@ -1591,7 +1767,10 @@ void CGroupWnd::ExpectOper(int param)
 	
 	if(nOver == MO_VISIBLE)
 	{
-	
+		//pWnd->SendMessage(WM_MANAGE, MK_SENDTREE);
+// 		CWnd*	pTreeWnd = (CWnd*)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_TREE));
+// 		
+// 		pTreeWnd->SendMessage(WM_MANAGE,MK_REMAIN);
 	}
 	else
 	{
@@ -1634,6 +1813,7 @@ void CGroupWnd::AutoExpectOper(int param)
 	}
 }
 
+
 void CGroupWnd::SetEqualizerField(int param)
 {
 	for ( int ii = 0 ; ii < m_nGroup ; ii++ )
@@ -1646,12 +1826,24 @@ void CGroupWnd::SetEqualizerField(int param)
 		{
 			m_GridWnd[ii]->FieldSetup(false, param);
 		}
+
+		
+// 		CWnd* pWnd = (CWnd*)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_TOOL));	
+// 		pWnd->SendMessage(WM_MANAGE, MK_SENDTREE);	
+// 		m_GridWnd[ii]->SendMessage(WM_MANAGE, MK_SENDTR);
 	}
+
+// 	if(param != 3)
+// 	{
+// 		m_GridWnd[0]->SaveAsInterField();
+// 	}
 }
 
 
 void CGroupWnd::OnMouseMove(UINT nFlags, CPoint point) 
 {
+//	TRACE("CGroupWnd::OnMouseMove\n");
+
 	if (m_bDivide)
 	{
 		DrawMove(m_rcDIVIDE);
@@ -1700,6 +1892,7 @@ void CGroupWnd::OnLButtonUp(UINT nFlags, CPoint point)
 		const CRect	rcDivide = GetMovedRect(m_nIndex, point.x - m_xPos);//BUFFET +1
 		m_arDIVIDE.SetAt(m_nIndex+1, rcDivide);//BUFFET +1
 		
+		//BUFFET FOR REPOSITION
 		SetMovedRect(m_nIndex, point.x - m_xPos);
 
 		CRect	rcL, rcR;
@@ -1734,6 +1927,7 @@ void CGroupWnd::OnLButtonUp(UINT nFlags, CPoint point)
 		}
 		
 		InvalidateDivide();
+//		OperResize(m_rect.Width(), m_rect.Height());
 	}
 
 	DrawMove(m_rcDIVIDE);
@@ -1939,9 +2133,6 @@ void CGroupWnd::SendGrid(int nIndex, UINT kind)
 
 void CGroupWnd::SendGrid(int nIndex, CGridData* sdata)
 {
-	m_slog.Format("[cx_interest][CGroupWnd][SendGrid][remove]<%s>", m_sMap);
-	OutputDebugString(m_slog);
-
 	UINT	kind = sdata->GetKind();
 
 	if(((CMainWnd*)m_pMainWnd)->m_bRemain)
@@ -1976,20 +2167,16 @@ void CGroupWnd::SendGrid(int nIndex, CGridData* sdata)
 	}
 }
 
+
+
 int CGroupWnd::OverOper(int nIndex, CGridData* sdata)
 {
-m_slog.Format("[cx_interest][CGroupWnd][OverOper][remove]<%s>", m_sMap);
-OutputDebugString(m_slog);
-
 	CWnd*	pWnd = (CWnd*)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_TOOL));
 
 	int	nOver = (int)pWnd->SendMessage(WM_MANAGE, MK_INPUTOVER);	
 	UINT	kind = sdata->GetKind();
 	const int	nOld = nIndex;
 	const int	nGroup = m_nGroup - nIndex;
-
-	m_slog.Format("------------------[cx_interest] OverOper[%d]   nGroup=[%d] nIndex=[%d] \r\n", nOver, nGroup, nIndex);
-	OutputDebugString(m_slog);
 
 	if (sdata->GetCount() == 0)
 		nOver = MO_SELECT;
@@ -2003,15 +2190,11 @@ OutputDebugString(m_slog);
 
 			if (nOver == MO_VISIBLE)
 			{
-				max = GetRowCount(); //test 20230206 확인
-				//max = 24;
-
+				max = GetRowCount();   //test 20290209 확인!!
+				//max = 24;  
+				
 				const int gridWidth = m_GridWnd[nIndex]->GetWidth();
 				const int intGridWidth = m_GridWnd[nIndex]->GetGridWidth();
-
-m_slog.Format("^^^^^^^^^------------------[cx_interest] OverOper max=[%d]  gridWidth=[%d] intGridWidth=[%d] \r\n", 
-max, gridWidth, intGridWidth);
-OutputDebugString(m_slog);
 
 				if((gridWidth - intGridWidth) < 0)
 				{
@@ -2038,9 +2221,6 @@ OutputDebugString(m_slog);
 			
 			int	nPos = 0;
 
-m_slog.Format("^^^^^^^^^^------------------[cx_interest] OverOper max=[%d] ncnt=[%d] \r\n", max, ncnt);
-OutputDebugString(m_slog);
-			
 			int kk = 0;
 			for ( kk = 0 ; kk < ncnt ; kk++ )
 			{
@@ -2074,7 +2254,7 @@ OutputDebugString(m_slog);
 
 				m_GridWnd[nIndex]->AddData(nPos++, sdata->m_arDatas.GetAt(kk));							
 			}				
-		
+			
 			//그룹에 못보여진 종목이 있을경우 마지막 창에 append한다
 			while(kk < ncnt)
 			{
@@ -2102,19 +2282,22 @@ OutputDebugString(m_slog);
 
 void CGroupWnd::RecvRTS(CRecvData* rdata)
 {
-	for ( int ii = 0 ; ii < m_nGroup ; ii++ )
+	for (int ii = 0; ii < m_nGroup; ii++)
 	{
 		m_GridWnd[ii]->SendMessage(WM_MANAGE, MK_RTSDATA, rdata->m_lParam);
 	}
 }
 
-//2012.02.10 KSJ
-void CGroupWnd::RecvRTSx(LPARAM lParam)
+void CGroupWnd::RecvRTSx(LPARAM lParam, int igubn)
 {
 	for (int ii = 0; ii < m_nGroup; ii++)
-		m_GridWnd[ii]->RecvRTSx(lParam);
+	{
+		if (igubn == 1)
+			m_GridWnd[ii]->parsingAlertx(lParam);
+		else
+			m_GridWnd[ii]->RTS_parsingAlertx(lParam);
+	}
 }
-// KSJ
 
 void CGroupWnd::CloseGrid(int nIndex)
 {
@@ -2153,6 +2336,8 @@ void CGroupWnd::CloseGrid(int nIndex)
 
 	SelectOper();
 	GroupMinus(bExpand);
+
+//	pWnd->SendMessage(WM_MANAGE, MK_SENDTREE);
 }
 
 void CGroupWnd::InvalidateDivide()
@@ -2240,6 +2425,8 @@ int CGroupWnd::GetGroupCount()
 
 void CGroupWnd::Recover()
 {
+m_slog.Format("[interest][cx_interest][%s] ", __FUNCTION__);
+OutputDebugString(m_slog);
 	int gno = 0;
 	CString strPath(_T("")), strTemp(_T("")), strBook(_T(""));
 
@@ -2250,6 +2437,7 @@ void CGroupWnd::Recover()
 	
 	strPath.Format("%s/%s/%s/portfolio.i%02d", m_root, USRDIR, m_user, gno);
 	strBook.Format("%s/%s/%s/bookmark.i%02d", m_root, USRDIR, m_user, gno);
+	
 	
 	CopyFile(strPath+".org",strPath,FALSE);
 	CopyFile(strBook+".org",strBook,FALSE);
@@ -2265,6 +2453,8 @@ void CGroupWnd::Recover()
 
 void CGroupWnd::DeleteOrg()
 {
+m_slog.Format("[interest][cx_interest][%s] ", __FUNCTION__);
+OutputDebugString(m_slog);
 	int gno = 0;
 	CString strPath(_T("")), strTemp(_T("")), strBook(_T(""));
 
@@ -2286,7 +2476,7 @@ void CGroupWnd::DeleteOrg()
 
 void CGroupWnd::OnDestroySave()
 {
-
+	GetParent()->GetParent()->GetParent()->SetFocus();
 }
 
 void CGroupWnd::saveWhenGroupClosed(int index)
@@ -2335,6 +2525,11 @@ int CGroupWnd::sumEachGroupCount()
 
 int CGroupWnd::WriteFileSumtoEachGroup(UINT curruntGroup)			// index : 그룹 시작점
 {
+m_slog.Format("[interest][cx_interest] ------------------------------");
+OutputDebugString(m_slog);
+m_slog.Format("[interest][cx_interest][%s]  curruntGroup=[%d] GetGroupCount=[%d] ", __FUNCTION__, curruntGroup, GetGroupCount());
+OutputDebugString(m_slog);
+
 	UINT nextGroup{};
 	int curruntGroupCount{}, nextGroupCount{}, gno{};
 	CString	code = _T(""), amount = _T(""), price = _T(""), name = _T(""), bookmark = _T("");
@@ -2353,12 +2548,17 @@ int CGroupWnd::WriteFileSumtoEachGroup(UINT curruntGroup)			// index : 그룹 시작
 		std::copy(vInters.begin(), vInters.begin() + count, std::back_insert_iterator(m_Inters));
 	}
 
-
 	if (m_Inters.size() <= 0)
 		return 0;
 
 	saveServer(gno);
-	strBook.Format("%s/%s/%s/bookmark.i%02d", m_root, USRDIR, m_user, gno);
+
+	//test mod
+	bool bBookFileProcess = m_pMainWnd->SendMessage(WM_MANAGE, MK_BOOKMARKPROCESSCHECK, gno);
+	if (!bBookFileProcess)
+		return gno;
+
+	strBook.Format("%s/%s/%s/bookmark.i%02d", m_root, USRDIR, m_user, gno);  //test mod 
 
 	char szTemp[10]{};	
 	struct _inters* pInters{};
@@ -2374,7 +2574,12 @@ int CGroupWnd::WriteFileSumtoEachGroup(UINT curruntGroup)			// index : 그룹 시작
 	for(int ii=0 ; ii< curruntGroupCount ; ii++)
 	{
 		const auto& pInters = m_Inters.at(ii);
-	
+		//if (!pInters->code.IsEmpty() && pInters->name.IsEmpty())
+		//{
+		//	CString strName = m_GridWnd[index]->GetcolName(ii);
+		//	pInters->name = strName;
+		//}
+		
 		struct _bookmarkinfo binfo;
 		FillMemory(&binfo, sizeof(_bookmarkinfo), ' ');
 
@@ -2384,24 +2589,35 @@ int CGroupWnd::WriteFileSumtoEachGroup(UINT curruntGroup)			// index : 그룹 시작
 		}
 		else
 		{
+			CopyMemory(binfo.gubn, (char*)CString(pInters->gubn, 1).GetBuffer(0), sizeof(binfo.gubn));
 			CopyMemory(binfo.code, pInters->code, min(sizeof(binfo.code), pInters->code.GetLength()));
 			CopyMemory(binfo.name, pInters->name, min(sizeof(binfo.name), pInters->name.GetLength()));
 			binfo.bookmark[0] = pInters->bookmark == '1' ? '1':'0';		//2015.04.03 KSJ 1이아니면 0으로 해준다.
 
-			if(pInters->bookmark == '1' || pInters->code[0] == 'm')
+			if(pInters->bookmark == '1' || pInters->code[0] == 'm') 
 				bSetBookMark = true;
 		}
 		
 		file2.Write(&binfo, sizeof(_bookmarkinfo));
 	}
 
+	//2014.06.05 KSJ 북마크가 지정되어 있지 않으면 저장할 필요가 없어서 삭제한다.
 	if(!bSetBookMark) ::DeleteFile(strBook);
+	else
+	{
+		m_slog.Format("[interest][cx_interest][%s]  북마크파일[%s] 저장 ", __FUNCTION__, strBook);
+		OutputDebugString(m_slog);
+	}
 
 	return gno;
 }
 
 void CGroupWnd::saveServer(int gno)
 {
+	CString stmp;
+m_slog.Format("[interest][cx_interest][%s]  gno=[%d] m_Inters size=[%d]", __FUNCTION__, gno,  m_Inters.size());
+OutputDebugString(m_slog);
+
 	if (m_Inters.size() <= 0)
 		return;
 	const int nScnt = m_Inters.size();
@@ -2430,20 +2646,36 @@ void CGroupWnd::saveServer(int gno)
 	int ii = 0;
 	for_each(spanInter.begin(), spanInter.end(), [&](auto& jinfo) {
 		auto& pInters = m_Inters.at(ii++);
-		if (!pInters->code.IsEmpty())   //test 20230208
+		if (!pInters->code.IsEmpty())
 		{
 			FillMemory(&jinfo, sz_jinfo, ' ');
 			jinfo.gubn[0] = pInters->gubn > 0 ? pInters->gubn : '0';
 			CopyMemory(jinfo.code, pInters->code, min(sizeof(jinfo.code), pInters->code.GetLength()));
 
-			if (!pInters->xprc.IsEmpty())
-				CopyMemory(jinfo.xprc, pInters->xprc, min(sizeof(jinfo.xprc), pInters->xprc.GetLength()));
-			if (!pInters->xnum.IsEmpty())
-				CopyMemory(jinfo.xnum, pInters->xnum, min(sizeof(jinfo.xnum), pInters->xnum.GetLength()));
+			//test mod 책갈피인 경우
+			if (pInters->gubn == ROW_COMMENT)
+			{
+				CopyMemory(jinfo.xprc, pInters->name, min(sizeof(jinfo.xprc), pInters->name.GetLength()));
+			}
+			else
+			{
+				if (!pInters->xprc.IsEmpty())
+					CopyMemory(jinfo.xprc, pInters->xprc, min(sizeof(jinfo.xprc), pInters->xprc.GetLength()));
+				if (!pInters->xnum.IsEmpty())
+					CopyMemory(jinfo.xnum, pInters->xnum, min(sizeof(jinfo.xnum), pInters->xnum.GetLength()));
+			}
+
+			if (pInters->gubn == ROW_COMMENT)
+				stmp.Format("%.20s", jinfo.xprc);
+			else
+				stmp.Format("%.10s%.10s", jinfo.xprc, jinfo.xnum);
+
+m_slog.Format("[interest][cx_interest] ii=[%d] gubn=[%c] name=[%s]", ii, jinfo.gubn[0], stmp);
+OutputDebugString(m_slog);
+
 		}
 	});
 
-	int isize = sizeof(struct _trkey);
 	char key{};
 	_trkey* trkey = (struct _trkey*)&key;
 	trkey->kind = TRKEY_GRIDSAVE;
@@ -2451,14 +2683,14 @@ void CGroupWnd::saveServer(int gno)
 
 	CSendData sData;
 	sData.SetData(trUPDOWN, key, buffer.data(), buffer.size(), "");
-//AxStd::_Msg("%s", buffer.data());
-m_slog.Format("************************* [cx_interest][remove][%s] CGroupWnd::saveServer <%s>", m_sMap, buffer.data());
-OutputDebugString(m_slog);
+AxStd::_Msg("%s", buffer.data());
 	m_pMainWnd->SendMessage(WM_MANAGE, MK_SENDTR, (LPARAM)&sData);
 	m_pMainWnd->SendMessage(WM_MANAGE, MK_PROCDLL);
 	CString string = "OnPortfolio\tok";
 	m_pViewWnd->SendMessage(WM_USER, MAKEWPARAM(procDLL, 0), (LPARAM)(LPCTSTR)string);
 }
+
+
 
 CString CGroupWnd::MakePacket(CString& code, CString amount, CString price, CString name, CString bookmark)
 // END MODIFY
@@ -2468,21 +2700,36 @@ CString CGroupWnd::MakePacket(CString& code, CString amount, CString price, CStr
 	if (code.IsEmpty())
 		return _T("");
 
+	// MODIFY PSH 20070914
+	/*
+	if (!amount.IsEmpty())
+		code += ("\t" + amount);
+	*/
 	code += "\t";
 	if (!amount.IsEmpty())
 		code += amount;
-	
+	// END MODIFY
+
+	// MODIFY PSH 20070914
+	/*
+	if (!price.IsEmpty())
+		code += ("\t" + price);
+	*/
 	code += "\t";
 	if (!price.IsEmpty())
 		code += price;
+	// END MODIFY
 
+	// ADD PSH 20070914
 	code += "\t";
 	if (!name.IsEmpty())
 		code += name;
 
+	// 북마크 추가
 	code += "\t";
 	if (!bookmark.IsEmpty())
 		code += bookmark;
+	// END ADD
 
 	return code;
 }
@@ -2500,6 +2747,11 @@ void CGroupWnd::OnTimer(UINT nIDEvent)
 
 	CBaseWnd::OnTimer(nIDEvent);
 }
+
+// CGridWnd* CGroupWnd::GetGridWndUpjn()
+// {
+// 	return m_GridWndUpjn; 
+// }
 
 void	CGroupWnd::arrangeGroup(int type)
 {
@@ -2634,4 +2886,9 @@ void	CGroupWnd::setFontSize(int size)
 
 	if(m_nGroup > 1)
 		m_GridWnd[1]->SetFontSize(size);
+}
+
+const std::unordered_map<int, int>& CGroupWnd::getRSymbol()
+{
+	return gsl::not_null<CGridWnd*>(m_GridWnd[0].get())->_mRsymbol;
 }

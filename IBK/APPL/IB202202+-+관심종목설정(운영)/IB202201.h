@@ -30,6 +30,7 @@
 #define upEndACTION			14
 #define upCancelACTION		15
 #define upOKACTION				16
+#define getBOOLFILEPROCESS 17
 
 
 #define TRKEY_GROUPARR							40

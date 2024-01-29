@@ -1161,6 +1161,7 @@ void CControlWnd::SetPrice(int mmgb, int price)
 	if (!m_money.chk)
 		return;
 
+	CString slog;
 	// 주문 수량
 	int iOrderCount = iBatPrice / price;
 
@@ -1176,6 +1177,10 @@ void CControlWnd::SetPrice(int mmgb, int price)
 
 	// 잔고
 	const int iJango = m_pTool->AtoI(m_strJango);
+
+	slog.Format("[IB100300] m_iJmdw=[%d] iJango=[%d] price=[%d]  iBatPrice=[%d]  iOrderCount=[%d] iTotalPay=[%d] iTax=[%d] iCommission=[%d] [%d]",
+		m_iJmdw, iJango, price, iBatPrice, iOrderCount, iTotalPay, iTax, iCommission, iBatPrice > iTotalPay - (iCommission + iTax));
+	//OutputDebugString(slog);
 	
 	switch (mmgb)
 	{
@@ -1193,6 +1198,10 @@ void CControlWnd::SetPrice(int mmgb, int price)
 
 			// 수수료 재계산
 			iCommission = calculateCommission(iTotalPay);
+
+			slog.Format("[IB100300] 매도 재조정  iOrderCount =[%d] iTotalPay=[%d] iTax=[%d] iCommission=[%d]",
+				iOrderCount, iTotalPay, iTax, iCommission);
+			//OutputDebugString(slog);
 		}
 
 		if (m_iJmdw == 10)
@@ -1213,6 +1222,10 @@ void CControlWnd::SetPrice(int mmgb, int price)
 
 			// 수수료 재계산
 			iCommission = calculateCommission(iTotalPay);
+
+			slog.Format("[IB100300] 매수 재조정  iOrderCount =[%d] iTotalPay=[%d] iTax=[%d] iCommission=[%d]",
+				iOrderCount, iTotalPay, iTax, iCommission);
+			//OutputDebugString(slog);
 		}
 
 		if (m_iJmdw != 1)

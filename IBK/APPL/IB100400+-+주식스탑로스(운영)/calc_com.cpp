@@ -81,9 +81,15 @@ int checkDelta(int spVal, int icodetype)
 		else
 			nRet = 1000;
 	}
-	else if (icodetype == etfType || icodetype == elwType)
+	else if (icodetype == etfType || icodetype == etnType)
 	{
-		OutputDebugString("ETFTYPE");
+		if (spVal < 2000)
+			nRet = 1;
+		else
+			nRet = 5;
+	}
+	else if (icodetype == elwType)
+	{
 		nRet = 5;
 	}
 	else
@@ -109,6 +115,7 @@ int checkDelta(int spVal, int icodetype)
 
 constexpr int checkDelta(int spVal, int iCodeType, bool bPlus )
 {
+	iCodeType = 27;
 	int nRet=0;
 
 	if (g_bNewHoga) {
@@ -204,7 +211,25 @@ constexpr int checkDelta(int spVal, int iCodeType, bool bPlus )
 			else if (spVal  > 500000)	nRet = 1000;
 		}
 	}
-	else if (iCodeType == etfType || iCodeType == elwType)
+	else if (iCodeType == etfType || iCodeType == etnType)
+	{
+		if (bPlus)
+		{
+			if (spVal < 2000)
+				nRet = 1;
+			else
+				nRet = 5;
+		}
+		else
+		{
+			if (spVal <= 2000)
+				nRet = 1;
+			else
+				nRet = 5;
+
+		}
+	}
+	else if (iCodeType == elwType)
 	{
 		nRet = 5;
 	}

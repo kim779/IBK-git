@@ -80,6 +80,7 @@ void CAccCombo::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	const	COLORREF crNormal = GetSysColor(COLOR_WINDOW);
 	const	COLORREF crSelected = GetSysColor(COLOR_HIGHLIGHT);
 	const	COLORREF crText = GetSysColor(COLOR_WINDOWTEXT);
+
 	
 	if (!dcContext.Attach(lpDrawItemStruct->hDC))
 		return;
@@ -148,10 +149,30 @@ void CAccCombo::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// draw text and block.
 	if (iItem != -1)
 	{
-		dcContext.SetBkMode(TRANSPARENT);
-		dcContext.TextOut(rItemRect.left+3, rItemRect.top+2, strColour);
+		//tests
+		CString str;
+		str = strColour; ;
+		str.Replace("-", "");
+		CFont* pfont{}, * poldfont{};
+		if (str.Find(m_pParentAccountCtrl->GetEditData()) >= 0)คำ
+		{
+			//	dcContext.SetTextColor(RGB(255, 0, 0));
+			CString sfont{};
+			int ifontsize{}, ifontstyle{};
+			m_pParentAccountCtrl->GetFontInfo(sfont, ifontsize, ifontstyle);
+			pfont = m_pParentAccountCtrl->getAxFont(sfont , ifontsize, 3);
+			poldfont  = dcContext.SelectObject(pfont);
+			dcContext.SetBkMode(TRANSPARENT);
+			dcContext.TextOut(rItemRect.left + 3, rItemRect.top + 2, strColour);
+			dcContext.SelectObject(poldfont);
+		}
+		else
+		{
+			dcContext.SetBkMode(TRANSPARENT);
+			dcContext.TextOut(rItemRect.left + 3, rItemRect.top + 2, strColour);
+		}
 	}
-	
+
 	dcContext.Detach();
 
 	Invalidate();

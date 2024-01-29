@@ -380,7 +380,11 @@ BSTR CMainWnd::GetTypeData(short typ, LPCTSTR str1)
 	const	char*	dta = (char*)m_pParent->SendMessage(WM_USER, MAKEWPARAM(variantDLL, typ), (LPARAM)str1);
 
 	if ((long)dta > 1)
-		strResult = dta;
+	{
+	//	strResult = dta;
+		strResult.Format("%s", dta);
+		strResult.Trim();
+	}
 
 	return strResult.AllocSysString();
 }

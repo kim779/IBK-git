@@ -118,7 +118,8 @@ enum sendtr_type{
 	type_news_count_day,		// 일별
 	type_news_count_week,		// 주별 
 	type_news_count_month,		// 월별 
-	type_scrap
+	type_scrap,
+	type_Edge_Env
 };
 
 //한경 추가 수정 부분

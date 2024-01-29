@@ -367,8 +367,6 @@ void CClient::OnTrigger(CString name, CString text, int key)
 	if (m_status & (S_WAIT|S_TRIX|S_XTRI))
 		return;
 
-	m_slog.Format("\r\n[WIZARD][CClient][OnTrigger] name=[%s]  text =[%s] key[%d]\r\n", name, text, key);
-	OutputDebugString(m_slog);
 	if (key != -1)
 		m_status |= S_TRIX;
 	if (name.IsEmpty())

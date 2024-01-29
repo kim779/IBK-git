@@ -52,6 +52,7 @@ BEGIN_DISPATCH_MAP(CControlWnd, CStatic)
 	//{{AFX_DISPATCH_MAP(CControlWnd)
 		// NOTE - the ClassWizard will add and remove mapping macros here.
 	//}}AFX_DISPATCH_MAP
+	DISP_FUNCTION_ID(CControlWnd, "ShowLine", dispidShowLine, ShowLine, VT_EMPTY, VTS_I2)
 END_DISPATCH_MAP()
 
 // Note: we add support for IID_IControlWnd to support typesafe binding
@@ -341,4 +342,14 @@ LONG CControlWnd::OnUser(WPARAM wParam, LPARAM lParam)
 	}
 
 	return ret;
+}
+
+void CControlWnd::ShowLine(SHORT bShow)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (bShow == 1)
+		ShowWindow(SW_SHOW);
+	else
+		ShowWindow(SW_HIDE);
+	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
 }

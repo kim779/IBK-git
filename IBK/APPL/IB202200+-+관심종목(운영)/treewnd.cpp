@@ -2427,6 +2427,11 @@ void  _intersx::copy(void* item)
 
 void CTreeWnd::receiveOub(CString& data, int keys)
 {
+m_slog.Format("[interest][IB202200] -------------------------------------");
+OutputDebugString(m_slog);
+m_slog.Format("[interest][IB202200][%s]", __FUNCTION__, data.Left(22));
+OutputDebugString(m_slog);
+
 	CWnd* pWnd = (CWnd*)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_GROUP));
 	pWnd->SendMessage(WM_MANAGE, MK_CLEARSECONDSEND, 0);
 	const int max = pWnd->SendMessage(WM_MANAGE, MK_GETMAX);
@@ -2458,9 +2463,22 @@ void CTreeWnd::receiveOub(CString& data, int keys)
  	CFile   fileB;
 	CString sBookBuffer;
 	CString filePath;
-	CString	code, amount, price, name, bookmark;
+	CString	code, amount, price, name, bookmark, stmp;
 
-	filePath.Format("%s/%s/%s/bookmark.i%0*d", m_root, USRDIR, m_user, 2, treeID.value);
+	filePath.Format("%s/%s/%s/bookmark.i%0*d", m_root, USRDIR, m_user, 2, treeID.value);  //북마크 파일을 읽는곳
+
+	//test mod
+	if (!((CMainWnd*)m_pMainWnd)->IsFileExist(filePath))
+	{
+		m_slog.Format("[interest][IB202200[[%s] [%s]파일이 없음 ", __FUNCTION__, filePath);
+		OutputDebugString(m_slog);
+	}
+	else
+	{
+		m_slog.Format("[interest][IB202200[[%s] [%s]파일이 있음 ", __FUNCTION__, filePath);
+		OutputDebugString(m_slog);
+	}
+
 	if(fileB.Open(filePath, CFile::modeRead|CFile::shareDenyNone))
 	{
 		fileSize = gsl::narrow_cast<UINT>(fileB.GetLength());
@@ -2477,39 +2495,75 @@ void CTreeWnd::receiveOub(CString& data, int keys)
 	const gsl::span<struct _bookmarkinfo> bookspan((struct _bookmarkinfo*)sBookBuffer.GetString(), count);
 	const gsl::span<struct _jinfo> codelist((struct _jinfo*)data.GetString(), nRow);
 
+	bool bBookFile{};
+	CFile	fileH;
+	if (fileH.Open(filePath, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone))
+	{
+		const int countC = gsl::narrow_cast<int>(fileH.GetLength() / sizeof(struct _bookmarkinfo));
+		bBookFile = true;
+	}
+
 	int ii = 0;
 	for_each(codelist.begin(), codelist.end(), [&](auto item) {
-	
-		if (bookspan.size() > ii)
+		if (bBookFile)
+		{
+			struct _bookmarkinfo st_book;
+			struct _bookmarkinfo st_copy;
+			fileH.Read(&st_book, sizeof(struct _bookmarkinfo));
+			memcpy(st_copy.gubn, st_book.gubn, sizeof(st_book.gubn));
+			memcpy(st_copy.code, st_book.code, sizeof(st_book.code));
+			memcpy(st_copy.name, st_book.name, sizeof(st_book.name));
+			memcpy(st_copy.bookmark, st_book.bookmark, sizeof(st_book.bookmark));
+		}
+
+		if (bookspan.size() > ii) //북마크 파일이 있을경우 
 			bookmark = CString(bookspan.at(ii).bookmark[0], 1);
 		else
 			bookmark = "0";
+
 		code = CString(item.code, codelen).Trim();
 		name = GetCodeName(CString(item.code, codelen).Trim());
-
-		if (bookmark == "1")
-			OutputDebugString(name);
+		
+		//test mod 서버에서 받은 북마크
+		if (CString(item.gubn, 1).Trim() == "9")
+			bookmark = "1";
+	
 
 //AxStd::_Msg("종목코드[%s]", code);
 		if (code.IsEmpty())
 			code = "          ";
 
 		if (code[0] == 'm' && name.IsEmpty() && bookspan.size() > ii)
-		{
+		{  //책갈피인경우 파일을 읽는다 
 			CString bookCode = CString(bookspan.at(ii).code, codelen).Trim();
+
+m_slog.Format("[interest][IB202200] bookCode=[%s] code=[%s] ", bookCode, code);
+OutputDebugString(m_slog);
+
 			if (code.CompareNoCase(bookCode) == 0)
 				name = CString(bookspan.at(ii).name, namelen).Trim();
+		}
+		else if (code[0] == 'm')  //test mod
+		{ //북마크 파일이 없는데 서버에 내려받는 종목코드 정보가 책갈피일때
+			struct _jinfo st_jinfo;
+			name = CString(item.xprc, sizeof(st_jinfo.xnum) + sizeof(st_jinfo.xprc)).Trim();
 		}
 
 		amount = CString(item.xnum, xnumlen).Trim();
 		price  = CString(item.xprc, pricelen).Trim();
+
+m_slog.Format("[interest][IB202200] ii=[%d] c=[%s] n=[%s] bookmark=[%s] p=[%s] a=[%s] ", ii, code, name, bookmark, price, amount);
+OutputDebugString(m_slog);
 		
 		sdata.m_arDatas.Add(MakePacket(code, amount, price, name, bookmark));
 		if (sdata.GetCount() == max)
 			return;		
 		ii++;
 	});
-	
+
+	if (bBookFile)
+		fileH.Close();
+
 	SendTreeData(sdata);
 }
 

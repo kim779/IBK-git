@@ -190,6 +190,8 @@ CString CLogin::GetLogin(int id)
 		m_returns.Empty();	break;
 	case 2:		// can input account
 		m_returns = m_cani;	break;
+	case 3:
+		m_returns = m_juno; break;
 	default:
 		m_returns.Empty();	break;
 	}

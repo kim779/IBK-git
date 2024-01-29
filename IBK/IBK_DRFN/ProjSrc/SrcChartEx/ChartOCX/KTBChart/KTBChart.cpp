@@ -56,6 +56,10 @@ BOOL CKTBChartApp::InitInstance()
 		CProgIDInfo::ComServerFromProgID( _OCX_PROG_ID, strOcxFile);
 		g_strOcxPath = strOcxFile.Left( strOcxFile.ReverseFind( '\\') + 1);
 
+		CString str;
+		str.Format("[DRFN][%s] g_strOcxPath=[%s]", __FUNCTION__, g_strOcxPath);
+		OutputDebugString(str);
+
 		// (2004.11.26, 배승원) Real의 분차트시 허수봉개념의 전체 시간을 지원할 것인지를 Flag으로 관리 지원한다.
 		//		특히, 별도의 Global을 속성을 두어 HTS 기본 설정을 관리하고,
 		//		별도의 Property를 제공하여 Chart별 속성을 변경토록 한다.
@@ -143,9 +147,16 @@ CHARTOCX_API BOOL LoadNomalizedMinuteTimeRule( const char *p_szHtsPath)
 	{
 		if( strCfgPath.GetAt( nHtsPathLength - 1) != '\\') strCfgPath += "\\";
 		strCfgPath += "Data\\Config.cfg";
+
+		CString str;
+		str.Format("[DRFN][%s] strCfgPath=[%s]", __FUNCTION__, strCfgPath);
+		OutputDebugString(str);
 		
 		// 2. CFG의 CHART Section중 NMTR의 값을 반영한다. (0과 1로 확인한다.)
 		g_bNormalizedMinuteTimeRule = !( GetPrivateProfileInt( "CHART", "NMTR", g_bNormalizedMinuteTimeRule ? 1 : 0, strCfgPath) == 0);
+
+		str.Format("[DRFN][%s] g_bNormalizedMinuteTimeRule=[%d]", __FUNCTION__, g_bNormalizedMinuteTimeRule);
+		OutputDebugString(str);
 	}
 
 	return g_bNormalizedMinuteTimeRule;

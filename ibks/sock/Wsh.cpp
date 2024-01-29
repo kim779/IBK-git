@@ -44,6 +44,7 @@ CWsh::CWsh()
 	m_queRTM.RemoveAll();
 
 	m_running = false;
+	m_tick = GetTickCount();
 }
 
 CWsh::~CWsh()
@@ -101,12 +102,14 @@ int CWsh::Run()
 		m_que.RemoveAt(0);
 		m_section.Unlock();
 
+	
 		if (pMQ->m_ssm != ssM_SM)
 		{
 			DoParse(pMQ);
 			delete pMQ;
 		}
 		else	DoParse(pMQ);
+
 	}
 	return 0;
 }
@@ -140,10 +143,27 @@ void CWsh::Dispatch(int ssm, char* pBytes, int nBytes)
 	mque->m_ssm = ssm;
 	mque->m_nBytes = nBytes;
 
+
+
+	//tests
+	//if (nBytes > 0)
+	//{
+	//	struct _rtmH* rtmH = (struct _rtmH*)pBytes;
+	//	int datL = atoi(CString(rtmH->datL, sizeof(rtmH->datL)));
+
+	//	nBytes -= L_rtmH;
+	//	pBytes += L_rtmH;
+
+	//	CString text;
+	//	text = CString(pBytes, datL);
+	//}
+	//teste
+	
 	m_section.Lock();
 	m_que.Add(mque);
 	m_section.Unlock();
 	m_event.SetEvent();
+
 }
 
 void CWsh::DoParse(CMQue* pMQ)
@@ -183,12 +203,26 @@ void CWsh::DoParse(CMQue* pMQ)
 	struct _rsmH *rsmH = (struct _rsmH *) pMQ->m_pBytes;
 	if (rsmH->dirF != dirF_OUTB || m_state == stFlag::stERR)
 		return;
+//#ifndef _DEBUG
+//	CString stmp;
+//	stmp.Format("[patch] %s", rsmH->resN);
+//	stmp.TrimRight();
+//	if (stmp.Find("icss") >= 0)   //icss test 
+//	{
+//		stmp.Format("[[patch] 1111  [%x]", rsmH->resK);
+//		OutputDebugString(stmp);
+//	}
+//#endif
 
 	bytes = atoi(CString(rsmH->datL, sizeof(rsmH->datL)));
 	switch (rsmH->resK)
 	{
 	case resK_REQ:
 	case resK_REQ2:
+#ifndef _DEBUG
+		m_slog.Format("[[patch]111 [%s]  [%s]",__FUNCTION__, path);
+		OutputDebugString(m_slog);
+#endif
 		if (!MakeDir(rsmH, path))
 			return;
 		switch (rsmH->resF)
@@ -216,6 +250,12 @@ void CWsh::DoParse(CMQue* pMQ)
 			switch (rsmH->resK)
 			{
 			case resK_REQ:
+
+#ifndef _DEBUG
+				m_slog.Format("[[patch]222 [%s]  [%s]", __FUNCTION__, path);
+				OutputDebugString(m_slog);
+#endif
+
 				if (MakeUpdateList())
 					DoRequest();
 				else
@@ -252,7 +292,12 @@ void CWsh::DoParse(CMQue* pMQ)
 			m_pWnd->SendMessage(WFM_EVENT, FEV_ERROR, (LPARAM)tmps.operator LPCTSTR());
 			break;
 		case stFlag::stRSC:
-			Update(pMQ->m_pBytes, 0);
+#ifndef _DEBUG
+			m_slog.Format("[[patch][%s][%x] stFlag::stRSC", __FUNCTION__, rsmH->resK);
+			OutputDebugString(m_slog);
+#endif  
+			//문제
+			Update(pMQ->m_pBytes, 0);  //icss test 
 			break;
 		}
 		return;
@@ -288,10 +333,27 @@ void CWsh::DoParse(CMQue* pMQ)
 	default:
 		return;
 	}
-
+#ifndef _DEBUG
+	m_slog.Format("[patch] %s", rsmH->resN);
+	m_slog.TrimRight();
+	if (m_slog.Find("icss") >= 0)   //icss test 
+	{
+		m_slog.Format("[[patch]2222  [%x][%x]", rsmH->resK, rsmH->resF);
+		//OutputDebugString(stmp);
+	}
+#endif
 	BOOL	update = FALSE;
 	if (rsmH->resF == resF_LAS || rsmH->resF == resF_ONLY)
 	{
+#ifdef _DEBUG
+		m_slog.Format("[[patch][%s][%x][%s]내려받은 파일을 실제 폴더에 복사하는 단계", __FUNCTION__, rsmH->resK, rsmH->resN);
+		OutputDebugString(m_slog);
+#endif
+		
+#ifdef DF_NORESOURCE_DOWN
+		return; //test
+#endif
+
 		if (!MakeDir(rsmH, path, true))
 			return;
 
@@ -309,18 +371,32 @@ void CWsh::DoParse(CMQue* pMQ)
 		else
 		{
 			DeleteFile(tmps);
+#ifndef _DEBUG
+		m_slog.Format("[patch]  [%s][%x]  DeleteFile= [%s]  MoveFile(=[%s]", __FUNCTION__, rsmH->resK, path, tmps);
+		OutputDebugString(m_slog);
+#endif
 			update = MoveFile(path, tmps);
 		}
 
 		if (rsmH->resK != resK_RSC)
 			update = FALSE;
 	}
+	//m_slog.Format("[[patch][%s][%x] rsmH->resF != resF_LAS || rsmH->resF != resF_ONLY", __FUNCTION__, rsmH->resK);
+	//OutputDebugString(m_slog);
 	Update(pMQ->m_pBytes, bytes, update);
 }
 
 void CWsh::ParseRTM(CMQue* pMQ)
 {
 	m_sectionRTM.Lock();
+	//m_delta = GetTickCount() - m_tick;
+	//if (pMQ->m_ssm == ssM_SM)
+	//{
+	//	m_slog.Format("m_delta = [%d][%d][%d] [%20s]", m_delta, pMQ->m_ssm, pMQ->m_nBytes, pMQ->m_pBytes);
+	//	LOG_OUTP(3, "socket", __FUNCTION__, m_slog);
+	//}
+	
+	
 	m_queRTM.Add(pMQ);
 	m_sectionRTM.Unlock();
 	m_eventRTM.SetEvent();
@@ -362,7 +438,8 @@ bool CWsh::MakeDir(_rsmH * rsmH, CString& path, bool temporary)
 		if (temporary)
 			path += _T(".tmp");
 		break;		
-	case resK_AXIS:
+	case resK_AXIS:  
+	
 		tmps = rsmH->resN;
 		pos  = tmps.ReverseFind('/');
 		tmps = tmps.Mid(pos+1);
@@ -421,6 +498,13 @@ BOOL CWsh::DoRequest(bool info)
 		struct	_rsmH*	rsmH = (struct _rsmH *)wb;
 
 		str  = m_list.GetAt(m_order-1)->m_name;
+
+	//	if (str.Find("icss") >= 0)   //icss test 
+		{
+			m_slog.Format("[patch][%s] [%s]", __FUNCTION__, str);
+			OutputDebugString(m_slog);
+		}
+
 		rsmH->dirF = dirF_INB;
 		rsmH->resC = resC_EXT;
 		rsmH->resK = (m_state == stFlag::stAXIS) ? resK_AXIS : resK_RSC;
@@ -445,7 +529,7 @@ void CWsh::Update(char* pBytes, int nBytes, BOOL update)
 		m_current++;
 
 	if (rsmH->resK == resK_RSP && m_current <= m_list.GetSize() && m_list.GetAt(m_current-1)->m_size > 0)
-	{
+	{  //문제   <-- 위 조건의 상황(==resK_RSP) 이 되면 m_list에 값을 가져 와서 넣어버리게 된다.,
 		rate   = 100;
 		nBytes = m_list.GetAt(m_current-1)->m_size;
 	}
@@ -472,14 +556,26 @@ void CWsh::Update(char* pBytes, int nBytes, BOOL update)
 		}
 	}
 
-	if (rsmH->resK == resK_RSP)
+	if (rsmH->resK == resK_RSP)  //문제
 		path =  m_list.GetAt(m_current-1)->m_name;
 	else
 		path = rsmH->resN;
+
+	//if(path.Find("icss") >= 0)   //icss
+	//	OutputDebugString(path);
+	//if (path.Find("IB0000A1") >= 0)   //test
+	//	OutputDebugString(path);
+#ifndef _DEBUG
+	m_slog.Format("[patch][%s] [%s] nBytes=[%d] m_current=[%d] m_list=[%d]", __FUNCTION__, path, nBytes, m_current, m_list.GetSize());
+	OutputDebugString(m_slog);
+#endif
 	pos  = path.ReverseFind('/');
 	if (pos != -1)
 		path = path.Mid(pos+1);
 	str.Format(_T("%s\t%d"), path.GetString(), nBytes);
+
+	
+
 	m_pWnd->SendMessage(WFM_STAT, rate, (LPARAM)(char *)str.operator LPCTSTR());
 
 	if ((rsmH->resK == resK_RSP || rsmH->resF == resF_LAS || rsmH->resF == resF_ONLY) && m_current >= m_list.GetSize())
@@ -506,6 +602,10 @@ void CWsh::Update(char* pBytes, int nBytes, BOOL update)
 		if (GetFileAttributes(str) != 0xffffffff)
 		{
 			DeleteFile(path);
+#ifndef _DEBUG
+m_slog.Format("[patch]  [%s]  DeleteFile= [%s]  MoveFile(=[%s]", __FUNCTION__, path, str);
+OutputDebugString(m_slog);
+#endif
 			MoveFile(str, path);
 		}
 		path.Format(_T("%s/%s/%s"), m_home.GetString(), TABDIR, (m_state == stFlag::stAXIS) ? snAXIS : snRSC);
@@ -540,8 +640,10 @@ bool CWsh::GetUpdateList()
 	}
 
 	infos.Format(_T("%s/%s/%s"), m_home.GetString(), TABDIR, section.GetString());
+	//infos -> updateRSC
 	if (GetFileAttributes(infos) == 0xffffffff)
 		return false;
+
 
 	path.Format(_T("%s/%s/updateX"), m_home.GetString(), TABDIR);
 	rc = GetPrivateProfileString(section, _T("done"), _T(""), wb, sizeof(wb), path);
@@ -558,7 +660,7 @@ bool CWsh::GetUpdateList()
 	int	value, total;
 	time_t	utime, ctime;
 
-	if (CFile::GetStatus(path, fs))
+	if (CFile::GetStatus(path, fs))  //이게 먼가 전체 받는 로직?
 	{
 		utime = fs.m_mtime.GetTime();
 		time(&ctime);
@@ -569,7 +671,10 @@ bool CWsh::GetUpdateList()
 	CStdioFile file;
 	char	twb[64];
 	int	size, vers, key;
-
+#ifndef _DEBUG
+	m_slog.Format("[patch][%s] infos=[%s] count=[%d]", __FUNCTION__, infos, count);
+	OutputDebugString(m_slog);
+#endif
 	if (!file.Open(infos, CFile::modeRead))
 		return false;
 
@@ -595,6 +700,11 @@ bool CWsh::GetUpdateList()
 			value += update->m_size;
 			total++;
 		}
+
+//#ifdef _DEBUG
+		m_slog.Format("[patch][%s]     [%s]", __FUNCTION__ , text);
+		OutputDebugString(m_slog);
+//#endif
 
 		m_list.Add(update);
 	}
@@ -630,7 +740,7 @@ public:
 
 bool CWsh::MakeUpdateList()
 {
-	CString	path, infos, str, text;
+	CString 	path, infos, str, text;
 	char	wb[256] = { 0, };
 	int	vers, size, value;
 	CStringArray	arr;
@@ -668,10 +778,13 @@ bool CWsh::MakeUpdateList()
 		path.Format(_T("%s/%s/updateX"), m_home.GetString(), TABDIR);
 		WritePrivateProfileSection(snAXIS, _T(""), path);
 		infos.Format(_T("%s/%s/%s"), m_home.GetString(), TABDIR, snAXIS);
-		if (!file.Open(infos, CFile::modeCreate|CFile::modeWrite))
+		if (!file.Open(infos, CFile::modeCreate|CFile::modeWrite)) //updateAxis
 			return false;
-
-		for (int ii = 0; ii < arr.GetSize(); ii++)
+#ifndef _DEBUG
+		m_slog.Format("[patch]  MakeUpdateList 11111111 arr=[%d]", arr.GetSize());
+		OutputDebugString(m_slog);
+#endif
+		for (int ii = 0; ii < arr.GetSize(); ii++) //infoAXIS.new에 있는 데이터 arr
 		{
 			str  = arr.GetAt(ii);
 			str.TrimLeft(); str.TrimRight();
@@ -732,6 +845,10 @@ bool CWsh::MakeUpdateList()
 		if (GetFileAttributes(str) != 0xffffffff)
 		{
 			DeleteFile(path);
+#ifndef _DEBUG
+m_slog.Format("[patch]  [%s]  DeleteFile= [%s]  MoveFile(=[%s]", __FUNCTION__, path, str);
+OutputDebugString(m_slog);
+#endif
 			MoveFile(str, path);
 		}
 		DeleteFile(infos);
@@ -750,6 +867,10 @@ bool CWsh::MakeUpdateList()
 
 	path.Format(_T("%s/%s/infoRSC"), m_home.GetString(), TABDIR);
 	LoadFile(path, arr);
+#ifndef _DEBUG
+	m_slog.Format("[patch] MakeUpdateList 22222222 arr=[%d]", arr.GetSize());
+	OutputDebugString(m_slog);
+#endif
 	for (int ii = 0; ii < arr.GetSize(); ii++)
 	{
 		str  = arr.GetAt(ii);
@@ -776,7 +897,7 @@ bool CWsh::MakeUpdateList()
 		item = new Citem;
 		item->m_vers = vers;
 		item->m_key  = atoi(keys);
-		clist.SetAt(str, item);
+		clist.SetAt(str, item);                                                                                                                                                                                                                                                                                                           
 	}
 
 	path.Format(_T("%s/%s/infoRSC.new"), m_home.GetString(), TABDIR);
@@ -800,6 +921,9 @@ bool CWsh::MakeUpdateList()
 		str.TrimLeft(); str.TrimRight();
 		if (str.IsEmpty())
 			continue;
+
+		//if (str.Find("icss"))    //icss test 
+		//	continue;
 
 		vers = size = 0;
 		sscanf_s((char *)str.operator LPCTSTR(), "%s %d %s %d %s", wb, _countof(wb), &vers, 
@@ -851,12 +975,22 @@ bool CWsh::MakeUpdateList()
 		default:
 			break;
 		}
-
+#ifndef _DEBUG
+		if (version == verMAP || version == verDEV)
+		{
+			m_slog.Format("[patch]  [%s]  text=[%s]", __FUNCTION__, text);
+			OutputDebugString(m_slog);
+		}
+#endif
 		update = new Cupdate;
 		update->m_name = text;
 		update->m_size = size;
 		update->m_info = str;
 		value += size;
+
+		if (text.Find("icss") >= 0)    //icss test 
+			OutputDebugString(text);
+
 		m_list.Add(update);
 		str += '\n';
 		file.WriteString(str);
@@ -898,6 +1032,10 @@ bool CWsh::MakeUpdateList()
 	if (GetFileAttributes(str) != 0xffffffff)
 	{
 		DeleteFile(path);
+#ifndef _DEBUG
+m_slog.Format("[patch]  [%s]  DeleteFile= [%s]  MoveFile(=[%s]", __FUNCTION__, path, str);
+OutputDebugString(m_slog);
+#endif
 		MoveFile(str, path);
 	}
 	DeleteFile(infos);
@@ -959,6 +1097,9 @@ void CWsh::LoadVersion(CString path)
 				CopyMemory(verM[count].name, wb, L_MAPN);
 				CopyMemory(verM[count].vers, keys, L_VERS);
 				count++;
+
+//m_slog.Format("[patch]  [%s]  name= [%s]  vers=[%s]", __FUNCTION__, wb, keys);
+//OutputDebugString(m_slog);
 			}
 		}
 
@@ -996,6 +1137,10 @@ void CWsh::DoClose()
 	if (GetFileAttributes(text) != 0xffffffff)
 	{
 		DeleteFile(path);
+#ifndef _DEBUG
+m_slog.Format("[patch]  [%s]  DeleteFile= [%s]  MoveFile(=[%s]", __FUNCTION__, path, text);
+OutputDebugString(m_slog);
+#endif
 		MoveFile(text, path);
 	}
 }
@@ -1007,7 +1152,7 @@ UINT dispatchRTM(LPVOID lpvoid)
 
 	CMQue *pMQ;
 	CSingleLock	syncLock(&pWsh->m_eventRTM);
-
+	int igubn;
 	while (pWsh->m_running)
 	{
 		if (pWsh->m_queRTM.GetUpperBound() < 0)
@@ -1018,10 +1163,23 @@ UINT dispatchRTM(LPVOID lpvoid)
 		}
 		pWsh->m_sectionRTM.Lock();
 		pMQ = (CMQue *)pWsh->m_queRTM.GetAt(0);
+		igubn = pMQ->m_ssm;
 		pWsh->m_queRTM.RemoveAt(0);
 		pWsh->m_sectionRTM.Unlock();
 		pWsh->SendRTM(pMQ);
 		delete pMQ;
+		/*if (igubn == ssM_SM)
+		{
+			if (pWsh->m_delta < 50)
+			{
+				pWsh->m_slog.Format("!!!!!!!!!!!!!!! v  [sleep] m_delta = [%d][%d]", pWsh->m_delta);
+				LOG_OUTP(3, "socket", __FUNCTION__, pWsh->m_slog);
+				Sleep(10);
+			}
+			pWsh->m_tick = GetTickCount();
+		}*/
+
+	
 	}
 	return 0;
 }

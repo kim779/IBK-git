@@ -49,7 +49,9 @@ CfmCtrl::CfmCtrl(CAxisForm* axform, struct _formR* formR, int iform, bool drawOn
 		}
 
 		name.Format(_T("%s/%s/%s.dll"), LPCTSTR(m_axform->m_root), DEVDIR, LPCTSTR(m_strR));
+	
 		m_instance = AfxLoadLibrary(name);
+		int err = GetLastError();
 		if (m_instance != NULL)
 		{
 			axCreate = (CWnd* (APIENTRY*)(CWnd*, void*))GetProcAddress(m_instance, _T("axCreate"));

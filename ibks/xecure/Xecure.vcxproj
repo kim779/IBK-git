@@ -30,7 +30,7 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -102,7 +102,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>.\Xecure.def</ModuleDefinitionFile>
-      <OutputFile>../../exe/axXecure.ocx</OutputFile>
+      <OutputFile>D:\IBKS_TEST/exe/axXecure.ocx</OutputFile>
       <RegisterOutput>true</RegisterOutput>
       <IgnoreSpecificDefaultLibraries>libcd.lib;</IgnoreSpecificDefaultLibraries>
       <AdditionalDependencies>xecure/xcon30.lib</AdditionalDependencies>

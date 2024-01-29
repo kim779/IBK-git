@@ -172,6 +172,7 @@
     <ClCompile Include="AccEdit.cpp" />
     <ClCompile Include="Account.cpp" />
     <ClCompile Include="AccountCtrl.cpp" />
+    <ClCompile Include="COubWnd.cpp" />
     <ClCompile Include="CX_Account.cpp" />
     <ClCompile Include="OXMaskedEdit.cpp" />
     <ClCompile Include="StdAfx.cpp">
@@ -203,6 +204,7 @@
     <ClInclude Include="AccEdit.h" />
     <ClInclude Include="Account.h" />
     <ClInclude Include="AccountCtrl.h" />
+    <ClInclude Include="COubWnd.h" />
     <ClInclude Include="CX_Account.h" />
     <ClInclude Include="OXDllExt.h" />
     <ClInclude Include="OXMaskedEdit.h" />

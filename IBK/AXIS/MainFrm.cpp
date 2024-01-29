@@ -100,7 +100,6 @@
 #include <assert.h>
 #pragma comment(lib, "Netapi32.lib")
 
-
 //** macho add end
 
 #ifdef _DEBUG
@@ -1013,7 +1012,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	WriteLog(m_slog);
 	InitMapHK();
 	WriteLog("CMainFrame  InitMapHK");
-
+	
 
 	CString fname;
 	fname = Axis::home + "\\exe\\BLDINFO.INI";
@@ -1058,6 +1057,41 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	ResourceHelper()->LoadIcon();
 	SetIcon(ResourceHelper()->GetIcon(), TRUE);
+
+//#ifdef USE_AHNLAB_SECUREBROWSER
+//
+//	CString filename;
+//	filename.Format("%s\\%s\\%s", Axis::home, "exe", "NOAOS.TXT");
+//	FILE* fp;
+//	fopen_s(&fp, filename, "rb");
+//
+//	int nInternalMember;
+//
+//	nInternalMember = 0;
+//
+//	if (fp)
+//	{
+//		nInternalMember = 1;
+//		m_bNoProtect = TRUE;
+//		fclose(fp);
+//	}
+//	else
+//	{
+//		GetLocalIP();
+//
+//		if(isIPInRange(m_ipAddr,"172.17.0.0") || isIPInRange(m_ipAddr,"172.20.0.0"))
+//		{
+//			nInternalMember = 1;
+//			m_bNoProtect = TRUE;   
+//		}
+//	}
+//
+//	if(nInternalMember == 1)
+//	{
+//		AfxGetApp()->WriteProfileInt(INFORMATION, "AOS", 0);
+//		AfxGetApp()->WriteProfileInt(INFORMATION, "PCFirewall", 0);
+//	}
+//#endif
 
 	GetASTxInstall();
 	LoadNoTwoPOP_NoSaveLast();
@@ -1289,7 +1323,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 		return FALSE;
 	return TRUE;
 }
-#include "CDlg_Cloude.h"
+
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg) 
 {//if (msg->wParam == VK_F8/*byte('P')*/ && (GetKeyState(VK_CONTROL) & 0x8000))
 	if(pMsg->message == WM_KEYDOWN)
@@ -1310,37 +1344,13 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				case 'f':
 				case 'F':
 					{
-				
-			
-					/*const BOOL pcAOS = AfxGetApp()->GetProfileInt(INFORMATION, "AOS", 1);
-					const BOOL pcFirewall = AfxGetApp()->GetProfileInt(INFORMATION, "PCFirewall", 0);
-					const BOOL pcKeyProtect = AfxGetApp()->GetProfileInt(ENVIRONMENT, "KeyProtect", 0);
-					if ((!pcFirewall || !pcKeyProtect || !pcAOS) && Axis::isCustomer)
+					if (GetKeyState(VK_CONTROL) & 0x8000)
 					{
-						load_secure_agree(pcAOS, pcFirewall, pcKeyProtect);
-					}*/
-				//	CreateSubAxis();
-						CreateSharedMemory();
-					//if (GetKeyState(VK_CONTROL) & 0x8000)
-					//{
-					//	if (GetKeyState(VK_SHIFT) & 0x8000)
-					//	{
-					//		CString	Path;
-					//		Path.Format("%s\\%s\\ACCNTDEPT.INI", Axis::home, "tab");
-
-					//		char readB[1024];
-					//		int readL;
-					//		readL = GetPrivateProfileString("ACCNTDEPT", "DEPT", "811", readB, sizeof(readB), Path);
-					//		CString tDept(readB, readL);
-					//		tDept.TrimLeft(); tDept.TrimRight();
-
-					//			//if (Axis::userID == "khs779")
-					//			{
-					//				ShowControlBar(m_TotalAcc, TRUE, FALSE);
-					//				m_TotalAcc->Refresh813(1);
-					//			}
-					//	}
-					//}
+						if (GetKeyState(VK_SHIFT) & 0x8000)
+						{
+							os_report();  //test
+						}
+					}
 					
 				/*	CString str, title;
 					str= "901	00110012107	902	devilswo \
@@ -1355,16 +1365,74 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				case 'x':
 				case 'X':
 					{
-						if(m_axMisc->NewRunVers(verRETRY))
-							KillMySelf();
-							
+						if (GetKeyState(VK_CONTROL) & 0x8000)
+						{
+							if (GetKeyState(VK_SHIFT) & 0x8000)
+							{
+								char	buf[512];
+								CString	file, stmp;
+								file.Format("%s\\tab\\axis.ini", Axis::home);
+								DWORD dw = GetPrivateProfileString("PHONEPAD", "HOTKEY", "", buf, sizeof(buf), file);
+								
+								if (dw > 0)
+								{
+									stmp.Format("%s", buf);
+									stmp.TrimRight();
+									if (stmp != "1") return 0;
+
+									CString sdat, dat;
+									dat = m_strPhone;
+									sdat = "zPwd\t" + dat;
+
+									m_slog.Format("[phonepad] OnPhonePadNating dat=[%s] m_activeKey=[%d] ", dat, m_activeKey);
+									OutputDebugString(m_slog);
+
+									m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY, (void*)NULL,
+										(BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, m_activeKey), (LPARAM)(const char*)sdat);
+									sdat = "pswd\t" + dat;
+									m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY, (void*)NULL,
+										(BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, m_activeKey), (LPARAM)(const char*)sdat);
+									sdat = "ed_pswd\t" + dat;
+									m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY, (void*)NULL,
+										(BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, m_activeKey), (LPARAM)(const char*)sdat);		
+								}
+							}
+						} 
 					}
 					break;
 				case 'z':
 				case 'Z':
 					{
+						CString stmp;
+						//stmp = Variant(getFOCUS);
+						//AfxMessageBox(stmp);
+
+						char ca[100];
+						int ret;
+
+						memset(ca, ' ', 100);
+						memcpy(ca, "testtest", 8);
+						//CopyMemory(ca,m_axConnect->GetCPass(),m_axConnect->GetCPass().GetLength());
+
+						m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
+							(BYTE*)(VTS_I4 VTS_I4), MAKEWPARAM(setACCG, 0), (long)(const char*)&ca[0]);
+
+						
+
+
+						char ca1[6776];
 				
-						return TRUE;
+						memset(ca1, ' ', 6776);
+						//CopyMemory(ca,m_axConnect->GetCPass(),m_axConnect->GetCPass().GetLength());
+
+						m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
+							(BYTE*)(VTS_I4 VTS_I4), MAKELONG(groupCC, 0), ca1);
+
+						m_slog.Format("\r\n----------------------------------[%d] \r\n", ret);
+						OutputDebugString(m_slog);
+						AfxMessageBox(m_slog);
+
+						CString str;
 					}
 					break;
 			}	
@@ -2783,6 +2851,7 @@ LONG CMainFrame::OnAXIS(WPARAM wParam, LPARAM lParam)
 			if (!getConnectInfo(tmps, value)) 
 			{
 				Axis::MessageBox(this, "설치정보를 확인하세요", MB_ICONINFORMATION);
+				m_axConnect->SetLoginBtnEnable(true);
 				return 0;
 			}
 			strcpy_s(wb, 128, tmps);
@@ -2797,7 +2866,7 @@ m_slog.Format("[axis] axstart onaxis m_ip=[%s] m_port=[%s]\n", m_ip,m_port);
 WriteLog(m_slog);
 
 			((CAxisApp*)m_axis)->m_conIP = m_ip;
-			
+
 			CString file, axisfile, usnm = Axis::user;
 			file.Format("%s\\%s\\%s\\%s.ini", Axis::home, USRDIR, usnm, usnm); 
 			axisfile.Format("%s\\%s\\Axis.ini", Axis::home, TABDIR);
@@ -2845,8 +2914,13 @@ WriteLog(m_slog);
 				}
 			}
 
+#ifdef _DEBUG
 			m_wizard->InvokeHelper(DI_RUN, DISPATCH_METHOD, VT_BOOL, (void *)&rc,
-						(BYTE *)(VTS_I4 VTS_I4 VTS_I4), loginAXISx, (long)wb, value);
+						(BYTE *)(VTS_I4 VTS_I4 VTS_I4), loginAXIS, (long)wb, value);
+#else
+			m_wizard->InvokeHelper(DI_RUN, DISPATCH_METHOD, VT_BOOL, (void*)&rc,
+				(BYTE*)(VTS_I4 VTS_I4 VTS_I4), loginAXISx, (long)wb, value);
+#endif
 
 			if (rc)
 			{
@@ -2941,7 +3015,9 @@ slog.Format("[MIAN_MONITOR] iFull_width[%d] < x[%d]  or  iFull_height[%d] < y[%d
 					else	
 					{
 						x -= GetSystemMetrics(SM_CXFRAME);
+						x -= GetSystemMetrics(SM_CXBORDER);
 						y -= GetSystemMetrics(SM_CYFRAME);
+						y -= GetSystemMetrics(SM_CYBORDER);
 						SetWindowPos(&wndTop, x, y, cx, cy, SWP_SHOWWINDOW);
 					}
 				}
@@ -3055,7 +3131,71 @@ slog.Format("[MIAN_MONITOR] iFull_width[%d] < x[%d]  or  iFull_height[%d] < y[%d
 
 			CreateHistoryBar();
 			
-			
+			//CString strFile;
+			////7805 팝업 
+			//strFile.Format("%s\\tab\\NOTICECOOKIE.ini", Axis::home); 
+			//
+			//char buff[1024];
+			//GetPrivateProfileString("7805","VISIBLE","Y",buff,sizeof(buff),strFile);
+			//
+			//CString str;
+			//str = buff;
+			//
+			//if(str == "Y")
+			//{
+			//	GetPrivateProfileString("7805","TODAY","0",buff,sizeof(buff),strFile);
+			//	
+			//	str = buff;
+			//	
+			//	const int nFirst = GetPrivateProfileInt("7805","FIRST",1,strFile);
+			//	
+			//	const CTime tm(CTime::GetCurrentTime());
+			//	CString today;
+			//	today.Format("%04d%02d%02d",tm.GetYear(),tm.GetMonth(),tm.GetDay());
+			//	
+			//	if(str != today)
+			//	{
+			//		WritePrivateProfileString("7805","FIRST","1",strFile);
+			//	}
+			//	
+			//	if((str == today && nFirst == 1) || str != today)
+			//	{
+			//		CTime time;
+			//		time = CTime::GetCurrentTime();
+			//
+			//		char readB[1024];
+			//		int readL;
+		
+			//		readL =	GetPrivateProfileString("7805","FROM","",readB,sizeof(readB),strFile);
+
+			//		if(readL == 0)  //파일이 없거나 데이터를 못읽으면 그냥 띄운다
+			//		{
+			//			SetTimer(TM_POPUP_JISU, 7000, NULL);
+			//			m_bInit = FALSE;
+			//			break;
+			//		}
+
+			//		CString strFrom(readB,readL);
+			//		const CTime FromTime(atoi(strFrom.Mid(0,4)), atoi(strFrom.Mid(4,2)), atoi(strFrom.Mid(6,2)), atoi(strFrom.Mid(8,2)), atoi(strFrom.Mid(10,2)), atoi(strFrom.Mid(12,2)));
+			//		
+			//		readL =	GetPrivateProfileString("7805","TO","",readB,sizeof(readB),strFile);
+
+			//		if(readL == 0)  //파일이 없거나 데이터를 못읽으면 그냥 띄운다
+			//		{
+			//			SetTimer(TM_POPUP_JISU, 7000, NULL);
+			//			m_bInit = FALSE;
+			//			break;
+			//		}
+
+			//		CString strTo(readB,readL);
+			//		const CTime ToTime(atoi(strTo.Mid(0,4)), atoi(strTo.Mid(4,2)), atoi(strTo.Mid(6,2)), atoi(strTo.Mid(8,2)), atoi(strTo.Mid(10,2)), atoi(strTo.Mid(12,2)));
+			//		
+			//		if(time <= FromTime || time >= ToTime)
+			//		{
+			//			SetTimer(TM_POPUP_JISU, 7000, NULL);	
+			//		}
+			//	}
+			//}
 			////////////////////////////////////////////////
 			//dkkim 2018.11.12 AXSOCK의 원복으로 기능 제외.아래 기능 활성화를 위해서는 AXSOCK의 기능이 필요함.
 // 			strFile.Format("%s\\tab\\RSCMONITOR.ini", Axis::home); 
@@ -3631,8 +3771,6 @@ LONG CMainFrame::OnUSER(WPARAM wParam, LPARAM lParam)
 		case MMSG_RESTORECONDLG:
 			ShowConclusion();
 			break;
-		case 0x08:
-			return (LRESULT)(LPCTSTR)Axis::userID;
 	}
 	return 0;
 }
@@ -4385,7 +4523,7 @@ WriteLog("CMainFrame::OnFireRec FEV_RUN  lParame EXIST [%s]\n", str);
 			break;
 		case dialogPAN:	// type : HIWORD(wParam), data  : lParam
 			str = (char *) lParam;
-			WriteLog("CMainFrame::OnFireRect  dialogPAN [%s] ", str);
+//			WriteLog("CMainFrame::OnFireRect  dialogPAN [%s] ", str);
 // 			s.Format("이중접속 : [%s] [%d]\n",str,HIWORD(wParam));
 // 			OutputDebugString(s);
 			switch (HIWORD(wParam))
@@ -5020,11 +5158,10 @@ bool CMainFrame::CreateWizard()
 	if (!m_wizard->CreateControl("AxisWizard.WizardCtrl.IBK2019", NULL, WS_CHILD, CRect(0, 0, 0, 0), this, -1))
 	{
 		m_wizard = nullptr;
-		m_slog.Format("[axis]createwizard fail err=[%d]", GetLastError());
-		OutputDebugString(m_slog);
-		return -1;
+		WriteLog("---------------[axis]createwizard fail---------------");
+		return false;
 	}
-	return 1;
+	return true;
 }
 
 int CMainFrame::Initialize()
@@ -5071,7 +5208,6 @@ int CMainFrame::Initialize()
 #ifdef DF_USE_CPLUS17
 	if (!CreateWizard())
 	{
-		OutputDebugString("[axis] CreateWizard fail");
 		m_wizard = nullptr;
 		return -1;
 	}
@@ -5541,6 +5677,7 @@ bool CMainFrame::Start(CString user)
 	int nInternalMember;
 
 	nInternalMember = 0;
+	AfxGetApp()->WriteProfileInt(INFORMATION, "INTERNAL", 0);
 
 	if (fp)
 	{
@@ -5548,21 +5685,27 @@ bool CMainFrame::Start(CString user)
 		m_bNoProtect = TRUE;
 		fclose(fp);
 	}
-	else
-	{
-		GetLocalIP();
 
-		if (isIPInRange(m_ipAddr, "172.17.0.0") || isIPInRange(m_ipAddr, "172.20.0.0"))
-		{
-			nInternalMember = 1;
-			m_bNoProtect = TRUE;
-		}
+	GetLocalIP();
+	if (isIPInRange(m_ipAddr, "172.17.0.0") || isIPInRange(m_ipAddr, "172.20.0.0"))
+	{
+		nInternalMember = 1;
+		m_bNoProtect = TRUE;
+		m_bLOCALIP_172 = TRUE;
 	}
+	
 
 	if (nInternalMember == 1)
 	{
 		AfxGetApp()->WriteProfileInt(INFORMATION, "AOS", 0);
 		AfxGetApp()->WriteProfileInt(INFORMATION, "PCFirewall", 0);
+		AfxGetApp()->WriteProfileInt(INFORMATION, "INTERNAL", 1);
+	}
+	else
+	{
+		AfxGetApp()->WriteProfileInt(INFORMATION, "AOS", 1);
+		AfxGetApp()->WriteProfileInt(INFORMATION, "PCFirewall", 1);
+		AfxGetApp()->WriteProfileInt(ENVIRONMENT, "KeyProtect", 1);
 	}
 #endif
 
@@ -5812,7 +5955,7 @@ void CMainFrame::registerControl()
 	UnregisterControl();
 
 	//char*	control[] = { "axWizard.ocx", "axSock.ocx", "axComCtl.ocx", "axXecure.ocx", "axCertify.ocx", "vbscript.dll", "IBKSConnector.ocx", NULL };
-	char*	control[] = { "axWizard.ocx", "axSock.ocx", "axXecure.ocx", "axCertify.ocx", NULL };
+	char*	control[] = { "axWizard.ocx", "axSock.ocx", "axComCtl.ocx", "axXecure.ocx", "axCertify.ocx", NULL };
 
 	CString	path;
 	HINSTANCE hLib{};
@@ -5830,16 +5973,15 @@ void CMainFrame::registerControl()
 		GetCurrentDirectory(256, buf2);
 		m_slog.Format("[axis][registerControl] registerControl....[%s] [%s]\n", buf1, buf2);
 
+
 		hLib = LoadLibrary(path);
 		if (hLib < (HINSTANCE)HINSTANCE_ERROR)
 		{
-			hLib = LoadLibraryEx(path, NULL, LOAD_LIBRARY_AS_DATAFILE);
 			TRACE("LoadLibrary error....[%s] error=[%d]\n", path, GetLastError());
 			m_slog.Format("[axis][registerControl] LoadLibrary error....[%s] error=[%d]\n", path, GetLastError());
 			OutputDebugString(m_slog);
 			WriteLog(m_slog);
-			if (hLib < (HINSTANCE)HINSTANCE_ERROR)
-				continue;
+			continue;
 		}
 
 		FARPROC	lpDllEntryPoint;
@@ -5847,9 +5989,7 @@ void CMainFrame::registerControl()
 
 		if (lpDllEntryPoint == nullptr)
 		{
-			int iret = GetLastError();
 			FreeLibrary(hLib);
-			AfxMessageBox(path);
 			continue;
 		}
 
@@ -5888,8 +6028,7 @@ BOOL CMainFrame::getConnectInfo(CString& ips, int& port)
 		port = ((CAxisApp*)m_axis)->m_forcePort;
 
 		m_forceIP = ips;
-		CheckServer(m_forceIP);
-		//m_strServer.Format("[%s]", m_forceIP);
+		CheckServer(ips);
 
 		if (Axis::isCustomer && port == portEmployee)
 			port = portCustomer;
@@ -6052,6 +6191,7 @@ void CMainFrame::closeMapByName(CString strName)
 
 void CMainFrame::endWorkstation()
 {
+	CheckCDDEDD();   //test CDD
 	SetPCData();
 	WriteLog("endWorkstation - Step 1");
 	m_dept = Variant(getDEPT);
@@ -6076,7 +6216,6 @@ CString s;
 s.Format("ACCTEST Main endWorkstation 로그인부서=[%s] 파일부서=[%s] \n",m_dept, tDept);
 OutputDebugString(s);
 WriteLog(s);
-
 ///	if ( (m_dept != "813") && (m_dept != "828") && m_dept != "812" && m_dept != tDept)
 	if(m_dept != tDept)  
 	{
@@ -6138,6 +6277,12 @@ WriteLog(s);
 	WriteLog("endWorkstation - Step 6");
 	
 	preload_screen();
+
+	//test_main
+	CString sfile, tmps, usnm = Axis::user;
+	sfile.Format("%s\\%s\\%s\\%s.ini", Axis::home, USRDIR, usnm, usnm);
+	tmps.Format("%d", (int)this->m_hWnd);
+	WritePrivateProfileString("MODE", "main", tmps, sfile);
 
 	// 직원의 패스워드 변경작업
 	// axlogon -> misf 에 SBPLI301의 [로그인비밀번호구분] 플래그([W]arning, e[X]pired)
@@ -6223,7 +6368,7 @@ WriteLog(s);
 			//CString date(p.GetString(noticeMapName, "DATE", "20080601"));
 			//if (atoi(date) < atoi(CTime::GetCurrentTime().Format("%Y%m%d")))
 			//m_mapHelper->ChangeChild(trust, 1, 0, CenterPOS);
-			load_hidescreen(trust);
+			load_hidescreen(trust); 
 		}
 		
 		
@@ -6459,8 +6604,6 @@ OutputDebugString(m_slog);
 	}
 	//@@간편인증
 #endif
-	//m_axConnect->m_bCloudeUSE;
-
 
 OutputDebugString("GLB signOnCert");
 	m_axConnect->SetGuide(_T("사용자정보 확인 중 입니다."));
@@ -7340,12 +7483,6 @@ void CMainFrame::showfname()
 	if (dlg.DoModal() == IDOK)
 	{
 		CString mapN = dlg.GetMapName();
-
-		if (mapN.Find("IBXXXX99") >= 0)
-		{
-		//	CreateSharedMemory();
-		}
-
 		if (mapN.GetLength() == L_MAPN)
 			m_mapHelper->ChangeChild(mapN);
 
@@ -7527,7 +7664,6 @@ void CMainFrame::change_Skin()
 
 void CMainFrame::IMAXSkinSet()
 {
-	return;  //test
 	int nkey{}, nSkinKind{};
 	CString tmp, sSkinName;
 	CSChild* schild{};
@@ -8548,6 +8684,9 @@ void CMainFrame::createUserScreen(int key)
 
 void CMainFrame::createUserScreen(CString mapN, bool allVS)
 {
+	m_slog.Format("--------------------[createUserScreen][cx_account]  start-------------");
+	OutputDebugString(m_slog);
+
 	int	pos{}, key{}, trigger{}, sdi{};
 	int    vsN{};  //vc2019
 	char	wb[512]{};
@@ -8587,7 +8726,7 @@ void CMainFrame::createUserScreen(CString mapN, bool allVS)
 	
 	//int focusKey;
 	//////////////////////////////////////////////////
-	
+	bool bpopCDD = false;
 	bool	showChild = false;
 	for (;ary.GetSize();)
 	{
@@ -8663,7 +8802,7 @@ void CMainFrame::createUserScreen(CString mapN, bool allVS)
 					break;
 				}
 			}
-		
+			bpopCDD = isCDDScreen(mapName);
 			if (IsNoSaveLastmap(mapName)) continue;
 			if (ExceptMap(mapName.Left(L_MAPN)))	continue;
 			
@@ -8674,8 +8813,14 @@ void CMainFrame::createUserScreen(CString mapN, bool allVS)
 			
 		}
 	}
+	if (bpopCDD)  //test CDD
+	{
 
+	}
 	m_bLoadScreen = true;
+
+	m_slog.Format("--------------------[createUserScreen][cx_account]  end-------------");
+	OutputDebugString(m_slog);
 }
 
 void CMainFrame::saveUserScreen()
@@ -9586,8 +9731,8 @@ BOOL CMainFrame::printImg(CString dat)
 
 		m_pPRNChild = pChild;
 		m_sizePRN = szRect;
-		m_sizePRN.cx -= 5;
-		m_sizePRN.cy -= 5;
+		//m_sizePRN.cx -= 5;    //test print
+		//m_sizePRN.cy -= 5;
 		m_sizePRNORG = szOrg;
 		m_bPRNResize = bResize;
 		m_szPRNData.Format("%s", dat);
@@ -9607,13 +9752,14 @@ BOOL CMainFrame::printOper(CWnd* pChild, CSize size, CSize sizeOrg, CString dat,
 	CWindowDC	dc(pChild);
 	CDC 		memDC;
 
-	bitmap.CreateCompatibleBitmap(&dc, size.cx, size.cy);
+	//bitmap.CreateCompatibleBitmap(&dc, size.cx, size.cy);
+	bitmap.CreateCompatibleBitmap(&dc, size.cx - 10, size.cy - 10);  //test print
 	memDC.CreateCompatibleDC(&dc); 	
 	
 	CBitmap* pOldBitmap = memDC.SelectObject(&bitmap);	
 
-	memDC.BitBlt(0, 0, size.cx, size.cy, &dc, 0, 0, SRCCOPY); 
-	
+	//memDC.BitBlt(0, 0, size.cx, size.cy, &dc, 0, 0, SRCCOPY); 
+	 memDC.BitBlt(-5, -5, size.cx, size.cy, &dc, 0, 0, SRCCOPY); 
 	// Create logical palette if device support a palette
 	CPalette pal;
 	if(dc.GetDeviceCaps(RASTERCAPS) & RC_PALETTE)
@@ -9729,6 +9875,11 @@ BOOL CMainFrame::printOper(CWnd* pChild, CSize size, CSize sizeOrg, CString dat,
 			yDest = paperY/2 - height/2;
 			ret = StretchDIBits(printDC.m_hDC, xDest, yDest, width ,height, 0, 0, 
 				bm.bmWidth, bm.bmHeight, pBuf, (LPBITMAPINFO)lpbi, DIB_RGB_COLORS, SRCCOPY);
+
+		/*	m_slog.Format("%d %d %d %d  %d %d", xDest, yDest, width, height, bm.bmWidth, bm.bmHeight);
+			AfxMessageBox(m_slog);
+			return 0;*/
+
 			if (!dat.IsEmpty())
 			{
 // #if 0
@@ -10942,7 +11093,7 @@ void CMainFrame::load_eninfomation(bool first)
 	if (first && GetPrivateProfileInt("SCREEN", "POPUPACC", 1, file) && Axis::user.CollateNoCase("guest"))
 		AcctPasswordConfig();
 
-	PopUp7805();
+	Popup7805();
 
 	//새창열기 허용
 	m_screenNew = GetPrivateProfileInt("SCREEN", "SCREENNEW", 1, file);
@@ -11438,8 +11589,8 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 				WriteLog("TM_DNINTEREST - Step 4-2");
 		
 				const char* trust = "IB820850"; 
-				if (!IsExistMap(trust)) 
-					load_hidescreen(trust);
+				//if (!IsExistMap(trust))    //test820850
+				//	load_hidescreen(trust);
 				
 				WriteLog("TM_DNINTEREST - Step 4-3");
 				//load_start_notice();
@@ -11592,8 +11743,10 @@ WriteLog("OnTimer - TM_ITGY 50초동안 piboitgy 응답이 안왔다?");
 			KillTimer(TM_POPUP_JISU);
 
 			//PopupWeb("http://www.ibks.com/worldstocks/ws_list.do?popup=Y&nPro_YN=N&keyB_YN=Y",800,715);
+#ifndef _DEBUG
 			const char* trust = "IB780500";
 			m_mapHelper->ChangeChild(trust, 1, 0, CenterPOS);
+#endif
 		}
 		break;
 	case TM_TOP10_2018:
@@ -13930,6 +14083,8 @@ void CMainFrame::processFMX(WPARAM wParam, LPARAM lParam)
 	case 'c':	ParseSBPGT336((char*)lParam, len); break;
 	case 251:   m_bar0->ParingGroupList((char*)lParam, HIWORD(wParam)); break;     //axissm::Categorypopup
 	case 250:   m_bar0->ParingGroupCode((char*)lParam, HIWORD(wParam)); break;  //axissm::Categorypopup
+	case 236:  ParseSAMFQ014((char*)lParam, len); break;   //test CDD
+	case 235:  ParseSACMQ101((char*)lParam, len); break;  //test CDD
 //	case 249: ParingGroupList(wParam, lParam); break;												  //axiscp::
 //	case 248: ParingGroupCode(wParam, lParam); break;
 		/*
@@ -13957,6 +14112,39 @@ void CMainFrame::processFMX(WPARAM wParam, LPARAM lParam)
 	}
 }
 
+void CMainFrame::SendSACMQ101() //test CDD
+{
+	char data[1024];
+	FillMemory(data, sizeof(data), ' ');
+	_ledgerH* ledger = (_ledgerH*)&data[0];
+
+	memcpy(ledger->svcd, "SACMQ101", 8);
+	memcpy(ledger->usid, Axis::userID, Axis::userID.GetLength());
+	ledger->odrf[0] = '1';
+	ledger->mkty[0] = '3';
+	memcpy(ledger->pcip, Axis::userIP, Axis::userIP.GetLength());
+	memcpy((char*)&data[L_ledgerH], "00001", 5);
+	memcpy((char*)&data[L_ledgerH + 5], (LPSTR)m_sjumin.GetBuffer(0), m_sjumin.GetLength());
+
+	sendTR("pibopbxq", data, L_ledgerH + 25, US_KEY, 235);
+}
+
+void CMainFrame::SendSAMFQ014() //test CDD
+{
+	char data[1024];
+	FillMemory(data, sizeof(data), ' ');
+	_ledgerH* ledger = (_ledgerH*)&data[0];
+
+	memcpy(ledger->svcd, "SAMFQ014", 8);
+	//memcpy(ledger->fkey, "5   ", 4);
+	memcpy(ledger->usid, Axis::userID, Axis::userID.GetLength());
+	ledger->odrf[0] = '1';
+	ledger->mkty[0] = '3';
+	memcpy(ledger->pcip, Axis::userIP, Axis::userIP.GetLength());
+
+	sendTR("pibopbxq", data, L_ledgerH, US_KEY, 236);
+}
+
 void CMainFrame::SendSBPGT336(CString sData)
 {
 	char data[1024];
@@ -13976,6 +14164,77 @@ void CMainFrame::SendSBPGT336(CString sData)
 	memcpy(mid->zTrxTp, sData, 1);
 
 	sendTR("pibopbxq", data, L_ledgerH + sizeof(SBPGT336_mid), US_ENC, 'c');
+}
+
+#define DF_DEV 
+//#define DEV_REAL
+void CMainFrame::ParseSACMQ101(char* dat, int len)   //test CDD
+{
+	if (len > 400)
+	{
+		m_slog.Format("ParseSACMQ101 len=[%d]", len);
+		return;
+	}
+	struct st_out_SACMQ101
+	{
+		char out_in[25];
+		char out_out[25];
+#ifdef DF_DEV
+		char out_jumin[24];
+#elif defined(DEV_REAL)
+		char out_jumin[20];
+#endif
+		char out_realnamegubn[20];
+		char out_custname[40];
+#ifdef DF_DEV
+		char out_remain[649];
+#elif defined(DEV_REAL)
+		char out_remain[645];
+#endif
+	};
+
+	_ledgerH* ledger = (_ledgerH*)dat;
+	CString ecod(ledger->ecod, sizeof(ledger->ecod));
+	CString emsg(ledger->emsg, sizeof(ledger->emsg));
+	emsg.TrimRight();
+
+	char pdata[900]{};
+	memcpy(pdata, (char*)&dat[L_ledgerH], 900);
+	st_out_SACMQ101* psacmq101 = (st_out_SACMQ101*)pdata;
+
+	CString sres(psacmq101->out_realnamegubn, sizeof(psacmq101->out_realnamegubn));
+	sres.TrimRight();
+
+	if (sres.Find("주민등록") >= 0)
+	{
+		CString file, axisfile, usnm = Axis::user;
+		file.Format("%s\\%s\\%s\\%s.ini", Axis::home, USRDIR, usnm, usnm);
+		WritePrivateProfileString("CDD/EDD", "popIB8224", "1", file);
+	}
+	else
+		m_axGuide->SetGuide("CDD EDD 온라인 등록은 개인 고객만 가 능합니다.", this);
+		//m_axMisc->MsgBox("CDD EDD 온라인 등록은 개인 고객만 가 능합니다.", "IBK 투자증권");
+}
+
+void CMainFrame::ParseSAMFQ014(char* dat, int len)  //test CDD
+{
+	_ledgerH* ledger = (_ledgerH*)dat;
+	CString ecod(ledger->ecod, sizeof(ledger->ecod));
+	CString emsg(ledger->emsg, sizeof(ledger->emsg));
+	emsg.TrimRight();
+
+	//char* pdata = (char*)&dat[L_ledgerH]; 
+	char pdata[5];
+	memcpy(pdata, (char*)&dat[L_ledgerH], 5);
+
+	if (atoi(pdata) == 1)
+		SendSACMQ101();
+	else
+	{
+		CString file, axisfile, usnm = Axis::user;
+		file.Format("%s\\%s\\%s\\%s.ini", Axis::home, USRDIR, usnm, usnm);
+		WritePrivateProfileString("CDD/EDD", "popIB8224", "0", file);
+	}
 }
 
 void CMainFrame::ParseSBPGT336(char* pdata, int len)
@@ -16590,12 +16849,17 @@ void CMainFrame::preload_screen()
 // 	CString s;
 // 	s.Format("[dll]NEW DLL PATH : [%s]\n",path);
 // 	OutputDebugString(s);
-		m_hMNews = LoadLibraryA(path);
+		m_hMNews = LoadLibraryA(path); //test
 		if (!m_hMNews)
 		{
-			const DWORD dwError = GetLastError();
-			emsg.Format("GetLastError(%d)", dwError);
-			MessageBox(path, emsg);
+			m_hMNews = LoadLibraryEx(path, nullptr, LOAD_LIBRARY_SEARCH_USER_DIRS);
+			if (!m_hMNews)
+			{
+				const DWORD dwError = GetLastError();
+				emsg.Format("GetLastError(%d)", dwError);
+				MessageBox(path, emsg);
+			}
+		
 		}
 	}
 	
@@ -19397,10 +19661,9 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
 	lpMMI->ptMaxSize.y = nMaxHeight + GetSystemMetrics(SM_CYFRAME)-3;
 	lpMMI->ptMaxSize.x = nMaxWidth + GetSystemMetrics(SM_CXFRAME);
 
-	lpMMI->ptMaxSize.x += GetSystemMetrics(SM_CXFRAME) * 2;
+	//20230522(BF) HTS Max size fixing 
+	lpMMI->ptMaxSize.x += GetSystemMetrics(SM_CXFRAME) * 2;  
 	lpMMI->ptMaxSize.y += GetSystemMetrics(SM_CYFRAME) * 2;
-	//if (Axis::isVista && Axis::WinTheme == 0)	lpMMI->ptMaxPosition.y += VistaFrame;
-	
 	CMDIFrameWnd::OnGetMinMaxInfo(lpMMI);
 }
 
@@ -21139,7 +21402,8 @@ void CMainFrame::FreeFirewall()
 LRESULT CMainFrame::OnPhonePad(WPARAM wParam, LPARAM lParam)
 {
 	//MessageBox((char*)lParam);
-
+	m_slog.Format("[phonepad] OnPhonePad ");
+	OutputDebugString(m_slog);
 	SetForegroundWindow();
 	//m_mapHelper->ChangeChild(m_activeMapN);
 	CChildFrame* child = (CChildFrame *) MDIGetActive();
@@ -21160,6 +21424,10 @@ LRESULT CMainFrame::OnPhonePad(WPARAM wParam, LPARAM lParam)
 		CString dat = ddd;
 		CString sdat;
 		sdat = "zPwd\t"+dat;
+
+		m_slog.Format("[phonepad] OnPhonePad sdat=[%s] m_activeKey=[%d]", sdat, m_activeKey);
+		OutputDebugString(m_slog);
+
 		m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY, (void *)NULL,
 							(BYTE *)(VTS_I4 VTS_I4), MAKELONG(setFDC, m_activeKey), (LPARAM)(const char*)sdat);
 		sdat = "pswd\t"+dat;
@@ -23636,24 +23904,6 @@ LRESULT CMainFrame::OnSecureDlg(WPARAM wParam, LPARAM lParam)
 		if (dlg.m_bNoRetry)
 		{
 			const CTime time = CTime::GetCurrentTime();
-			struct	_pidouini_mid* mid;
-			mid = new struct _pidouini_mid;
-			memset(mid,  ' ', sizeof(struct _pidouini_mid));
-			mid->gubn[0] = 'I';
-			memcpy(mid->item.usid, (LPCSTR)Axis::userID, Axis::userID.GetLength());
-#ifdef DF_USE_CPLUS17
-			memcpy(mid->item.innm, "AGREEMENT", strlen("AGREEMENT"));
-			memcpy(mid->item.senm, "SECURETOOLS", strlen("SECURETOOLS"));
-			memcpy(mid->item.skey, "DISABLE", strlen("DISABLE"));
-#else
-			memcpy(mid.item.innm, "AGREEMENT", 9);
-			memcpy(mid.item.senm, "SECURETOOLS", 11);
-			memcpy(mid.item.skey, "DISABLE", 7);
-#endif
-
-			sprintf(mid->item.valu, "OK - %s", time.Format("[%Y/%m/%d][%H:%M:%S]"));
-			sendTR("pidouini", (char*)mid, sizeof(struct	_pidouini_mid), 0, 'p');
-		/*	const CTime time = CTime::GetCurrentTime();
 			struct	_pidouini_mid mid;
 			memset(&mid, 0, sizeof(mid));
 			mid.gubn[0] = 'I';
@@ -23669,7 +23919,7 @@ LRESULT CMainFrame::OnSecureDlg(WPARAM wParam, LPARAM lParam)
 #endif
 			
 			sprintf(mid.item.valu, "OK - %s", time.Format("[%Y/%m/%d][%H:%M:%S]"));
-			sendTR("pidouini", (char*)&mid, sizeof(mid), 0, 'p');*/
+			sendTR("pidouini", (char*)&mid, sizeof(mid), 0, 'p');
 		}
 	}
 	return 0;
@@ -23718,12 +23968,19 @@ void CMainFrame::os_report()
 #endif
 	
 	memcpy(mid.item.skey, "VERSION", 7);
-// 	sprintf(mid.item.valu, "VER[%d.%d] BUILD[%d] PLATFORM[%d] OS[%s] OS BIT[%s] CPU[%d] CPU NUMBER[%d] MEMORY PHYS[%dM] SKIN [%s]", 
-// 		info.dwMajorVersion, info.dwMinorVersion, info.dwBuildNumber,
-// 		info.dwPlatformId, m_sysInfo->GetWindowInfo(),IsWow64(),m_sysInfo->GetCPUInfo(),sysinfo.dwNumberOfProcessors,m_sysInfo->GetMemoryInfo(),skinName);
-	sprintf(mid.item.valu, "VER[%s] BUILD[%d] PLATFORM[%d] OS[%s] OS BIT[%s] CPU[%d] CPU NUMBER[%d] MEMORY PHYS[%dM] SKIN [%s]",
-		m_sysInfo->GetWindowVersion(), info.dwBuildNumber,
-		info.dwPlatformId, m_sysInfo->GetWindowInfo(), IsWow64(), m_sysInfo->GetCPUInfo(), sysinfo.dwNumberOfProcessors, m_sysInfo->GetMemoryInfo(), skinName);
+	//VER[10.0] BUILD[19045] PLATFORM[2] OS[WINDOWS 10] OS BIT[64 Bit] CPU[6542672] 
+	//CPU NUMBER[16] MEMORY PHYS[6563912M] SKIN [Blue]
+	sprintf_s(mid.item.valu, "VER[%s] BUILD[%d] PLATFORM[%d] OS[%s] OS BIT[%s] "
+									  "CPU[%d] CPU NUMBER[%d] MEMORY PHYS[%dM] SKIN [%s]",
+		m_sysInfo->GetWindowVersion(), 
+		info.dwBuildNumber,
+		info.dwPlatformId, 
+		m_sysInfo->GetWindowInfo(), 
+		IsWow64(), 
+		m_sysInfo->GetCPUInfo(), 
+		sysinfo.dwNumberOfProcessors, 
+		m_sysInfo->GetMemoryInfo(), 
+		skinName);
 	memcpy(mid.item.date, sdat, 8);
 
 // 	CString s;
@@ -23978,8 +24235,12 @@ BOOL CMainFrame::OnCreateClient( LPCREATESTRUCT lpcs, CCreateContext* pContext )
 BOOL CMainFrame::IsSuperUser()
 {
 	CString s;
+	if (Axis::userID = "khs779")
+		return TRUE;
+
 	if (!Axis::isCustomer)
-		return (Axis::userID=="071006" || Axis::userID=="081394" || Axis::userID=="091120" || Axis::userID=="##ibk9" || Axis::userID=="890307" || Axis::userID == "071003" || Axis::userID == "171059");
+		return (Axis::userID=="071006" || Axis::userID=="081394" || Axis::userID=="091120" || Axis::userID=="##ibk9" || Axis::userID=="890307" || Axis::userID == "071003" || Axis::userID == "171059" || Axis::userID == "191099"); 
+
 	else
 	{
 // 		if(Axis::userID == "warship" || Axis::userID == "hwanmun" || Axis::userID == "dundas" || Axis::userID == "minkyu42" || Axis::userID == "fly2com" || Axis::userID == "onetym00" || Axis::userID == "" || Axis::userID == "haejoy" || Axis::userID == "devilswo" || Axis::userID == "june6365" || Axis::userID == "jingga")
@@ -25228,9 +25489,6 @@ void CMainFrame::ParsePihoitgyList(char* dat, int len)
 		gubn = CString(mod->grid[ii].gubn, sizeof(mod->grid[ii].gubn));	gubn.TrimRight();
 		mnam = CString(mod->grid[ii].mnam, sizeof(mod->grid[ii].mnam));	mnam.TrimRight();
 
-m_slog.Format("[axis][pihoitgy] ParsePihoitgyList     gubn[%s]  mnam=[%s] \r\n", gubn, mnam);
-OutputDebugString(m_slog);
-
 		CString filename,gridItem;
 
 // 		s.Format("PIHOITGY [%s] [%s] [%d]\n",gubn,mnam,mnam.Find("@"));
@@ -25269,7 +25527,6 @@ OutputDebugString(m_slog);
 		}
 		else
 		{
-			mnam = mnam.Mid(1);
 			filename.Format("%s\\%s\\IB\\%s\\%s", Axis::home, gubn, mnam.Mid(0,3), mnam);
 		}
 
@@ -25281,10 +25538,7 @@ OutputDebugString(m_slog);
 			char* str = GetFileSHA256(filename,hModule);
 
 			gridItem.Format("%-3s%-47s%-44s",gubn,mnam,str);
-
-m_slog.Format("[axis][pihoitgy] ParsePihoitgyList     gubn[%s]  mnam=[%s] \r\n", gubn, mnam);
-OutputDebugString(m_slog);
-			
+	
 			m_arrayItgy.Add(gridItem);
 		}
 	}
@@ -25366,9 +25620,6 @@ void CMainFrame::ParsePihoitgy(char* dat, int len)
 		gubn = CString(mod->grid[ii].gubn, sizeof(mod->grid[ii].gubn));	gubn.TrimRight();
 		mnam = CString(mod->grid[ii].mnam, sizeof(mod->grid[ii].mnam));	mnam.TrimRight();
 
-		s.Format("ITGY [%s][%s]\n",gubn,mnam);
-		OutputDebugString(s);
-		
 		if(gubn == "PLF")
 		{
 			m_arrayPlfItgy.Add(mnam);
@@ -25633,9 +25884,12 @@ LRESULT CMainFrame::OnPhonePadNating(WPARAM wParam, LPARAM lParam)
 	dat.Format("%s",(char*)lParam);
 	dat.TrimLeft();
 	dat.TrimRight();
-
+	m_strPhone = dat;
 	CString sdat;
 	sdat = "zPwd\t"+dat;
+
+	m_slog.Format("[phonepad] OnPhonePadNating dat=[%s] m_activeKey=[%d] ", dat,  m_activeKey);
+	OutputDebugString(m_slog);
 
 	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY, (void *)NULL,
 		(BYTE *)(VTS_I4 VTS_I4), MAKELONG(setFDC, m_activeKey), (LPARAM)(const char*)sdat);
@@ -26592,6 +26846,24 @@ BOOL CMainFrame::startAK()
 		return FALSE;
 	}
 	
+	// Protect Edit Ctrl1
+// 	HWND hwnd1 = m_axConnect->GetPassHwnd();
+// 	DWORD dwErr1 = g_pIAstxAkSDK->ProtectEditControl(hwnd1);
+// 	if( dwErr1 != 0 ) 
+// 	{
+// 		OutputDebugString("[ASTx] AK 비밀번호 에디트 초기화에 실패했습니다.");
+// 		return FALSE;
+// 	}
+// 
+// 	HWND hwnd2 = m_axConnect->GetCPassHwnd();
+// 	DWORD dwErr2 = g_pIAstxAkSDK->ProtectEditControl(hwnd2);
+// 	if( dwErr2 != 0 ) 
+// 	{
+// 		OutputDebugString("[ASTx] AK 인증번호 에디트 초기화에 실패했습니다.");
+// 		return FALSE;
+// 	}
+// 
+// 	m_axConnect->SetAK(g_pIAstxAkSDK);
 	WriteLog("[ASTx]방화벽 기능이 정상적으로 기동되었습니다. [키보드보안] startAK()");
 	return TRUE;
 }
@@ -26663,6 +26935,11 @@ int CMainFrame::GetTheme()
 
 LRESULT CMainFrame::OnLockPass( WPARAM wParam, LPARAM lParam )
 {
+	if ((int)wParam == 1)
+	{
+		KillMySelf();
+		return 0;
+	}
 	char ca[20];
 	int ret;
 
@@ -26688,8 +26965,8 @@ LRESULT CMainFrame::OnLockPass( WPARAM wParam, LPARAM lParam )
 	m_slog.Format("[idle][auth][cert] ret=[%d] \n", ret);
 	OutputDebugString(m_slog);
 
-	if (ret == 0)
-	{
+	if ((ret == 0 && !m_bCloudeUse) || (ret == 1 && m_bCloudeUse))  
+	{//공동인증서는 성공시 ret = 0,  클라우드 인증서는 성공시 ret = 1
 		SendSBPGT336("S");
 		memcpy(pdata, "success", 7);
 	}
@@ -27219,10 +27496,36 @@ OutputDebugString(m_slog);
 
 void   CMainFrame::Check_XECUREPATH()
 {
-	CString filePath, rootPath, logPath;
+	CString stmp, filePath;
+	char buff[128];
+	CString iniConf = Axis::home + "\\tab\\axis.ini";
+	GetPrivateProfileString("XECURE", "size", "10", buff, sizeof(buff) - 1, iniConf);
+	stmp.Format("%s", buff);
+	int maxSizeInKB = atoi(stmp);
+	filePath = Axis::home + _T("\\exe\\xc.log");
+	CFileStatus fileStatus;
+	if (CFile::GetStatus(filePath, fileStatus))
+	{
+		ULONGLONG fileSize = fileStatus.m_size;
+
+		if (fileSize >= (ULONGLONG)maxSizeInKB * 1024)
+		{
+			// 파일 크기가 maxSizeInKB 이상인 경우 파일을 삭제합니다.
+			DeleteFile(filePath);
+		}
+	}
+
+	memset(buff, 0x00, 128);
+
+	GetPrivateProfileString("XECURE", "level", "0", buff, sizeof(buff) - 1, iniConf);
+	stmp.Format("%s", buff);
+	int ilevel = atoi(stmp);
+
+	CString rootPath, logPath, logLevel;
 	filePath = Axis::home + _T("\\exe\\xc_conf.ini");
 	rootPath = "Module Directory = " + Axis::home + "\\xc32_win64\\";
 	logPath = "LOG DIR = " + Axis::home + "\\exe\\";
+	logLevel.Format("LOG LEVEL 	= %d", ilevel);
 
 	CStdioFile fileB;
 	CString strLine;
@@ -27256,7 +27559,14 @@ void   CMainFrame::Check_XECUREPATH()
 				strLine = logPath;
 			}
 		}
-
+		else if (strLine.Find("LOG LEVEL 	=") >= 0)
+		{
+			if (strLine != logLevel)
+			{
+				bRightPath = FALSE;
+				strLine = logLevel;
+			}
+		}
 		sWriteBuf += strLine;
 		sWriteBuf += "\r\n";
 	}
@@ -27274,6 +27584,39 @@ void   CMainFrame::Check_XECUREPATH()
 		}
 	}
 }
+
+void   CMainFrame::FileMove()
+{
+	char buff[128];
+	CString iniConf = Axis::home + "\\tab\\axis.ini";
+	GetPrivateProfileString("move", "file", "", buff, sizeof(buff) - 1, iniConf);
+
+	CString strpath, strfile;
+	strpath.Format("%s", buff);
+	strpath.TrimRight();
+
+	strfile = Parser(strpath, ";");
+
+	iniConf = Axis::home +  "\\tab\\";
+	iniConf += strfile;
+	CString strOripath;
+	strOripath = iniConf;
+
+	CFileFind cfFind;
+	BOOL bFind = cfFind.FindFile(iniConf);
+
+	if (bFind)
+	{
+		int ifind = iniConf.ReverseFind('\\');
+		iniConf = iniConf.Left(ifind);
+		iniConf += "\\";
+		iniConf += strfile;
+		iniConf.Replace("tab", strpath);
+		CopyFile(strOripath, iniConf, FALSE);
+		//DeleteFile(strOripath);
+	}
+}
+
 
 #pragma warning (default : 4477)
 /*
@@ -27577,7 +27920,7 @@ void CMainFrame::Delete_AsisICon()
 void CMainFrame::CheckServer(CString strip)
 {
 	if (strip.Find("211.255.204.70") >= 0) m_strServer = "[BP10]";
-	else if (strip.Find("211.255.204.71") >= 0) m_strServer = "[BP11]"; 
+	else if (strip.Find("211.255.204.71") >= 0) m_strServer = "[BP11]";
 	else if (strip.Find("211.255.204.72") >= 0) m_strServer = "[BP12]";
 	else if (strip.Find("211.255.204.73") >= 0) m_strServer = "[BP13]";
 	else if (strip.Find("211.255.204.74") >= 0) m_strServer = "[BP14]";
@@ -27596,11 +27939,10 @@ void CMainFrame::CheckServer(CString strip)
 	else if (strip.Find("211.255.204.57") >= 0) m_strServer = "[BP27]";
 	else if (strip.Find("211.255.204.58") >= 0) m_strServer = "[BP28]";
 	else if (strip.Find("211.255.204.59") >= 0) m_strServer = "[BP29]";
-	else m_strServer = strip;
-
+	else m_strServer.Format("[%s]", strip);
 }
 
-void CMainFrame::PopUp7805()
+void CMainFrame::Popup7805()
 {
 	CString strFile;
 	//7805 팝업 
@@ -27638,11 +27980,10 @@ void CMainFrame::PopUp7805()
 			int readL;
 
 			readL = GetPrivateProfileString("7805", "FROM", "", readB, sizeof(readB), strFile);
-			readL = 0; //test
+
 			if (readL == 0)  //파일이 없거나 데이터를 못읽으면 그냥 띄운다
 			{
 				SetTimer(TM_POPUP_JISU, 1000, NULL);
-				m_bInit = FALSE;
 				return;
 			}
 
@@ -27654,8 +27995,7 @@ void CMainFrame::PopUp7805()
 			if (readL == 0)  //파일이 없거나 데이터를 못읽으면 그냥 띄운다
 			{
 				SetTimer(TM_POPUP_JISU, 1000, NULL);
-				m_bInit = FALSE;
-				return;
+				return;;
 			}
 
 			CString strTo(readB, readL);
@@ -27670,6 +28010,140 @@ void CMainFrame::PopUp7805()
 
 }
 
+void CMainFrame::CloudeCertUp()
+{
+	int ret = -1;
+	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
+		(BYTE*)(VTS_I4 VTS_I4), MAKELONG(caCLOUD, 1), 0);
+
+	if (ret == 0)
+	{
+		if (m_bUseNewLogin)
+			m_axConnect->SetGuide(_T("클라우드로 인증서 올리기 성공"));
+		else
+			m_axConnectOld->SetGuide(_T("클라우드로 인증서 올리기 성공"));
+	}
+}
+
+void CMainFrame::CloudeCertDown()
+{
+	int ret = -1;
+	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
+		(BYTE*)(VTS_I4 VTS_I4), MAKELONG(caCLOUD, 2), 0);
+
+	if (ret == 0)
+	{
+		if (m_bUseNewLogin)
+			m_axConnect->SetGuide(_T("클라우드에서 인증서 내려받기 성공"));
+		else
+			m_axConnectOld->SetGuide(_T("클라우드로 인증서 내려받기 성공"));
+	}
+}
+
+void CMainFrame::CloudeCertPassChange()
+{
+	int ret = -1;
+	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
+		(BYTE*)(VTS_I4 VTS_I4), MAKELONG(caCLOUD, 3), 0);
+
+	if (ret == 0)
+	{
+		if (m_bUseNewLogin)
+			m_axConnect->SetGuide(_T("클라우드 인증서 간편비밀번호 변경 성공"));
+		else
+			m_axConnectOld->SetGuide(_T("클라우드 인증서 간편비밀번호 변경 성공"));
+	}
+}
+
+void CMainFrame::CludeFuncCall(int igubn)
+{
+	int ret{};
+	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
+		(BYTE*)(VTS_I4 VTS_I4), MAKELONG(caCLOUD, igubn), 0);
+}
+
+void CMainFrame::CludeUSE(bool bUseCloude)
+{
+	int ret{};
+	int igubn = 0;
+	m_bCloudeUse = bUseCloude;
+
+	if (bUseCloude)
+		igubn = 11;
+	else
+		igubn = 12;
+
+	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
+		(BYTE*)(VTS_I4 VTS_I4), MAKELONG(caCLOUD, igubn), 0);
+}
+
+BOOL CMainFrame::isCDDScreen(CString strScreen)  //test CDD
+{
+	char	wb[512];
+	CString file, axisfile, usnm = Axis::user, stmp;
+	file.Format("%s\\%s\\%s\\%s.ini", Axis::home, USRDIR, usnm, usnm);
+
+	const DWORD dwRc = GetPrivateProfileString("CDD/EDD", "popIB8224", "", wb, sizeof(wb), file);
+	if (dwRc <= 0)
+		return FALSE;
+
+	stmp.Format("%s", wb);
+	stmp.TrimRight();
+	if (stmp == "0")
+		return FALSE;
+
+	if (m_arrCDDScreen.GetSize() == 0)
+		return FALSE;
+
+
+	for (int ii = 0; ii < m_arrCDDScreen.GetSize(); ii++)
+	{
+		if (m_arrCDDScreen.GetAt(ii).Find(strScreen) >= 0)
+		{
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+int CMainFrame::CheckCDDEDD()  //test CDD
+{
+	m_arrCDDScreen.RemoveAll();
+	CString	Path, stmp;
+	Path.Format("%s\\%s\\CDDEDD.INI", Axis::home, "tab");
+
+	char readB[1024];
+	int readL;
+	readL = GetPrivateProfileString("CDD/EDD", "screen", "", readB, sizeof(readB), Path);
+	if (readL > 0)
+	{
+		stmp.Format("%s", readB);
+		while (1)
+		{
+			if (stmp.IsEmpty())
+				break;
+			m_arrCDDScreen.Add(Parser(stmp, ";"));
+		}
+	}
+
+	if (m_arrCDDScreen.GetSize() <= 0)
+		return 0;
+
+	CString str;
+	long  rc;
+	char data[20]{};
+
+	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&rc,
+		(BYTE*)(VTS_I4 VTS_I4), MAKELONG(0x26, 3), data);
+
+	m_sjumin.Format("%s", (char*)data);
+	m_sjumin.TrimRight();
+
+	SendSAMFQ014();
+
+	return 0;
+}
+
 void CMainFrame::KillMySelf()
 {
 	HANDLE         hProcessSnap = NULL;
@@ -27682,7 +28156,7 @@ void CMainFrame::KillMySelf()
 	hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
 	if (hProcessSnap == (HANDLE)-1)
-		return ;
+		return;
 
 	pe32.dwSize = sizeof(PROCESSENTRY32);
 	CString slog;
@@ -27756,144 +28230,70 @@ HANDLE CMainFrame::ProcessFind(char* strProcessName)
 	return nullptr;
 }
 
-void CMainFrame::CreateSubAxis()
-{
-	if (ProcessFind("SubAxis"))
-		return;
-
-	CreateSharedMemory();
-
-	CString	aps, cmds, exes;
-	STARTUPINFO		si;
-	PROCESS_INFORMATION	pi;
-
-	ZeroMemory(&si, sizeof(STARTUPINFO));
-	ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
-
-	si.cb = sizeof(STARTUPINFO);
-	si.dwFlags = STARTF_USESHOWWINDOW;
-	si.wShowWindow = SW_SHOW;
-
-	char	buffer[1024];
-	GetClassName(m_hWnd, buffer, sizeof(buffer));
-	cmds.Format(" /c %s",  m_strSharedMName);
-	aps.Format("%s\\%s\\SubAxis.exe", Axis::home, RUNDIR);
-
-	const BOOL bRc = CreateProcess(
-		aps,				// application name
-		(char*)(const char*)cmds,// command line
-		NULL,				// process attribute
-		NULL,				// thread attribute
-		FALSE,				// is inherit handle
-		0,					// creation flags
-		NULL,				// environment
-		NULL,				// current directory
-		&si,				// STARTUPINFO
-		&pi);				// PROCESS_INFORMATION
-
-	if (bRc)
-	{
-
-	}
-}
-
-void CMainFrame::CreateSharedMemory()
-{
-	DWORD processID = GetCurrentProcessId();
-	m_strSharedMName.Format("%s%d", "Axis", processID);
-	m_hKeyFile = ::OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, m_strSharedMName);
-
-	if (m_hKeyFile == nullptr)
-	{
-		m_hKeyFile = CreateFileMapping((HANDLE)0xffffffff,
-			nullptr,
-			PAGE_READWRITE,
-			0,
-			1024 * 50,
-			m_strSharedMName);
-	}
-}
-
-void CMainFrame::CludeCertup()
-{
-	int ret{};
-	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
-		(BYTE*)(VTS_I4 VTS_I4), MAKELONG(caCLOUD, 1), 0);
-}
-void CMainFrame::CludeCertDown()
-{
-	int ret{};
-	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
-		(BYTE*)(VTS_I4 VTS_I4), MAKELONG(caCLOUD, 2), 0);
-}
-void CMainFrame::CludePschange()
-{
-	int ret{};
-	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
-		(BYTE*)(VTS_I4 VTS_I4), MAKELONG(caCLOUD, 3), 0);
-	if (ret == 0)
-		m_axConnect->SetGuide(_T("클라우드 인증서 간편비밀번호 변경!!"));
-}
-
-void CMainFrame::CludeFuncCall(int igubn)
-{
-	int ret{};
-	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
-		(BYTE*)(VTS_I4 VTS_I4), MAKELONG(caCLOUD, igubn), 0);
-}
-
-void CMainFrame::CludeUSE(bool bUseCloude)
-{
-	int ret{};
-	int igubn = 0;
-	if (bUseCloude)
-		igubn = 11;
-	else
-		igubn = 12;
-
-//	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
-//		(BYTE*)(VTS_I4 VTS_I4), MAKELONG(caCLOUD, igubn), 0);
-}
-
-void CMainFrame::FileMove()
-{
-	char buff[128];
-	CString iniConf = Axis::home +  "\\tab\\axis.ini";
-	GetPrivateProfileString("move", "file", "", buff, sizeof(buff) - 1, iniConf);
-
-	CString strpath, strfile;
-	strpath.Format("%s", buff);
-	strpath.TrimRight();
-
-	strfile = Parser(strpath, ";");
-
-	iniConf = Axis::home +  + "\\tab\\";
-	iniConf += strfile;
-	CString strOripath;
-	strOripath = iniConf;
-
-	CFileFind cfFind;
-	BOOL bFind = cfFind.FindFile(iniConf);
-
-	if (bFind)
-	{
-		int ifind = iniConf.ReverseFind('\\');
-		iniConf = iniConf.Left(ifind);
-		iniConf += "\\";
-		iniConf += strfile;
-		iniConf.Replace("tab", strpath);
-		CopyFile(strOripath, iniConf, FALSE);
-		DeleteFile(strOripath);
-	}
-
-}
+//void CMainFrame::CreateSubAxis()
+//{
+//	if (ProcessFind("SubAxis"))
+//		return;
+//
+//	CreateSharedMemory();
+//
+//	CString	aps, cmds, exes;
+//	STARTUPINFO		si;
+//	PROCESS_INFORMATION	pi;
+//
+//	ZeroMemory(&si, sizeof(STARTUPINFO));
+//	ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
+//
+//	si.cb = sizeof(STARTUPINFO);
+//	si.dwFlags = STARTF_USESHOWWINDOW;
+//	si.wShowWindow = SW_SHOW;
+//
+//	char	buffer[1024];
+//	GetClassName(m_hWnd, buffer, sizeof(buffer));
+//	cmds.Format(" /c %s", m_strSharedMName);
+//	aps.Format("%s\\%s\\SubAxis.exe", Axis::home, RUNDIR);
+//
+//	const BOOL bRc = CreateProcess(
+//		aps,				// application name
+//		(char*)(const char*)cmds,// command line
+//		NULL,				// process attribute
+//		NULL,				// thread attribute
+//		FALSE,				// is inherit handle
+//		0,					// creation flags
+//		NULL,				// environment
+//		NULL,				// current directory
+//		&si,				// STARTUPINFO
+//		&pi);				// PROCESS_INFORMATION
+//
+//	if (bRc)
+//	{
+//
+//	}
+//}
+//
+//void CMainFrame::CreateSharedMemory()
+//{
+//	DWORD processID = GetCurrentProcessId();
+//	m_strSharedMName.Format("%s%d", "Axis", processID);
+//	m_hKeyFile = ::OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, m_strSharedMName);
+//
+//	if (m_hKeyFile == nullptr)
+//	{
+//		m_hKeyFile = CreateFileMapping((HANDLE)0xffffffff,
+//			nullptr,
+//			PAGE_READWRITE,
+//			0,
+//			1024 * 50,
+//			m_strSharedMName);
+//	}
+//}
 
 //CString ip;
 //	ip.Format("%s", ipaddr);
 //	ip.TrimLeft(), ip.TrimRight();
 
    //int returnL = 12;
-   //FillMemory(data, returnL, 'f' '); data[returnL] = 0x00;
+   //FillMemory(data, returnL, ' '); data[returnL] = 0x00;
    //CString strRetrun;
 
    //IP_ADAPTER_INFO AdapterInfo[16];

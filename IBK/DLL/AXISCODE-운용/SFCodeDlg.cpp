@@ -232,7 +232,10 @@ void CSFCodeDlg::OnSelchangeNameList()
 				{
 					str = str.Right(13).Mid(0,6);
 
-					((CButton*)GetDlgItem(nIndex[n]))->SetWindowText(str);
+				/*	if(n >= 17)
+						((CButton*)GetDlgItem(nIndex[8]))->SetWindowText(str);
+					else*/
+						((CButton*)GetDlgItem(nIndex[n]))->SetWindowText(str);
 				}
 
 				m_arHNam.SetAt(str,cod);
@@ -240,7 +243,10 @@ void CSFCodeDlg::OnSelchangeNameList()
 
 				n++;
 
-				if (n >= 17)
+				//if (n >= 17)
+				if (n == 17)
+				/*	TRACE("test");
+				if (n >= 18)*/
 					break;
 			}
 		}

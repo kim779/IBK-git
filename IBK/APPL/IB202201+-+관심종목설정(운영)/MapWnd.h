@@ -12,9 +12,7 @@ class CMapWnd : public CWnd
 public:
 	CMapWnd(CWnd* parent);
 	virtual ~CMapWnd();
-	CString m_slog;
-	BOOL ChangeBookFile(CString strFileA, CString strFileB, CStringArray& strarr);
-	BOOL ExitBookFile(CString strBookFile);
+
 // Attributes
 public:
 	CString _sDomino;
@@ -129,5 +127,13 @@ private:
 	BOOL ExistFile(CString fullfile);
 	void Request_GroupList();
 	void Request_GroupCode(int iseq);
+
+	BOOL m_bBookFileProcess{};
+	BOOL CheckBookFileProcess();
+	BOOL CheckFileModificationTime(const CString& filePath);
+public:
+	CString m_slog;
+	BOOL ChangeBookFile(int index, CString strFileA, CString strFileB, CStringArray& strarr);
+	BOOL ExitBookFile(CString strBookFile);
 };
 

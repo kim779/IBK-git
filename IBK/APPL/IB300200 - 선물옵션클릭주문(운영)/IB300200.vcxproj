@@ -113,7 +113,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../dev/IB300200.dll</OutputFile>
+      <OutputFile>D:\IBKS_TEST/dev/IB300200.dll</OutputFile>
       <ImportLibrary>.\Debug\IB300200.lib</ImportLibrary>
       <AdditionalDependencies>../../control/fx_misc/Debug/fx_misc.lib;../../control/fx_GridEx/Debug/fx_GridEx.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\IB300200.def</ModuleDefinitionFile>

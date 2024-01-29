@@ -603,7 +603,7 @@ void CIHCodeEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		}
 		else if (m_Unit == GU_FUTURE || m_Unit == GU_OPTION || m_Unit == GU_FOCODE || m_Unit == GU_POPTION)
 		{
-			if (m_Unit == GU_FUTURE && (len == 5 && tmpS.GetAt(0) == '1'))
+			if (m_Unit == GU_FUTURE && (len == 5 && (tmpS.GetAt(0) == '1' || tmpS.GetAt(0) == 'A')))  //파생상품 코드개편
 			{
 				tmpS += "000";
 				SetWindowText(tmpS);
@@ -714,7 +714,7 @@ void CIHCodeEdit::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 				
 				return;
 			}
-			if (len == 5 && sTmp.GetAt(0) == '1')
+			if (len == 5 && (sTmp.GetAt(0) == '1' || sTmp.GetAt(0) == 'A'))  //파생상품 코드개편
 			{
 				sTmp += "000";
 				SetWindowText(sTmp);

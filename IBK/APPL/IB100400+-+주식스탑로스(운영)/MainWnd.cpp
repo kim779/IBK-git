@@ -2351,6 +2351,8 @@ int CMainWnd::ExecSetup(int itype, int irow)
 		pDlg.SetPossvol(m_pRemainGrid->GetItemText(irow, colPOSSVOL));
 		pDlg.m_stConfig = m_arConfigList.GetAt(irow);
 		m_pRemainGrid->SetItemText(irow, colSET, B_SETUP);
+
+		pDlg.m_iCodetype = getCodeType(sCode);
 	}
 	
 	int iResult = 0;

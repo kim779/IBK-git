@@ -28,7 +28,6 @@
 /////////////////////////////////////////////////////////////////////////////
 // CCertLogin dialog
 #include "useMaindefine.h"
-
 class CCertLogin : public CDialog
 {
 // Construction
@@ -213,19 +212,12 @@ private:
 	CBmpButton* m_btnGen;
 	CBmpButton* m_btnBanner;
 
-
-
-	
 	void ShowCloudeBtn(BOOL bShow, BOOL AllShow = TRUE);
 	CBmpButton* m_btnClude;  //clude
 	CBmpButton* m_btn_pc_Clude;
 	CBmpButton* m_btn_PSchange_Clude;
 	CBmpButton* m_btn_downcert_Clude;
 	CBmpButton* m_btn_upcert_Clude;
-
-
-
-	
 
 	IAstxMkd8* m_AkSdk;
 
@@ -250,7 +242,7 @@ private:
 	void		ApplySecurity();
 public:
 	BOOL m_bCloudeUSE = FALSE;
-
+	
 	void RunCopyCfg();
 	CString DeleteStr(CString p1, CString p2);
 	bool IsNumber(CString str);
@@ -269,19 +261,17 @@ public:
 		OnRun();
 	}
 
+	//로그인 버트
+	void SetLoginBtnEnable(bool bEnable) { m_btnRun->EnableWindow(bEnable); }
 	//간편인증
 	CString m_slog;
 	void OnEasyCert();
 	void ShowQRDlg();
-
-	//클라우드 인증
-	void InitCloude();
-	afx_msg void OnBnClickedClude();
-	afx_msg void OnBnClickedCludeCertup();
-	afx_msg void OnBnClickedCludePschange();
-	afx_msg void OnBnClickedCludeCertDown();
-	afx_msg void OnBnClickedCludePc();
 	afx_msg void OnBnClickedCloudePcbtn();
+	afx_msg void OnBnClickedCloude();
+	afx_msg void OnBnClickedCloudeCertup();
+	afx_msg void OnBnClickedCloudeDown();
+	afx_msg void OnBnClickedCloudePschange();
 };
 
 //{{AFX_INSERT_LOCATION}}

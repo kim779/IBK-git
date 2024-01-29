@@ -553,7 +553,7 @@ int CRemainFuture::getJKind(CString m_code)
 	case '2':	// call option
 		if(ch3 == '5') //2015.07.15 KSJ	미니 코스피200 선물 추가
 			return JK_MINI_CALLOPT;
-		else if (m_code.GetAt(1) == '0')
+		else if (m_code.GetAt(1) == '0' || m_code.GetAt(1) == 'A')  //check
 			return JK_CALLOPT;
 		else
 			return JK_JCALLOPT;
@@ -562,7 +562,7 @@ int CRemainFuture::getJKind(CString m_code)
 	case '3':	// put option
 		if(ch3 == '5') //2015.07.15 KSJ	미니 코스피200 선물 추가
 			return JK_MINI_PUTOPT;
-		else if (m_code.GetAt(1) == '0')
+		else if (m_code.GetAt(1) == '0' || m_code.GetAt(1) == 'A') //check
 			return JK_PUTOPT;
 		else
 			return JK_JPUTOPT;

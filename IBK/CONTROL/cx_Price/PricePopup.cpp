@@ -752,7 +752,14 @@ double CPricePopup::CalculateUnit(double price, bool bInc)
 		}
 		break;
 	case 7://KOSDAQ ETF 200740824
-		unit = 5;
+		if (price < 2000)
+		{
+			unit = 1;
+			if (!bInc && price <= 1) 
+				unit = 0;
+		}
+		else
+			unit = 5;
 		break;
 	case 8:	// kostar
 		unit = 0.5;

@@ -63,6 +63,7 @@ extern CComModule _Module;
 typedef BOOL(WINAPI* RtlGetVersion_FUNC) (OSVERSIONINFOEXW*);
 #include "../H/axislog.h"
 
+
 //#define DF_NO_PRELOADHIDDEN
 
 //{{AFX_INSERT_LOCATION}}

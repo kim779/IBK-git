@@ -307,6 +307,7 @@ struct	_userWH	{
 #define	caFULLx			0x24		// full certify for main
 #define    caCLOUD			0x25		// cloud functino
 						// variant : cloud information
+#define    getLoinData			0x26 
 // variant : ca information
 // HIWORD(kind) = ca information length
 
@@ -825,7 +826,7 @@ struct	_alertR	{
 	CString	code;
 	int	stat{};				// DLL_ALERT.stat
 	int	size{};				// data record count
-	DWORD	ptr[maxREC]{};			// data record array
+	char*	ptr[maxREC]{};			// data record array
 };
 #define	L_alertR	sizeof(struct _alertR)
 

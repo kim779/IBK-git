@@ -133,5 +133,6 @@ public:
 	int		m_nMoveSave{};
 	int		m_selectedTab{};
 	// END ADD
+	CString m_slog;
 };
 

@@ -156,6 +156,16 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	rc1.DeflateRect(0,1);
 	m_pMapWnd7->SetWindowPos( NULL, 0, 0, rc1.Width()/7, rc1.Height()/2-30, SWP_SHOWWINDOW|SWP_NOMOVE|SWP_NOZORDER );
 
+	if (1)
+	{
+		mapName.Format("IB876112");
+
+		m_pMapWnd8 = std::make_unique<CMapWnd>(m_pWizard);
+		m_pMapWnd8->Create(NULL, NULL, WS_CHILD, rc, this, IDC_MAPVIEW8);
+		m_pMapWnd8->ChangeMap(mapName, "");
+		m_pMapWnd8->ShowWindow(SW_HIDE);
+	}
+
 
 	mapName.Format("IB876110");
 	
@@ -224,6 +234,7 @@ void CMainWnd::OnPaint()
 
 	GetClientRect(&rect);
 
+
 	dc.FillSolidRect(rect, RGB(0,0,0));
 
 	
@@ -245,17 +256,6 @@ void CMainWnd::OnDestroy()
 			m_pMapWnd2->DestroyWindow();
 	}
 	
-
- 	
-// 	if (m_pMapWnd4)
-// 	{
-// 		m_pMapWnd4->closeMap();
-// 		
-// 		if (m_pMapWnd4->m_hWnd && ::IsWindow(m_pMapWnd4->m_hWnd))
-// 			m_pMapWnd4->DestroyWindow();
-// 		delete m_pMapWnd4;	m_pMapWnd4 = NULL;
-// 	}
-	
 	if (m_pMapWnd6)
 	{
 		m_pMapWnd6->closeMap();
@@ -272,6 +272,11 @@ void CMainWnd::OnDestroy()
 			m_pMapWnd7->DestroyWindow();
 	}
 
+	if (m_pMapWnd8)
+	{
+		if (m_pMapWnd8->m_hWnd && ::IsWindow(m_pMapWnd8->m_hWnd))
+			m_pMapWnd8->DestroyWindow();
+	}
 //	delete m_label;
 	
 	KillTimer(1);
@@ -340,53 +345,66 @@ void CMainWnd::set_timer(char *timer)
 
 	const int iHeight = rc.Height() / 14;
 	
-/*
-	m_pMapWnd6->GetClientRect( rc2 ); 		// 달력
-	m_pMapWnd6->ShowWindow(SW_SHOW);
-	rc2.InflateRect(0,1);
-	m_pMapWnd6->SetWindowPos( NULL, 590, 0, rc2.Width(), 180, SWP_SHOWWINDOW|SWP_NOMOVE|SWP_NOZORDER );
-	rc2.DeflateRect(0,1);
-	m_pMapWnd6->SetWindowPos( NULL, 590, 0, rc2.Width(), 180, SWP_SHOWWINDOW|SWP_NOMOVE|SWP_NOZORDER );
-	m_pMapWnd6->MoveWindow(720, 20, rc2.Width(), 210);
-*/
+
+	//무사고
+	int idelta = 155;
+	m_pMapWnd8->ShowWindow(SW_SHOW);
+	tempRect = CRect(0, 0, rc.Width(), idelta);
+	m_pMapWnd8->MoveWindow(tempRect);
+
 	//코스피
-//	m_pMapWnd1->GetClientRect( rc1 ); 	
 	m_pMapWnd1->ShowWindow(SW_SHOW);
-	/*
-	rc1.InflateRect(0,1);
-	m_pMapWnd1->SetWindowPos( NULL, 0, 0, rc1.Width(), rc1.Height()/2-30, SWP_SHOWWINDOW|SWP_NOMOVE|SWP_NOZORDER );
-	rc1.DeflateRect(0,1);
-	m_pMapWnd1->SetWindowPos( NULL, 0, 0, rc1.Width(), rc1.Height()/2-30, SWP_SHOWWINDOW|SWP_NOMOVE|SWP_NOZORDER );
-	//	m_pMapWnd1->MoveWindow(0, 230, rc1.Width(), 217);  //test
-	*/
-	tempRect = CRect(0, 0, rc.Width(), iHeight * 3);
-	tmpRect = tempRect;
-	tmpRect.DeflateRect(0, 2);
-	m_pMapWnd1->MoveWindow(tmpRect);
+
+	if (1)
+	{
+		tempRect = CRect(0, idelta, rc.Width(), idelta * 2);
+		//tempRect.OffsetRect(0, iHeight);  //test
+		m_pMapWnd1->MoveWindow(tempRect);
+		//m_pMapWnd1->ShowWindow(SW_HIDE);
+	}
+	else
+	{
+		tempRect = CRect(0, 0, rc.Width(), iHeight * 2);
+		tmpRect = tempRect;
+		tmpRect.DeflateRect(0, 2);  //test
+		m_pMapWnd1->MoveWindow(tmpRect);
+	}
+	
 
 	//코스닥
-//	m_pMapWnd5->GetClientRect( rc1 ); 	
 	m_pMapWnd5->ShowWindow(SW_SHOW);
-	/*
-	rc1.InflateRect(0,1);
-	m_pMapWnd5->SetWindowPos( NULL, 0, 0, rc1.Width(), rc1.Height()/2-30, SWP_SHOWWINDOW|SWP_NOMOVE|SWP_NOZORDER );
-	rc1.DeflateRect(0,1);
-	m_pMapWnd5->SetWindowPos( NULL, 0, 0, rc1.Width(), rc1.Height()/2-30, SWP_SHOWWINDOW|SWP_NOMOVE|SWP_NOZORDER );
-	//	m_pMapWnd5->MoveWindow(0, 449, rc1.Width(), 217);  //test
-	*/
-	tempRect.OffsetRect(0, iHeight * 3);
-	tmpRect = tempRect;
-	tmpRect.DeflateRect(0, 2);
-	m_pMapWnd5->MoveWindow(tmpRect);
+
+	if (1)
+	{
+		tempRect.OffsetRect(0, idelta);  //test
+		m_pMapWnd5->MoveWindow(tempRect);
+		//m_pMapWnd5->ShowWindow(SW_HIDE);
+	}
+	else
+	{
+		tempRect.OffsetRect(0, iHeight * 3); 
+		tmpRect = tempRect;
+		tmpRect.DeflateRect(0, 2);  
+		m_pMapWnd5->MoveWindow(tmpRect);
+	}
 
 
-//	m_pMapWnd4->GetClientRect( rc2 ); 	// 시계
-	m_pMapWnd4->ShowWindow(SW_SHOW);
-	tempRect.OffsetRect(0, iHeight * 3);
-	tempRect.bottom -= iHeight;
-	tmpRect = tempRect;
-	tmpRect.InflateRect(0, 3);
-	m_pMapWnd4->MoveWindow(tmpRect);
+	if (1)  //시계
+	{
+		m_pMapWnd4->ShowWindow(SW_SHOW);
+		tempRect.OffsetRect(0, iHeight * 2);
+		m_pMapWnd4->MoveWindow(tempRect);
+	}
+	else {
+		//	m_pMapWnd4->GetClientRect( rc2 ); 	// 시계
+		m_pMapWnd4->ShowWindow(SW_SHOW);
+		tempRect.OffsetRect(0, iHeight * 3);
+		tempRect.bottom -= iHeight;
+		tmpRect = tempRect;
+		tmpRect.InflateRect(0, 3);
+		m_pMapWnd4->MoveWindow(tmpRect);
+	}
+
 
 	/*
 	rc2.InflateRect(0,1);

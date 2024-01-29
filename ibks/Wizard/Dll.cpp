@@ -434,29 +434,11 @@ bool CDll::Attach(CString maps, bool only, bool fix)
 	if (!equal)
 	{
 		name.Format(_T("%s\\%s\\%s.dll"), m_guard->m_root.GetString(), DEVDIR, tmapN);
-		instance = AfxLoadLibrary(name);  //test loaddll
+		instance = AfxLoadLibrary(name);
 		if (instance == NULL)
 		{
-			instance = LoadLibraryEx(name, NULL, LOAD_LIBRARY_SEARCH_USER_DIRS);
-			if (instance == NULL)
-			{
-				CString slog;
-				slog.Format(_T("load error = [%s] [%d] ]\n"), name, GetLastError());
-				//	AfxMessageBox(slog);
-				return false;
-			}
-			else
-			{
-				CString slog;
-				slog.Format(_T("LoadLibraryEx  = [%s][%x] \n"), name, instance);
-				OutputDebugString(slog);
-			}
-		}
-		else
-		{
-		//	CString slog;
-		//	slog.Format(_T("LoadLibraryEx load  = [%s][%x] \n"), name, instance);
-		//	OutputDebugString(slog);
+			TRACE(_T("load error = [%s] [%d]\n"), name, GetLastError());
+			return false;
 		}
 
 		xAlert();

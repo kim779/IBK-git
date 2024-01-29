@@ -10,6 +10,7 @@
 #include "../../h/axisvar.h"
 #include "TrSearch1.h"
 #include "MapWnd.h"
+#include "CDlg_Slider.h"
 
 //#include "../../../dll/sm/TrSearch.h"
 
@@ -215,6 +216,7 @@ BEGIN_MESSAGE_MAP(CPage2, CPropertyPage)
 	ON_CBN_SELCHANGE(IDC_CBFIELD, OnSelchangeCbfield)
 	ON_BN_CLICKED(IDC_CHK_OVERLAP, OnChkOverlap)
 	//}}AFX_MSG_MAP
+	ON_BN_CLICKED(IDC_BTN_SETTING, &CPage2::OnBnClickedBtnSetting)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1553,9 +1555,11 @@ void CPage2::SetSize()
 	y = 158;
 	//실시간처리
 	((CStatic *)GetDlgItem(IDC_REAL_STATIC))->MoveWindow(x, y, 150, 80);
-	((CStatic *)GetDlgItem(IDC_RADIO401))->MoveWindow(x+15, y+18, 100, 20);
+	((CStatic *)GetDlgItem(IDC_RADIO401))->MoveWindow(x+15, y+18, 80, 20);
 	((CStatic *)GetDlgItem(IDC_RADIO402))->MoveWindow(x+15, y+38, 100, 20);
 	((CStatic *)GetDlgItem(IDC_RADIO403))->MoveWindow(x+15, y+58, 100, 20);
+
+	((CStatic*)GetDlgItem(IDC_BTN_SETTING))->MoveWindow(x + 105, y + 18, 40, 20);
 
 	x = 660;
 	y = 158;
@@ -1582,4 +1586,13 @@ void CPage2::SetSize()
 	((CStatic *)GetDlgItem(IDC_CHK_CODETRIGGER))->MoveWindow(x, y+19, 120, 20);	//원클릭종목연동
 	((CStatic *)GetDlgItem(IDC_CHK_OVERLAP))->MoveWindow(x, y+39, 120, 20);		//종목 중복등록허용
 	((CStatic *)GetDlgItem(IDC_BTNDEFAULT))->MoveWindow(x+30, y+59, 90, 20);		//기본값지정
+}
+
+
+void CPage2::OnBnClickedBtnSetting()
+{
+	CDlg_Slider dlg;
+	dlg.m_root = m_root;
+	dlg.m_bCustomer = m_parent->SendMessage(WM_USER, MAKEWPARAM(variantDLL, orderCC), 0L);
+	dlg.DoModal();
 }

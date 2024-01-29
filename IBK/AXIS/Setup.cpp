@@ -117,17 +117,39 @@ void CSetup::Init()
 		GetDlgItem(IDC_EMP)->EnableWindow(FALSE);
 	}
 	**/
-	if (app->GetProfileInt(INFORMATION, "AOS", 1))
-		GetDlgItem(IDC_AOS)->SendMessage(BM_SETCHECK, TRUE);
+	//AfxGetApp()->WriteProfileInt(INFORMATION, "INTERNAL", 1);
+	if (app->GetProfileInt(INFORMATION, "INTERNAL", 1))  //³»ºÎ¸Á Á÷¿ø
+	{
+		if (app->GetProfileInt(INFORMATION, "AOS", 1))
+			GetDlgItem(IDC_AOS)->SendMessage(BM_SETCHECK, TRUE);
 
-	if (app->GetProfileInt(INFORMATION, "PCFirewall", 0))
-		GetDlgItem(IDC_PCFIREWALL)->SendMessage(BM_SETCHECK, TRUE);
+		if (app->GetProfileInt(INFORMATION, "PCFirewall", 0))
+			GetDlgItem(IDC_PCFIREWALL)->SendMessage(BM_SETCHECK, TRUE);
+
+		if (app->GetProfileInt(ENVIRONMENT, "KeyProtect", 0))
+			GetDlgItem(IDC_KEYPROTECT)->SendMessage(BM_SETCHECK, TRUE);
+
+		if (app->GetProfileInt(WORKSTATION, "ServerTime", 0))
+			GetDlgItem(IDC_USESERVERTIME)->SendMessage(BM_SETCHECK, TRUE);
+	}
+	else
+	{
+			GetDlgItem(IDC_AOS)->EnableWindow(FALSE);
+			GetDlgItem(IDC_PCFIREWALL)->EnableWindow(FALSE);
+			GetDlgItem(IDC_KEYPROTECT)->EnableWindow(FALSE);
+
+			GetDlgItem(IDC_AOS)->SendMessage(BM_SETCHECK, TRUE);
+			GetDlgItem(IDC_PCFIREWALL)->SendMessage(BM_SETCHECK, TRUE);
+			GetDlgItem(IDC_KEYPROTECT)->SendMessage(BM_SETCHECK, TRUE);
+
+			app->WriteProfileInt(INFORMATION, "AOS", GetDlgItem(IDC_AOS)->SendMessage(BM_GETCHECK));
+			app->WriteProfileInt(INFORMATION, "PCFireWall", GetDlgItem(IDC_PCFIREWALL)->SendMessage(BM_GETCHECK));
+			app->WriteProfileInt(ENVIRONMENT, "KeyProtect", GetDlgItem(IDC_KEYPROTECT)->SendMessage(BM_GETCHECK));
+
+		if (app->GetProfileInt(WORKSTATION, "ServerTime", 0))
+			GetDlgItem(IDC_USESERVERTIME)->SendMessage(BM_SETCHECK, TRUE);
+	}
 	
-	if (app->GetProfileInt(ENVIRONMENT, "KeyProtect", 0))
-		GetDlgItem(IDC_KEYPROTECT)->SendMessage(BM_SETCHECK, TRUE);
-
-	if (app->GetProfileInt(WORKSTATION, "ServerTime", 0))
-		GetDlgItem(IDC_USESERVERTIME)->SendMessage(BM_SETCHECK, TRUE);
 }
 
 void CSetup::Save()

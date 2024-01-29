@@ -151,7 +151,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../exe/axislogin.dll</OutputFile>
+      <OutputFile>D:\IBKS_TEST/exe/axislogin.dll</OutputFile>
       <ImportLibrary>.\Debug\axislogin.lib</ImportLibrary>
       <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\axislogin.def</ModuleDefinitionFile>

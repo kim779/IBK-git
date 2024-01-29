@@ -1852,7 +1852,7 @@ CString CTreeWnd::GetCodeName(CString code)
 			return CString(upcode.hnam, UNameLen);
 		}
 	}
-	else if (code[0] == '1' || code[0] == '4')	// future code
+	else if (code[0] == '1' || code[0] == '4'|| code[0] == 'A' || code[0] == 'D')	// future code  //파생상품 코드개편
 	{
 		_sfjcode   fjcode;
 		if (m_fjcode.GetSize() == 0) loadingFJcode();
@@ -1866,7 +1866,7 @@ CString CTreeWnd::GetCodeName(CString code)
 		}
 
 	}
-	else if (code[0] == '2' || code[0] == '3')
+	else if (code[0] == '2' || code[0] == '3' || code[0] == 'B' || code[0] == 'C')  //파생상품 코드개편
 	{
 		if (code[1] == '0')			// future option code
 		{
@@ -3769,6 +3769,10 @@ void CTreeWnd::GetAccnTotal(CMapStringToString& mapACCN, CStringArray& arACCN, H
 
 void CTreeWnd::receiveOub(CString& data, int key)
 {	
+m_slog.Format("[interest][cx_interest] -------------------------------------");
+OutputDebugString(m_slog);
+m_slog.Format("[interest][cx_interest][%s]", __FUNCTION__, data.Left(22));
+OutputDebugString(m_slog);
 	CGridData sdata;
 	
 	sdata.m_kind = 0;
@@ -3798,7 +3802,15 @@ void CTreeWnd::receiveOub(CString& data, int key)
 		if (readL != fileSize)
 			return;
 
+		m_slog.Format("[interest][cx_interest][%s] 파일이 있다", filePath);
+
+		OutputDebugString(m_slog);
 		fileB.Close();
+	}
+	else
+	{
+		m_slog.Format("[interest][cx_interest][%s] 파일이 없다", filePath);
+		OutputDebugString(m_slog);
 	}
 
 	if (fileSize)
@@ -3814,11 +3826,15 @@ void CTreeWnd::receiveOub(CString& data, int key)
 		else
 			bookmark = "0";
 
+		//test mod 서버에서 받은 북마크
+		if (CString(item.gubn, 1).Trim() == "9")
+			bookmark = "1";
+
 		code = CString(item.code, codelen).Trim();
 		name = GetCodeName(CString(item.code, codelen).Trim());
 		if (code.IsEmpty())
 			code = "emptyrow";
-	//		code = "          ";  //test 20230208
+	//		code = "          ";  //test 20230209
 
 		if (code[0] == 'm' && name.IsEmpty() && bookspan.size() > ii)
 		{
@@ -3826,9 +3842,17 @@ void CTreeWnd::receiveOub(CString& data, int key)
 			if (code.CompareNoCase(bookCode) == 0)
 				name = CString(bookspan.at(ii).name, namelen).Trim();
 		}
+		else if (code[0] == 'm')  //test mod
+		{ //북마크 파일이 없는데 서버에 내려받는 종목코드 정보가 책갈피일때
+			struct _jinfo st_jinfo;
+			name = CString(item.xprc, sizeof(st_jinfo.xnum) + sizeof(st_jinfo.xprc)).Trim();
+		}
 
 		amount = CString(item.xnum, xnumlen).Trim();
 		price = CString(item.xprc, pricelen).Trim();
+
+		m_slog.Format("[interest][cx_interest] ii=[%d] c=[%s] n=[%s] bookmark=[%s] p=[%s] a=[%s] ", ii, code, name, bookmark, price, amount);
+		OutputDebugString(m_slog);
 
 		sdata.m_arDatas.Add(MakePacket(code, amount, price, name, bookmark));
 		if (sdata.GetCount() == 100)

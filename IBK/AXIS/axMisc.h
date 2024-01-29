@@ -124,7 +124,6 @@ public:
 	void	GetGuide(int key, CString& string);
 	BOOL	RunVers(int type, CString user = _T(""), CString pass = _T(""), CString cpass = _T(""));
 	BOOL	NewRunVers(int type, CString user = _T(""), CString pass = _T(""), CString cpass = _T(""));
-
 protected:
 };
 

@@ -24,6 +24,7 @@ LRESULT CALLBACK CallProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	bool	fBool;
 	int	value;
 	CScreen* screen;
+	CString slog;
 
 	if (client->m_focus && (client->m_status & S_LOAD) && client->isTips())
 		client->m_guard->m_tips->RelayEvent(client, msg, lParam);
@@ -283,6 +284,9 @@ LRESULT CALLBACK CallProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case TM_WAIT:
 			client->WaitDone(NULL, true);
 			client->m_guard->SetGuide(AE_TIMEOUT, client->m_key);
+			slog.Format("[axwizard] TM_WAIT len=[%d]  [%s]", client->m_stream->m_sndL, CString(client->m_stream->m_sndB, 50));
+			LOG_OUTP(3, "axwizard", __FUNCTION__, slog);
+			FileLog(slog, "timeout.ini");
 			break;
 		case TM_RTM:
 			client->OnClear();

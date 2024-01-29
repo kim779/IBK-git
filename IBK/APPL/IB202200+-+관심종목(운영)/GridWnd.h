@@ -440,7 +440,7 @@ protected:
 
 	// END ADD
 
-	CMapStringToString m_mapCurValue{}; // 2012.04.03 KSJ 처음 현재가 넣기위해..
+	CMapStringToString m_mapCurValue; // 2012.04.03 KSJ 처음 현재가 넣기위해..
 	int m_nCount;			  // 2013.04.22 KSJ 그리드 카운트
 
 	HINSTANCE m_hSignalMng;
@@ -459,7 +459,9 @@ protected:
 public:
 	int m_iTime;
 	bool m_bSending;
+	BOOL m_bGetHogaRTS{};
 	CString m_sRoot;
+	CString m_slog;
 
 	std::unordered_map<int, int>	_mRsymbol;
 	std::map<CString, int>		_mapSymbol;
@@ -467,4 +469,5 @@ public:
 	void initRSymbol();
 	void saveServer(const std::vector<std::shared_ptr<struct _intersx>>& vInters, int gno = -1);
 	void saveBookMark(int gno = -1);
+	void bookfilebackup(int gno, BOOL bDelete);
 };

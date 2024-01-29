@@ -1557,6 +1557,8 @@ bool CMapForm::loadJCode()
 		code.nameS = CString(item.second->hnam, HNameLen).Mid(1).Trim();
 		code.kosd = item.second->kosd;
 		code.ssgb = item.second->ssgb;
+		if(code.codeS.Find("091170") >= 0)
+			OutputDebugString("Test");
 		m_arCode.Add(code);
 	});
 	return true;
@@ -1912,6 +1914,7 @@ CString CMapForm::getCodeName(CString codeS, int& gubn)
 				gubn = CG_KOSPI;
 			else if (code.kosd == jmKOSDAQ)
 				gubn = CG_KOSDAQ;
+
 			return code.nameS;
 		}
 	}
@@ -2289,6 +2292,8 @@ void CMapForm::popupSetup(bool bAdd, CString codeS, int updateRow /*=-1*/)
 
 	int gubn{};
 	CString nameS = getCodeName(codeS, gubn);
+	gubn = m_pParent->SendMessage(WM_USER, MAKEWPARAM(codeTYPE, 0), (long)(LPCTSTR)codeS);
+
 	m_pSetupDlg = std::make_unique<CSetupDlg>(m_pParent, m_pParent, codeS, nameS);
 	_codeinfo *codeinfo = nullptr;
 	if (bAdd)

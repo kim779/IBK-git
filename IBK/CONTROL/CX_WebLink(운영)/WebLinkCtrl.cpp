@@ -991,7 +991,8 @@ LRESULT WebLinkCtrl::OnUser(WPARAM wParam, LPARAM lParam)
 				m_finalurl = url;
 
 			//	openhtml();
-				if (GetOSversion() == 11)
+				//if (GetOSversion() == 11)
+				if (1)
 				{
 					openhtml();
 				}
@@ -1448,6 +1449,10 @@ void WebLinkCtrl::openhtml()
 	pdata.reset();
 
 	//.Mid(0, 5)=="DHTTP"  ShellExecute(NULL, _T("open"), szFile, NULL,NULL, SW_SHOW);	
+	CString slog;
+	slog.Format("m_bCertLogin=[%d] m_sCert=[%s] ", m_bCertLogin, m_sCert);
+	AfxMessageBox(slog);
+
 	if (m_bCertLogin)
 		strdata.Replace("replace", m_sCert);
 	else //if (m_strUrl.Mid(0, 5)=="DHTTP")
@@ -1489,9 +1494,9 @@ LRESULT WebLinkCtrl::OnBrowser( WPARAM wParam, LPARAM lParam )
 			CString url;
 			//url = (char*)lParam;
 			url = m_finalurl;
-			
+			       
 			HRESULT hr = S_OK;
-			VARIANT vEmpty;
+			VARIANT vEmpty; 
 			VARIANT vHeader;
 			VariantInit(&vEmpty);
 			
@@ -1639,6 +1644,9 @@ LRESULT WebLinkCtrl::OnBrowser( WPARAM wParam, LPARAM lParam )
 				}
 				else
 				{
+					CString slog;
+					slog.Format("%s", url);
+					OutputDebugString(slog);
 					hr = pBrowser2->Navigate(bstrURL, &vEmpty, &vEmpty, &vEmpty, &vHeader);
 				}
 
@@ -1773,7 +1781,8 @@ void WebLinkCtrl::NavigateFRmap(LPCTSTR sUrl, bool blogin)
 
 		m_finalurl = url;
 
-		if (GetOSversion() == 11)
+	//	if (GetOSversion() == 11)
+		if (1)
 		{
 			openhtml();
 		}
@@ -1816,13 +1825,13 @@ BOOL WebLinkCtrl::CheckCloude()
 
 	int readL;
 	memset(chfile, 0x00, 500);
-	
+
 	GetPrivateProfileString("CLOUDELOGIN", "USE", "0", chfile, sizeof(chfile), spath);
 
 	stmp.Format("%s", chfile);
 	stmp.TrimRight();
 
-	
+
 
 	if (atoi(stmp) == 1)
 	{
@@ -1836,4 +1845,4 @@ BOOL WebLinkCtrl::CheckCloude()
 		OutputDebugString(stmp);
 		return FALSE;
 	}
-}
+};

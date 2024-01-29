@@ -127,6 +127,8 @@
 #define MK_MARKETTIME		116
 #define MK_GRIDREFRESH		117
 #define MK_GETGROUPTR		118
+#define MK_GROUPCHANGECHECK 119
+#define MK_BOOKMARKPROCESSCHECK 120
 
 // HIWORD(wParam)	// Msg Option
 // common
@@ -415,7 +417,7 @@ struct _trkey
 #define	icurrMAP	"IB290300"		// 업종 현재가
 #define	ecurrMAP	"IB280200"		// elw 현재가
 #define	chartMAP	"IB711200"		// chart
-#define	configMAP	"IB202201"		// config map
+#define	configMAP	"IB202201"		// config map  //사용은 안함
 
 #define	upACTION	1
 

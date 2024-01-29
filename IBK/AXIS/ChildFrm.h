@@ -128,9 +128,6 @@ public:
 	void ShowBackGround(bool f_show);
 	void	SetMinMaxInfo(MINMAXINFO* lpMinMaxInfo);
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-
-public:
-	CString m_slog{};
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnPaint();
 };

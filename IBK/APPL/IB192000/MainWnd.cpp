@@ -179,12 +179,6 @@ void CMainWnd::Init()
 	
 	initRTM();
 	
-	//*/
-	/*
-	CString trData; trData.Format("1301%c%s\t1021\t2023\t", 0x7f, "005930");
-	SendTR("POOPPOOP", trData, TK_SISE);
-	*/
-	
 	QueryExcelSise();
 
 // 	SetTimer(TID_CHARTDRAW, 1000, NULL);
@@ -265,6 +259,7 @@ void CMainWnd::OnPaint()
 	chartRect = rc;
 	chartRect.top = 0;
 	chartRect.bottom = 200;
+	chartRect.bottom = 198;
 	drawChartRect = CRect(0, rc.bottom-200, chartRect.right , rc.bottom);
 	CBitmap bitmap;
 	bitmap.CreateCompatibleBitmap(&dc, chartRect.Width(), chartRect.Height());
@@ -369,7 +364,6 @@ long CMainWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 			{
 				ii = i+1;
 				m_grid->SetItemText(ii, colRCODE, "A" + CString(mod.grid[i].code, sizeof(mod.grid[i].code)));
-//				m_grid->SetItemText(ii, colRCODE, CString(mod.grid[i].code, sizeof(mod.grid[i].code)));
 				m_grid->SetItemText(ii, colNAME, CString(mod.grid[i].hnam, sizeof(mod.grid[i].hnam)));
 				m_grid->SetItemText(ii, colCURR, CString(mod.grid[i].curr, sizeof(mod.grid[i].curr)));
 				m_grid->SetItemText(ii, colDIFF, CString(mod.grid[i].diff, sizeof(mod.grid[i].diff)));
@@ -381,8 +375,8 @@ long CMainWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 				m_grid->SetItemText(ii, colHIGH, CString(mod.grid[i].higp, sizeof(mod.grid[i].higp)));
 				m_grid->SetItemText(ii, colLOW, CString(mod.grid[i].lowp, sizeof(mod.grid[i].lowp)));
 				m_grid->SetItemText(ii, colPCURR, CString(mod.grid[i].stdp, sizeof(mod.grid[i].stdp)));
-
-				CalcRowDiff(i);
+				m_grid->SetRowHeight(ii, 20);
+				CalcRowDiff(ii);
 			}
 			m_choi_curr = CString(mod.f1item.fprc, sizeof(mod.f1item.fprc));
 			m_choi_diff = CString(mod.f1item.fdif, sizeof(mod.f1item.fdif));
@@ -933,26 +927,6 @@ void CMainWnd::parsingAlert(CString datB)
 		bool m_bchoi = false;
 		m_bchoi = (code == m_choi_code);
 		
-// 		while (!datB.IsEmpty())
-// 		{
-// 			idx = datB.Find('\t');
-// 			if (idx == -1) break;
-// 			
-// 			symbol = datB.Left(idx++);
-// 			datB = datB.Mid(idx);
-// 			
-// 			idx = datB.Find('\t');
-// 			if (idx == -1)
-// 			{
-// 				entry = datB;	datB = _T("");
-// 			}
-// 			else
-// 			{
-// 				entry = datB.Left(idx++); datB = datB.Mid(idx);
-// 			}
-// 			fms.SetAt(symbol, entry);
-// 		}
-
 		for(int i=1;i<arTokens.GetSize();i=i+2)
 		{
 			symbol = arTokens.GetAt(i);
@@ -966,7 +940,6 @@ void CMainWnd::parsingAlert(CString datB)
 		}
 
 
-		
 		if (fms.Lookup("023", entry))  //선물 현재가
 			if (m_bchoi)
 			{
@@ -1017,12 +990,26 @@ void CMainWnd::parsingAlert(CString datB)
 			m_meme_geon.Format("%d", DefStrToAbsInt(m_mesu_geon,0)-DefStrToAbsInt(m_medo_geon,0));
 			m_meme_jan  = AddComma(m_meme_jan);
 			m_meme_geon = AddComma(m_meme_geon);
-						
-
 		}else
 		{
-			if (fms.Lookup("201", entry))  //선물 매수총건수
-				m_migyul = AddComma(entry);
+		//	if (fms.Lookup("201", entry))  //선물 매수총건수  //이상하다
+		//		m_migyul = AddComma(entry);
+			if (fms.Lookup("101", entry))  //선물 매도총잔량
+				m_cha_medo_jan = AddComma(entry);
+			if (fms.Lookup("106", entry))  //선물 매수총잔량
+				m_cha_mesu_jan = AddComma(entry);
+			if (fms.Lookup("103", entry))  //선물 매도총건수
+				m_cha_medo_geon = AddComma(entry);
+			if (fms.Lookup("108", entry))  //선물 매수총건수
+				m_cha_mesu_geon = AddComma(entry);
+
+			//선물 매매순잔량
+			m_cha_meme_jan.Format("%d", DefStrToAbsInt(m_cha_mesu_jan, 0) - DefStrToAbsInt(m_cha_medo_jan, 0));
+			//선물 매매순건수
+			m_cha_meme_geon.Format("%d", DefStrToAbsInt(m_cha_mesu_geon, 0) - DefStrToAbsInt(m_cha_medo_geon, 0));
+			m_cha_meme_jan = AddComma(m_cha_meme_jan);
+			m_cha_meme_geon = AddComma(m_cha_meme_geon);
+
 		}
 		m_bDataChange = true;
 		
@@ -1078,26 +1065,6 @@ void CMainWnd::parsingAlert(CString datB)
 		}
 		CalcRow(xrow);
 	}
-	
-// 	while (!datB.IsEmpty())
-// 	{
-// 		idx = datB.Find('\t');
-// 		if (idx == -1) break;
-// 		
-// 		symbol = datB.Left(idx++);
-// 		datB = datB.Mid(idx);
-// 		
-// 		idx = datB.Find('\t');
-// 		if (idx == -1)
-// 		{
-// 			entry = datB;	datB = _T("");
-// 		}
-// 		else
-// 		{
-// 			entry = datB.Left(idx++); datB = datB.Mid(idx);
-// 		}
-// 		fms.SetAt(symbol, entry);
-// 	}
 }
 
 void CMainWnd::parsingAlert(struct _alertR* alertR)
@@ -1129,9 +1096,10 @@ void CMainWnd::parsingAlert(struct _alertR* alertR)
 
 			if (data[23])  //선물 현재가
 			{
+				entry = (char*)data[23];
 				if (m_bchoi)
 				{
-					entry = (char*)data[23];
+					//entry = (char*)data[23];
 					m_choi_curr = entry;
 					if (data[34]) //체결시간
 					{					
@@ -1154,8 +1122,6 @@ void CMainWnd::parsingAlert(struct _alertR* alertR)
 					m_cha_diff = entry;
 			}
 				
-
-					
 			if (m_bchoi)
 			{
 				if (data[40]) //호가시간
@@ -1169,7 +1135,7 @@ void CMainWnd::parsingAlert(struct _alertR* alertR)
 				}
 			}
 			
-			if (m_bchoi)
+			if (m_bchoi)  //최근월
 			{
 				if (data[101])  //선물 매도총잔량
 					m_medo_jan = AddComma((char*)data[101]);
@@ -1179,6 +1145,8 @@ void CMainWnd::parsingAlert(struct _alertR* alertR)
 					m_medo_geon = AddComma((char*)data[103]);
 				if (data[108])  //선물 매수총건수
 					m_mesu_geon = AddComma((char*)data[108]);
+				if (data[201])  //선물 미결제 약정
+					m_migyul = AddComma((char*)data[201]);
 				
 				//선물 매매순잔량
 				m_meme_jan.Format("%d", DefStrToAbsInt(m_mesu_jan,0)-DefStrToAbsInt(m_medo_jan,0));
@@ -1186,12 +1154,26 @@ void CMainWnd::parsingAlert(struct _alertR* alertR)
 				m_meme_geon.Format("%d", DefStrToAbsInt(m_mesu_geon,0)-DefStrToAbsInt(m_medo_geon,0));
 				m_meme_jan  = AddComma(m_meme_jan);
 				m_meme_geon = AddComma(m_meme_geon);
-							
-
-			}else
+					
+			}else   //차근월
 			{
-				if (data[201])  //선물 매수총건수
-					m_migyul = AddComma((char*)data[201]);
+				if (data[101])  //선물 매도총잔량
+					m_cha_medo_jan = AddComma((char*)data[101]);
+				if (data[106])  //선물 매수총잔량
+					m_cha_mesu_jan = AddComma((char*)data[106]);
+				if (data[103])  //선물 매도총건수
+					m_cha_medo_geon = AddComma((char*)data[103]);
+				if (data[201])  //선물 미결제 약정
+					m_cha_migyul = AddComma((char*)data[201]);
+				if (data[108])  //선물 매수총건수
+					m_cha_mesu_geon = AddComma((char*)data[108]);
+
+				//선물 매매순잔량
+				m_cha_meme_jan.Format("%d", DefStrToAbsInt(m_cha_mesu_jan, 0) - DefStrToAbsInt(m_cha_medo_jan, 0));
+				//선물 매매순건수
+				m_cha_meme_geon.Format("%d", DefStrToAbsInt(m_cha_mesu_geon, 0) - DefStrToAbsInt(m_cha_medo_geon, 0));
+				m_cha_meme_jan = AddComma(m_cha_meme_jan);
+				m_cha_meme_geon = AddComma(m_cha_meme_geon);
 			}
 			m_bDataChange = true;
 			
@@ -1209,10 +1191,16 @@ void CMainWnd::parsingAlert(struct _alertR* alertR)
 			symbol = CString(gridHdr.symbol, strlen(gridHdr.symbol));
 			if (symbol.GetLength() >= 3) symbol = symbol.Right(3);
 			
+			if(!isdigit(symbol.GetAt(0)))
+				break;
+
 			if (!data[atoi(symbol)])
 				continue;
 			
 			entry = (char*)data[atoi(symbol)];
+
+			if (entry.IsEmpty() || atof(entry) == 0)
+				break;
 
 			if (xrow == -1) continue;
 			
@@ -1348,15 +1336,15 @@ void CMainWnd::CalcRow(int row)
 		data = "+"+data;
 	else
 		data = "-"+data;
-	m_grid->SetItemText(row, colDAYPRC, data);
+	m_grid->SetItemText(row, colDAYPRC, data);  //가격변동
 	data.Format("%d",it_vol);
-	/*
+	
 	if (it_vol>=0)
 		data = "+"+data;
 	else
 		data = "-"+data;
-	*/	
-	m_grid->SetItemText(row, colDAYVOL, data);
+		
+	m_grid->SetItemText(row, colDAYVOL, data);   //거래량변동
 	if (it_curr>=0)
 		m_grid->SetItemText(row, colUP1, "1");
 	else
@@ -1480,16 +1468,20 @@ void CMainWnd::DrawUpData(CDC *pdc)
 	CString strtcurr;
 	strtcurr = m_choi_curr; strtcurr.Remove('-'); strtcurr.Remove('+');
 	pdc->DrawText(strtcurr, m_rc_choi_curr,  DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);
-	m_choi_diff.Remove(' ');
+
+	m_choi_diff.Remove(' '); 
 	pdc->DrawText(m_choi_diff, m_rc_choi_diff,  DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);
+
 	clrText = GetIndexColor(69);
 	pdc->SetTextColor(clrText);
-	pdc->DrawText(m_medo_jan, m_rc_medo_jan,  DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);
-	pdc->DrawText(m_mesu_jan, m_rc_mesu_jan,  DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);
-	pdc->DrawText(m_medo_geon, m_rc_medo_geon,  DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);
-	pdc->DrawText(m_mesu_geon, m_rc_mesu_geon,  DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);
-	pdc->DrawText(m_meme_jan, m_rc_meme_jan,  DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);
-	pdc->DrawText(m_meme_geon, m_rc_meme_geon,  DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);
+	pdc->DrawText(m_migyul, m_rc_choi_migyul, DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);			//미결제
+	pdc->DrawText(m_medo_jan, m_rc_medo_jan,  DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);				//매도총잔량
+	pdc->DrawText(m_mesu_jan, m_rc_mesu_jan,  DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);				//매수총잔량
+	pdc->DrawText(m_medo_geon, m_rc_medo_geon,  DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);     //매도총건수
+	pdc->DrawText(m_mesu_geon, m_rc_mesu_geon,  DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);      //매수총건수
+	pdc->DrawText(m_meme_jan, m_rc_meme_jan,  DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);			//총호가순잔량 
+	pdc->DrawText(m_meme_geon, m_rc_meme_geon,  DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);    //총호가순건수
+
 	itemp = atof(m_cha_diff);
 	if (itemp > 0)
 		clrText = GetIndexColor(94);
@@ -1504,7 +1496,13 @@ void CMainWnd::DrawUpData(CDC *pdc)
 	pdc->DrawText(m_cha_diff, m_rc_cha_diff,  DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);
 	clrText = GetIndexColor(69);
 	pdc->SetTextColor(clrText);
-	pdc->DrawText(m_migyul, m_rc_cha_migyul,  DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);
+	pdc->DrawText(m_cha_migyul, m_rc_cha_migyul,  DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);							//미결제
+	pdc->DrawText(m_cha_medo_jan, m_rc_cha_medo_jan, DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);				//매도총잔량
+	pdc->DrawText(m_cha_mesu_jan, m_rc_cha_mesu_jan, DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);				//매수총잔량
+	pdc->DrawText(m_cha_medo_geon, m_rc_cha_medo_geon, DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);		//매도총건수
+	pdc->DrawText(m_cha_mesu_geon, m_rc_cha_mesu_geon, DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);		//매수총건수
+	pdc->DrawText(m_cha_meme_jan, m_rc_cha_meme_jan, DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);			//총호가순잔량 
+	pdc->DrawText(m_cha_meme_geon, m_rc_cha_meme_geon, DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);		//총호가순건수
 
 	pdc->SelectObject(m_pGridLine);
 	pdc->MoveTo(m_rc_choi_curr.left, 2);
@@ -1551,49 +1549,101 @@ void CMainWnd::initArea()
 	GetClientRect(&rc);
 	const int START_POS = 60, WIDTH_CURR = 65, WIDTH_DIFF = 50, WIDTH_ITEM = 78, I_HEIGHT = 15, I_GAP = 2;
 	const int LINE2_TOP = 29, LINE1_TOP = 16;
+
+	//KP최근월 현재가
 	m_rc_choi_curr.left = rc.left+START_POS; m_rc_choi_curr.right = m_rc_choi_curr.left+WIDTH_CURR;
 	m_rc_choi_curr.top = LINE2_TOP; m_rc_choi_curr.bottom = m_rc_choi_curr.top+I_HEIGHT;
 	
+	//KP최근월 전일대비
 	m_rc_choi_diff.left = m_rc_choi_curr.right+I_GAP; m_rc_choi_diff.right = m_rc_choi_diff.left + WIDTH_DIFF;
 	m_rc_choi_diff.top = LINE2_TOP; m_rc_choi_diff.bottom = m_rc_choi_diff.top+I_HEIGHT;
+
+	//KP최근월 미결제
+	m_rc_choi_migyul.left = m_rc_choi_diff.right + I_GAP; m_rc_choi_migyul.right = m_rc_choi_migyul.left + WIDTH_ITEM;
+	m_rc_choi_migyul.top = LINE2_TOP; m_rc_choi_migyul.bottom = m_rc_choi_migyul.top + I_HEIGHT;
 	
+	//KP최근월 매도총잔량 (? 미결제 수량은?)
 	m_rc_medo_jan.left = m_rc_choi_diff.right+I_GAP+I_GAP+WIDTH_ITEM; m_rc_medo_jan.right = m_rc_medo_jan.left + WIDTH_ITEM;
 	m_rc_medo_jan.top = LINE2_TOP; m_rc_medo_jan.bottom = m_rc_medo_jan.top+I_HEIGHT;
 	
+	//KP최근월 매수총잔량
 	m_rc_mesu_jan.left = m_rc_medo_jan.right+I_GAP; m_rc_mesu_jan.right = m_rc_mesu_jan.left + WIDTH_ITEM;
 	m_rc_mesu_jan.top = LINE2_TOP; m_rc_mesu_jan.bottom = m_rc_mesu_jan.top+I_HEIGHT;
 
+	//KP최근월 매도 총건수
 	m_rc_medo_geon.left = m_rc_mesu_jan.right+I_GAP; m_rc_medo_geon.right = m_rc_medo_geon.left + WIDTH_ITEM;
 	m_rc_medo_geon.top = LINE2_TOP; m_rc_medo_geon.bottom = m_rc_medo_geon.top+I_HEIGHT;
 
+	//KP최근월 매수 총건수
 	m_rc_mesu_geon.left = m_rc_medo_geon.right+I_GAP; m_rc_mesu_geon.right = m_rc_mesu_geon.left + WIDTH_ITEM;
 	m_rc_mesu_geon.top = LINE2_TOP; m_rc_mesu_geon.bottom = m_rc_mesu_geon.top+I_HEIGHT;
 
+	//KP최근월 총호가 순잔량
 	m_rc_meme_jan.left = m_rc_mesu_geon.right+I_GAP; m_rc_meme_jan.right = m_rc_meme_jan.left + WIDTH_ITEM+20;
 	m_rc_meme_jan.top = LINE2_TOP; m_rc_meme_jan.bottom = m_rc_meme_jan.top+I_HEIGHT;
 
+	//KP최근월 총호가 순건수
 	m_rc_meme_geon.left = m_rc_meme_jan.right+I_GAP; m_rc_meme_geon.right = m_rc_meme_geon.left + WIDTH_ITEM+20;
 	m_rc_meme_geon.top = LINE2_TOP; m_rc_meme_geon.bottom = m_rc_meme_geon.top+I_HEIGHT;
 
+	//KP최근월 지정상승
 	m_rc_sum_up1.left = m_rc_meme_geon.right+I_GAP; m_rc_sum_up1.right = m_rc_sum_up1.left + WIDTH_ITEM;
 	m_rc_sum_up1.top = LINE2_TOP; m_rc_sum_up1.bottom = m_rc_sum_up1.top+I_HEIGHT;
 
+	//KP최근월 전일상승
 	m_rc_sum_up2.left = m_rc_sum_up1.right+I_GAP; m_rc_sum_up2.right = m_rc_sum_up2.left + WIDTH_ITEM;
 	m_rc_sum_up2.top = LINE2_TOP; m_rc_sum_up2.bottom = m_rc_sum_up2.top+I_HEIGHT;
 
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	//KP차근월 현재가
 	m_rc_cha_curr.left = rc.left+START_POS; m_rc_cha_curr.right = m_rc_cha_curr.left+WIDTH_CURR;
 	m_rc_cha_curr.top = LINE1_TOP; m_rc_cha_curr.bottom = m_rc_cha_curr.top+I_HEIGHT;
 	
+	//KP차근월 전일대비
 	m_rc_cha_diff.left = m_rc_cha_curr.right+I_GAP; m_rc_cha_diff.right = m_rc_cha_diff.left + WIDTH_DIFF;
 	m_rc_cha_diff.top = LINE1_TOP; m_rc_cha_diff.bottom = m_rc_cha_diff.top+I_HEIGHT;
 	
+	//KP차근월 미결제
 	m_rc_cha_migyul.left = m_rc_cha_diff.right+I_GAP; m_rc_cha_migyul.right = m_rc_cha_migyul.left + WIDTH_ITEM;
 	m_rc_cha_migyul.top = LINE1_TOP; m_rc_cha_migyul.bottom = m_rc_cha_migyul.top+I_HEIGHT;
 
+	//KP차근월 매도총잔량
+	m_rc_cha_medo_jan.left = m_rc_cha_migyul.right + I_GAP; m_rc_cha_medo_jan.right = m_rc_cha_medo_jan.left + WIDTH_ITEM;
+	m_rc_cha_medo_jan.top = LINE1_TOP; m_rc_cha_medo_jan.bottom = m_rc_cha_medo_jan.top + I_HEIGHT;
+
+	//KP차근월 매수총잔량
+	m_rc_cha_mesu_jan.left = m_rc_cha_medo_jan.right + I_GAP; m_rc_cha_mesu_jan.right = m_rc_cha_mesu_jan.left + WIDTH_ITEM;
+	m_rc_cha_mesu_jan.top = LINE1_TOP; m_rc_cha_mesu_jan.bottom = m_rc_cha_mesu_jan.top + I_HEIGHT;
+
+	//KP차근월 매도총건수
+	m_rc_cha_medo_geon.left = m_rc_cha_mesu_jan.right + I_GAP; m_rc_cha_medo_geon.right = m_rc_cha_medo_geon.left + WIDTH_ITEM;
+	m_rc_cha_medo_geon.top = LINE1_TOP; m_rc_cha_medo_geon.bottom = m_rc_cha_medo_geon.top + I_HEIGHT;
+
+	//KP차근월 매수총건수
+	m_rc_cha_mesu_geon.left = m_rc_cha_medo_geon.right + I_GAP; m_rc_cha_mesu_geon.right = m_rc_cha_mesu_geon.left + WIDTH_ITEM;
+	m_rc_cha_mesu_geon.top = LINE1_TOP; m_rc_cha_mesu_geon.bottom = m_rc_cha_mesu_geon.top + I_HEIGHT;
+
+	//KP차근월  총호가 순잔량
+	m_rc_cha_meme_jan.left = m_rc_cha_mesu_geon.right + I_GAP; m_rc_cha_meme_jan.right = m_rc_cha_meme_jan.left + WIDTH_ITEM + 20;
+	m_rc_cha_meme_jan.top = LINE1_TOP; m_rc_cha_meme_jan.bottom = m_rc_cha_meme_jan.top + I_HEIGHT;
+
+	//KP차근월 총호가 순건수
+	m_rc_cha_meme_geon.left = m_rc_cha_meme_jan.right + I_GAP; m_rc_cha_meme_geon.right = m_rc_cha_meme_geon.left + WIDTH_ITEM + 20;
+	m_rc_cha_meme_geon.top = LINE1_TOP; m_rc_cha_meme_geon.bottom = m_rc_cha_meme_geon.top + I_HEIGHT;
+
+	//KP차근월 가격상승수
+	m_rc_cha_sum_up1.left = m_rc_cha_meme_geon.right + I_GAP; m_rc_cha_sum_up1.right = m_rc_cha_sum_up1.left + WIDTH_ITEM;
+	m_rc_cha_sum_up1.top = LINE1_TOP; m_rc_cha_sum_up1.bottom = m_rc_cha_sum_up1.top + I_HEIGHT;
+
+	//KP차근월 거래량상승수
+	m_rc_cha_sum_up2.left = m_rc_cha_sum_up1.right + I_GAP; m_rc_cha_sum_up2.right = m_rc_cha_sum_up2.left + WIDTH_ITEM;
+	m_rc_cha_sum_up2.top = LINE1_TOP; m_rc_cha_sum_up2.bottom = m_rc_cha_sum_up2.top + I_HEIGHT;
+
 	m_rc_dataRect.left = rc.left+START_POS; m_rc_dataRect.right = m_rc_sum_up2.right;
 	m_rc_dataRect.top = LINE1_TOP; m_rc_dataRect.bottom = 40;
-	
-	
 }
 
 void CMainWnd::DrawChart(CDC *pDC, CRect rc)
@@ -1662,6 +1712,8 @@ void CMainWnd::DrawChart(CDC *pDC, CRect rc)
 		pDC->SelectObject(m_pLine2Pen);
 		
 		//return;
+		if (m_maxy2val == 0 && m_miny2val == 0)
+			return;
 		h_unit = (double)draw_height/(m_maxy2val-m_miny2val);
 		
 		CPoint lastPoint;
@@ -1707,7 +1759,7 @@ void CMainWnd::DrawChart(CDC *pDC, CRect rc)
 				}
 				
 			}
-			//if (i==m_lastHVOL) 마지막 순호가잔량
+			//if (i==m_lastHVOL) 마지막 순호가잔량  //총호가순잔량의 마지막값을 좌측영역에 써준다
 			{
 				ypos = (int)((m_lastIVol-m_miny2val)*h_unit);
 				CRect trc = CRect(rc.left+2,in_rc.bottom-ypos-7, rc.left+2+52, lastPoint.y-7+13);
@@ -1724,7 +1776,7 @@ void CMainWnd::DrawChart(CDC *pDC, CRect rc)
 		h_unit = (double)draw_height/(m_maxyval-m_minyval);
 		pDC->SelectObject(m_pLine1Pen);
 		bfirst = false;
-		
+		//최근원물가를 우측영역에 그려준다
 		minmaxtrc = CRect(in_rc.right+8,in_rc.bottom-7, in_rc.right+60, in_rc.bottom+5);
 		str.Format("%.2f",m_minyval);
 		pDC->FillSolidRect(minmaxtrc, RGB(255,255,255));
@@ -1762,7 +1814,7 @@ void CMainWnd::DrawChart(CDC *pDC, CRect rc)
 				}
 				else
 				{
-					if (m_bCheck1)
+					if (m_bCheck1)  //KP최근월물가 체크
 					{
 						x = i;//pCPoint->idx;
 						y = pCPoint->data;

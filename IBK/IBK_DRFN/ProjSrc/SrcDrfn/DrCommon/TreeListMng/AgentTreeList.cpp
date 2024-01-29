@@ -1816,7 +1816,10 @@ int CTreeListManager::RequestData_GroupMASTER(CItemLongData* pILData, ITLMCallba
 				if ((pILData->m_szTitle).Find("M") >= 0)
 					bMondayWeelky = TRUE;
 
-				CString strName, strTemp;
+				CString strName, strTemp, strMonth, strWeek;
+				strMonth = (pILData->m_szTitle).Mid(2, 2);
+				strWeek = bMondayWeelky == TRUE ? (pILData->m_szTitle).Mid(6, 2) : (pILData->m_szTitle).Mid(5, 2);
+
 				int nTemp = 2;
 				for (int i = 0; i < arrNameTemp.GetSize(); i++)
 				{
@@ -1824,8 +1827,8 @@ int CTreeListManager::RequestData_GroupMASTER(CItemLongData* pILData, ITLMCallba
 					{
 						strTemp = arrNameTemp.GetAt(i);
 						strName = arName->GetAt(j);
-						if (arrNameTemp.GetAt(i) == strName &&
-							((bMondayWeelky && strName.Find("M") >= 0) || (!bMondayWeelky && strName.Find("M") < 0)))
+						if (arrNameTemp.GetAt(i) == strName && ((bMondayWeelky && strName.Find("M") >= 0) || (!bMondayWeelky && strName.Find("M") < 0))
+							&& strName.Find(strMonth) >= 0 && strName.Find(strWeek) >= 0)
 						{
 							if (bMondayWeelky)
 							{

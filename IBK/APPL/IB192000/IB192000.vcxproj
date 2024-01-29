@@ -162,7 +162,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../dev/IB192000.dll</OutputFile>
+      <OutputFile>D:\IBKS_TEST\dev/IB192000.dll</OutputFile>
       <ImportLibrary>.\Debug\IB192000.lib</ImportLibrary>
       <AdditionalDependencies>../../control/fx_misc/Debug/fx_misc.lib;../../control/fx_Grid/Debug/fx_Grid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\IB192000.def</ModuleDefinitionFile>

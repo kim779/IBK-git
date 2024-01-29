@@ -35,4 +35,6 @@
 #include <AxStd.hpp>
 #include <EzIni.hpp>
 
-
+#define ROW_COMMENT '8'  
+#define ROW_BOOKMARK '9'
+//#define DF_USEBOOKFILE

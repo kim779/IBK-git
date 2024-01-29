@@ -1389,7 +1389,6 @@ OutputDebugString(s);
 	//**frameGap = CSize(2, CAPTION_HEIGHT + 4);
 	nCx = LOWORD(size) + frameGap.cx - 1;
 	nCy = HIWORD(size) + frameGap.cy - 1;
-
 	child->SetSize(nCx, nCy);
 
 	BOOL	rc = FALSE;
@@ -2363,6 +2362,13 @@ int CMapHelper::CreateMDIbySDI_Tabview(CString mapN, int group, int fontN, CRect
 
 int CMapHelper::CopyScreen(CString mapN, int group, int fontsize, CPoint sp)
 {
+	//test cdd
+	if (m_main->isCDDScreen(mapN))
+	{
+		ChangeChild(MAPN_CDDEDD);
+		return 0;
+	}
+
 	if (!IsValidMap(mapN.Left(L_MAPN)))	
 		return 0;
 	if (m_main->IsTabView(mapN.Left(L_MAPN)))
@@ -2622,6 +2628,12 @@ int CMapHelper::CopyTabScreen(CString mapN, int group, int fontsize, CPoint sp)
 
 int CMapHelper::ChangeChild(CString mapN, int trigger, int key, int position)
 {
+	//test CDD
+	if (m_main->isCDDScreen(mapN))
+	{
+		ChangeChild(MAPN_CDDEDD);
+		return 0;
+	}
 CString s;
 
 s.Format("[AXIS]_ [map] ChangeChild[CString] : mapN=[%s] trigger=[%d] key=[%d]\n",

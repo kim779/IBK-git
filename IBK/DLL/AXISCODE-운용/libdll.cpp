@@ -424,7 +424,8 @@ __declspec(dllexport) bool WINAPI axGetCode(int kind, char *user, char* code, in
 	case foptionCODE: // Futures && option	
 		{
 			CFuturesDlg dlg(kind, pt, type);
-			if (dlg.DoModal() == IDOK)
+			int iResult = dlg.DoModal();
+			if (iResult == IDOK)
 			{
 				szCode = dlg.GetCode();
 				szName = dlg.GetName();
@@ -436,6 +437,29 @@ __declspec(dllexport) bool WINAPI axGetCode(int kind, char *user, char* code, in
 				strcpy(code, szTemp);
 				return TRUE;
 			}
+#ifdef DF_TEST
+			else
+			{
+				int iRet = dlg.getReturnData();
+				if (dlg.getReturnData() == 1)
+				{
+					CSFCodeDlg dlg(kind, pt);
+					if (dlg.DoModal() == IDOK)
+					{
+						szCode = dlg.GetCode();
+						szName = dlg.GetName();
+						szTemp = szCode + "\t" + szName;
+
+						if (szCode.IsEmpty())
+							return FALSE;
+
+						strcpy(code, szTemp);
+						return TRUE;
+					}
+				}
+				return FALSE;
+			}
+#endif
 			return FALSE;
 		}
 		break;

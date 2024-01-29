@@ -12,6 +12,8 @@
 #include "AccEdit.h"
 #include "Account.h"
 
+#include "COubWnd.h"
+
 #define INI_DELIGATION		("DELAGENT.INI")
 
 typedef std::vector<CString> StrVector;
@@ -209,6 +211,7 @@ public:
 	CString m_dept;
 	BOOL	m_bDestroy;		//2012.02.08 KSJ OnDestroy에서 SaveHistory호출할때를 체크하기 위해
 	bool	m_bAddAll;		//2012.02.16 KSJ 한글입력인지 체크
+	BOOL m_bEnableCtrl = TRUE;
 
 	void	QueryAccntInfo(CString strAcc);
 	BOOL	ReadAcc813();
@@ -233,6 +236,9 @@ public:
 	CString GetAcntTypeName(CString tp);
 	CString GetAcntName(LPCSTR acno);
 
+	//test
+	CString GetEditData();
+	void GetFontInfo(CString& sfontname, int& isize, int& itype) const;
 	// Generated message map functions
 protected:
 	//{{AFX_MSG(CAccountCtrl)
@@ -383,13 +389,26 @@ private:
 	CString m_sHideTradeAgent;	//20200924 주문대리인계좌 삭제
 
 	std::unique_ptr<CToolTipCtrl> m_pTipCtrl;
+
+	COubWnd* m_pOubWnd{};
+	void	QueryAccntCheck(CString strData);
+	BOOL m_bCheckAgetn{};
 protected:
 	BSTR GetShowHideAcc(BSTR strAdd,  BSTR strDel);
 
 	enum
 	{
+		dispidEnableCtrl = 23L,
 		dispidGetShowHideAccName = 22L,
 		dispidGetShowHideAcc = 21L
 	};
 	BSTR GetShowHideAccName(BSTR strShow, BSTR strHide);
+public:
+	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnMButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnMove(int x, int y);
+	afx_msg void OnMoving(UINT fwSide, LPRECT pRect);
+protected:
+	void EnableCtrl(SHORT bShow);
 };

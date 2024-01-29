@@ -57,9 +57,12 @@ typedef struct SFCode
 
 typedef struct SFCodeInfo
 {
-	CString info[17];		//2015.12.01 KSJ 13 -> 17
-	CString codx[17];		//2015.12.01 KSJ 13 -> 17
-	CString nam[17];		//2015.12.01 KSJ 13 -> 17
+	//CString info[17];		//2015.12.01 KSJ 13 -> 17  //test ÁÖ¼±
+	//CString codx[17];		//2015.12.01 KSJ 13 -> 17
+	//CString nam[17];		//2015.12.01 KSJ 13 -> 17
+	CString info[18];		//2015.12.01 KSJ 13 -> 17
+	CString codx[18];		//2015.12.01 KSJ 13 -> 17
+	CString nam[18];		//2015.12.01 KSJ 13 -> 17
 }SFCODEINFO;
 
 typedef struct SFCodeBase

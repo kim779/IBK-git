@@ -159,6 +159,7 @@ LRESULT CMapWnd::OnUser( WPARAM wParam, LPARAM lParam )
 			break;
 		case TK_ACCOUNT_CTRL1:
 		case TK_ACCOUNT_CTRL2:
+		case 250:
 			if (m_pAcno) m_pAcno->m_pCtrl->SendMessage(WM_USER, wParam, lParam); 
 			break;
 		case TK_SDLDQ003:
@@ -2073,33 +2074,40 @@ void CMapWnd::ChangeCode( LPCSTR code , BOOL bTrigger /*=TRUE*/)
 	if(m_pOptionEx)
 		m_pOptionEx->SetCode(_code);
 
+	CString slog;
 	if (bTrigger)
 	{
 		if(m_pControl->m_nCurrTab == 1)	//2015.10.19 KSJ 현재탭인지
 		{
 			ch = _code.GetAt(0);
-// 			param.Format("ed_focod\t%s", _code);
-// 			
-// 			m_pParent->PostMessage(WM_USER, MAKEWPARAM(variantDLL, triggerCC), (LPARAM)(LPCSTR)param);
+slog.Format("[3006][%s] TAB =1 _code=[%s]", __FUNCTION__, _code);
+OutputDebugString(slog);
+			if      (ch=='1' || ch=='4' || ch == 'A' || ch == 'D') { 
+				param.Format("30301\t%s", _code); Variant(codeCC, param); Variant(triggerCC, param); 
+			}  //파생상품 코드개편
+			else if (ch=='2' || ch=='3' || ch == 'B' || ch == 'C') { 
+				param.Format("40301\t%s", _code); Variant(codeCC, param); Variant(triggerCC, param); 
+			}
 			
-			if      (ch=='1' || ch=='4' || ch == 'A' || ch == 'D') { param.Format("30301\t%s", _code); Variant(codeCC, param); Variant(triggerCC, param); }  //파생상품 코드개편
-			else if (ch=='2' || ch=='3' || ch == 'B' || ch == 'C') { param.Format("40301\t%s", _code); Variant(codeCC, param); Variant(triggerCC, param); }
-			
-			m_pParent->PostMessage(WM_USER, MAKEWPARAM(variantDLL, triggerCC), (LPARAM)(LPCSTR)param);
+		//	m_pParent->PostMessage(WM_USER, MAKEWPARAM(variantDLL, triggerCC), (LPARAM)(LPCSTR)param);
 
-// 			param.Format("ed_focod\t%s", _code);
-// 			m_pParent->PostMessage(WM_USER, MAKEWPARAM(variantDLL, triggerCC), (LPARAM)(LPCSTR)param);
-
-			SetTimer(2000, 10, NULL);
+		//	SetTimer(2000, 10, NULL);
 		}
 		else
 		{
 			ch = _code.GetAt(0);
 			param.Format("ed_focod\t%s", _code);
 						
+			slog.Format("[3006][%s] TAB != 1 _code=[%s]", __FUNCTION__, _code);
+			OutputDebugString(slog);
+
 			Variant(codeCC, param); Variant(triggerCC, param);
-			if      (ch=='1' || ch=='4' || ch == 'A' || ch == 'D') { param.Format("30301\t%s", _code); Variant(codeCC, param); Variant(triggerCC, param); }  //파생상품 코드개편
-			else if (ch=='2' || ch=='3' || ch == 'B' || ch == 'C') { param.Format("40301\t%s", _code); Variant(codeCC, param); Variant(triggerCC, param); }
+			if      (ch=='1' || ch=='4' || ch == 'A' || ch == 'D') { 
+				param.Format("30301\t%s", _code); Variant(codeCC, param); Variant(triggerCC, param); 
+			}  //파생상품 코드개편
+			else if (ch=='2' || ch=='3' || ch == 'B' || ch == 'C') { 
+				param.Format("40301\t%s", _code); Variant(codeCC, param); Variant(triggerCC, param); 
+			}
 		}
 	}
 

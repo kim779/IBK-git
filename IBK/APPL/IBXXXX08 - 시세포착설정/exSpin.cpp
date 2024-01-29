@@ -486,7 +486,14 @@ void CSpinCtrl::checkDelta(BOOL nFlag)
 
 	if (val == 1)
 	{
-		if (m_spType & spETFKOSPI)
+		if (m_spType & spETF || m_spType & spETN)
+		{
+			if (spVal < 2000)
+				m_delta = 1;
+			else
+				m_delta = 5;
+		}
+		else if (m_spType & spETFKOSPI)
 		{
 			m_delta = 5;
 			/*

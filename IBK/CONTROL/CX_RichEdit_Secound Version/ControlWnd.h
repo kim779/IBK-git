@@ -19,7 +19,9 @@ public:
 public:
 	CWnd*	m_pParent;
 	struct	_param	m_param;
-
+	enum {MODE_INOUT = 0, MODE_JUSTSHOW = 1};
+	int m_mode{};//0: 입출력모드  1:출력모드
+	CFont* getAxFont(CString fName, int point, int style);
 protected:
 	CRichEditCtrl* m_Edit;
 
@@ -50,4 +52,11 @@ protected:
 	afx_msg long OnMessage(WPARAM wParam, LPARAM lParam);
 	DECLARE_DISPATCH_MAP()
 	DECLARE_INTERFACE_MAP()
+public:
+	afx_msg LRESULT OnNcHitTest(CPoint point);
+	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };

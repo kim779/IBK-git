@@ -330,7 +330,7 @@ BOOL CCommodityDlg::LoadCCodeFromFile()
 		pin = std::make_shared<ccode_in>();
 		pin->code = CString(ccode.codx,8);
 
-		if (pin->code.Find("A75") >= 0)
+		if (pin->code.Find("470V") >= 0)
 			TRACE("eset");
 
 		int mode = 0;  //파생상품 코드개편 
@@ -373,18 +373,31 @@ void CCommodityDlg::AddGroup(std::shared_ptr<ccode_in> pin )
 {
 	std::shared_ptr<ccode_group> pg{};
 
+
+
 	for( int i = 0; i < m_codeGroup.GetSize(); i++ )
 	{
 		pg = m_codeGroup.GetAt(i);
+
+		
+
 		if( pg->mode == pin->mode )
 		{
+			if (pg->mode == 470)
+				TRACE("test");
+
 			AddMonth( pin, pg );
 			return;
 		}
 	}
 
+
 	pg = std::make_shared<ccode_group>();
 	pg->mode = pin->mode;
+
+	if (pg->mode == 470)
+		TRACE("test");
+
 	m_codeGroup.Add( pg );
 	AddMonth( pin, pg );	
 }
@@ -395,6 +408,10 @@ void CCommodityDlg::AddMonth(std::shared_ptr<ccode_in> pin, std::weak_ptr<ccode_
 	while( pos )
 	{
 		const std::shared_ptr<ccode_in> p = pg.lock()->list.GetNext( pos );
+
+		if (p->mode == 470)
+			TRACE("test");
+
 		if( p->year == pin->year )
 		{
 			if( p->month > pin->month )
@@ -733,14 +750,14 @@ void CCommodityDlg::SetList(int iMin, int iMax, int igubn)
 	CString stmp;
 	std::shared_ptr<ccode_group> SPgp;
 
-	std::shared_ptr<ccode_group>gp_65, gp_66, gp_67;
+	std::shared_ptr<ccode_group>gp_65, gp_66, gp_67, gp_70, gp_470;
 	std::shared_ptr<ccode_group>gp_75, gp_76, gp_77, gp_78;
 
 	int iColCount = 0;
 
 	CArray<std::weak_ptr<ccode_group>, std::weak_ptr<ccode_group>> list;
 	CArray<std::weak_ptr<ccode_group>, std::weak_ptr<ccode_group>> tmplist;
-	//3년 65, 5년 66, 10년 67, 3년-10년 68
+	//3년 65, 5년 66, 10년 67, 3년-10년 68,    30년 70,  3년-30년 국채 470
 	//미국달러 75, 앤 76, 유로 77, 위안 78
 	for( int i = 0; i < m_codeGroup.GetSize(); i++ )
 	{
@@ -763,6 +780,10 @@ void CCommodityDlg::SetList(int iMin, int iMax, int igubn)
 			if (stmp == "76") gp_76 = gp;
 			if (stmp == "77") gp_77 = gp;
 			if (stmp == "78") gp_78 = gp;
+		//	if (gp->mode == 470) 
+		//		gp_470 = gp;
+			if (gp->mode == 170) 
+				gp_70 = gp;
 		}
 
 		if(stmp == "68")
@@ -788,8 +809,12 @@ void CCommodityDlg::SetList(int iMin, int iMax, int igubn)
 		list.Add(gp_78);
 	}
 
-	if(m_btnGumri.GetCheck() && SPgp != nullptr)
-		list.Add( SPgp );
+	if (m_btnGumri.GetCheck() && SPgp != nullptr)
+	{
+		list.Add(gp_70);
+		list.Add(SPgp);
+		//list.Add(gp_470);
+	}
 
 	m_list.InsertColumn(0,"이름", LVCFMT_LEFT, 100 );
 	
@@ -943,12 +968,16 @@ void CCommodityDlg::SetSpread(std::weak_ptr<ccode_in> pin )
 	for( int i = 0; i < m_codeGroup.GetSize(); i++ )
 	{
 		std::shared_ptr<ccode_group> gp = m_codeGroup.GetAt( i );
+
+		if (gp->mode == 470)
+			TRACE("TEST");
+
 		if( gp->mode < 400 )
 			continue;
 
 		const CPoint pt = m_list.GetSelect();
 	//	if(gp->mode == 468 && pt.y >= 3)
-		if(gp->mode == 468 && pt.y >= 3 && m_btnGumri.GetCheck()) //금리이며 3-10년국채 선택시
+		if(gp->mode == 468 && pt.y == 4 && m_btnGumri.GetCheck()) //금리이며 3-10년국채 선택시
 		{
 			POSITION pos = gp->list.GetHeadPosition();
 			if(pos)
@@ -959,6 +988,27 @@ void CCommodityDlg::SetSpread(std::weak_ptr<ccode_in> pin )
 
 				const int idx = m_spdList.AddString( pin->code );
 				m_spdList.SetItemData( idx, (DWORD)pin.get() );
+				return;
+			}
+		}
+		else if (gp->mode == 470 && pt.y == 3 && m_btnGumri.GetCheck()) //금리이며 3-30년국채 선택시
+		{
+			POSITION pos = gp->list.GetHeadPosition();
+			if (pos)
+			{
+				std::shared_ptr<ccode_in> pin = gp->list.GetNext(pos);
+			
+				POSITION pos = gp->list.GetHeadPosition();
+				while (pos)
+				{
+					const std::shared_ptr<ccode_in> pin = gp->list.GetNext(pos);
+					const int idx = m_spdList.AddString(pin->code);
+					OutputDebugString("\r\n" + pin->code);
+					m_spdList.SetItemData(idx, (DWORD)pin.get());
+				}
+
+			/*	const int idx = m_spdList.AddString(pin->code);
+				m_spdList.SetItemData(idx, (DWORD)pin.get());*/
 				return;
 			}
 		}
@@ -1042,7 +1092,7 @@ void CCommodityDlg::OnSelchangeList2() // 스프레드 선택 변경
 		const ccode_in* pin = (ccode_in*)m_spdList.GetItemData( nIndex );
 		const CPoint pt = m_list.GetSelect();
 	//	if(pt.y >= 3)  //금리이며 3년10년 상품선물 스프레드 종목(4번째 줄) 선택시 
-		if(pt.y >= 3 && m_btnGumri.GetCheck())
+		if(pt.y == 4 && m_btnGumri.GetCheck())
 		{
 			CString str1, str2;
 
@@ -1069,6 +1119,34 @@ void CCommodityDlg::OnSelchangeList2() // 스프레드 선택 변경
 			m_edit2.SetWindowText( str3 ); 
 			
 			SwapControl( 1 );			
+		}
+		else if (pt.y == 3 && m_btnGumri.GetCheck())
+		{
+			CString str1, str2;
+
+			CString sname;
+			sname = pin->ename;
+			sname.TrimRight();
+			sname = sname.Right(6);
+
+			str1 = pin->code.Mid(3, 2);
+			str2 = pin->code.Mid(5, 2);
+			int val = atoi(sname.Mid(2, 2));
+			CString str3, str4;
+			if (atoi(sname.Mid(2, 2)) >= 26)
+				str3.Format("A%02s%s000", "70", str1);   //65 3년
+			else
+				str3.Format("1%02s%s000", "70", str1);   //65 3년
+
+			if (atoi(sname.Mid(2, 2)) >= 26)
+				str4.Format("A%02s%s000", "70", str2);   //70 30년
+			else
+				str4.Format("1%02s%s000", "70", str2);   //70 30년
+
+			m_edit1.SetWindowText(str4);
+			m_edit2.SetWindowText(str3);
+
+			SwapControl(1);
 		}
 		else if( pin )
 		{	

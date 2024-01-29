@@ -113,7 +113,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../dev/C_UserGrpDlg.dll</OutputFile>
+      <OutputFile>D:\IBKS_TEST\dev/C_UserGrpDlg.dll</OutputFile>
       <ImportLibrary>.\Debug\C_UserGrpDlg.lib</ImportLibrary>
       <ModuleDefinitionFile>.\C_UserGrpDlg.def</ModuleDefinitionFile>
     </Link>

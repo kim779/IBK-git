@@ -46,10 +46,9 @@ struct _inters
 	char	filler[6]{};		// Reserved
 };
 
-
 struct _intersx
 {
-	char	gubn = '0';		// 종목구분	0:none, 1:현물, 2:선물, 3:옵션, 4:개별주식옵션, 5:지수	
+	char	gubn = '0';		// 종목구분	0:none, 1:현물, 2:선물, 3:옵션, 4:개별주식옵션, 5:지수, 8: 책갈피, 9 : 북마크
 	CString code;			// 종목코드
 	CString name;			// 종목명
 	CString	xprc;			// 보유단가

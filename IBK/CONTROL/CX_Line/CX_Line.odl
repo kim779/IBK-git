@@ -29,6 +29,7 @@ library CX_Line
 			//{{AFX_ODL_METHOD(CControlWnd)
 			//}}AFX_ODL_METHOD
 
+			[id(1)] void ShowLine(SHORT bShow);
 	};
 
 	//  Class information for CControlWnd

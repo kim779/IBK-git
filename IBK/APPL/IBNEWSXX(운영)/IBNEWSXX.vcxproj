@@ -112,7 +112,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../dev/IBNEWSXX.DLL</OutputFile>
+      <OutputFile>D:\IBKS_TEST\dev/IBNEWSXX.DLL</OutputFile>
       <ImportLibrary>.\Debug\IBNEWSXX.lib</ImportLibrary>
       <AdditionalDependencies>msimg32.lib;../../control/fx_misc/Debug/fx_misc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\IBNEWSXX.def</ModuleDefinitionFile>

@@ -32,6 +32,8 @@
 #include <afxmt.h>
 
 #include <AxStd.hpp>
-#define BOOK_MARK    '8'
+#define ROW_COMMENT    '8'
 #define ROW_MARK     '9'
 
+#define DF_BOOKFILE_ORI    "bookmark.i"
+//#define DF_USEBOOKFILE

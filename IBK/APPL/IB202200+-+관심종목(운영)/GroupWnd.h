@@ -246,4 +246,6 @@ public:
 	std::map<CString, int> _symbol;
 	std::map<int, CString> _GroupName;
 	int m_iTime;
+
+	BOOL CheckGetRTS();
 };

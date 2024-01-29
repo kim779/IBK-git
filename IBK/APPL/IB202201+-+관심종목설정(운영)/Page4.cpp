@@ -432,212 +432,31 @@ void CPage4::loadGrid()
 		auto& pinter = m_inters.at(ii);
 //		m_grid->InsertRow("");
 		m_grid->SetItemText(ii+1, colCODE, pinter->code);
-		if (!pinter->code.IsEmpty())
+
+		if (pinter->gubn == ROW_COMMENT)
 		{
-			m_grid->SetItemText(ii+1, colNAME, pinter->name);
-			m_grid->SetItemText(ii+1, colXNUM, pinter->xnum);
-			m_grid->SetItemText(ii+1, colXPRC, pinter->xprc);
+			UINT attr = m_grid->GetItemAttr(ii + 1, colXNUM) & GVAT_HIDDEN;
+			m_grid->SetItemAttr(ii + 1, colXNUM, attr);
+			attr = m_grid->GetItemAttr(ii + 1, colXPRC) & GVAT_HIDDEN;
+			m_grid->SetItemAttr(ii + 1, colXPRC, attr);
+			m_grid->SetItemText(ii + 1, colNAME, pinter->name);
 		}
+		else
+		{
+			if (!pinter->code.IsEmpty())
+			{
+				m_grid->SetItemText(ii + 1, colNAME, pinter->name);
+				m_grid->SetItemText(ii + 1, colXNUM, pinter->xnum);
+				m_grid->SetItemText(ii + 1, colXPRC, pinter->xprc);
+			}
+		}
+	
 	}
 }
 
-//int CPage4::loadingActiveInterest(int gno)
-//{
-//	clearActiveInterest();
-//	
-//	CString	filePath, fileBook;
-//// 	if (ExistFile(gno, true))
-//// 		filePath.Format("%s/%s/%s/portfolio.i%02d.tmp", m_root, USRDIR, m_name, gno);
-//// 	else if (ExistFile(gno))
-//// 		filePath.Format("%s/%s/%s/portfolio.i%02d", m_root, USRDIR, m_name, gno);
-//	if (ExistFile(gno))
-//		filePath.Format("%s/%s/%s/portfolio.i%02d", m_root, USRDIR, m_name, gno);
-//	else
-//		return 0;
-//	
-//	fileBook.Format("%s/%s/%s/bookmark.i%02d", m_root, USRDIR, m_name, gno);
-//	bool    isFile = true;
-//	UINT	readL{};
-//	struct	_inters* pinter{};
-//	struct  _bookmarkinfo* bInfo{};
-//	
-//	CFile	fileH(filePath, CFile::modeRead|CFile::shareDenyNone);
-//	CFile	fileB;
-//	
-//	if( !fileB.Open(fileBook, CFile::modeRead|CFile::shareDenyNone) )
-//	{
-//		isFile = false;		//파일 없을경우
-//	}
-//	
-//	for (int ii = 0; ii < maxJONGMOK; ii++)
-//	{
-//		pinter = (_inters *) new char[sz_inters];
-//		ZeroMemory(pinter, sz_inters);
-//		
-//		readL = fileH.Read(pinter, sz_inters);
-//		if (readL < sz_inters)
-//		{
-//			delete[] pinter;
-//			break;
-//		}
-//		
-//		if (pinter->code[0] == 'm')
-//		{
-//			
-//			if(isFile == true)
-//			{
-//				bInfo = (_bookmarkinfo *) new char[sizeof(_bookmarkinfo)];
-//				ZeroMemory(bInfo, sizeof(_bookmarkinfo));
-//				
-//				readL = fileB.Read(bInfo, sizeof(_bookmarkinfo));
-//				
-//				if(readL < sizeof(_bookmarkinfo))
-//				{
-//					delete[] bInfo;
-//				}
-//				else
-//				{
-//					CString temp = CString((pinter->code));
-//					temp = temp.Left(12);
-//					temp.TrimRight();
-//					CString temp2 = CString(bInfo->code);
-//					temp2.TrimRight();
-//					
-//					if(strcmp(temp, temp2) == 0)
-//					{
-//						CopyMemory(pinter->name, bInfo->name, sizeof(bInfo->name));
-//						
-//						pinter->bookmark[0] = bInfo->bookmark[0] == '1' ? '1':'0';//2015.04.03 KSJ 1이아니면 0으로 해준다.
-//					}
-//				}
-//			}
-//			
-//		}
-//		else
-//		{
-//			strcpy(pinter->name, m_page->GetCodeName(pinter->code));
-//		}
-//		
-////		m_ActiveInters.Add(pinter);
-//	}
-//	
-//	fileH.Close();
-//	return m_inters.size();
-//}
-
-//int CPage4::loadingInterest(int gno)
-//{
-//	clearInterest();
-//
-//	CString	filePath, fileBook;
-//	// 	if (ExistFile(gno, true))
-//	// 		filePath.Format("%s/%s/%s/portfolio.i%02d.tmp", m_root, USRDIR, m_name, gno);
-//	// 	else if (ExistFile(gno))
-//	// 		filePath.Format("%s/%s/%s/portfolio.i%02d", m_root, USRDIR, m_name, gno);
-//	if (ExistFile(gno))
-//		filePath.Format("%s/%s/%s/portfolio.i%02d", m_root, USRDIR, m_name, gno);
-//	else
-//		return 0;
-//	
-//	fileBook.Format("%s/%s/%s/bookmark.i%02d", m_root, USRDIR, m_name, gno);
-//	bool    isFile = true;
-//	UINT	readL{};
-//	struct	_inters* pinter{};
-//	struct  _bookmarkinfo* bInfo{};
-//
-//	CFile	fileH(filePath, CFile::modeRead|CFile::shareDenyNone);
-//	CFile	fileB;
-//
-//	if( !fileB.Open(fileBook, CFile::modeRead|CFile::shareDenyNone) )
-//	{
-//		isFile = false;		//파일 없을경우
-//	}
-//
-//	for (int ii = 0; ii < maxJONGMOK; ii++)
-//	{
-//		pinter = (_inters *) new char[sz_inters];
-//		ZeroMemory(pinter, sz_inters);
-//
-//		readL = fileH.Read(pinter, sz_inters);
-//		if (readL < sz_inters)
-//		{
-//			delete[] pinter;
-//			break;
-//		}
-//
-//		for(int a=0;a<10;a++)
-//		{
-//			if(!isdigit(pinter->xprc[a]))
-//			{
-//				pinter->xprc[a] = ' ';
-//			}
-//		}
-//		
-//		if (pinter->code[0] == 'm')
-//		{
-//
-//			if(isFile == true)
-//			{
-//				bInfo = (_bookmarkinfo *) new char[sizeof(_bookmarkinfo)];
-//				ZeroMemory(bInfo, sizeof(_bookmarkinfo));
-//				
-//				readL = fileB.Read(bInfo, sizeof(_bookmarkinfo));
-//
-//				if(readL < sizeof(_bookmarkinfo))
-//				{
-//					delete[] bInfo;
-//				}
-//				else
-//				{
-//					CString temp = CString((pinter->code));
-//					temp = temp.Left(12);
-//					temp.TrimRight();
-//					CString temp2 = CString(bInfo->code);
-//					temp2.TrimRight();
-//					
-//					if(strcmp(temp, temp2) == 0)
-//					{
-//						CopyMemory(pinter->name, bInfo->name, sizeof(bInfo->name));
-//					
-//						pinter->bookmark[0] = bInfo->bookmark[0] == '1' ? '1':'0';//2015.04.03 KSJ 1이아니면 0으로 해준다.
-//					}
-//				}
-//			}
-//		
-//		}
-//		else
-//		{
-//			//strcpy(pinter->name, m_page->GetCodeName(pinter->code));
-//			CopyMemory(pinter->name,m_page->GetCodeName(pinter->code),sizeof(pinter->name));
-//		}
-//		
-////		m_inters.Add(pinter);
-//	}
-//
-//	fileH.Close();
-//	return m_inters.size();
-//}
-
 void CPage4::savingInterest(int gno)
 {
-//	m_bIsEdit = true;    
-//	
-//	CString	filePath;
-////	filePath.Format("%s/%s/%s/portfolio.i%02d.tmp", m_root, USRDIR, m_name, gno);
-//	filePath.Format("%s/%s/%s/portfolio.i%02d", m_root, USRDIR, m_name, gno);
-//
-//	struct	_inters* pinter{};
-//
-//	CFile	fileH(filePath, CFile::modeWrite|CFile::modeCreate|CFile::shareDenyNone);
-//
-//	if (fileH.m_hFile == CFile::hFileNull) return;
-//
-//	for (int ii = 0; ii < m_inters.GetSize(); ii++)
-//	{
-//		pinter = m_inters.GetAt(ii);
-//		fileH.Write(pinter, sizeof(_inters));
-//	}
-//	fileH.Close();
+
 }
 
 //모든 그룹에 동일 적용 체크 여부
@@ -846,8 +665,13 @@ int CPage4::GetUploadData(int gno, CString& name, char* datB)
 
 		info.gubn[0] = item->gubn;
 		CopyMemory(info.code, item->code, item->code.GetLength());
-		CopyMemory(info.xprc, item->xprc, item->xprc.GetLength());
-		CopyMemory(info.xnum, item->xnum, item->xnum.GetLength());
+		if (item->gubn == ROW_COMMENT)
+			CopyMemory(info.xprc, item->name, strlen(item->name));
+		else
+		{
+			CopyMemory(info.xprc, item->xprc, item->xprc.GetLength());
+			CopyMemory(info.xnum, item->xnum, item->xnum.GetLength());
+		}
 	});
 	return m_inters.size();
 }
@@ -882,12 +706,20 @@ void CPage4::receiveOub(int key, CString data)
 		const CString sCount = data.Mid(22, 4);
 
 		data = data.Mid(26);
-
+		CString stmp;
 		const gsl::span<_jinfo> codelist((_jinfo*)data.GetString(), atoi(sCount));
 		for_each(codelist.begin(), codelist.end(), [&](auto item) {
 			auto& inter = m_inters.emplace_back(std::make_unique<_intersx>());
 			inter->copy(&item);
-			inter->name = m_page->GetCodeName(inter->code);
+			if (inter->gubn == ROW_COMMENT)
+			{
+				inter->name = m_page->GetCodeName(inter->code);
+				stmp.Format("%s", inter->xprc);
+				stmp = stmp.Left(sizeof(inter->xprc) + sizeof(inter->xprc));
+				inter->name = stmp;
+			}
+			else
+				inter->name = m_page->GetCodeName(inter->code);
 		});
 
 		m_grid->MessageToGrid(WM_VSCROLL, SB_TOP);

@@ -18,6 +18,7 @@ public:
 	//}}AFX_DATA
 
 	int						m_iType;
+	int						m_iCodetype{};
 	std::unique_ptr<CHogaWindow> m_pHogaWnd;
 	CWnd*					m_pMain;
 
@@ -47,6 +48,7 @@ public:
 	void					SetInitControl();
 	void					SetConfigValue();
 	void					SetSpinDeltaValue(NM_UPDOWN* pNMUD, CEdit* pEdit, int iunit);
+	void					SetSpinPrcie(NM_UPDOWN* pNMUD, CEdit* pEdit );
 
 	CString					GetDlgWindowText(UINT uiID);
 	bool					SetDlgButtonCheck(UINT uiID, int icheck);

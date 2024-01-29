@@ -191,6 +191,7 @@ public:
 	void uploadBackup();	  // 2016.07.12 KSJ 관심종목 설정과 같이 'b' 보내줌	
 	void RTS_RecvRTSx(LPARAM lParam);
 
+	CString m_slog;
 	int m_iTick{};
 	BOOL m_bSending{};
 	CString CheckIP();
@@ -199,11 +200,16 @@ public:
 
 	bool m_bSkipRTS{};
 
-	CString m_strBeginTimeEnd = "085959";  //동시호가 종료시간 xx:59:59
-	CString m_strEndTime      = "152000";  //동시호가 시작시간 xx:10:00
-	CString m_strEndTimeEnd   = "155959";  //동시호가 종료시간 xx:59:59
-	CString m_strBeginTime    = "083000";  //동시호가 시작시간 xx:10:00
+	//CString m_strBeginTimeEnd = "085959";  //동시호가 종료시간 xx:59:59
+	//CString m_strEndTime      = "152000";  //동시호가 시작시간 xx:10:00
+	//CString m_strEndTimeEnd   = "155959";  //동시호가 종료시간 xx:59:59
+	//CString m_strBeginTime    = "083000";  //동시호가 시작시간 xx:10:00
+	CString m_strBeginTimeEnd{};  //동시호가 종료시간 xx:59:59
+	CString m_strEndTime{};  //동시호가 시작시간 xx:10:00
+	CString m_strEndTimeEnd{};  //동시호가 종료시간 xx:59:59
+	CString m_strBeginTime{};  //동시호가 시작시간 xx:10:00
 
+	int	m_iTime{};
 	bool m_bcustomer{};
 	
 	std::map<CString, int>    _mRealtime;
@@ -213,4 +219,10 @@ public:
 	void Request_GroupList();
 	void Request_GroupCode(int iseq);
 	void receiveOub(int key, CString data);
+
+	void CheckRTSTimer(bool bFirst = false);
+
+	bool IsFileExist(CString filename);  //test mod
+	BOOL m_bBookFileProcess{};  //test mod 북마크파일이 없는 사람이면 파일저장 프로세스는 하지 않는다
+	BOOL CheckBookFileProcess();
 };

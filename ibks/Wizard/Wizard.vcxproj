@@ -109,6 +109,7 @@
       <AdditionalDependencies>ws2_32.lib;imm32.lib;version.lib;winmm.lib;../dll/lib/debug/axislib.lib;../dll/form/debug/axisform.lib;../dll/vbs/debug/axisvbs.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
+      <StackReserveSize>4194304</StackReserveSize>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -173,12 +174,12 @@
       <OptimizeReferences>
       </OptimizeReferences>
       <ModuleDefinitionFile>.\Wizard.def</ModuleDefinitionFile>
-      <OutputFile>D:\IBKS_TEST\release/axWizard.ocx</OutputFile>
+      <OutputFile>D:\git\src\release/axWizard.ocx</OutputFile>
       <RegisterOutput>false</RegisterOutput>
       <AdditionalDependencies>ws2_32.lib;imm32.lib;version.lib;winmm.lib;../dll/lib/release/axislib.lib;../dll/form/release/axisform.lib;../dll/vbs/release/axisvbs.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration />
       <ImportLibrary>.\Release\axWizard.lib</ImportLibrary>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>

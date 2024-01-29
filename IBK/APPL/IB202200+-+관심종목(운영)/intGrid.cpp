@@ -8611,6 +8611,7 @@ BOOL CintGrid::MoveColAction(int sCol, int dCol)
 
 COLORREF CintGrid::DisplayAttribute(int attr, CString& data)
 {
+	CString stmp;   //tests
 	if (data.IsEmpty())
 		return 0;
 		
@@ -8622,11 +8623,16 @@ COLORREF CintGrid::DisplayAttribute(int attr, CString& data)
 	CString	string = data, stringx;
 	string.TrimLeft(); string.TrimRight();
 
-	if ((idx = string.FindOneOf("+-0")) == 0)
+	idx = string.FindOneOf("+-");
+	if (idx >= 0) 
 	{
-		//스프레드 처리를 위해서 2번째 문자도 부호인지 확인
-		sign = string.GetAt(idx);
-		string.Delete(idx);
+		//if ((idx = string.FindOneOf("+-0")) == 0)
+	//if ((idx = string.FindOneOf("+-")) == 0)
+		if ((idx = string.FindOneOf("+-0")) == 0)
+		{
+			sign = string.GetAt(idx);
+			string.Delete(idx);
+		}
 	} 
 
 	if (attr & GVAT_ZEROSUP)

@@ -9,6 +9,13 @@
 #include "GridWnd.h"
 #include <afxmt.h>
 
+struct	_Ralert {
+	CString code;
+	int	stat{};				// DLL_ALERT.stat
+	int	size{};				// data record count
+	std::unique_ptr<char[]> ptr[999]{};	// data record array
+};
+#define	L_RalertR	sizeof(struct _Ralert)
 
 class CParam
 {
@@ -31,7 +38,7 @@ class CMainWnd : public CWnd
 // Construction
 public:
 	CMainWnd(CWnd* pWnd, _param* pInfo);
-	CString m_slog;
+
 // Attributes
 public:
 	CParam		m_param{};
@@ -46,10 +53,7 @@ public:
 	CString		m_Pass;
 	BOOL		m_bRemain{};
 	CString		m_sMapHandle;
-
 	BOOL		m_bChangeGroup{};
-	int			m_iSendTr{};
-	void			SetDragTimer();
 // Operations
 public:
 	BOOL GetRTSVisible() { return m_bRTS; };
@@ -205,7 +209,16 @@ private:
 	BOOL		m_bMainClose{};
 
 	CString		m_strMarketTime;	//시장구분 (동시호가) KSJ 2012.11.26 
-
+	//CString    CalMaketTime(CString strTime, bool bEnd); //test시작시간
+	CString    CalMaketTime(CString strTime, bool bEnd, bool bmorning = false);
+	CString		m_strBeginTime{};  //동시호가 시작시간 xx:10:00
+	CString		m_strBeginTimeEnd{};  //동시호가 종료시간 xx:59:59
+	CString		m_strEndTime{};  //동시호가 시작시간 xx:10:00
+	CString		m_strEndTimeEnd{};  //동시호가 종료시간 xx:59:59
+	//CString		m_strBeginTime = "084000";  //동시호가 시작시간 xx:10:00
+	//CString		m_strBeginTimeEnd = "085959";  //동시호가 종료시간 xx:59:59
+	//CString		m_strEndTime = "152000";  //동시호가 시작시간 xx:10:00
+	//CString		m_strEndTimeEnd = "155959";  //동시호가 종료시간 xx:59:59
 // etc...
 	void DrawBitmap(CDC *pDC, CRect rc, CString strImage);
 	void DrawRoundBitmap(CDC *pDC, CRect rc, int nKind);
@@ -281,22 +294,22 @@ private:
 
 
 public:
-
+	int m_iTick;
+	CString m_slog;
 	CString _groupName;
 	int     _groupKey = 0;
 	void Request_GroupCode(int iseq);
-	//CString getMapName() { return m_strMap; }
-	CString m_strMap{};
-	int		m_iGroup{};
-protected:
+	int m_iGroup{};
+	void SetDragTimer();
+	void CheckRTSTimer();
+	CString CheckIP();
+	bool isIPInRange(CString ip, CString network_s, CString network_e);
+	unsigned int IPToUInt(CString ip);
+	bool m_bcustomer{};
+	std::map<CString, int>    _mRealtime;
+	std::map<CString, std::unique_ptr<struct _Ralert>> _mapRealData;
+	void RTS_RecvRTSx(LPARAM lParam);
 
-//	CString m_strMap;
-
-
-	void SetMapName(BSTR strMap);
-
-	enum
-	{
-		dispidSetMapName = 33L
-	};
+	BOOL m_bBookFileProcess{};  //test mod 북마크파일이 없는 사람이면 파일저장 프로세스는 하지 않는다
+	BOOL CheckBookFileProcess();
 };

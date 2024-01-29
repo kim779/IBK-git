@@ -102,10 +102,16 @@ CBitmap* CMainDlg::getBitmap(CString path)
 LONG CMainDlg::OnUser(WPARAM wParam, LPARAM lParam)
 {
 	//LONG	ret = 0;
+	int ilen{};
+	CString sdata;
 	switch(LOBYTE(LOWORD(wParam)))
 	{
 		case DLL_OUB:
-			ParsingOubData( (char*)lParam );
+			ilen = HIWORD(wParam);
+			sdata.Format("%s", (char*)lParam);
+			sdata = sdata.Left(ilen);
+			//ParsingOubData( (char*)lParam );
+			ParsingOubData(sdata);
 			break;
 
 		case DLL_ALERT:break;
@@ -147,6 +153,7 @@ BOOL CMainDlg::OnInitDialog()
 	m_cboReportType.InsertString(3, "WxReport04");
 	m_cboReportType.InsertString(4, "WxReport05");
 	m_cboReportType.InsertString(5, "WxReport06");
+	m_cboReportType.InsertString(5, "WxReport07");  //test print
 	m_cboReportType.SetCurSel(0);
 	
 
@@ -501,6 +508,7 @@ void CMainDlg::sendTransaction(CString sAccount, CString strSVCD, int iInputCnt,
 	GetDlgItem(IDC_BUTTON1)->EnableWindow(FALSE);
 	SetPrinterStatus("데이타 요청중입니다..");
 
+
 	CString sMarket, sOrdf;
 	GetDlgItem(IDC_MARKETEDIT)->GetWindowText(sMarket);
 	GetDlgItem(IDC_ODRFEDIT)->GetWindowText(sOrdf);
@@ -533,6 +541,12 @@ void CMainDlg::sendTransaction(CString sAccount, CString strSVCD, int iInputCnt,
 		sTmp = sInputData[i];
 		sTmp = filltoken(sTmp, iInputLen[i], sfiltoken, ifiltype);
 		if(sInputType[i] == "S") sTmp = _T("+") + sTmp;
+
+		sLog.Format("\r\n[print][%s]  cnt=[%d]  sInputType=[%s] sTmp=[%s]", __FUNCTION__,
+			iInputCnt, sInputType[i], sTmp);
+
+		OutputDebugString(sLog);
+
 
 		szSend += sTmp;
 		InsertQueryList(sTmp);
@@ -825,6 +839,7 @@ CString CMainDlg::ParsingGridData(CString sData)
 	sData = sData.Right(sData.GetLength() - m_stOutput.iOutGridLens[0]);
 
 	const int igridcolcnt = m_stOutput.iOutCount - m_stOutput.iSimpleCount - 1 - m_stOutput.iLastSimpleCount;
+	//const int igridcolcnt = m_stOutput.iOutCount - m_stOutput.iSimpleCount  - m_stOutput.iLastSimpleCount;
 
 	CString		sList[MAXCOUNT], sLine;
 	int ilinecnt = 0, i = 0;

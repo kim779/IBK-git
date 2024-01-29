@@ -402,7 +402,11 @@ BOOL CFuturesDlg::OnInitDialog()
 			else
 			{
 				if (m_type == 0)
-					m_ctlButtonKostar.EnableWindow(FALSE);
+					m_ctlButtonKostar.EnableWindow(FALSE);  
+
+				m_ctlButtonKostar.EnableWindow(TRUE);  //test  주선
+
+
 			//	if(m_bMini) OnButtonMiniK200();	//2015.09.14 KSJ 미니
 			//	else		OnButtonKospi200();
 				if(m_iGubn == NORMAKKOSPI200)		OnButtonKospi200();
@@ -667,6 +671,17 @@ void CFuturesDlg::HideButton(BOOL flag)
 
 void CFuturesDlg::OnButtonKostar() 
 {
+#ifdef DF_TEST
+	//this->OnCancel();
+//	EndDialog(0);
+//	OnOK();
+//	
+	m_iReturnData = 1;
+	OnCancel();
+	return;
+#endif
+
+
 	m_nStep = sfCODE;
 
 	Invalidate();
@@ -1283,6 +1298,7 @@ BOOL CFuturesDlg::loadSfCode()
 	m_mapsfinfo.RemoveAll();
 	m_sfbase.RemoveAll();
 	m_mapsfcode.RemoveAll();
+
 
 	CString path, sztmp = _T("");
   	

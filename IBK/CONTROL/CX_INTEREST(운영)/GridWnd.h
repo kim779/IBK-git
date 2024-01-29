@@ -45,10 +45,7 @@ class CGridWnd : public CBaseWnd
 // Construction
 public:
 	CGridWnd(CWnd* pMainWnd, int nIndex);
-	CString m_slog;
-	CString m_sMap;
 	int m_iIndex;
-	void show_m_inter();
 // Attributes
 public:
 
@@ -194,14 +191,13 @@ public:
 	void	toggleAction5000(bool toggle);
 	void	makeCodeExist();
 	void	OperAlarm(int kind, char* lParam);
-	//std::shared_ptr<struct _intersx> GetData(int nIndex) { return m_inters.at(nIndex); }    //test 확인
+	//std::shared_ptr<struct _intersx> GetData(int nIndex) { return m_inters.at(nIndex); }    //test 20230209
 	std::shared_ptr<struct _intersx> GetData(int nIndex) {
 		if (m_inters.size() > nIndex)
 			return m_inters.at(nIndex);
 		return nullptr;
-	//	return m_inters.at(nIndex);
 	}
-	void	SetData(int nIndex, std::shared_ptr<struct _intersx> pinters) { m_inters.at(nIndex) = pinters; }  //test 확인
+	void	SetData(int nIndex, std::shared_ptr<struct _intersx> pinters) { m_inters.at(nIndex) = pinters; }
 
 	CString CalcuPyungaSonik(struct _intersx* pinters, CString curr);
 	CString CalcuSuik(struct _intersx* pinters, CString curr);
@@ -365,7 +361,7 @@ protected:
 
 	void	parsingNews(CString datB);
 	void	InsertNews(CString datB);
-	void	parsingAlertx(LPARAM lParam);	//2012.01.19 KSJ Alertx 추가
+	
 	void	parsingNewsx(DWORD* data);	//2012.01.19 KSJ Alertx 추가
 	void	InsertNewsx(DWORD* data);	//2012.01.19 KSJ Alertx 추가
 	void	calcInClient();
@@ -497,4 +493,11 @@ protected:
 	CString m_strEndTime;		//동시호가 종료시간 xx:59:59
 	int	m_nBookMarkRow;		//2013.05.21  KSJ 북마크 넣을 Row
 	// END ADD
+public:
+	CString m_slog{};
+	std::unordered_map<int, int>	_mRsymbol;
+	void initRSymbol();
+	void RTS_parsingAlertx(LPARAM lParam);
+	void	parsingAlertx(LPARAM lParam);	//2012.01.19 KSJ Alertx 추가
+	BOOL DataCheck(char* ptr);
 };

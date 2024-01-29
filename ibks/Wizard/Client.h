@@ -65,7 +65,7 @@ class CClient : public CWorks
 public:
 	CClient(CGuard* guard, CWnd* view, int key, int type);
 	virtual ~CClient();
-	CString m_slog;
+
 public:
 	class CStream*	m_stream;
 	class CScript*	m_vm;

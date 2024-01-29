@@ -63,6 +63,9 @@
     <ClCompile Include="TrSearch1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CDlg_Slider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="IB202201.rc">
@@ -122,6 +125,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TrSearch1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CDlg_Slider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -163,7 +163,7 @@ CGridWnd::CGridWnd(CWnd* pMainWnd, int nIndex) : CBaseWnd(pMainWnd)
 	m_mapCurValue.RemoveAll();
 
 	m_strBeginTime = "081000";
-	m_strEndTime = "085959";
+	m_strEndTime = "152000";
 
 }
 
@@ -297,7 +297,7 @@ CString CGridWnd::CalMaketTime(CString strTime, bool bEnd)
 		if(strTime.IsEmpty())
 			strTime = "80";
 
-		strData.Format("%03d000", atoi(strTime) + 4);	//081000, 084000, 091000
+		strData.Format("%04d00", atoi(strTime));
 	}
 
 	return strData;
@@ -318,7 +318,7 @@ void CGridWnd::FieldSetup(bool bDlgSetup, int iEqualizer)
 
 	// ADD PSH 20070918
 	MarkerSetup();
-
+	initRSymbol();
 	// END ADD
 }
 
@@ -2608,13 +2608,15 @@ BOOL CGridWnd::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 				nIdx = 0;
 			else
 				nIdx  = m_drop - 2 ;
+		
+		//	auto& pinters = m_inters.at(nIdx);
+			auto pinters = m_inters.at(nIdx);
 
-			auto& pinters = m_inters.at(nIdx);
 			if (!pinters->code.IsEmpty())
 			{
 				const int	nOver = ((CMainWnd*)m_pMainWnd)->GetMViewType();
 				int rowcount = 0;
-
+			
 				if(nOver == MO_VISIBLE)
 				{
 					rowcount = 0;
@@ -2637,8 +2639,10 @@ BOOL CGridWnd::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 				}
 			
 				m_selectRow = m_drop;
+				pinters = m_inters.at(m_drop);
 				insertInterest(m_drop - 1);
 				insertRow(m_drop);
+				//insertRow(m_drop - 1);
 				m_drop -= 1;
 				pinters = m_inters.at(m_drop);
 			}
@@ -3267,7 +3271,7 @@ writelog(m_slog);
 		{
 			if (0 < nmgv->row)
 			{
-				RbuttonAction(nmgv->row);
+				RbuttonAction(nmgv->row); 
 			}
 		}
 		break;
@@ -4249,9 +4253,9 @@ void CGridWnd::ShowPopupMenu(int nX /* = -1 */, int nY /* = -1 */)
 	}
 	else
 	{
-		m_menuHeader.EnableMenuItem(IDC_MENU_MARKER, m_bSorting ? MF_DISABLED : MF_ENABLED);
+	//	m_menuHeader.EnableMenuItem(IDC_MENU_MARKER, m_bSorting ? MF_DISABLED : MF_ENABLED);
 
-		nResult = m_menuHeader.TrackPopupMenu(TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RETURNCMD, nX, nY, this);
+	//	nResult = m_menuHeader.TrackPopupMenu(TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RETURNCMD, nX, nY, this);
 	}
 
 	switch(nResult)
@@ -6544,6 +6548,901 @@ void CGridWnd::SettingGridHeaderName(int index)
 	}
 }
 
+BOOL CGridWnd::DataCheck(char* ptr)
+{
+	if (CString(ptr).IsEmpty())
+		return FALSE;
+	return TRUE;
+}
+
+void CGridWnd::RTS_parsingAlertx(LPARAM lParam)
+{
+	CString stmp;
+	int xrow{};
+	CString	code, name, symbol, entry, datB, strValue, dataExceptCode, strCode, strData;
+	BOOL bTicker{};
+	CString strGubn;		// 2012.02.09 KSJ 호가 체결 저장
+	CString strTemp;
+	bool bCheType = false;	//2012.06.20 KSJ 체결일때는 true로 바꿔준다.
+	CString str950, str951;
+
+	bTicker = TRUE;
+
+	struct _Ralert* alertR;
+	alertR = (struct _Ralert*)lParam;
+
+	code = alertR->code;
+
+	if (code.GetLength() == 7)
+	{
+		strCode = code.Mid(1);
+	}
+	else if (code.GetAt(0) == 'X')
+	{
+		strCode = code.Mid(1);
+	}
+	else
+	{
+		strCode = code;
+	}
+
+	DWORD* data{};
+	int ii = 0;
+
+	if (code.CompareNoCase("S0000") == 0)
+	{
+		parsingNewsx((DWORD*)alertR->ptr);
+	//	parsingNewsx(data);
+		return;
+	}
+
+
+	int count = 0;
+	count = CheckRealTimeCode(code);
+	if (count == 0)
+		return;
+
+	//	DWORD* data{};
+
+		//2012.12.20 KSJ 최신데이터가 제일 처음에 있다.(그러므로 처음것만 보여주면 된다.)
+		//그러므로 체결은 끝에서 부터 그려주고, 호가는 제일처음 것만 그려준다.
+	//	for(int ii = alertR->size - 1; ii > -1; ii--)
+	{
+
+		//2012.02.09 KSJ
+		//data[0]의 값으로 호가, 체결으로 나눈다.
+		//호가일때는 alertR->size -1의 값을 한번만 세팅해주면 된다.
+		if (DataCheck(alertR->ptr[0].get()))
+		{
+			//strGubn = (char*)data[0]; 
+			strGubn.Format("%s", alertR->ptr[0].get());
+			strGubn.TrimLeft(); strGubn.TrimRight();
+
+
+			//우선호가, 호가잔량, 시간외호가, 시간외단일가매매 우선호가,
+			//시간외단일가매매 호가잔량, ELW 호가잔량,  LP 호가 내재변동성, 선물호가잔량
+			//옵션호가잔량, SO호가잔량, 상품선물호가잔량, 상품옵션호가잔량
+			if (!strGubn.Compare("C") || !strGubn.Compare("D") || !strGubn.Compare("E") || !strGubn.Compare("c")
+				|| !strGubn.Compare("d") || !strGubn.Compare("y") || !strGubn.Compare("k") || !strGubn.Compare("L")
+				|| !strGubn.Compare("P") || !strGubn.Compare("p") || !strGubn.Compare("g") || !strGubn.Compare("n")
+				|| !strGubn.Compare("4"))	//2015.01.15 KSJ 선물호가 추가됨.
+			{
+				ii = 0;
+				//data = (DWORD*)alertR->ptr[ii]; //check 주석해제 해야함
+			}
+			//주식종목체결, 선물체결, 옵션체결, SO옵션체결, 채권, 상품선물체결, 상품옵션체결 2012.06.20 KSJ 매도호가(25), 매수호가(26)은
+			//체결데이터일때만 그려준다.
+			else if (!strGubn.Compare("B") || !strGubn.Compare("K") || !strGubn.Compare("O") || !strGubn.Compare("o")
+				|| !strGubn.Compare("z") || !strGubn.Compare("f") || !strGubn.Compare("m"))
+			{
+				bCheType = true;
+			}
+			else if (strGubn.GetLength() != 1)
+				return;
+		}
+		// KSJ
+
+		//2013.08.26 KSJ	지수일때 예상가 표시
+		/*
+			08:30~09:00 'X' 예상가표시
+			09:01~14:50 'J' 현재가표시
+			14:50~15:00 'X' 예상가표시
+			15:00~15:01 'J' 현재가표시
+		*/
+		if (!strGubn.Compare("X") && code.GetLength() == 5)		//지수일때
+		{
+			code.Delete(0);	//첫 글자 'X'를 삭제한다.
+			code.Insert(0, 'K'); //첫 글자를 'K'로 바꿔준다.
+			strCode = code;
+		}
+		//2013.08.26 KSJ END
+
+		//그룹 종목 중복 허용일 경우,
+		for (int rowPosition = 0; rowPosition < count; rowPosition++)
+		{
+			xrow = m_irowCode[rowPosition];
+
+			//BOOL bNot = FALSE;
+
+			if (!DataCheck(alertR->ptr[34].get()) && DataCheck(alertR->ptr[40].get()))
+			{
+				if (!DataCheck(alertR->ptr[111].get()))
+					bTicker = FALSE;
+			}
+
+			if (DataCheck(alertR->ptr[734].get()) || DataCheck(alertR->ptr[740].get()))
+			{
+				bTicker = FALSE;
+			}
+
+			entry = _T("");
+			CString	oldEXP = m_grid->GetItemText(xrow, colEXPECT);
+			CString	newEXP = _T("");
+			const BOOL	bManual = (BOOL)m_pToolWnd->SendMessage(WM_MANAGE, MK_EXPECT);
+			const BOOL	bAutoCheck = (BOOL)m_pToolWnd->SendMessage(WM_MANAGE, MK_AUTOEXPECT);
+			BOOL	bTransSymbol = FALSE;		//2012.02.09 KSJ 심볼변경되는 상황 일때 TRUE
+			BOOL	bDaebi = FALSE;				//2012.03.20 KSJ 예상대비가 0일때 체크함.
+			BOOL	bZisu = FALSE;				//2013.08.27 KSJ 지수일때는 구분이 'X'이고 예상가가 23에 온다.
+
+			CString strTime, expect, real, excep;
+			CString codeExceptA;
+
+			//변경이 있을때마다 배열에 저장해 둔 현재가 데이타 업데이트
+			CString en2, saveData;
+
+			if (DataCheck(alertR->ptr[111].get()))
+			{
+				saveData.Format("%s", alertR->ptr[111].get());
+				en2.Format("%s", alertR->ptr[34].get());
+			}
+			else if (DataCheck(alertR->ptr[23].get()))
+			{
+				saveData.Format("%s", alertR->ptr[23].get());
+				en2.Format("%s", alertR->ptr[34].get());
+			}
+			
+			//내려오는 걸 기준으로 끊기
+			//111이 내려오는지 023이 내려오는지 판단해서 사전 차단
+
+			entry.Empty();
+
+			CString str90;
+			str90.Format("%s", alertR->ptr[90].get());
+			BOOL	bLast = FALSE;	//2015.01.15 필터링때문에 오는 마지막 데이터 무시해야함.
+
+			str90.TrimLeft(); str90.TrimRight();
+			//2015.01.15 선물호가 4 추가됨 2015.02.03 KSJ 9시 장시작할 때도 필터링된 데이터가 나온다.
+			if ((!strGubn.Compare("L") || !strGubn.Compare("4") || !strGubn.Compare("P") || !strGubn.Compare("g")) && ((!str90.Compare("99")) || (!str90.Compare("40"))))
+			{
+				m_grid->SetItemText(xrow, colEXPECT, "0"); //2013.09.13 KSJ 옵션필터링때문에 마지막에 예상가를 주는데 무시해야한다.
+				m_grid->SetItemData(xrow, colEXPECT, 0);
+
+				bLast = TRUE;
+			}
+
+			const int nEndOPMarket = m_grid->GetItemData(xrow, colEXPECT);	//2013.09.17 KSJ 해당종목이 장종료 되었으면
+
+			if ((!strGubn.Compare("X") || DataCheck(alertR->ptr[111].get()) || nEndOPMarket == 1) && !bLast)	// 예상가 적용	2013.08.22 지수예상가는111심볼이 없고 구분값이X로 온다.
+			{ //예상가 심볼에 값이 있는 동시호간대 처리
+				if (!CString(alertR->ptr[111].get()).IsEmpty())
+					entry.Format("%s", alertR->ptr[111].get());
+				else if (nEndOPMarket == 1)	//2013.09.17 KSJ 해당종목이 장종료 되었을때
+					entry = " ";			//예상가가 0이 올때랑 같은 상황임.
+				else
+				{
+					bZisu = TRUE;
+					entry.Format("%s", alertR->ptr[23].get()); //2013.08.22 지수예상가는111심볼이 없고 구분값이X로 온다.
+				}
+
+				if (entry != "0" && entry != "-0" && entry != "0.00" && entry != "+0" && entry != " 0" && entry != " ")
+				{
+					m_grid->SetItemText(xrow, colEXPECT, "1");
+				}
+				else
+				{
+					//2012.05.09 KSJ 예상가가 0이 올때는 현재가를 뿌려준다.
+					m_mapCurValue.Lookup(strCode, strData);
+					m_grid->SetItemText(xrow, colEXPECT, "0");	//예상가 취소
+					return;
+				}
+
+				//현재 예상버튼이 안눌러져 있을때, 강제로 심볼을 바꾸어서 그리드에 데이터를 보여주고 있다
+				//(현재가 심볼로 되어있기 때문에 )
+				//그럼 자동 체크 눌러있을때만, 보여주면 되고
+				//자동 체크 해지시엔, 예상가 안보여주면 된다
+				if (!bManual)					//예상 버튼 안눌린 상태
+				{
+					// replace symbol
+					if (bAutoCheck)				// 자동에 체크된 상태
+					{
+						bTransSymbol = TRUE;	//2012.02.09 KSJ 현재가 심볼이 예상가 심볼로 바껴야함.
+					}
+					else
+					{
+						if (!entry.IsEmpty())
+						{
+							m_grid->SetItemText(xrow, colEXPECT, "0");
+						}
+					}
+				}
+				else
+					bTransSymbol = TRUE;	//2012.02.09 KSJ 현재가 심볼이 예상가 심볼로 바껴야함.
+			}
+			else if (DataCheck(alertR->ptr[23].get()))
+			{
+				entry.Format("%s", alertR->ptr[23].get());
+
+
+				if (!bManual)	//예상 버튼 안눌린 상태
+				{
+					if (bAutoCheck)				// 자동에 체크된 상태
+					{
+						strTime.Format("%s", alertR->ptr[34].get());
+
+						if (m_strBeginTime <= strTime && m_strEndTime >= strTime)  //장중
+						{ //8:44:00 ~ 8:59:59
+							if (entry != "0" && entry != "-0" && entry != "0.00" && entry != "+0" && entry != " 0" && entry != " ")
+							{
+								m_grid->SetItemText(xrow, colEXPECT, "1");
+							}
+							else
+							{
+								m_grid->SetItemText(xrow, colEXPECT, "0");		//2012.08.29 KSJ 예상가 취소함. 8:10 ~ 8:30분 사이에 체결이 떨어지면
+								entry = m_grid->GetItemText(xrow, colCURR);
+								return;
+							}
+						}
+						else
+						{
+							m_grid->SetItemText(xrow, colEXPECT, "0");
+						}
+					}
+				}
+				else  //예상버튼이 눌린상태
+				{
+					if (!entry.IsEmpty())
+					{
+						bTransSymbol = TRUE;	//2012.02.09 KSJ 현재가 심볼이 예상가 심볼로 바껴야함.
+
+						if (entry != "0" && entry != "-0" && entry != "0.00" && entry != "+0" && entry != " 0" && entry != " ")
+						{
+
+							m_grid->SetItemText(xrow, colEXPECT, "1");
+						}
+						else
+						{
+							m_grid->SetItemText(xrow, colEXPECT, "0");	//2012.08.23 KSJ 예상가 취소 추가함
+
+							entry = m_grid->GetItemText(xrow, colCURR);
+							return;
+						}
+					}
+				}
+
+				///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				//2012.05.10 KSJ ParseOubs에서 저장한m_mapCurValue의 데이터들은 초기값이므로 2012.08.22 수정
+				//실시간으로 변경된 값을 저장해 주어야한다. 거래량, 체결량 같은..
+				//아래와 같이 예상가가 0이 들어올때만 저장해주면 싱크가 맞지 않을수가 있어서 계속 업데이트 한다.
+				//동시 호가 시간일때만 따로 저장한다.
+				//자동에 체크되어 있을때만 저장한다.
+
+				const int countX = m_gridHdrX.GetSize();
+				_gridHdr gridHdr;
+
+				CString strNewData, strNewTemp;
+				strNewData.Empty();
+
+				for (int jj = col7852; jj < countX; jj++)
+				{
+					gridHdr = m_gridHdrX.GetAt(jj);
+
+					symbol = CString(gridHdr.symbol, strlen(gridHdr.symbol));
+
+					if (symbol.GetLength() >= 3)
+						symbol = symbol.Right(3);
+
+					//2012.11.19 KSJ 데이터가 없으면 탭만 넣는다.
+					//2013.07.01 KSJ 현재가 수정
+					if (atoi(symbol) == 0) // 2014.03.18 KSJ 심볼값에 #이 들어가면 0이되어서 B,F,G이런 값이 들어간다.
+						strNewTemp.Format("\t");
+					else if (DataCheck(alertR->ptr[atoi(symbol)].get()))
+						  strNewTemp.Format("\t%s", alertR->ptr[atoi(symbol)].get());
+					else if (jj == col7852)
+						  strNewTemp.Format("\t%s", alertR->ptr[atoi("023")].get());
+					else if (jj == col7853)
+						   strNewTemp.Format("\t%s", alertR->ptr[atoi("027")].get());
+					else if (jj == col7854)
+						strNewTemp.Format("\t%s", alertR->ptr[atoi("024")].get());
+					else if (jj == col7855)
+						strNewTemp.Format("\t%s", alertR->ptr[atoi("033")].get());
+					else
+						strNewTemp.Format("\t");
+
+					strNewData += strNewTemp;
+				}
+
+				if (m_mapCurValue.Lookup(strCode, strData))
+				{
+					int nIndex = 0, nCount = 0;
+					while (nIndex != -1)
+					{
+						nIndex = strData.Find(P_TAB, nIndex + 1);
+
+						nCount++;
+
+						if (nCount == col7852)
+						{
+							strTemp = strData.Left(nIndex);
+							strData = strTemp + strNewData;
+							m_mapCurValue.SetAt(strCode, strData);
+							break;
+						}
+					}
+				}
+
+				// KSJ 2012.08.22 수정 끝
+				///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			}
+
+			newEXP = m_grid->GetItemText(xrow, colEXPECT);
+			const BOOL	bForceDraw = (newEXP == oldEXP) ? FALSE : TRUE;
+			BOOL	bExpect = (BOOL)atoi(m_grid->GetItemText(xrow, colEXPECT));	// 위에서 설정한 0 이나 1 값 return
+			bool	updatePoss = false;
+			const int countX = m_gridHdrX.GetSize();
+			_gridHdr gridHdr;
+			const LONG ret = 0;
+
+			const COLORREF rtmColor = ((CGroupWnd*)m_pGroupWnd)->GetRTMColor();
+			const int	rtmAction = ((CGroupWnd*)m_pGroupWnd)->GetRtmAction();
+			const BOOL	bBold = ((CGroupWnd*)m_pGroupWnd)->GetCurrBold();
+
+			//2012.11.08 KSJ 주식과 선물옵션의 심볼값이 똑같은 것이 있다. 외인소진률 같은것.
+			bool bKospi = true;
+			if (strCode.GetLength() == 6)
+				bKospi = true;
+			else
+				bKospi = false;
+			//KSJ
+
+			for (int ii = 2; ii < countX; ii++)
+			{
+				gridHdr = m_gridHdrX.GetAt(ii);
+
+				symbol = CString(gridHdr.symbol, strlen(gridHdr.symbol));
+
+
+				if (symbol.GetLength() >= 3)
+					symbol = symbol.Right(3);
+
+				if (/*data[atoi(symbol)] &&*/ !bTransSymbol)	//2013.07.08 예상체크되어 있을때 밑에 타도록
+				{
+					//2012.03.16 KSJ 예상가, 거래량 빠져있어서 추가함..
+					if (!symbol.Compare("111"))		//예상가
+						entry.Format("%s", alertR->ptr[23].get());
+					else if (!symbol.Compare("112"))	//예상거래량
+						entry.Format("%s", alertR->ptr[27].get());
+					else if (!symbol.Compare("115"))	//예상전일대비
+						entry.Format("%s", alertR->ptr[24].get());
+					else if (!symbol.Compare("116"))	//예상등락률
+						entry.Format("%s", alertR->ptr[33].get());
+					else if (!bKospi && !symbol.Compare("204"))// 2012.11.08 KSJ 외인소진률
+						entry = " ";
+					else if (atof(symbol) == 0)	//2014.03.18 KSJ 심볼값에 #이 들어가면 0이됨
+						entry = " ";
+					else
+						entry.Format("%s", alertR->ptr[atoi(symbol)].get());
+				}
+				else if (DataCheck(alertR->ptr[atoi(symbol)].get()) && bZisu)	//2013.08.27 KSJ 지수일때는 심볼과 인덱스가 일치함.
+				{
+					entry.Format("%s", alertR->ptr[atoi(symbol)].get());
+				}
+				else if (bTransSymbol)
+				{
+					//2012.03.16 KSJ 예상가, 거래량 빠져있어서 추가함..
+					if (!symbol.Compare("023"))		//예상가
+						entry.Format("%s", alertR->ptr[111].get()); //현재가
+					else if (!symbol.Compare("027"))	//예상거래량
+						entry.Format("%s", alertR->ptr[112].get()); //거래량
+					else if (!symbol.Compare("024"))	//예상전일대비
+						entry.Format("%s", alertR->ptr[115].get()); //전일대비
+					else if (!symbol.Compare("033"))	//예상등락률
+						entry.Format("%s", alertR->ptr[116].get()); //등락률
+					else if (!bKospi && !symbol.Compare("204"))// 2012.11.08 KSJ 외인소진률
+						entry = " ";
+					else if (atof(symbol) == 0)	//2014.03.18 KSJ 심볼값에 #이 들어가면 0이됨
+						entry = " ";
+					else
+						entry.Format("%s", alertR->ptr[atoi(symbol)].get());
+				}
+				else
+					continue;
+
+				if (!bForceDraw && IH::TOf(entry) == IH::TOf(m_grid->GetItemText(xrow, ii)))
+					continue;
+
+				if (entry.Find("null") >= 0)
+				{
+					m_slog.Format("\r\n[cx_interest][RTS_parsingAlert] entry is null =[%s][%d]", symbol, ii);
+					OutputDebugString(m_slog);
+					continue;
+				}
+					
+
+				if (!(gridHdr.attr & GVAT_HIDDEN) && !entry.IsEmpty())
+				{
+					if ((strcmp("2029", gridHdr.symbol) == 0) ||
+						(strcmp("2030", gridHdr.symbol) == 0) ||
+						(strcmp("2031", gridHdr.symbol) == 0))
+					{
+						if ((1 == gridHdr.needs) || (3 == gridHdr.needs))
+						{
+							CString strVal = entry;
+							CString strDiff = strVal;
+
+							if (strVal[0] == '+' || strVal[0] == '-')
+							{
+								strDiff = strVal.Mid(1);
+							}
+
+							double dDiffOpen = 0.0;
+							double dPClose{}, dVal{};
+							dVal = atof(strDiff.GetBuffer(0));
+							dPClose = atof((m_grid->GetItemText(xrow, colPCURR)).GetBuffer(0));
+
+							if (dVal != 0 && dPClose != 0)
+							{
+								dDiffOpen = (dVal - dPClose) / dPClose * 100;
+
+								if (1 == gridHdr.needs)
+								{
+									if (0 > dDiffOpen)
+									{
+										entry.Format("%s(%0.2f%c)", strVal, dDiffOpen, P_PER);
+									}
+									else
+									{
+										entry.Format("%s(%0.2f%c)", strVal, dDiffOpen, P_PER);
+									}
+								}
+								else if (3 == gridHdr.needs)
+								{
+									if (0 > dDiffOpen)
+									{
+										entry.Format("%0.2f%c", dDiffOpen, P_PER);
+									}
+									else if (0 == dDiffOpen)
+									{
+										entry.Format(" %0.2f%c", dDiffOpen, P_PER);
+									}
+									else
+									{
+										entry.Format(" +%0.2f%c", dDiffOpen, P_PER);
+									}
+								}
+							}
+						}
+					}
+				}
+
+				if ((ii == colCURR) && bExpect && !m_bExpect)		// 예상버튼이 안눌려져있고, 동시호가때
+				{
+					entry.TrimLeft();
+					entry.TrimRight();
+
+					if ((entry == "0") || (entry == "-0") || (entry == "+0") || (entry == ""))
+					{
+						entry = " ";
+
+						entry = m_grid->GetItemText(xrow, colCURR);
+						return;
+					}
+				}
+
+				CString tempStr;
+
+				if (ii == colCURR)
+				{
+					if (code.Find("K0001") > -1)
+					{
+						m_dKospi = atof(entry);
+						tempStr.Format("%.2f", m_dKospi);
+						m_dKospi = atof(tempStr);
+					}
+					else if (code.Find("KQ001") > -1)
+					{
+						m_dKosdaq = atof(entry);
+						tempStr.Format("%.2f", m_dKosdaq);
+						m_dKosdaq = atof(tempStr);
+					}
+				}
+
+				//2012.03.20 KSJ 현재가 보합될때 대비, 등락률 지워지지 않는 현상 수정
+				if ((strcmp("2115", gridHdr.symbol) == 0) || (strcmp("2024", gridHdr.symbol) == 0)
+					|| (strcmp("2116", gridHdr.symbol) == 0) || (strcmp("2033", gridHdr.symbol) == 0))
+				{
+					entry.TrimLeft(); entry.TrimRight();
+					if (entry == "0" || entry == "-0" || entry == "0.00" || entry == "+0" || entry == " 0" || entry == "30" || entry == ".00" || entry == "+0.00" || entry == "-0.00")	//2012.07.17 KSJ 옵션일때의 경우 추가
+					{
+						bDaebi = TRUE;
+					}
+				}
+				else
+				{
+					//2012.03.22 KSJ 보유수량, 매입단가, 평가손익 등 필드값에 #이 들어가는 것은 atoi에서 0이 나온다.
+					//그래서 entry를 data[0]에서 뽑아오므로 최초 구분값 d,f,b, 이런값들이 들어가 그리드에 뿌려진다.
+					entry.TrimLeft(); entry.TrimRight();
+					if (entry == "0" || entry == "-0" || entry == "0.00" || entry == "+0" || entry == " 0" || entry == ".00" || entry == "+0.00" || entry == "-0.00" || atof(entry) == 0 || atof(symbol) == 0)	//KSJ 2012.07.17 atoi --> atof로 수정
+					{
+						if (entry.GetLength() > 0 && atof(entry.Mid(1)) == 0)	entry = " ";	//2013.09.24 KSJ 스프레드종목은 ++ +- 등 기호가 두자리로 들어오는데 이때는 atof로 값을 구하면 0으로 나온다. 그래서 한자리 자르고 구해봄
+					}
+				}
+
+				CString tmp;
+
+				if (ii == colCURR)
+				{
+					if (entry == "")
+					{
+						entry = m_grid->GetItemText(xrow, colCURR);
+					}
+				}
+
+				CString strPreValue;
+
+				strPreValue = m_grid->GetItemText(xrow, ii);
+				strPreValue.TrimLeft();
+				strPreValue.TrimRight();
+
+				if (ii != colCURR && strPreValue != entry)
+				{
+					entry.TrimLeft();
+					entry.TrimRight();
+
+					if (!entry.IsEmpty())	//2012.03.20 KSJ 현재가 보합될때 대비, 등락률 지워지지 않는 현상 수정
+					{
+						if (bDaebi)
+							entry = "";
+
+						bDaebi = FALSE;
+
+						//2012.02.27 KSJ 그려지는 데이터에 이상있을때는 여기를 체크해야함
+						m_grid->SetItemText(xrow, ii, entry);
+					}
+				}
+				else if (ii == colCURR)
+				{
+					//2013.08.23 KSJ 스프레드종목이면 보합+, 하락+, 상승- 등 색과 기호를 표시해줘야한다.
+					if (strCode.GetLength() == 8 && strCode.GetAt(0) == '4')
+					{
+						if (entry.GetAt(0) == ' ')	//처음이 빈칸이면 보합에 -, + 표시가 있는 것이다.
+							entry.Replace(" ", "　");	//그때는 '　' ㄱ 한자 1번 을 넣어준다. 스페이스 아님..
+						else if (entry.GetAt(0) == '0')
+						{
+							entry.Delete(0);
+							entry.Insert(0, "　");
+						}
+					}
+					//2013.08.23 KSJ END
+
+					m_grid->SetItemText(xrow, ii, entry);
+				}
+
+				//전일거래대비율 실시간 계산
+				CString str2027, str2403;
+
+				if (ii == colCURR)
+				{
+					if (!bExpect && m_bongField >= 0)
+					{
+						CString	bongdata = _T(""), open = _T(""), high = _T(""), low = _T("");
+
+						if (DataCheck(alertR->ptr[29].get()))
+						{
+							open.Format("%s", alertR->ptr[29].get());
+							m_grid->SetItemText(xrow, colOPEN, open);
+						}
+
+						if (DataCheck(alertR->ptr[30].get()))
+						{
+							high.Format("%s", alertR->ptr[30].get());
+							high.Remove('+'), high.Remove('-');
+
+							if (DataCheck(alertR->ptr[31].get()))
+							{
+								low.Format("%s", alertR->ptr[31].get());
+								low.Remove('+'), low.Remove('-');
+								bongdata.Format("%s%c%s", high, P_TAB, low);
+								m_grid->SetItemText(xrow, m_bongField, bongdata);
+							}
+						}
+					}
+
+					if (m_posField && !bExpect)
+					{
+						updatePoss = true;
+					}
+				}
+
+				CString cheg;
+				if (m_EqualizerField >= 0 && DataCheck(alertR->ptr[32].get()))
+				{
+					cheg.Format("%s", alertR->ptr[32].get());
+					m_grid->SetItemText(xrow, m_EqualizerField, cheg);
+				}
+
+				entry.Empty();	//2012.02.20 KSJ 초기화
+			}//for 문 끝
+
+			BOOL bRealData = TRUE;
+			CString strTemp;
+			int  nTemp = 0;
+
+			// ADD PSH 20070912
+			if (m_tkConfig.m_bApply)
+			{
+				bRealData = FALSE;
+
+				nTemp = m_grid->GetItemData(xrow, colRATE);
+
+				if ((m_tkConfig.m_ulimit) && (nTemp == 1))
+				{
+					bRealData = TRUE;
+				}
+
+				if ((m_tkConfig.m_up) && (nTemp == 2))
+				{
+					bRealData = TRUE;
+				}
+
+				if ((m_tkConfig.m_flat) && (nTemp == 3))
+				{
+					bRealData = TRUE;
+				}
+
+				if ((m_tkConfig.m_dlimit) && (nTemp == 4))
+				{
+					bRealData = TRUE;
+				}
+
+				if ((m_tkConfig.m_down) && (nTemp == 5))
+				{
+					bRealData = TRUE;
+				}
+
+				if (bRealData)
+				{
+					strTemp = m_grid->GetItemText(xrow, colTVOL);
+					nTemp = atoi(strTemp.GetBuffer(0));
+
+					if (0 > nTemp) nTemp = -nTemp;
+
+					if (nTemp >= m_tkConfig.m_vol * 1000)
+					{
+						bRealData = TRUE;
+					}
+					else
+					{
+						bRealData = FALSE;
+					}
+
+					if (bRealData || !m_tkConfig.m_and)
+					{
+						if (m_tkConfig.m_and)
+						{
+							strTemp = m_grid->GetItemText(xrow, colCURR);
+							nTemp = nTemp * atoi(strTemp.GetBuffer(0));
+
+							if (nTemp < 0) nTemp = -nTemp;
+
+							if (nTemp >= m_tkConfig.m_amt * 10000000)
+							{
+								bRealData = TRUE;
+							}
+							else
+							{
+								bRealData = FALSE;
+							}
+						}
+
+						if (bRealData)
+						{
+							if (m_tkConfig.m_price)
+							{
+								strTemp = m_grid->GetItemText(xrow, colCURR);
+								nTemp = atoi(strTemp.GetBuffer(0));
+
+								if (0 > nTemp) nTemp = -nTemp;
+
+								if ((nTemp >= m_tkConfig.m_sprc) && (nTemp <= m_tkConfig.m_eprc))
+								{
+									bRealData = TRUE;
+								}
+								else
+								{
+									bRealData = FALSE;
+								}
+							}
+						}
+					}
+				}
+			}//if문 끝
+
+			if (m_ccField)
+				calcInClient(xrow);
+
+			if ((bRealData && bTicker) || m_posField)
+			{
+				for (int jj = 0; jj < m_gridHdrX.GetSize(); jj++)
+				{
+					if (m_posField)
+					{
+						double	dval1{}, dval2{}, dval3{};
+						CString	str;
+						dval1 = dval2 = dval3 = 0.0;
+						CString futurnGubn, mCode, strCurr;
+						int sizeCode{};
+
+						const _gridHdr gridHdr = m_gridHdrX.GetAt(jj);
+						if (gridHdr.needs != 9)
+							continue;
+
+						auto& pinters = m_inters.at(xrow - 1);
+
+						mCode = pinters->code;
+						mCode.Trim();
+						sizeCode = mCode.GetLength();;
+
+						if (bExpect == FALSE)		// 장중
+						{
+							switch (gridHdr.symbol[3])
+							{
+							case '3':		// 평가손익
+								dval1 = atof(pinters->xnum);
+								dval2 = atof(pinters->xprc);
+								dval3 = IH::TOfabs(m_grid->GetItemText(xrow, colCURR));
+
+								if (dval1 <= 0 || dval2 <= 0) continue;
+
+								if (sizeCode == 6 || sizeCode == 9)
+								{
+									entry = CalcuPyungaSonik(pinters.get(), m_grid->GetItemText(xrow, colCURR));
+								}
+								else
+								{
+									futurnGubn = CString(pinters->futureGubn, sizeof(pinters->futureGubn));
+									entry = CalFutureEvalPrice(pinters.get(), code, futurnGubn, dval3, dval2, dval1);
+								}
+
+								break;
+
+							case '4':		// 수익율
+								dval1 = atof(pinters->xnum);
+								dval2 = atof(pinters->xprc);
+								dval3 = IH::TOfabs(m_grid->GetItemText(xrow, colCURR));
+
+								if (dval1 <= 0 || dval2 <= 0) continue;
+
+								if (sizeCode == 6 || sizeCode == 9)
+								{
+									entry = CalcuSuik(pinters.get(), m_grid->GetItemText(xrow, colCURR));
+								}
+								else
+								{
+									futurnGubn = CString(pinters->futureGubn, sizeof(pinters->futureGubn));
+									entry = CalFutureEvalRate(pinters.get(), code, futurnGubn, dval3, dval2, dval1);
+								}
+
+								break;
+
+							default:
+								continue;
+							}
+							m_grid->SetItemText(xrow, jj, entry);
+
+						}
+						else		//동시호가 시간
+						{
+							if (bAutoCheck)
+							{
+								//int ii = 0;
+								switch (gridHdr.symbol[3])
+								{
+								case '3':		// 평가손익
+
+									dval1 = atof(pinters->xnum);
+									dval2 = atof(pinters->xprc);
+
+									if (dval1 <= 0 || dval2 <= 0) continue;
+
+									if (sizeCode == 6 || sizeCode == 9)
+									{
+										entry = CalcuPyungaSonik(pinters.get(), strCurr);
+									}
+									else
+									{
+										futurnGubn = CString(pinters->futureGubn, sizeof(pinters->futureGubn));
+										entry = CalFutureEvalPrice(pinters.get(), code, futurnGubn, dval3, dval2, dval1);
+									}
+
+									break;
+
+								case '4':		// 수익율
+									dval1 = atof(pinters->xnum);
+									dval2 = atof(pinters->xprc);
+
+									if (dval1 <= 0 || dval2 <= 0) continue;
+
+									if (sizeCode == 6 || sizeCode == 9)
+									{
+										entry = CalcuSuik(pinters.get(), strCurr);
+									}
+									else
+									{
+										futurnGubn = CString(pinters->futureGubn, sizeof(pinters->futureGubn));
+										entry = CalFutureEvalRate(pinters.get(), code, futurnGubn, dval3, dval2, dval1);
+									}
+
+									break;
+								default:
+									continue;
+								}
+
+								m_grid->SetItemText(xrow, jj, entry);
+
+								entry.Empty();	//2012.02.20 KSJ 초기화
+							}
+						}
+					}
+				}
+			}
+
+			//2012.06.20 KSJ 배분, 임의 추가
+			if (DataCheck(alertR->ptr[950].get()))
+			{
+				str950.Format("%s", alertR->ptr[950].get());
+
+				if (!str950.IsEmpty() /*&& str950.GetAt(0) != '0'*/)
+				{
+					if (str950.GetAt(0) == '1')
+					{
+						m_grid->SetItemData(xrow, colINFO, 12);
+					}
+					else
+					{
+						entry = m_grid->GetItemText(xrow, colINFO);	// 종목특이사항
+						CString strName = m_grid->GetItemText(xrow, colNAME);
+
+						SetColInfo(strName, xrow, entry);
+					}
+				}
+				m_grid->Invalidate(FALSE);
+			}
+
+			if (DataCheck(alertR->ptr[951].get()))
+			{
+				str951.Format("%s", alertR->ptr[951].get());
+
+				if (!str951.IsEmpty() /*&& str951.GetAt(0) != '0'*/)
+				{
+					if (str951 == "12" || str951 == "14" || str951 == "16")
+					{
+						m_grid->SetItemData(xrow, colINFO, 13);
+					}
+					else
+					{
+						entry = m_grid->GetItemText(xrow, colINFO);	// 종목특이사항
+						CString strName = m_grid->GetItemText(xrow, colNAME);
+
+						SetColInfo(strName, xrow, entry);
+					}
+				}
+				m_grid->Invalidate(FALSE);
+			}
+			//KSJ
+		}
+	}
+}
+
 void CGridWnd::parsingAlertx(LPARAM lParam)
 {
 	int xrow{};
@@ -6604,7 +7503,8 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 		//호가일때는 alertR->size -1의 값을 한번만 세팅해주면 된다.
 		if(data[0])
 		{
-			strGubn = (char*)data[0]; strGubn.TrimLeft(); strGubn.TrimRight();
+			strGubn = (char*)data[0]; 
+			strGubn.TrimLeft(); strGubn.TrimRight();
 
 
 			//우선호가, 호가잔량, 시간외호가, 시간외단일가매매 우선호가,
@@ -6767,7 +7667,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 						strTime = (char*)data[34];
 
 						if (m_strBeginTime <= strTime && m_strEndTime >= strTime)
-						{
+						{ //현재가(23)가 있는데 동시호가 시간
 							if(entry != "0" && entry != "-0" && entry != "0.00" && entry != "+0" && entry != " 0" && entry != " ")
 							{
 								m_grid->SetItemText(xrow, colEXPECT, "1");
@@ -7811,7 +8711,8 @@ CString CGridWnd::FindTitle(UINT kind)
 
 void CGridWnd::RecvRTSx(LPARAM lParam)
 {
-	parsingAlertx(lParam);
+	//parsingAlertx(lParam);//check
+	RTS_parsingAlertx(lParam);
 }
 
 void CGridWnd::OnTimer(UINT nIDEvent)
@@ -8551,7 +9452,44 @@ void CGridWnd::parsingNews(CString datB)
 void CGridWnd::parsingNewsx(DWORD* data)
 {
 	CString	code = _T(""), szTitle = _T(""), szKey = _T("");
+	//struct _Ralert* alertR;
+	//alertR = (struct _Ralert*)data;
+	////(char*)alertR->ptr[0].get();
 
+	//if (alertR->ptr[15].get())
+	//	szTitle.Format("%s", alertR->ptr[15].get()); szTitle.Trim();
+
+	//if (alertR->ptr[301].get())
+	//	code.Format("%s", alertR->ptr[301].get()); code.Trim();
+
+	//if (alertR->ptr[16].get())
+	//	szKey.Format("%s", alertR->ptr[16].get()); szKey.Trim();
+
+	//code.TrimLeft(); code.TrimRight();
+
+	//if (!code.IsEmpty())
+	//{
+	//	const int	ncnt = m_arExist.GetCount();
+	//	int	nIndex = 0;
+
+	//	nIndex = atoi(m_arExist.GetData("A" + code));
+	//	if (GetInter(code) > -1)
+	//	{
+	//		//2012.03.20 KSJ 뉴스나오지 않는 현상 수정함..
+	//		CString str;
+	//		str.Format("015\t%s\n016\t%s\n1301\t%s", szTitle, szKey, code);
+
+	//		newsFms.SetAt(code, str);
+	//		// KSJ
+
+	//		const LPARAM	lParam = m_grid->GetItemData(nIndex + 1, colSIG);
+	//		const WORD	low = LOWORD(lParam);
+	//		const WORD	high = 1;
+	//		m_grid->SetItemData(nIndex + 1, colSIG, MAKELPARAM(low, high));
+	//		if (m_bWaveApply) PlayWave();
+	//	}
+	//}
+	
 	if(data[15])
 		szTitle = (char*)data[15];
 
@@ -8585,6 +9523,7 @@ void CGridWnd::parsingNewsx(DWORD* data)
 			if (m_bWaveApply) PlayWave();
 		}
 	}
+	
 }
 
 //2012.01.19 KSJ Alertx 추가 끝
@@ -9216,3 +10155,70 @@ writelog(m_slog);
 		if (ii > 10) break;
 	}
 }
+
+void CGridWnd::initRSymbol()
+{
+	_mRsymbol.clear();
+	_mRsymbol.emplace(std::make_pair(0, 0));
+	_mRsymbol.emplace(std::make_pair(950, 950));
+	_mRsymbol.emplace(std::make_pair(951, 951));
+	_mRsymbol.emplace(std::make_pair(32, 32));
+	_mRsymbol.emplace(std::make_pair(31, 31));
+	_mRsymbol.emplace(std::make_pair(30, 30));
+	_mRsymbol.emplace(std::make_pair(29, 29));
+	_mRsymbol.emplace(std::make_pair(27, 27));
+	_mRsymbol.emplace(std::make_pair(23, 23));
+	_mRsymbol.emplace(std::make_pair(24, 24));
+	_mRsymbol.emplace(std::make_pair(111, 111));
+	_mRsymbol.emplace(std::make_pair(112, 112));
+	_mRsymbol.emplace(std::make_pair(115, 115));
+	_mRsymbol.emplace(std::make_pair(116, 116));
+	_mRsymbol.emplace(std::make_pair(33, 33));
+	_mRsymbol.emplace(std::make_pair(34, 34));
+	_mRsymbol.emplace(std::make_pair(40, 40));
+	_mRsymbol.emplace(std::make_pair(734, 734));
+	_mRsymbol.emplace(std::make_pair(740, 740));
+	_mRsymbol.emplace(std::make_pair(15, 15));
+	_mRsymbol.emplace(std::make_pair(301, 301));
+	_mRsymbol.emplace(std::make_pair(90, 90));
+	_mRsymbol.emplace(std::make_pair(16, 16));
+	const int countX = m_gridHdrX.GetSize();
+	//for (int jj = col7852; jj < countX; jj++)
+	for (int jj = 0; jj < countX; jj++)
+	{
+		const _gridHdr gridHdr = m_gridHdrX.GetAt(jj);
+		CString sSymbol = CString(gridHdr.symbol, strlen(gridHdr.symbol));
+
+		//외인소진율은 실시간이 아니다.
+		if (sSymbol.CompareNoCase("2204") == 0 || sSymbol.IsEmpty())
+			continue;
+
+		CString slog;
+		slog.Format("\r\n------ [%s] ---", sSymbol);
+		OutputDebugString(slog);
+
+		sSymbol = sSymbol.Right(3);
+		const int symbol = atoi(sSymbol);
+		if (symbol > 0)
+			_mRsymbol.emplace(std::make_pair(symbol, symbol));
+
+	
+	}
+	CString slog;
+	for (const auto& pair : _mRsymbol)
+	{
+		slog.Format("\r\n [%d][%d]", pair.first, pair.second);
+		OutputDebugString(slog);
+	}
+}
+
+/*
+for_each(_mRealtime.begin(), _mRealtime.end(), [&](auto code) {
+			const auto& it = _mapRealData.find(code.first);
+				if (it != _mapRealData.end())
+				{
+					m_pGroupWnd->RecvRTSx((LPARAM)it->second.get());
+					_mapRealData.erase(code.first);
+				}
+			});
+*/

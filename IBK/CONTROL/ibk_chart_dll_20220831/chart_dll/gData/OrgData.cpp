@@ -469,21 +469,30 @@ bool COrgData::AttachGraphData(int iCount, int iDummy, char* pcData, int& riData
 		m_iCdd = m_iRdd;
 	}
 
-	/*if (strlen(pcCurDate) >= 12)
-	{
-		m_iShh = short(CharToInt(&pcCurDate[8], 2));
-		m_iSmm = unsigned char(CharToInt(&pcCurDate[10], 2));  //fix
-	}*/
-	if (strlen(pcCurDate) >= 4)  //fix weekly
-	{
-		m_iShh = short(CharToInt(&pcCurDate[0], 2));   //fix
-		m_iSmm = unsigned char(CharToInt(&pcCurDate[2], 2));
-	}
-	else
+	CString stmp, strhour, strmin;
+	stmp.Format("%s", pcCurDate);
+	stmp.Trim();
+	strhour = stmp.Right(4);
+	strhour = strhour.Left(2);
+	strmin = stmp.Right(2);
+	m_iShh = atoi(strhour);
+	m_iSmm = atoi(strmin);
+
+	//if (strlen(pcCurDate) >= 12)
+	//{
+	//	m_iShh = short(CharToInt(&pcCurDate[8], 2));
+	//	m_iSmm = unsigned char(CharToInt(&pcCurDate[10], 2));  //fix
+	//}
+	//if (strlen(pcCurDate) >= 4)  //fix weekly
+	//{
+	//	m_iShh = short(CharToInt(&pcCurDate[0], 2));   //fix
+	//	m_iSmm = unsigned char(CharToInt(&pcCurDate[2], 2));
+	//}
+	/*else
 	{
 		m_iShh = 9;
 		m_iSmm = 0;
-	}
+	}*/
 
 	strtmp.Format("start H=[%d]start M=[%d] pcCurDate=[%s]", m_iShh, m_iSmm, pcCurDate);
 	LOG_OUTP(3, "gData", __FUNCTION__, strtmp);
@@ -1389,6 +1398,21 @@ int COrgData::GetToken(char *pData, char *token)
 void COrgData::SetTime(int min, int cHH, int cMM, int cSS, unsigned char &nHH, unsigned char &nMM, unsigned char &nSS)
 {
 	CString strtmp;
+	if (cHH == m_iShh && cMM == m_iSmm && cMM == 0) //check 
+	{
+		nHH = 8;
+		nMM = 45;
+		nSS = 0;
+
+		strtmp.Format("장시작 시간 들어왔다  cHH=[%d] cMM=[%d] cSS=[%d]  nHH=[%c] nMM=[%c] nSS=[%c] ",
+			cHH, cMM, cSS, nHH, nMM, nSS);
+		LOG_OUTP(3, "gData", __FUNCTION__, strtmp);
+
+
+		return;
+	}
+
+	
 	int	gap = (cHH - m_iShh)*60 + (cMM - m_iSmm);
 	if (min > 900)	// 30초봉
 	{

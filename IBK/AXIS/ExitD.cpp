@@ -90,9 +90,33 @@ BOOL CExitD::OnInitDialog()
 	if(m_bUseNewLogin)
 	{
 		if (Axis::isCustomer)
-			m_bitmap = Axis::GetBitmap("NEW_LOGOUT_BG_BAGIC");
+			m_bitmap = Axis::GetBitmap("NEW_LOGOUT_BG_BAGIC_CLOUDE");
 		else
-			m_bitmap = Axis::GetBitmap("NEW_STAFF_LOGOUT_BG_BAGIC");
+			m_bitmap = Axis::GetBitmap("NEW_STAFF_LOGOUT_BG_BAGIC_CLOUDE");
+		//test
+		/*
+		HBITMAP hBitmap;
+		CString bmpName, fileName;
+		bmpName = "NEW_LOGOUT_BG_BAGIC"; 
+		CString path(bmpName);
+		path.MakeUpper();
+		if (path.Find(".BMP") < 0)
+			fileName.Format("%s\\image\\%s.bmp", Axis::home, bmpName);
+		else
+			fileName = path;
+
+		hBitmap = (HBITMAP)::LoadImage(AfxGetInstanceHandle(), fileName,
+			IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+		if (hBitmap)
+		{
+			//TRACE("Loaded File Bitmap NAME = %s\n", bmpName);
+			TRACE("SUCCESS !!!!! = %s\n", bmpName);
+			CBitmap* bmp = new CBitmap;
+			bmp->Attach(hBitmap);
+			m_bitmap = bmp;
+		}
+		//test
+		*/
 	}
 	else
 	{
@@ -128,7 +152,7 @@ BOOL CExitD::OnInitDialog()
 		{
 			m_shapeButtons[i] = CreateShapeButton(IDC_SHAPE1 + i, Format("NEW_LINK_%02d", i + 1),
 				CRect(shapePosition[i].x, shapePosition[i].y, 0, 0));
-			m_shapeButtons[i]->ShowWindow(SW_HIDE);
+			m_shapeButtons[i]->ShowWindow(SW_HIDE);   //cloude HTS종료 DLG화면 내부 버튼 삭제
 		}
 		
 		m_shapeButtons[MAX_SHAPE_EX -2] = CreateShapeButton(IDC_SHAPE1 + MAX_SHAPE_EX -2, Format("NEW_LINK_%02d", MAX_SHAPE_EX -1),
@@ -173,16 +197,16 @@ BOOL CExitD::OnInitDialog()
 	ASSERT(m_btnOK && m_btnCancel);
 
 	if(m_bUseNewLogin)
-	{																	
-		m_btnOK->SetWindowPos(NULL,  338, 276, 259, 39, SWP_NOSIZE | SWP_NOZORDER);
-		m_btnCancel->SetWindowPos(NULL, 603, 276,  56, 39, SWP_NOSIZE | SWP_NOZORDER);
+	{
+		m_btnOK->SetWindowPos(NULL, 338, 276, 259, 39, SWP_NOSIZE | SWP_NOZORDER);
+		m_btnCancel->SetWindowPos(NULL, 603, 276, 56, 39, SWP_NOSIZE | SWP_NOZORDER);
 	}
 	else
 	{
 		m_btnOK->SetWindowPos(NULL,  228, 248, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 		m_btnCancel->SetWindowPos(NULL, 329, 248, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 	}
-	//m_btnCancel->ShowWindow(SW_HIDE);
+
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE

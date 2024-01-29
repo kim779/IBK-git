@@ -136,7 +136,6 @@ void CStgInfo::DrawInfo(CDC* pDC)
 		dcMem.CreateCompatibleDC(pDC);
 
 		CBitmap* pbitmapOld= dcMem.SelectObject(m_pBitmap.get());
-
 		pDC->BitBlt(0, 0 - m_Scroll, IMG_WIDTH, IMG_HEIGHT, &dcMem, 0, 0, SRCCOPY);
 
 		dcMem.SelectObject(pbitmapOld);
@@ -229,6 +228,12 @@ BOOL CStgInfo::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	const double pos = ((double)(IMG_HEIGHT - m_rect.Height()) / (double)IMG_HEIGHT) * nBar;
 	m_Scroll = (int)pos;
 	Invalidate();
+
+	//tests
+	CString sdata;
+	sdata.Format("\r\n nBar=[%d] m_Scroll=[%f]", nBar, pos);
+	OutputDebugString(sdata);
+	//teste
 	
 	return CWnd::OnMouseWheel(nFlags, zDelta, pt);
 }

@@ -25,8 +25,6 @@
 #include <future>
 #include <thread>
 
-#include "../../IBK/H/axislog.h"
-
 #ifdef _DEBUG
 #undef THIS_FILE
 static char THIS_FILE[]=__FILE__;
@@ -228,7 +226,6 @@ int CGuard::Initial(CWnd* control)
 	m_certify = new CWnd();
 	if (!m_certify->CreateControl(_T("AxisCertify.CertifyCtrl.IBK2019"), NULL, 0, CRect(0, 0, 0, 0), control, 0))
 	{
-		int iret = GetLastError();
 		delete m_certify;
 		m_certify = NULL;
 	}
@@ -1474,6 +1471,23 @@ void CGuard::Sign(int signK, char* signB, int signL, CString& dns, bool shop)
 	CString	user, text = _T(""), string;
 	struct _signR*	signR;
 
+	/*CString strresult;
+	CString stmp;
+	char ctemp[sizeof(struct _signR) + 1]{};
+	memcpy(ctemp, signB, sizeof(struct _signR));
+	for (int ii = 0; ii < sizeof(struct _signR); ii++)
+	{
+		if (ctemp[ii] == 0)
+			stmp = "0";
+		else if (ctemp[ii] == 1)
+			stmp = "1";
+		else if (ctemp[ii] == 20)
+			stmp = " ";
+		else
+			stmp.Format("%s", (char*)&ctemp[ii]);
+		strresult += stmp;
+	}*/
+
 	signR = (struct _signR*) signB;
 	if (!dns.IsEmpty())
 		m_user.Empty();
@@ -1482,8 +1496,11 @@ void CGuard::Sign(int signK, char* signB, int signL, CString& dns, bool shop)
 		m_absS = signR->absS;
 
 	int	idx;
-	switch (signR->mask & maskSEC)
-	{
+	switch (signR->mask & maskSEC)  
+	{//먼가 서버랑 규칙을 맞추는거 같다.
+	 //or  ,  and,  xor 셋중에 하나 하기로 서버가 정해준걸 구분자로 받고
+	//실제 incS 값을 정해진 구분자로 비트 연산한다.
+	//배열의 인자 1, 0 값을 비트연산해서 넣어둔다.
 	case maskOR:
 		for (idx = 0; idx < sizeof(signR->incS); idx++)
 		{
@@ -2698,15 +2715,8 @@ void CGuard::OnProcedure(CString proc, CString param, CString maps, int major, i
 		for (POSITION pos = m_clients.GetStartPosition(); pos; )
 		{
 			m_clients.GetNextAssoc(pos, major, works);
-			
 			if (maps.IsEmpty() || !works->m_mapN.CompareNoCase(maps))
-			{
 				works->OnProcedure(proc, param);
-			}
-			else
-			{
-			
-			}
 		}
 	}
 }
@@ -4936,10 +4946,6 @@ bool CGuard::Modal(int kind, CString keys, CString& currents, CString defs)
 
 CCmdTarget* CGuard::GetLedger(void* mapH)
 {
-	struct	_mapH* pmapH;
-	pmapH = (struct _mapH*)mapH;
-	m_slog.Format("trx=[%s] trxC=[%s] mapN=[%s]", pmapH->trxH, pmapH->trxC, pmapH->mapN);
-	LOG_OUTP(3, "CGuard", __FUNCTION__, m_slog);
 	if (axLedger)
 		return (CCmdTarget *)axLedger(mapH);
 	return NULL;
@@ -4950,8 +4956,6 @@ CString CGuard::GetLedger(CCmdTarget* ledger, int pos, int length)
 	if (axGetLedger)
 	{
 		char*	ptr = (char *)axGetLedger((void *)ledger, pos, length);
-		m_slog.Format("[axGetLedger]  pos=[%d] length=[%d] ptr=[%s]", pos, length, ptr);
-		LOG_OUTP(3, "CGuard", __FUNCTION__, m_slog);
 		if (ptr)
 			return CString(ptr);
 	}
@@ -4963,8 +4967,6 @@ CString CGuard::GetLedger(CCmdTarget* ledger, int id)
 	if (axGetLedgerEx)
 	{
 		char*	ptr = (char *)axGetLedgerEx((void *)ledger, id);
-		m_slog.Format("[axGetLedgerEx] id=[%d] ptr=[%s]", id, ptr);
-		LOG_OUTP(3, "CGuard", __FUNCTION__, m_slog);
 		if (ptr)
 			return CString(ptr);
 	}
@@ -4976,8 +4978,6 @@ CString CGuard::GetLedger(CCmdTarget* ledger, char* data, int id)
 	if (axGetLedgerData)
 	{
 		char*	ptr = (char *)axGetLedgerData((void *)ledger, (void *)data, id);
-		m_slog.Format("[axGetLedgerData] id=[%d] ptr=[%s]", id, ptr);
-		LOG_OUTP(3, "CGuard", __FUNCTION__, m_slog);
 		if (ptr)
 			return CString(ptr);
 	}
@@ -4987,31 +4987,19 @@ CString CGuard::GetLedger(CCmdTarget* ledger, char* data, int id)
 void CGuard::SetLedger(CCmdTarget* ledger, int pos, int length, char* data)
 {
 	if (axSetLedger)
-	{
-	//	m_slog.Format("[SetLedger] pos=[%d] length=[%d] data=[%s]", pos, length, data);
-	//	LOG_OUTP(3, "CGuard", __FUNCTION__, m_slog);
-		axSetLedger((void*)ledger, pos, length, data);
-	}
+		axSetLedger((void *)ledger, pos, length, data);
 }
 
 void CGuard::SetLedger(CCmdTarget* ledger, CString data)
 {
 	if (axLedgerEx)
-	{
-		m_slog.Format("[SetLedger] data=[%s]", data);
-		LOG_OUTP(3, "CGuard", __FUNCTION__, m_slog);
-		axLedgerEx(ledger, (void*)data.operator LPCTSTR());
-	}
+		axLedgerEx(ledger, (void *)data.operator LPCTSTR());
 }
 
 void CGuard::Ledger(char* ledger)
 {
 	if (axLoginLedger)
-	{
-		m_slog.Format("[Ledger] ledger=[%s]", ledger);
-		LOG_OUTP(3, "CGuard", __FUNCTION__, m_slog);
-		axLoginLedger((void*)ledger);
-	}
+		axLoginLedger((void *)ledger);
 }
 
 CString CGuard::GetLoginData(int id)
@@ -5019,10 +5007,14 @@ CString CGuard::GetLoginData(int id)
 	if (axLoginData)
 	{
 		char*	ptr = (char *)axLoginData(id);
-		m_slog.Format("[axLoginData] ptr=[%s]", ptr);
-		LOG_OUTP(3, "CGuard", __FUNCTION__, m_slog);
-		if (ptr)
-			return CString(ptr);
+		CString stmp;
+		stmp.Format("%s", ptr);
+	//	AfxMessageBox(stmp);
+		stmp.TrimRight();
+		if (!stmp.IsEmpty())
+			return stmp;
+	//	if (ptr)
+	//		return CString(ptr);
 	}
 	return _T("");
 }
@@ -6046,18 +6038,6 @@ char* CGuard::strtokx(char* str, const char delim, char** start)
 
 	*start = save;
 	return sbegin;
-}
-
-long CGuard::CertifyCloude(int igubn)
-{
-	if (!m_certify)
-		return -1;
-
-	long	retv, outL;
-	m_certify->InvokeHelper(DI_CLOUD, DISPATCH_METHOD, VT_I4, (void*)&retv,
-		(BYTE*)(VTS_I4 ), igubn);
-
-	return retv;
 }
 
 long CGuard::CertifyFull(CString srcB, int srcL, char* desB, int& desL)

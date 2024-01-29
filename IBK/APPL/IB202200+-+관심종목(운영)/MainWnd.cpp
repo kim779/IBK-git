@@ -95,32 +95,76 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
-
+	m_bBookFileProcess =  CheckBookFileProcess();  //test mod
 	SetTimer(8787, 500, nullptr);
 
+	CheckRTSTimer(true);
+	return 1;
+}
+
+void CMainWnd::CheckRTSTimer(bool bFirst)
+{
 	CString slog;
 	CString userip;
 	m_bcustomer = m_pWnd->SendMessage(WM_USER, MAKEWPARAM(variantDLL, orderCC), 0L);
 	userip = CheckIP();
 	CString filePath;
 	filePath.Format("%s/%s/InterOption.ini", Variant(homeCC), "tab");
-
-	int iTime = 800;
+	
+	int iTime = 800;  
 	if (!m_bcustomer) //직원용
 	{
 		iTime = GetPrivateProfileInt("STAFF", "TIME", 800, filePath);
-		SetTimer(TM_RTSTIME, iTime, nullptr);
-		return 1;
+
+		if (!bFirst)  //관심설정창 닫은후 호출 
+		{
+			if (iTime != m_iTime)  //실시간 데이터 수신 설정률이 변한 경우만 타이머 다시 세팅
+			{
+				m_slog.Format("[IB202200][CheckRTSTimer1] KillTimer 직원용 iTime=[%d] m_iTime=[%d]", iTime, m_iTime);
+				OutputDebugString(m_slog);
+				m_iTime = iTime;
+				KillTimer(TM_RTSTIME);
+				_mRealtime.clear();
+				_mapRealData.clear();
+				SetTimer(TM_RTSTIME, m_iTime, nullptr);
+			}
+		}
+		else  //최초 화면 오픈하였을 경우
+		{
+			m_iTime = iTime;
+			SetTimer(TM_RTSTIME, m_iTime, nullptr);
+		}
+		
+		return;
 	}
 
 	//고객용 HTS
 	int icount = 0;
-	iTime  = GetPrivateProfileInt("CUSTOMER", "TIME", 200, filePath);
+	iTime = GetPrivateProfileInt("CUSTOMER", "TIME", 200, filePath);
 	icount = GetPrivateProfileInt("IPLIST", "COUNT", 0, filePath);
 	if (icount == 0)
 	{
-		SetTimer(TM_RTSTIME, iTime, nullptr);
-		return 1;
+		
+		if (!bFirst)  //관심설정창 닫은후 호출 
+		{
+			if (iTime != m_iTime)  //실시간 데이터 수신 설정률이 변한 경우만 타이머 다시 세팅
+			{
+				m_slog.Format("[IB202200][CheckRTSTimer2] KillTimer 고객용 iTime=[%d] m_iTime=[%d]", iTime, m_iTime);
+				OutputDebugString(m_slog);
+				m_iTime = iTime;
+				KillTimer(TM_RTSTIME);
+				_mRealtime.clear();
+				_mapRealData.clear();	
+				SetTimer(TM_RTSTIME, m_iTime, nullptr);
+			}
+		}
+		else  //최초 화면 오픈하였을 경우
+		{
+			m_iTime = iTime;
+			SetTimer(TM_RTSTIME, m_iTime, nullptr);
+		}
+
+		return;
 	}
 	else
 	{
@@ -144,18 +188,49 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			if (binip)
 			{
 				iTime = GetPrivateProfileInt("SCUSTOMER", "TIME", 700, filePath);
-				SetTimer(TM_RTSTIME, iTime, nullptr);
-				// slog.Format("[2022]TIMER 고객용직원IP대역 ip=[%s]  iTime=[%d]", userip, iTime);
-				return 1;
+				if (!bFirst)  //관심설정창 닫은후 호출 
+				{
+					if (iTime != m_iTime)  //실시간 데이터 수신 설정률이 변한 경우만 타이머 다시 세팅
+					{
+						m_slog.Format("[IB202200][CheckRTSTimer3] KillTimer 고객용이지만ip대역이 직원용  iTime=[%d] m_iTime=[%d]", iTime, m_iTime);
+						OutputDebugString(m_slog);
+						m_iTime = iTime;
+						KillTimer(TM_RTSTIME);
+						_mRealtime.clear();
+						_mapRealData.clear();
+						SetTimer(TM_RTSTIME, m_iTime, nullptr);	
+					}
+				}
+				else  //최초 화면 오픈하였을 경우
+				{
+					m_iTime = iTime;
+					SetTimer(TM_RTSTIME, m_iTime, nullptr);
+				}
+				
+				return;
 			}
 		}
 	}
 
-
 	//고객용이지만 IP가 직원용 대역이 아닌경우 (대부분 고객)
-	// slog.Format("[2022]TIMER 고객용일반 ip=[%s] iTime=[%d]", userip, iTime);
-	SetTimer(TM_RTSTIME, iTime, nullptr);
-	return 1;
+	if (!bFirst)  //관심설정창 닫은후 호출 
+	{
+		if (iTime != m_iTime)  //실시간 데이터 수신 설정률이 변한 경우만 타이머 다시 세팅
+		{
+			m_slog.Format("[IB202200][CheckRTSTimer2] KillTimer 고객용 iTime=[%d] m_iTime=[%d]", iTime, m_iTime);
+			OutputDebugString(m_slog);
+			m_iTime = iTime;
+			KillTimer(TM_RTSTIME);
+			_mRealtime.clear();
+			_mapRealData.clear();
+			SetTimer(TM_RTSTIME, m_iTime, nullptr);
+		}
+	}
+	else  //최초 화면 오픈하였을 경우
+	{
+		m_iTime = iTime;
+		SetTimer(TM_RTSTIME, m_iTime, nullptr);
+	}
 }
 
 void CMainWnd::GuideMessage(CString msg)
@@ -599,7 +674,13 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 		OperSize(HIWORD(wParam), CSize(LOWORD(lParam), HIWORD(lParam)));
 		break;
 	case MK_OPENSCR:
-		OpenScreen(HIWORD(wParam), (char *)lParam);
+	{
+		m_slog.Format("[interest][IB202200] -------------------------------------");
+		OutputDebugString(m_slog);
+		m_slog.Format("[interest][IB202200][%s]  MK_OPENSCR m_bProc =[%d]", __FUNCTION__,  m_bProc);
+		OutputDebugString(m_slog);
+		OpenScreen(HIWORD(wParam), (char*)lParam);
+	}
 		break;
 	case MK_SEARCHOPT:
 		ret = SearchOption(HIWORD(wParam), (DWORD)lParam);
@@ -766,6 +847,11 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 		Request_GroupList();
 		break;
 
+	case MK_BOOKMARKPROCESSCHECK:
+	{
+		return m_bBookFileProcess;
+	}
+	break;
 	default:
 		break;
 	}
@@ -901,6 +987,9 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 		if (m_bDestroy)
 			break;
 
+		if (m_strBeginTime.IsEmpty())
+			break;
+
 		m_bAlertx = TRUE;
 		RTS_RecvRTSx(lParam);
 	}
@@ -965,6 +1054,11 @@ void CMainWnd::parsingTrigger(CString datB)
 	strDataB = datB;
 	symbol = IH::Parser(datB, "\t");
 
+	m_slog.Format("[interest][IB202200] -------------------------------------");
+	OutputDebugString(m_slog);
+	m_slog.Format("[interest][IB202200][%s]  symbol=[%s] strDataB=[%s] m_bProc =[%d]", __FUNCTION__, symbol, strDataB, m_bProc);
+	OutputDebugString(m_slog);
+
 	if (symbol == _T("OnPortfolio") && datB == _T("ok"))
 	{
 		if (!m_bProc)
@@ -973,9 +1067,11 @@ void CMainWnd::parsingTrigger(CString datB)
 			if (m_pGroupWnd->IsNewDrop())
 			{
 				m_bProc = false;
+m_slog.Format("[interest][IB202200][%s]  parsingTrigger 인데 먼가 수정된 내용이 있어서 refresh를 하지 않음", __FUNCTION__);
+OutputDebugString(m_slog);
 				return;
 			}
-
+			CheckRTSTimer(false);
 			const int ret = (int)m_pToolWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
 			m_pTreeWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
 
@@ -1015,13 +1111,6 @@ COLORREF CMainWnd::getAxColor(int color)
 
 void CMainWnd::sendTR(CString trCode, char *datB, int datL, int key)
 { 
-	CString slog;
-	if (trCode.Find("pidomyst") >= 0)
-	{
-		slog.Format("\r\n-------------------------[202200] %50s", datB);
-		OutputDebugString(slog);
-	}
-
 	std::string sendB;
 	sendB.resize(L_userTH + datL + 1);
 	struct _userTH *uTH{};
@@ -1926,7 +2015,11 @@ void CMainWnd::RTS_RecvRTSx(LPARAM lParam)
 	code = alertR->code;
 	code.Trim();
 
-
+	if (code.Find("094840") >= 0)
+	{
+		m_slog.Format("\r\n[%s]  023=[%s]", (char*)data[0], (char*)data[23]);
+		OutputDebugString(m_slog);
+	}
 
 	COleDateTime oTime;
 	oTime = COleDateTime::GetCurrentTime();
@@ -1945,6 +2038,7 @@ void CMainWnd::RTS_RecvRTSx(LPARAM lParam)
 
 	if(bCheckTime)	//동시호가 시간이면 기존처리
 	{
+		_mRealtime.clear();
 		m_pGroupWnd->RecvRTSx(lParam, 1);
 		return;
 	}
@@ -1963,8 +2057,15 @@ void CMainWnd::RTS_RecvRTSx(LPARAM lParam)
 			bHoga = true;
 	}
 	
-	if (bHoga == false && sgubn.FindOneOf("DLy") != -1)
+	if (bHoga == false && sgubn.FindOneOf("DLy") != -1 && !m_pGroupWnd->CheckGetRTS())
 		return;
+
+	if (code.Find("094840") >= 0)
+	{
+		m_slog.Format("\r\n[%s]  023=[%s] 111=[%s] ", (char*)data[0], (char*)data[23], (char*)data[111]);
+		OutputDebugString(m_slog);
+	}
+
 
 	const auto mt = _mapRealData.emplace(code, std::make_unique<struct _Ralert>());
 
@@ -2137,6 +2238,11 @@ bool CMainWnd::isIPInRange(CString ip, CString network_s, CString network_e)
 
 void CMainWnd::Request_GroupList()
 {
+	m_slog.Format("[interest][IB202200] -------------------------------------");
+	OutputDebugString(m_slog);
+	m_slog.Format("[interest][IB202200][%s]", __FUNCTION__);
+	OutputDebugString(m_slog);
+
 	int	sendL = 0;
 	std::string sendB;
 	sendB.resize(16 * 1024);
@@ -2155,6 +2261,12 @@ void CMainWnd::Request_GroupList()
 
 void CMainWnd::Request_GroupCode(int iseq)
 {
+	m_slog.Format("[interest][IB202200] -------------------------------------");
+	OutputDebugString(m_slog);
+	m_slog.Format("[interest][IB202200][%s]  iseq =%d", __FUNCTION__, iseq);
+	OutputDebugString(m_slog);
+
+
 	const int index = iseq;
 	int sendL = 0;
 	CString stmp;
@@ -2185,12 +2297,22 @@ void CMainWnd::receiveOub(int key, CString data)
 
 	if (key == TRKEY_GROUP)
 	{
+		m_slog.Format("[interest][IB202200] -------------------------------------");
+		OutputDebugString(m_slog);
+		m_slog.Format("[interest][IB202200] 그룹리스트  조회결과");
+		OutputDebugString(m_slog);
+
 		const int cnt = atoi(data.Left(4));
 
 //XMSG(그룹개수);
 //AxStd::_Msg("그룹 총개수[%d]",  cnt);
 		data = data.Mid(4);
 		data.Trim();
+
+m_slog.Format("[interest][IB202200] data =[%s]", data);
+OutputDebugString(m_slog);
+
+
 		if (!data.IsEmpty() && cnt > 0)
 		{
 			std::vector<std::pair<CString, CString>> vGroupName;
@@ -2203,6 +2325,10 @@ void CMainWnd::receiveOub(int key, CString data)
 			for_each(groupList.begin(), groupList.end(), [&](auto item) {
 				const CString groupKey = CString(item.ngrs, 2).Trim();
 				const CString groupName = CString(item.gnam, 30).Trim();
+
+
+m_slog.Format("[interest][IB202200] groupKey =[%s]  groupName=[%s]", groupKey, groupName);
+OutputDebugString(m_slog);
 				//AxStd::_Msg("그룹키[%s]", groupKey);
 				//AxStd::_Msg("그룹명[%s]", groupName);
 				vGroupName.emplace_back(std::make_pair(groupName, groupKey));
@@ -2215,9 +2341,18 @@ void CMainWnd::receiveOub(int key, CString data)
 
 			if (m_pGroupWnd)
 			{
+				m_pGroupWnd->_GroupName.clear();
+
 				auto& map = m_pGroupWnd->_GroupName;
 				for_each(vGroupName.begin(), vGroupName.end(), [&](const auto item) {
 					map.emplace(std::make_pair(atoi(item.second), item.first));
+					});
+
+		
+				CString stmp;
+				for_each(m_pGroupWnd->_GroupName.begin(), m_pGroupWnd->_GroupName.end(), [&](const auto item) {
+					stmp.Format("\r\n[interest][IB202200] _GroupName [%d] [%s]", item.first, item.second);
+					OutputDebugString(stmp);
 					});
 
 				m_pGroupWnd->SelectOper();
@@ -2234,4 +2369,57 @@ void CMainWnd::receiveOub(int key, CString data)
 		if (m_pTreeWnd)
 			m_pTreeWnd->receiveOub(data, key);
 	}
+}
+
+bool CMainWnd::IsFileExist(CString filename)
+{
+	CFileFind   finder;
+
+	if (!finder.FindFile(filename))
+		return FALSE;
+
+	return TRUE;
+}
+
+BOOL CMainWnd::CheckBookFileProcess()
+{
+#ifdef DF_USEBOOKFILE
+	return TRUE;  //북마크 파일 저장하는 테스트를 위해
+#endif
+	//유저폴더 내부에 북마크 파일이 있는지 확인
+	//파일이 있다면 북마크 파일 저장 프로세스를 계속 사용한다.
+	//파일이 없다면 북마크 파일 저장 프로세스는 하지 않고 서버 저장만 한다.
+	CStringArray arrBookFile;
+	CString sname, stmp, spath;
+	sname = Variant(nameCC, "");
+	spath = Variant(homeCC);
+	CString	filepath = AxStd::FORMAT("%s/%s/%s", spath, "user", sname);
+
+	CString searchPath = filepath + _T("\\*.*");
+
+	CFileFind fileFind;
+	BOOL bWorking = fileFind.FindFile(searchPath);
+	BOOL bFindBookFile = FALSE;
+
+	while (bWorking)
+	{
+		bWorking = fileFind.FindNextFile();
+
+		if (!fileFind.IsDots() && !fileFind.IsDirectory())
+		{
+			CString sname;
+			sname = fileFind.GetFileName();
+			if (sname.Find("bookmark.i") >= 0 && sname.Find("tmp") < 0)
+			{
+				bFindBookFile = TRUE;
+				arrBookFile.Add(sname);
+			}
+		}
+	}
+	fileFind.Close();
+
+	if (arrBookFile.GetSize() == 0)
+		return bFindBookFile;
+
+	return bFindBookFile;
 }

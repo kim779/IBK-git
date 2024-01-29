@@ -304,6 +304,9 @@ public:
 	bool		m_bFirstDuplicateNO{};		// 2012.02.13 KSJ 처음 중복여부 물어봤을때 다시는 묻지않기 위해서.
 	int			m_nResult{};					// 2012.04.02 KSJ 처음 중복여부 물어봤을때의 결과값 저장.
 	char     m_pdata[1024 * 4]{};
+
+	CString m_slog;
+	BOOL CheckBookFileProcess();
 public:
 	void	makingBackupFile();
 	void	recoveryFile();

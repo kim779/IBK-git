@@ -71,7 +71,9 @@ public:
 	CEvent		m_eventRTM;
 	CObArray	m_queRTM;
 	CCriticalSection m_sectionRTM;
-
+	CString m_slog;
+	int m_tick;
+	int m_delta{};
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CWsh)

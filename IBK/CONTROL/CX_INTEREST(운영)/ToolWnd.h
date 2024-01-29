@@ -19,7 +19,7 @@ class CToolWnd : public CBaseWnd
 // Construction
 public:
 	CToolWnd(CWnd* pMainWnd);
-	CString m_slog;
+
 // Attributes
 public:
 

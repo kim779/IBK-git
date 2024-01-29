@@ -162,7 +162,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../dev/IB876100.dll</OutputFile>
+      <OutputFile>D:\IBKS_TEST/dev/IB876100.dll</OutputFile>
       <ImportLibrary>.\Debug\IB876100.lib</ImportLibrary>
       <ModuleDefinitionFile>.\IB876100.def</ModuleDefinitionFile>
     </Link>

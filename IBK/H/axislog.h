@@ -17,6 +17,10 @@ static void LOG_OUTP(int scnt, ...)
 
 	CString sTmp, sResult;
 
+	CTime time;
+	time = CTime::GetCurrentTime();
+	sResult.Format("%02d:%02d:%02d  ", time.GetHour(), time.GetMinute(), time.GetSecond());
+
 	for (int i = 0; i < scnt; i++)
 	{
 		if (i == 0)
@@ -35,7 +39,7 @@ static void LOG_OUTP(int scnt, ...)
 	OutputDebugString("\r\n" + sResult);
 }
 
-void FileLog(LPCSTR log, ...)
+static void FileLog(LPCSTR log, CString spath="", ...)
 {
 #if 1
 	TRY
@@ -43,10 +47,20 @@ void FileLog(LPCSTR log, ...)
 		char buf[500]{};
 		GetModuleFileName(nullptr, buf, 260);
 
-		CString spath;
-		spath.Format("%s\\%s", buf, "axis.log");
+		CString spath, slog;
+		spath.Format("%s", buf);
 		spath.TrimRight();
-		spath.Replace("axis.exe\\", "");
+		if (spath.IsEmpty())
+		{
+			spath.Replace("axis.exe", "axis.log");
+			spath.Replace("AXIS.EXE", "axis.log");
+		}
+		else
+		{
+			spath.Replace("axis.exe", spath);
+			spath.Replace("AXIS.EXE", spath);
+		}
+		
 
 		FILE* fp;
 		fopen_s(&fp, spath, "a+");
@@ -54,6 +68,9 @@ void FileLog(LPCSTR log, ...)
 
 		const CTime time = CTime::GetCurrentTime();
 		fprintf(fp, (LPCSTR)time.Format("[%Y-%m-%d %H:%M:%S] "));
+
+		slog.Format("[FileLog] [%s]", log);
+		OutputDebugString(slog);
 
 		va_list argptr;
 		va_start(argptr, log);

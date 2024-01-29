@@ -110,7 +110,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../release/IB771000.dll</OutputFile>
+      <OutputFile>F:\util\HTS\IBK투자증권 HTS\dev/IB771000.dll</OutputFile>
       <ImportLibrary>.\Release\IB771000.lib</ImportLibrary>
       <AdditionalDependencies>msimg32.lib;../../control/fx_misc/release/fx_misc.lib;winmm.lib;../../dll/sm/Release/axissm.lib;Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>
@@ -130,7 +130,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Debug\</AssemblerListingLocation>
-      <BrowseInformation>true</BrowseInformation>
+      <BrowseInformation>false</BrowseInformation>
       <PrecompiledHeaderOutputFile>.\Debug\IB771000.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
@@ -140,7 +140,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnablePREfast>true</EnablePREfast>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <MinimalRebuild />
+      <MinimalRebuild>true</MinimalRebuild>
       <AdditionalIncludeDirectories>../../h</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
@@ -173,6 +173,7 @@
   <ItemGroup>
     <ClCompile Include="AxBrower.cpp" />
     <ClCompile Include="BkUtil.cpp" />
+    <ClCompile Include="BrowserWindowEdge.cpp" />
     <ClCompile Include="CContentWnd.cpp" />
     <ClCompile Include="ColorButton.cpp" />
     <ClCompile Include="ColoredListCtrl.cpp" />
@@ -180,7 +181,6 @@
     <ClCompile Include="ConfigDlg.cpp" />
     <ClCompile Include="datap.cpp" />
     <ClCompile Include="DropBtn.cpp" />
-    <ClCompile Include="excel.cpp" />
     <ClCompile Include="fxTab.cpp" />
     <ClCompile Include="GubnConfigDlg.cpp" />
     <ClCompile Include="IB771000.cpp" />
@@ -222,6 +222,7 @@
   <ItemGroup>
     <ClInclude Include="AxBrower.h" />
     <ClInclude Include="BkUtil.h" />
+    <ClInclude Include="BrowserWindowEdge.h" />
     <ClInclude Include="CContentWnd.h" />
     <ClInclude Include="ColorButton.h" />
     <ClInclude Include="ColoredListCtrl.h" />
@@ -229,7 +230,6 @@
     <ClInclude Include="ConfigDlg.h" />
     <ClInclude Include="datap.h" />
     <ClInclude Include="DropBtn.h" />
-    <ClInclude Include="excel.h" />
     <ClInclude Include="fxTab.h" />
     <ClInclude Include="GubnConfigDlg.h" />
     <ClInclude Include="IB771000.h" />
@@ -281,7 +281,21 @@
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\..\AXIS\packages\cpprestsdk.v141.2.10.12.1\build\native\cpprestsdk.v141.targets" Condition="Exists('..\..\AXIS\packages\cpprestsdk.v141.2.10.12.1\build\native\cpprestsdk.v141.targets')" />
+    <Import Project="..\..\AXIS\packages\Microsoft.Web.WebView2.1.0.2151.40\build\native\Microsoft.Web.WebView2.targets" Condition="Exists('..\..\AXIS\packages\Microsoft.Web.WebView2.1.0.2151.40\build\native\Microsoft.Web.WebView2.targets')" />
+    <Import Project="..\..\AXIS\packages\Microsoft.Windows.ImplementationLibrary.1.0.231028.1\build\native\Microsoft.Windows.ImplementationLibrary.targets" Condition="Exists('..\..\AXIS\packages\Microsoft.Windows.ImplementationLibrary.1.0.231028.1\build\native\Microsoft.Windows.ImplementationLibrary.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>이 프로젝트는 이 컴퓨터에 없는 NuGet 패키지를 참조합니다. 해당 패키지를 다운로드하려면 NuGet 패키지 복원을 사용하십시오. 자세한 내용은 http://go.microsoft.com/fwlink/?LinkID=322105를 참조하십시오. 누락된 파일은 {0}입니다.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\AXIS\packages\cpprestsdk.v141.2.10.12.1\build\native\cpprestsdk.v141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\AXIS\packages\cpprestsdk.v141.2.10.12.1\build\native\cpprestsdk.v141.targets'))" />
+    <Error Condition="!Exists('..\..\AXIS\packages\Microsoft.Web.WebView2.1.0.2151.40\build\native\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\AXIS\packages\Microsoft.Web.WebView2.1.0.2151.40\build\native\Microsoft.Web.WebView2.targets'))" />
+    <Error Condition="!Exists('..\..\AXIS\packages\Microsoft.Windows.ImplementationLibrary.1.0.231028.1\build\native\Microsoft.Windows.ImplementationLibrary.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\AXIS\packages\Microsoft.Windows.ImplementationLibrary.1.0.231028.1\build\native\Microsoft.Windows.ImplementationLibrary.targets'))" />
+  </Target>
 </Project>

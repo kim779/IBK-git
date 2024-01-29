@@ -369,5 +369,6 @@ private:
 public:
 	void makeInterGroup(std::vector<std::pair<CString, CString>>& vGroup);
 	void receiveOub(CString& data, int key);
+	CString m_slog;
 };
  

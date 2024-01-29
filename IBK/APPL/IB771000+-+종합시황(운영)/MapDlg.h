@@ -19,6 +19,9 @@
 #include "CContentWnd.h"
 //#define DF_TEST
 
+//EDGE browser
+#include "BrowserWindowEdge.h"
+
 #include "../../h/axisfire.h"
 #include "../../h/jmcode.h"
 
@@ -444,6 +447,16 @@ private:
 
 	HGLOBAL m_hGlobal;
 	IStream *m_pStream;
+
+	public: //EDGE browser
+//Edge window
+		CString m_slog;
+		BOOL	m_bUsingEdgeBrowser{};
+		std::unique_ptr<BrowserWindowEdge> browserEdge{};
+		CString URLEncode(const char* lpszURL);
+		std::string UrlEncode(const std::string& value);
+		void UploadEdgeEnv(CString sProgramName);
+		BOOL IsProgramInstalled(CString sProgramName);
 };
 
 class CCommandThread : public CWinThread {

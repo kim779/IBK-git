@@ -94,7 +94,8 @@ public:
 	void ChangeSize(double* lRate, int ipoint, LPCTSTR lszname);
 	void OrderSend();
 
-
+	int GetValueUpDownfloor(int ival, int idelta, bool bUP = false);
+	CString GetOrderPriceByMarket(int iprice, CString strCode);
 	// Generated message map functions
 protected:
 	//{{AFX_MSG(COrderWnd)

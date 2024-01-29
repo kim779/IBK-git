@@ -307,6 +307,16 @@ BOOL CPage4::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 
 	switch (nmgv->hdr.code)
 	{
+		//case GVNM_LMOUSEDOWN:
+		//{
+		//	const int	index = nmgv->row - 1;
+
+		//	if (index < 0 || index >= m_inters.GetSize())
+		//		break;
+
+		//	CString	string = m_grid->GetItemText(nmgv->row, 0);
+		//}
+		//break;
 	case GVNM_ENDEDIT: case GVNM_ENDTABKEY: case GVNM_ENDRETURN:
 		{
 			m_bIsEdit = true;
@@ -566,8 +576,17 @@ void CPage4::loadGrid()
 	for (int ii = 0; ii < m_inters.GetSize(); ii++)
 	{
 		pinter = m_inters.GetAt(ii);
-
+		//attr
 		m_grid->SetItemText(ii+1, colCODE, chTOstring(pinter->code, sizeof(pinter->code)));
+		
+		if (pinter->gubn[0] == ROW_COMMENT)
+		{
+			UINT attr = m_grid->GetItemAttr(ii + 1, colXNUM) & GVAT_HIDDEN;
+			m_grid->SetItemAttr(ii + 1, colXNUM, attr);
+			attr = m_grid->GetItemAttr(ii + 1, colXPRC) & GVAT_HIDDEN;
+			m_grid->SetItemAttr(ii + 1, colXPRC, attr);
+		}
+	
 		if (strlen(pinter->code))
 		{
 			m_grid->SetItemText(ii+1, colNAME, chTOstring(pinter->name, sizeof(pinter->name)));
@@ -580,88 +599,8 @@ void CPage4::loadGrid()
 int	CPage4::loadingActiveInterest(int gno)
 {
 	return 0;
-	//clearActiveInterest();
-	//
-	//CString	filePath, fileBook;
-	//if (ExistFile(gno))
-	//	filePath.Format("%s/%s/%s/portfolio.i%02d", m_root, USRDIR, m_name, gno);
-	//else
-	//	return 0;
-	//
-	//fileBook.Format("%s/%s/%s/bookmark.i%02d", m_root, USRDIR, m_name, gno);
-	//bool    isFile = true;
-	//UINT	readL{};
-	//struct	_inters* pinter{};
-	//struct  _bookmarkinfo* bInfo{};
-	//
-	//CFile	fileH(filePath, CFile::modeRead);
-	//CFile	fileB;
-	//
-	//if( !fileB.Open(fileBook, CFile::modeRead) )
-	//{
-	//	isFile = false;		//파일 없을경우
-	//}
-	//
-	//for (int ii = 0; ii < maxJONGMOK; ii++)
-	//{
-	//	pinter = (_inters *) new char[sz_inters];
-	//	ZeroMemory(pinter, sz_inters);
-	//	
-	//	readL = fileH.Read(pinter, sz_inters);
-	//	if (readL < sz_inters)
-	//	{
-	//		delete pinter;
-	//		break;
-	//	}
-	//	
-	//	if (pinter->code[0] == 'm')
-	//	{
-	//		
-	//		if(isFile == true)
-	//		{
-	//			bInfo = (_bookmarkinfo *) new char[sizeof(_bookmarkinfo)];
-	//			ZeroMemory(bInfo, sizeof(_bookmarkinfo));
-	//			
-	//			readL = fileB.Read(bInfo, sizeof(_bookmarkinfo));
-	//			
-	//			if(readL < sizeof(_bookmarkinfo))
-	//			{
-	//				delete bInfo;
-	//			}
-	//			else
-	//			{
-	//				CString temp = CString((pinter->code));
-	//				temp = temp.Left(12);
-	//				temp.TrimRight();
-	//				CString temp2 = CString(bInfo->code);
-	//				temp2.TrimRight();
-	//				
-	//				if(strcmp(temp, temp2) == 0)
-	//				{
-	//					CopyMemory(pinter->name, bInfo->name, sizeof(bInfo->name));
-	//					
-	//					pinter->bookmark[0] = bInfo->bookmark[0] == '1' ? '1':'0';//2015.04.03 KSJ 1이아니면 0으로 해준다.
-	//				}
-	//			}
-	//		}
-	//		
-	//	}
-	//	else
-	//	{
-	//		strcpy(pinter->name, m_page->GetCodeName(pinter->code));
-	//	}
-	//	
-	//	m_ActiveInters.Add(pinter);
-	//}
-	//
-	//fileH.Close();
-	//return m_inters.GetSize();
 }
 
-/*
-* 	CWnd* wnd = GetParent()->GetParent();
-	char* pdata = (char*)wnd->SendMessage(WM_MSG, MSG_SEARCH_GROUPCODE, gno);
-*/
 int CPage4::loadingInterest(int gno)
 {
 #ifdef DF_SEARCH
@@ -1165,9 +1104,24 @@ void CPage4::SendMsgToPage(int igubn, CString sdata)
 
 			memcpy(pinter->gubn, jinfo->gubn, sizeof(jinfo->gubn));		// 종목구분	0:none, 1:현물, 2:선물, 3:옵션, 4:개별주식옵션, 5:지수
 			memcpy(pinter->code, jinfo->code, sizeof(jinfo->code));			// 종목코드[12]
-			memcpy(pinter->xprc, jinfo->xprc, sizeof(jinfo->xprc));				// 보유단가[10]
-			memcpy(pinter->xnum, jinfo->xnum, sizeof(jinfo->xnum));  	     // 보유수량[10]
-			strcpy(pinter->name, m_page->GetCodeName(jinfo->code));
+
+			if(pinter->gubn[0] == ROW_COMMENT)
+			{ 
+			//	memcpy(pinter->xprc, jinfo->xprc, sizeof(jinfo->xprc));				// 보유단가[10]
+			//	memcpy(pinter->xnum, jinfo->xnum, sizeof(jinfo->xnum));  	     // 보유수량[10]
+				stmp.Format("%s", jinfo->xprc);
+				stmp = stmp.Left(sizeof(jinfo->xprc) + sizeof(jinfo->xprc));
+				stmp.Trim();
+				strcpy(pinter->name, (LPSTR)(LPCTSTR)stmp);
+			}
+			else
+			{
+				memcpy(pinter->xprc, jinfo->xprc, sizeof(jinfo->xprc));				// 보유단가[10]
+				memcpy(pinter->xnum, jinfo->xnum, sizeof(jinfo->xnum));  	     // 보유수량[10]
+				strcpy(pinter->name, m_page->GetCodeName(jinfo->code));
+			}
+
+		
 		
 			m_inters.Add(pinter);
 
@@ -1265,8 +1219,16 @@ int CPage4::GetUploadData(int gno, CString& name, char* datB)
 
 		jinfo->gubn[0] = pinter->gubn[0];
 		CopyMemory(jinfo->code, pinter->code, strlen(pinter->code));
-		CopyMemory(jinfo->xprc, pinter->xprc, strlen(pinter->xprc));
-		CopyMemory(jinfo->xnum, pinter->xnum, strlen(pinter->xnum));
+		if (pinter->gubn[0] == ROW_COMMENT)
+		{
+			CopyMemory(jinfo->xprc, pinter->name, strlen(pinter->name));
+		}
+		else
+		{
+			CopyMemory(jinfo->xprc, pinter->xprc, strlen(pinter->xprc));
+			CopyMemory(jinfo->xnum, pinter->xnum, strlen(pinter->xnum));
+		}
+		
 	}
 
 	return m_inters.GetSize();

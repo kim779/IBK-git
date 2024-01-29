@@ -11,6 +11,7 @@
 #define		IDC_MAPVIEW5	5005
 #define		IDC_MAPVIEW6	5006
 #define		IDC_MAPVIEW7	5007
+#define		IDC_MAPVIEW8	5008
 
 class CMapWnd : public CWnd
 {

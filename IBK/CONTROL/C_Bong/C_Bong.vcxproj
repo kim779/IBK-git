@@ -138,7 +138,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../dev/C_Bong.dll</OutputFile>
+      <OutputFile>D:\IBKS_TEST\dev/C_Bong.dll</OutputFile>
       <ImportLibrary>.\Debug\C_Bong.lib</ImportLibrary>
       <ModuleDefinitionFile>.\C_Bong.def</ModuleDefinitionFile>
     </Link>

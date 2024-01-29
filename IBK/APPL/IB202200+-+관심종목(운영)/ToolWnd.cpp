@@ -638,6 +638,11 @@ BOOL CToolWnd::OnCommand(WPARAM wParam, LPARAM lParam)
 			if(nOver == MO_VISIBLE)
 				pWnd->SendMessage(WM_MANAGE, MK_SELECTFIRST);
 
+
+			//test mod
+			CWnd* pGWnd = (CWnd*)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_GROUP));
+			pGWnd->SendMessage(WM_MANAGE, MK_GROUPCHANGECHECK, (LPARAM)m_selectedTab);
+			
 			sztmp.Format("%s /p5 /S /d %s%c%d%c%s%c", MAP_CONFIG, "selectGROUP", P_TAB ,GroupNumber , P_NEW , "NO", P_TAB);
 			m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_OPENSCR, typePOPUP), (LPARAM)sztmp.operator LPCTSTR());
 
@@ -1566,6 +1571,11 @@ int CToolWnd::loadActiveField()
 
 int CToolWnd::Reload()
 {
+	m_slog.Format("[interest][IB202200] -------------------------------------");
+	OutputDebugString(m_slog);
+	m_slog.Format("[interest][IB202200][%s]", __FUNCTION__);
+	OutputDebugString(m_slog);
+
 	const int ncntBeforeload = m_cbGROUP->GetCount();		//변경전 그룹 개수
 	int	ncursel = m_cbFIELD->GetCurSel();
 	int	ndata = 0;

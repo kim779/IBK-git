@@ -5,4 +5,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>/k IBK_TEST /a 172.16.202.106 /i devil006 ahffkdy1 #1</LocalDebuggerCommandArguments>
   </PropertyGroup>
+  <PropertyGroup>
+    <RESOURCE_FILE>CX_Symbol.rc</RESOURCE_FILE>
+  </PropertyGroup>
 </Project>

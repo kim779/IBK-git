@@ -29,6 +29,8 @@ CLog::~CLog()
 
 void CLog::Trace(char* msg, int len, dirLog dir)
 {
+	//test
+	return;
 	errno_t	err;
 
 	err = fopen_s(&m_logDs, (char*)m_fName.operator LPCTSTR(), (m_logDs == NULL) ? "w+" : "a+");

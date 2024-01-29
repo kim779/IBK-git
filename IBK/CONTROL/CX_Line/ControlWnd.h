@@ -75,4 +75,10 @@ protected:
 
 	DECLARE_DISPATCH_MAP()
 	DECLARE_INTERFACE_MAP()
+	void ShowLine(SHORT bShow);
+
+	enum
+	{
+		dispidShowLine = 1L
+	};
 };

@@ -316,7 +316,7 @@ int CMapWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
-	
+	SetTimer(9999, 3000, nullptr);
 #ifdef	_FILE_DEBUG
 	dFile	<< "======> DH014000 Start  <<======" << endl;
 	QueryPerformanceFrequency(&frequency);

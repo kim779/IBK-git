@@ -28,6 +28,8 @@ protected:
 	CString	m_pass;
 	CWnd* m_wizard;
 
+	//비밀번호 오류횟수
+	int m_iPassErrorCnt{};
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CLockDlg)
@@ -56,6 +58,8 @@ private:
 #else
 	CControlChanger* m_changer;
 #endif
+public:
+	
 };
 
 //{{AFX_INSERT_LOCATION}}

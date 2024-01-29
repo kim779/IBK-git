@@ -4,7 +4,10 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // CMarketDlg dialog
+#ifndef DF_NOEXCEL
 #include "excel.h"
+#endif
+
 #include "BkUtil.h"
 #include "fxTab.h"
 #include "SListCtrl.h"

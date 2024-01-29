@@ -120,7 +120,7 @@ __declspec(dllexport) CWnd* WINAPI axCreate(CWnd* pParent, _param* pParam)
 	auto pMainWnd = std::make_unique<CMainWnd>(pParent, pParam);	
 	if (!pMainWnd->Create(nullptr, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS, pParam->rect, pParent, 100))
 		return nullptr;
-	OutputDebugString("[cx_interest] axcreate \r\n");
+		
 	return pMainWnd.release();
 }
 

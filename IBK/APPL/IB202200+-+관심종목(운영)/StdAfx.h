@@ -42,3 +42,11 @@ struct	_Ralert	{
 	std::unique_ptr<char[]> ptr[999]{};	// data record array
 };
 #define	L_RalertR	sizeof(struct _Ralert)
+
+#define ROW_COMMENT '8'   //test mod
+#define ROW_BOOKMARK '9'
+
+#define DF_BOOKFILE_BACK "back_bookmark.i"
+#define DF_BOOKFILE_ORI    "bookmark.i"
+
+//#define DF_USEBOOKFILE   //기존 북마크 사용하는 모드

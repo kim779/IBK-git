@@ -2190,7 +2190,24 @@ int CHogaWnd::GetPriceUnit(int iPrice, bool bPlus)
 				else if (iPrice > 50000)	iPrice -= 100;
 			}
 		}
-		else if (m_eMarket == ETF || m_eMarket == ELW)
+		else if (m_eMarket == ETF )
+		{
+			if (bPlus)
+			{
+				if (iPrice >= 2000)
+					iPrice += 5;
+				else
+					iPrice += 1;
+			}
+			else
+			{
+				if (iPrice < 2000)
+					iPrice -= 1;
+				else
+					iPrice -= 5;
+			}
+		}
+		else if ( m_eMarket == ELW)
 		{
 			if (bPlus)
 			{
@@ -2246,7 +2263,24 @@ int CHogaWnd::GetPriceUnit(int iPrice, bool bPlus)
 				else if (iPrice > 500000)	iPrice -= 1000;
 			}
 		}
-		else if (m_eMarket == ETF || m_eMarket == ELW)
+		else if (m_eMarket == ETF)
+		{
+			if (bPlus)
+			{
+				if (iPrice >= 2000)
+					iPrice += 5;
+				else
+					iPrice += 1;
+			}
+			else
+			{
+				if (iPrice <= 2000)
+					iPrice -= 1;
+				else
+					iPrice -= 5;
+			}
+		}
+		else if (m_eMarket == ELW)
 		{
 			if (bPlus)
 			{

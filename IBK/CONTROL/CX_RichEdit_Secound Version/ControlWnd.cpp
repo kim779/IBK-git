@@ -42,6 +42,11 @@ BEGIN_MESSAGE_MAP(CControlWnd, CWnd)
 	ON_WM_CREATE()
 	//}}AFX_MSG_MAP
 	ON_MESSAGE(WM_USER, OnMessage)
+	ON_WM_NCHITTEST()
+	ON_WM_SETCURSOR()
+	ON_WM_LBUTTONDOWN()
+	ON_WM_LBUTTONDBLCLK()
+	ON_WM_LBUTTONUP()
 END_MESSAGE_MAP()
 
 
@@ -77,6 +82,9 @@ void CControlWnd::SetParam(struct _param* pParam)
 	m_param.tRGB    = pParam->tRGB;
 	m_param.pRGB    = pParam->pRGB;
 	m_param.options = CString(pParam->options, pParam->options.GetLength());
+
+	if (m_param.options.Find("k2") >= 0)
+		m_mode = MODE_JUSTSHOW;
 }
 
 int CControlWnd::OnCreate(LPCREATESTRUCT lpCreateStruct) 
@@ -91,12 +99,49 @@ int CControlWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 		GetClientRect(rect);
 		m_Edit = new CRichEditCtrl;
-		m_Edit->Create(WS_TABSTOP | WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_MULTILINE, rect, this, 245);
-		m_Edit->ShowScrollBar(TRUE);
+		if (m_mode == MODE_INOUT)
+		{
+			m_Edit->Create(WS_TABSTOP | WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_MULTILINE, rect, this, 245);
+			m_Edit->ShowScrollBar(TRUE);
+		}
+		else if (m_mode == MODE_JUSTSHOW)
+		{
+			m_Edit->Create(WS_TABSTOP | WS_CHILD | WS_VISIBLE  | ES_MULTILINE | DT_CENTER, rect, this, 245);
+			m_Edit->SetReadOnly(TRUE);
+		}
+		CFont* pfont = getAxFont(m_param.fonts, m_param.point, m_param.style);
+		m_Edit->SetFont(pfont);
 		m_Edit->SetFocus();
-
 	}
 	return 0;
+}
+
+CFont* CControlWnd::getAxFont(CString fName, int point, int style)
+{
+	struct	_fontR	fontR {};
+
+	fontR.name = (LPSTR)fName.GetString();
+	fontR.point = point;
+	fontR.italic = false;
+	fontR.bold = 0;
+
+	switch (style)
+	{
+	case 0: // none
+	case 1: // none
+		break;
+	case 2: // italic
+		fontR.italic = true;
+		break;
+	case 3: // bold
+		fontR.bold = FW_BOLD;
+		break;
+	case 4: // both
+		fontR.italic = true;
+		fontR.bold = FW_BOLD;
+		break;
+	}
+	return (CFont*)m_pParent->SendMessage(WM_USER, getFONT, (LPARAM)&fontR);
 }
 
 void CControlWnd::SetData(LPCTSTR strData) 
@@ -106,7 +151,14 @@ void CControlWnd::SetData(LPCTSTR strData)
 		CString sData;
 
 		sData = CString(strData);
-		RsDataAddString(sData, RGB(255,0,0), sData.GetLength());
+		if(m_mode == MODE_INOUT)
+			RsDataAddString(sData, RGB(255,0,0), sData.GetLength());
+		else if (m_mode == MODE_JUSTSHOW)
+		{
+			m_Edit->SetWindowText("");
+			RsDataAddString(sData, RGB(255, 0, 0), sData.GetLength());
+		}
+
 		m_Edit->SetFocus();
 		m_Edit->Invalidate();
 	}
@@ -154,4 +206,62 @@ long CControlWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 	default:break;
 	}
 	return 0;
+}
+
+LRESULT CControlWnd::OnNcHitTest(CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	//if (m_mode == MODE_JUSTSHOW)
+	//	return HTTRANSPARENT;
+	return CWnd::OnNcHitTest(point);
+}
+
+
+BOOL CControlWnd::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	//if (m_mode == MODE_JUSTSHOW)
+	//{
+	//	SendMessage(WM_KILLFOCUS, 0, 0);
+	//	//OutputDebugString("[richdit] OnSetCursor killfocus");
+	//}
+	return CWnd::OnSetCursor(pWnd, nHitTest, message);
+}
+
+
+void CControlWnd::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	OutputDebugString("[richdit]  OnLButtonDown");
+	CWnd::OnLButtonDown(nFlags, point);
+}
+
+
+void CControlWnd::OnLButtonDblClk(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	CWnd::OnLButtonDblClk(nFlags, point);
+}
+
+
+void CControlWnd::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	OutputDebugString("[richdit]  OnLButtonUp");
+	CWnd::OnLButtonUp(nFlags, point);
+}
+
+
+BOOL CControlWnd::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	if (pMsg->message == WM_LBUTTONDOWN || pMsg->message == WM_LBUTTONUP ||
+		pMsg->message == WM_LBUTTONDBLCLK || pMsg->message == WM_MOUSEMOVE)
+	{
+		OutputDebugString("[ricedit]  PreTranslateMessage return true");
+		return TRUE;
+	}
+	OutputDebugString("[ricedit]  PreTranslateMessage return true");
+	return CWnd::PreTranslateMessage(pMsg);
 }

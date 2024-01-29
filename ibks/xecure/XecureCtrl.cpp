@@ -272,8 +272,8 @@ long CXecureCtrl::Xecure(long pBytes, long nBytes)
 		//WriteLog(slog);
 		//WriteLog(spath);
 		m_log->Trace("xecure_2", 0, dirSTR);
-		if (XC_INIT(XECURE_PSWD, XECURE_CONF, XC_SMODE_CLIENT) < 0)
-		//if (XC_INIT(XECURE_PSWD, (LPSTR)(LPCTSTR)spath, XC_SMODE_CLIENT) < 0)
+		//if (XC_INIT(XECURE_PSWD, XECURE_CONF, XC_SMODE_CLIENT) < 0)
+		if (XC_INIT(XECURE_PSWD, (LPSTR)(LPCTSTR)spath, XC_SMODE_CLIENT) < 0)
 		{
 			m_log->Trace("xecure_2_2", 0, dirSTR);
 			AfxMessageBox(_T("Xecure Init 실패"));

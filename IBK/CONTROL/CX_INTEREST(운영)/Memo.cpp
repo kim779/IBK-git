@@ -205,33 +205,7 @@ void CMemo::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
 void CMemo::OnPaint() 
 {
 	CPaintDC dc(this); // device context for painting
-#ifdef _DEBUG
-	CRect	rc;
-	CPen* pOldPen;
-
-	GetClientRect(&rc);
-	rc.DeflateRect(0, 18, 0, 0);
-
-	dc.FillSolidRect(rc, GetSysColor(COLOR_INACTIVEBORDER));
-	drawCaption(&dc);
-
-	pOldPen = (CPen*)dc.SelectObject(getAxPen(GetSysColor(COLOR_HIGHLIGHTTEXT), 1, PS_SOLID));
-
-	// exit button
-	GetClientRect(&rc);
-	rc.left = rc.right - exitW;
-	rc.top = rc.top + 5;
-	rc.bottom = rc.top + 10;
-	rc.right = rc.left + 10;
-	dc.Rectangle(rc);
-	rc.DeflateRect(1, 1);
-	dc.FillSolidRect(rc, GetSysColor(COLOR_HIGHLIGHT));
-	rc.InflateRect(1, 1);
-	dc.MoveTo(rc.left, rc.top);
-	dc.LineTo(rc.right - 1, rc.bottom - 1);
-	dc.MoveTo(rc.right - 1, rc.top);
-	dc.LineTo(rc.left, rc.bottom - 1);
-#else
+	
 	xxx::CMemDC	memdc(&dc);
 	CRect	rc;
 	CPen	*pOldPen;
@@ -258,7 +232,11 @@ void CMemo::OnPaint()
 	memdc.LineTo(rc.right - 1, rc.bottom - 1);
 	memdc.MoveTo(rc.right - 1, rc.top);
 	memdc.LineTo(rc.left, rc.bottom - 1);
-#endif
+	
+// upateX_20121228	
+//	memdc.SelectObject(pOldPen);
+
+	//memdc->DeleteDC();
 }
 
 void CMemo::OnSize(UINT nType, int cx, int cy) 

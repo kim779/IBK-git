@@ -79,7 +79,6 @@ void CBaseWnd::OnPaint()
 		OperDraw(&mdc);
 		mdc.SelectObject(oldfont);
 #endif
-	//	OperDraw(&dc);
 		//mdc->DeleteDC();
 	}
 	else

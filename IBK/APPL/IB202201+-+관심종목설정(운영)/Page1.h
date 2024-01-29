@@ -152,7 +152,7 @@ class CPage1 : public CPropertyPage
 public:
 	CPage1(CWnd *parent = nullptr);
 	~CPage1();
-	CString m_slog;
+
 	// Dialog Data
 	//{{AFX_DATA(CPage1)
 	enum
@@ -462,7 +462,9 @@ protected:
 	void ExceptionMsg();
 
 	void insertList2(CString sCodes); // 2012.02.13	KSJ	그룹에 종목등록
+	
 public:
+	void insertList2x(CString sCodes);
 	void AppendItem(CString sCodes); // 2012.02.13 KSJ  아이템추가
 	void AppendNewgroup();		 // 2012.02.13 KSJ  그룹추가
 
@@ -473,7 +475,8 @@ public:
 	virtual BOOL OnSetActive();
 	virtual BOOL OnKillActive();
 	void    receiveOub(int key, CString Data);
-
+	BOOL CheckBookFileProcess();
+	CString m_slog;
 protected:
 	virtual void DoDataExchange(CDataExchange *pDX); // DDX/DDV support
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT *pResult);

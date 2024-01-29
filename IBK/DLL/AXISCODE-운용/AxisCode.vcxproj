@@ -100,8 +100,7 @@
       <OutputFile>../../../release/AXISCODE.DLL</OutputFile>
       <ImportLibrary>.\Release\AXISCODE.lib</ImportLibrary>
       <AdditionalDependencies>imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <StackReserveSize>
-      </StackReserveSize>
+      <StackReserveSize>4194304</StackReserveSize>
       <ModuleDefinitionFile>.\AxisCode.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>

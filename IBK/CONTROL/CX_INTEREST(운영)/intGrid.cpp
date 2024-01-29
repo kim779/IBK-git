@@ -1301,9 +1301,9 @@ void CintGrid::OnPaint()
 #else
 	xxx::CMemDC	MemDC(&dc);
 	OnDraw(&MemDC);
-
+	
 	if (m_memoAry.GetSize() > 0)
-		memoDraw(&MemDC);
+		memoDraw(&MemDC);	
 #endif
 }
 
@@ -1564,7 +1564,7 @@ void CintGrid::OnTimer(UINT nIDEvent)
 							
 							CString str;
 							str.Format("IBNEWSXX /t /p5 /d %s", strValue);
-			
+							
 							if(strValue != "")
 							{
 								if(m_pViewWnd)	
@@ -1730,6 +1730,7 @@ void CintGrid::OnTimer(UINT nIDEvent)
 						switch (rtscode.GetAt(0))
 						{
 						case '1':	//2012.10.09 KSJ 주식선물은 소숫점이 안붙어야 한다.
+						case 'A':  //파생상품 코드개편
 							{				
 								CString strScoop = rtscode.Mid(1, 2);
 								
@@ -1739,9 +1740,12 @@ void CintGrid::OnTimer(UINT nIDEvent)
 									ndot = 2;
 							}
 							break;
-						case '2':
+						case '2':  //파생상품 코드개편
+						case 'B':
 						case '3':
+						case 'C':
 						case '4':
+						case 'D':
 							ndot = 2;
 							break;
 						}
@@ -3734,7 +3738,7 @@ BOOL CintGrid::DrawCell(CDC* pDC, int nRow, int nCol, CRect rect, BOOL bEraseBk)
 
 	if (nRow > 0)
 	{
-		const auto& pInter = m_pParent->GetData(nRow - 1);   //test 확인
+		const auto& pInter = m_pParent->GetData(nRow - 1);
 		if (pInter)
 		{
 			if (pInter->bookmark == '1')
@@ -6069,14 +6073,6 @@ BOOL CintGrid::SetColumnItems(int nCol, GVITEM* gvitem)
 
 BOOL CintGrid::SetItemText(int nRow, int nCol, LPCTSTR str)
 {
-	//CString str1;
-	//if (nRow == 2 &&  (nCol == 0 || nCol ==21))
-	//{	
-	//	str1.Format("[cx_interest] ------------ nRow=[%d] nCol=[%d] str=[%s]\r\n", nRow, nCol, str);
-	//	OutputDebugString(str1);
-	//}
-
-
 	const auto pCell = GetCell(nRow, nCol);
 	
 	if (!pCell) return FALSE;
@@ -6440,7 +6436,7 @@ int CintGrid::GetRowHeight(int nRow) const
 
 int CintGrid::GetColumnWidth(int nCol) const
 {
-//	ASSERT(nCol >= 0 && nCol < m_nCols);  //test 20230207
+	ASSERT(nCol >= 0 && nCol < m_nCols);
 	if (nCol < 0 || nCol >= m_nCols)
 		return -1;
 
@@ -7582,7 +7578,10 @@ void CintGrid::OnLButtonUp(UINT nFlags, CPoint point)
 				ScreenToClient(&start);
 
 // 				int nOldLength = GetRealColumnWidth(m_idClick.col);
-				SetColumnWidth(m_idClick.col, point.x - start.x);
+				int iwidth = point.x - start.x;   //20231107 column width
+				iwidth = abs(iwidth);
+				iwidth = (int)(iwidth / m_xRate);
+				SetColumnWidth(m_idClick.col, iwidth);
 // 				int nLength = GetRealColumnWidth(m_idClick.col);
 
 				ResetScrollBars(); Invalidate();

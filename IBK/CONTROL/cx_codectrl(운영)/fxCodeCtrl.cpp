@@ -125,6 +125,85 @@ void CCodeCombo::OnDestroy()
 	CWnd::OnDestroy();
 }
 
+BOOL CCodeCombo::SearchName(CString sdata)
+{
+	if (sdata.IsEmpty())
+	{
+		SetTopIndex(0);
+		SetCurSel(0);
+		return FALSE;
+	}
+
+	sdata.MakeUpper();
+
+	_JCode	jCode;
+	const	int	len = sdata.GetLength();
+
+	if (IsCodeListMode())
+	{
+		CString	strItem;
+		CString	strCode, strName;
+		const	int	size = GetCount();
+
+		for (int ii = 0, nidx = 0; ii < size; ii++)
+		{
+
+			strItem = m_pCodeList->GetRawItem(ii);
+			nidx = strItem.Find('\t');
+
+			if (nidx < 0)
+				continue;
+
+			strCode = strItem.Left(nidx);
+			strName = strItem.Mid(nidx + 1);
+			if (strName.GetLength() < len)
+				continue;
+
+			if (strCode.Find(sdata) == 0)
+				return TRUE;
+		/*	if (m_nType == 0)
+			{
+				if (strName.Left(len) == sdata)
+				{
+					SetTopIndex(ii);
+					SetCurSel(ii);
+					return TRUE;
+				}
+			}
+			else
+			{
+				if (strName.Find(sdata) > -1)
+				{
+					SetTopIndex(ii);
+					SetCurSel(ii);
+					return TRUE;
+				}
+			}*/
+		}
+	}
+	else if (IsHistoryMode())
+	{
+		const	int	size = m_pHCode.GetSize();
+		for (int ii = 0; ii < size; ii++)
+		{
+			jCode = m_pHCode.GetAt(ii);
+			if (jCode.Code.GetLength() < len)
+				continue;
+
+			if (jCode.Code.Find(sdata) >= 0)
+				return TRUE;
+			/*if (jCode.Code.Left(len) == sdata)
+			{
+				SetTopIndex(ii);
+				SetCurSel(ii);
+				return TRUE;
+			}*/
+		}
+	}
+
+	return FALSE;
+}
+
 void CCodeCombo::SearchCode(CString code)
 {
 	if (code.IsEmpty())
@@ -152,6 +231,9 @@ void CCodeCombo::SearchCode(CString code)
 
 			strItem = m_pCodeList->GetRawItem(ii);
 			nidx = strItem.Find('\t');
+
+			if (strItem.Find("5A000B") >= 0)
+				OutputDebugString(strItem);
 
 			if (nidx < 0)
 				continue;
@@ -324,6 +406,10 @@ void CCodeCombo::InitCodeList(int unit,CString sFind)
 
 		if (!jCode.Code.GetLength())
 			continue;
+
+		if(jCode.Code.Find("5A000B") >= 0)
+			OutputDebugString(jCode.Code);
+
 		Str.Format("%s\t%s", jCode.Code.Mid(1), jCode.Name);
 
 		if (m_nType == 1)
@@ -460,6 +546,10 @@ bool CCodeCombo::JCodeLoad(CString tabPath)
 
 		jCode.Code = CString(pcodex->code, HCodeLen);
 		jCode.Code.TrimRight();
+
+		if (jCode.Code.Find("5A000B") >= 0)
+			OutputDebugString(jCode.Code);
+
 		if (jCode.Code.IsEmpty())
 			continue;
 
@@ -472,7 +562,7 @@ bool CCodeCombo::JCodeLoad(CString tabPath)
 
 		m_pJCode.Add(jCode);
 	}
-	m_pJCode.QuickSort();
+	m_pJCode.QuickSort(); 
 	pWb.reset();
 
 	return true;
@@ -1047,18 +1137,25 @@ void CCodeEdit::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 				((CControlWnd*)m_pParent->GetParent())->clean();
 				return;
 			}
+			
 			//TRACE("KeyUp: %s\n", sTmp);
 			//if (!isHexNumeric(sTmp) && m_Unit == GU_CODE)
-			if (!isHexNumeric2(sTmp) && m_Unit == GU_CODE)
+			if (!isHexNumeric2(sTmp) && m_Unit == GU_CODE && !m_pParent->SearchName(sTmp))
 			{
 				m_pParent->CodeListMode(sTmp);
 				if (!m_pParent->GetDroppedState())
 					m_pParent->ShowDropDown(false);
 				::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
 				
-				m_pParent->SearchCode(sTmp);
+			    m_pParent->SearchCode(sTmp);
 				return;
 			}
+
+			
+
+			if (sTmp.Find("5A000B") >= 0)
+				TRACE("test");
+
 			if ((len == sz_JCODE && m_bValidCheck 
 				&& (m_pParent->IsValidCode(sTmp)) || (m_bValidCheck && len >= sz_JCODE)))
 			{	
@@ -1316,6 +1413,8 @@ bool CCodeEdit::isHexNumeric(CString str)
 
 bool CCodeEdit::isHexNumeric2(CString str)
 {
+
+	OutputDebugString("\r\n" + str);
 	if (!str.IsEmpty() && (str.GetAt(0) < '0' || str.GetAt(0) > '9'))
 		return false;
 /*
@@ -1690,6 +1789,8 @@ CString CfxCodeCtrl::GetHistCode(int idx)
 void CfxCodeCtrl::SetEditData(CString sData, bool bflag, bool bfocus)
 {
 	//AfxMessageBox("SetListCode");
+	if (sData.Find("5A000B") >= 0)
+		OutputDebugString(sData);
 	CString	str, symbol;
 	if (m_pEdit == NULL)
 	{

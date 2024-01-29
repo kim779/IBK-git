@@ -190,19 +190,36 @@ int CSkinListCtrl2::OnToolHitTest( CPoint point, TOOLINFO* pTI ) const
 {
 	int             row, col;
 	RECT    cellrect;
-	row = CellRectFromPoint(point, &cellrect, &col );
+	try
+	{
+		row = CellRectFromPoint(point, &cellrect, &col);
+	}
+	catch (const std::exception&)
+	{
+		CString slog;
+		slog.Format("\r\n [axiscode][OnToolHitTest] try catch");
+		OutputDebugString(slog);
+	}
+	
 
 	if ( row == -1 )        return -1;
-	
+
 	pTI->hwnd               = m_hWnd;
 	pTI->uId                = (UINT)((row<<10)+(col&0x3ff)+1);
 	pTI->lpszText   = LPSTR_TEXTCALLBACK;
 	pTI->rect               = cellrect;
+
+	CString slog;
+	slog.Format("\r\n [axiscode][OnToolHitTest] row=[%d] col=[%d] pTI->uId =[%d] ", row, col, pTI->uId);
+	OutputDebugString(slog);
+
 	return  pTI->uId;
 }
 
 int CSkinListCtrl2::CellRectFromPoint(const CPoint &point, RECT *cellrect, int *col) const
 {
+
+
 	int colnum{};
 	
 	// 리스트뷰가 LVS_REPORT 모드에있는지 확인
@@ -257,12 +274,25 @@ BOOL CSkinListCtrl2::OnToolTipText( UINT, NMHDR* pNMHDR, LRESULT* pResult )
 	CString         strTipText;
 	const UINT    nID = pNMHDR->idFrom;
 
+	CString slog;
+	slog.Format("\r\n [axiscode][OnToolTipText] nID=[%d] ", nID);
+	OutputDebugString(slog);
+
 	if( nID == 0 )                  // NT 에서의 자동생성 툴팁으로부터의 통지
 		return FALSE;       // 그냥 빠져나간다.
 	
 	const int row     = ((nID-1) >> 10) & 0x3fffff ;
 	const int col     = (nID-1) & 0x3ff;
+
+	slog.Format("\r\n [OnToolTipText] row=[%d] col=[%d] ", row, col);
+	OutputDebugString(slog);
 	
+	if (row < 0 || row > 3 || col < 0 || (col != 1 && col != 2))
+	{
+		slog.Format("\r\n [axiscode][OnToolTipText] row=[%d] col=[%d] ", row, col);
+		OutputDebugString(slog);
+		return FALSE;
+	}
 	
 	strTipText = GetItemText( row, col );
 

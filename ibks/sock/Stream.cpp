@@ -108,13 +108,19 @@ void CStream::OnSend(int nErrorCode)
 
 void CStream::OnReceive(int nErrorCode) 
 {
+	CString text;
+	//text.Format("[axSock][CStream][OnReceive]----------- [%d] \r\n", nErrorCode);
+	//OutputDebugString(text);
+
 	if (nErrorCode)
 	{
 		OnClose(nErrorCode);
 		return;
 	}
-
 	m_frameL = Receive(m_frameB, sizeof(m_frameB));
+
+	//text.Format("[axSock][m_frameL] = [%d] [m_frameB] [%.100s] \r\n", m_frameL, m_frameB);
+	//OutputDebugString(text);
 
 #ifdef	_DEBUG
 	m_log->Trace(m_frameB, m_frameL, dirRCV);
@@ -346,8 +352,8 @@ bool CStream::ResponseFM(unsigned char fmC)
 bool CStream::WriteData(char *data, int ndat, bool wait)
 {
 	CString text;
-	text.Format("[axSock][CStream][WriteData] [%.100s] \r\n", data);
-	OutputDebugString(text);
+	//text.Format("[axSock][CStream][WriteData] [%.100s] \r\n", data);
+	//OutputDebugString(text);
 
 	_fmH *fmh = (_fmH *) m_pBytesToData;
 	fmh->fmF[0] = fmF_FS;
@@ -391,6 +397,11 @@ bool CStream::WriteBytes(char *pBytes, int nBytes)
 	for (int ii = 0; ;)
 	{
 		int nWritten = Send(&pBytes[ii], nBytes);
+
+		CString text;
+		//text.Format("[axSock][CStream][WriteBytes] nWritten = [%d] \r\n", nWritten);
+		//OutputDebugString(text);
+
 		if (nWritten == SOCKET_ERROR)
 		{
 			switch (GetLastError())

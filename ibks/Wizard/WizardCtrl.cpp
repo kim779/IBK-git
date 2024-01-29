@@ -493,7 +493,8 @@ long CWizardCtrl::axWizard(long kind, long variant)
 		break;
 	case getCA:
 		m_guard->GetCetifyInfo(tmps);
-		return (long)tmps.operator LPCTSTR();
+		//return (long)tmps.operator LPCTSTR();
+		return (long)tmps.GetString();
 	case getLEDGER:
 		m_guard->Ledger((char*)variant);
 		break;
@@ -543,7 +544,7 @@ long CWizardCtrl::axWizard(long kind, long variant)
 	{
 		CString str;
 		value = HIWORD(kind);
-		value = m_guard->CertifyCloude(value);
+		//value = m_guard->CertifyCloude(value);  //test
 		return value;
 	}
 	break;
@@ -559,6 +560,7 @@ long CWizardCtrl::axWizard(long kind, long variant)
 
 		m_guard->OnCertify(NULL, 0);
 		value = m_guard->CertifyFull(ptr, value, wb, desL);
+
 		struct	_cainfo* cainfo = (struct _cainfo*)ptr;
 		memset(cainfo, 0x20, L_CAINFO);
 		if (desL > 0)
@@ -577,7 +579,7 @@ long CWizardCtrl::axWizard(long kind, long variant)
 			CopyMemory(cainfo->dnL, tmps, sizeof(cainfo->dnL));
 			len += desL;
 		}
-		return value; 
+		return value;
 	}
 	break;
 	case caFULLx:
@@ -592,6 +594,15 @@ long CWizardCtrl::axWizard(long kind, long variant)
 
 		value = m_guard->CertifyFull(ptr, value, wb, desL);
 		return value;
+	}
+	break;
+	case 0x26:
+	{
+		CString ret;
+		int hword = HIWORD(kind);
+		ret = m_guard->GetLoginData(hword);
+		memcpy((char*)variant, (LPCSTR)ret.GetBuffer(0), ret.GetLength());
+		return 1;
 	}
 	break;
 	case setTRACE:
@@ -672,6 +683,9 @@ void CWizardCtrl::OnRead(char* pBytes, int nBytes)
 		axisH = (struct _axisH*)pBytes;
 		pBytes += L_axisH;
 		nBytes -= L_axisH;
+
+//m_slog.Format("\r\n [axwizrd][%s] trc=[%s]", __FUNCTION__, axisH->trxC);
+//OutputDebugString(m_slog);
 
 		axisL = atoi(CString(axisH->datL, sizeof(axisH->datL)));
 		if (axisL > nBytes)

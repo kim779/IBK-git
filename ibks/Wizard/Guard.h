@@ -72,7 +72,7 @@ class CGuard
 public:
 	CGuard();
 	virtual ~CGuard();
-	CString m_slog;
+
 public:
 	CWinApp*	m_app;
 	CString		m_keys;			// copyrights/registry keys
@@ -380,7 +380,6 @@ public:
 
 	bool	GetFdsValue(CString trN, char* datB, int& datL);
 	long	CertifyFull(CString srcB, int srcL, char* desB, int& desL);
-	long CertifyCloude(int igubn);
 	long	CertifyName(char* datB);
 
 private:

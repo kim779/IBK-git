@@ -155,6 +155,15 @@ public:
 	DWORD SetBitmaps(HBITMAP hBitmapIn, COLORREF crTransColorIn, HBITMAP hBitmapOut = NULL, COLORREF crTransColorOut = 0);
 
 	void SizeToContent();
+
+	//testlogin
+	COLORREF m_clrEnableCheck;
+	BOOL	m_bEnableRGBColor;
+	void SetEnableCheckRGBColor(COLORREF clr)
+	{
+		m_clrEnableCheck = clr;
+		m_bEnableRGBColor = true;
+	}
 /*
 #ifdef	BTNST_USE_BCMENU
 	DWORD SetMenu(UINT nMenu, HWND hParentWnd, BOOL bWinXPStyle = TRUE, UINT nToolbarID = NULL, CSize sizeToolbarIcon = CSize(16, 16), COLORREF crToolbarBk = RGB(255, 0, 255), BOOL bRepaint = TRUE);

@@ -49,6 +49,73 @@ static	int g_htmlindex = 0;		// 뉴스 내용 저장 index
 
 /////////////////////////////////////////////////////////////////////////////
 
+//test edge
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <iomanip>
+std::string URLEncodeUTF8(const std::string& strUTF8) {
+	std::ostringstream escaped;
+	escaped.fill('0');
+	escaped << std::hex;
+
+	for (char c : strUTF8) {
+		// 안전한 문자는 그대로 유지, 특수문자는 URL 인코딩
+	//	if (std::isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+		if (c == '-' || c == '_' || c == '.' || c == '~') {
+			escaped << c;
+		}
+		else if (c == ' ') {
+			escaped << '+';
+		}
+		else {
+			escaped << '%' << std::setw(2) << static_cast<unsigned int>(static_cast<unsigned char>(c));
+		}
+	}
+
+	return escaped.str();
+}
+
+std::string ToUpperCase(const std::string& input) {
+	std::string result = input;
+
+	for (char& c : result) {
+		c = std::toupper(c);
+	}
+
+	return result;
+}
+
+#define	HANGULMSK	0x80
+CString ExtractHangulCharacters(const CString& input) {
+	CString result;
+	CString stmp;
+
+	int len = input.GetLength();
+	int i = 0;
+	WORD wHangul;
+	while (i < len) {
+		wchar_t ch = input[i];
+
+		char cName;
+		cName = input.GetAt(i);
+		if (cName & HANGULMSK)
+		{
+			stmp = input.Mid(i, 2);
+			result += stmp;
+			i++;
+		}
+		else if (cName == '(' || cName == ')')
+		{
+			stmp = input.Mid(i, 1);
+			result += stmp;
+		}
+
+		i++;
+	}
+	return result;
+}
+
 CMapDlg::CMapDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CMapDlg::IDD, pParent)
 {
@@ -143,6 +210,9 @@ CMapDlg::CMapDlg(CWnd* pParent /*=NULL*/)
 	m_hGlobal = nullptr;
 	m_pStream = nullptr;
 
+	//test edge
+	HINSTANCE hins;
+	BrowserWindowEdge::InitInstance(hins);
 }
 
 CMapDlg::~CMapDlg()
@@ -290,7 +360,33 @@ LRESULT CMapDlg::OnSend(WPARAM wParam, LPARAM lParam)
 		try
 		{
 #ifndef DF_TEST
-			m_pBrowser->Navigate2((char *)lParam);		
+			if (m_bUsingEdgeBrowser)  //test edge
+			{
+				if (browserEdge && browserEdge->IsWindowVisible())  //test edge
+				{
+					CString strEdgeUrl;
+					strEdgeUrl.Format("%s", (char*)lParam);
+					CString strkor = ExtractHangulCharacters(m_szFileName);
+
+					m_slog.Format("[edge] strkor = [%s] ", strkor);
+					OutputDebugString(m_slog);
+
+					std::wstring strUni = CA2W(strkor); // std::wstring에 어떤 값이 들어가 있는지에 따라 선언
+					std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+					std::string strUTF8 = converter.to_bytes(strUni);
+					std::string stdres = ToUpperCase(URLEncodeUTF8(strUTF8));
+					CString strEnCode;
+					strEnCode = stdres.c_str();
+					strEdgeUrl.Replace(strkor, strEnCode);
+					strEdgeUrl = "file:///" + strEdgeUrl;
+					std::string message_a = strEdgeUrl;
+					std::wstring wurl;
+					wurl.assign(message_a.begin(), message_a.end());
+					browserEdge->Init(wurl);
+				}
+			}
+			else
+				m_pBrowser->Navigate2((char *)lParam);		
 #endif
 		}
 		catch ( CException* e)
@@ -1096,6 +1192,9 @@ BOOL CMapDlg::OnInitDialog()
 	m_szUser = GetAxVariant(nameCC);
 	m_pFont = GetAxFont(8,false,"굴림체");
 
+	//Microsoft Edge WebView2 런타임
+	m_bUsingEdgeBrowser = IsProgramInstalled("Microsoft Edge WebView2 런타임");
+
 	m_sFile.Format("%s/%s/%s/%s", m_szRootDir, USRDIR, m_szUser, NEWS_CHECK_FILE);
 	
 	m_clrText = GetAxColor(69);
@@ -1167,6 +1266,7 @@ BOOL CMapDlg::OnInitDialog()
 
 	SetTimer( DO_INNER_JOB, 500, NULL );
 
+	UploadEdgeEnv("Microsoft Edge WebView2 런타임");
 	return TRUE;
 }
 
@@ -1715,13 +1815,26 @@ void CMapDlg::ReSizeSplit()
 			
 			browserRect.bottom = rc1.bottom;
 			
-			m_pBrowser->MoveWindow(browserRect);
+			if (m_bUsingEdgeBrowser)
+			{
+				if (browserEdge && browserEdge->IsWindowVisible())  //test edge
+					browserEdge->MoveWindow(browserRect);
+			}
+			else
+				m_pBrowser->MoveWindow(browserRect);
+		
 			
 			m_pMapWnd3->MoveWindow(browserRect.right+1,browserRect.top, rc1.Width() - browserRect.Width(), rc1.Height(),TRUE);
 		}
 		else
 		{
-			m_pBrowser->MoveWindow(rc1);
+			if (m_bUsingEdgeBrowser)
+			{
+				if (browserEdge && browserEdge->IsWindowVisible())  //test edge
+					browserEdge->MoveWindow(rc1);
+			}
+			else
+				m_pBrowser->MoveWindow(rc1);
 		}
   
 		m_pMapWnd1->MoveWindow(rc1);  
@@ -1863,13 +1976,25 @@ void CMapDlg::ReSizeSplitTransform()
 			
 			browserRect.bottom = rc1.bottom;
 			
-			m_pBrowser->MoveWindow(browserRect);
+			if (m_bUsingEdgeBrowser)
+			{
+				if (browserEdge && browserEdge->IsWindowVisible())  //test edge
+					browserEdge->MoveWindow(browserRect);
+			}
+			else
+				m_pBrowser->MoveWindow(browserRect);
 			
 			m_pMapWnd3->MoveWindow(browserRect.right+1,browserRect.top, rc1.Width() - browserRect.Width(), rc1.Height(),TRUE);
 		}
 		else
 		{
-			m_pBrowser->MoveWindow(rc1);
+			if (m_bUsingEdgeBrowser)
+			{
+				if (browserEdge && browserEdge->IsWindowVisible())  //test edge
+					browserEdge->MoveWindow(rc1);
+			}
+			else
+				m_pBrowser->MoveWindow(rc1);
 		}
   
 		m_pMapWnd1->MoveWindow(rc1);  
@@ -2403,7 +2528,8 @@ void CMapDlg::OnButtonPrint()
 	vArg.parray = psaHeadFoot;
 
 #ifndef DF_TEST
-	m_pBrowser->ExecWB(OLECMDID_PRINT, OLECMDEXECOPT_PROMPTUSER, &vArg, NULL);
+	if (!m_bUsingEdgeBrowser)
+		m_pBrowser->ExecWB(OLECMDID_PRINT, OLECMDEXECOPT_PROMPTUSER, &vArg, NULL);
 #endif
 	
 	return; //WebBrowser control will clean up the SAFEARRAY after printing.
@@ -2532,7 +2658,8 @@ void CMapDlg::OnButtonPreview()
 	vArg.parray = psaHeadFoot;
 
 #ifndef DF_TEST
-	m_pBrowser->ExecWB(OLECMDID_PRINTPREVIEW, OLECMDEXECOPT_DONTPROMPTUSER, &vArg, NULL);
+	if (!m_bUsingEdgeBrowser)
+		m_pBrowser->ExecWB(OLECMDID_PRINTPREVIEW, OLECMDEXECOPT_DONTPROMPTUSER, &vArg, NULL);
 #endif
 	
 //	GetAxVariant(guideCC ,"출력완료." );
@@ -3897,6 +4024,31 @@ bool CMapDlg::initControl()
 	m_pBrowser->ModifyStyleEx(0, WS_EX_CLIENTEDGE, 0);
 	m_pBrowser->SetWindowPos(&wndTop, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	m_pBrowser->Navigate2("about:blank");
+
+#ifdef DF_USEEDGE
+	if (m_bUsingEdgeBrowser)
+	{
+		m_pBrowser->ShowWindow(SW_HIDE);
+		browserEdge = std::make_unique<BrowserWindowEdge>();
+		CRect rect;
+		GetClientRect(rect);
+
+		if (!browserEdge->Create(nullptr, "BrowserWindowEdge", WS_CHILD | WS_VISIBLE, rect, this, 0)) {
+			m_slog.Format("[edge] [%s] create failure", __FUNCTION__);
+			OutputDebugString(m_slog);
+			AfxMessageBox("edge create fail");
+		}
+
+		CString strEmptyPage = _T("about:blank");
+		std::string message_a = strEmptyPage;
+		std::wstring wurl;
+		wurl.assign(message_a.begin(), message_a.end());
+
+		browserEdge->Init(wurl);
+		m_slog.Format("[edge] [%s] create success", __FUNCTION__);
+		OutputDebugString(m_slog);
+	}
+#endif
 #else
 	m_pBrowser = new CContentWnd();
 	m_pBrowser->SetParent(m_pParent);
@@ -4273,7 +4425,7 @@ void CMapDlg::sendTR(CString strCode, void *m, int nLen, int key, bool bOOP )
 		if (strCode.GetLength() != 8)
 			return;
 
-		std::unique_ptr<char[]> cDataBuffer = std::make_unique<char[]>(2048);
+		std::unique_ptr<char[]> cDataBuffer = std::make_unique<char[]>(4096);
 		memset(cDataBuffer.get(), 0x00, 2048);
 
 		_userTH* userTH = (_userTH*)&cDataBuffer[0];
@@ -5184,8 +5336,19 @@ void CMapDlg::emptyFile()
 		DeleteFile(m_szFileName);
 
 #ifndef DF_TEST
-	m_pBrowser->Stop();
-	m_pBrowser->Navigate2("about:blank");
+	if (m_bUsingEdgeBrowser)  //test edge
+	{
+		/*CString strEmptyPage = _T("about:blank");
+		std::string message_a = strEmptyPage;
+		std::wstring wurl;
+		wurl.assign(message_a.begin(), message_a.end());
+		browserEdge->Init(wurl);*/
+	}
+	else
+	{
+		m_pBrowser->Stop();
+		m_pBrowser->Navigate2("about:blank");
+	}
 #endif
 
 	CheckTab( -1 );
@@ -5210,7 +5373,7 @@ void CMapDlg::selectTab(int nIndex)
 	try
 	{
 		const int	nSelList = m_List.GetSelectionMark();
-		
+
 		if (nSelList >= 0 && nSelList < m_List.GetItemCount())
 		{
 			szcode = m_List.GetItemText(nSelList, 11); // 코드 
@@ -5219,45 +5382,66 @@ void CMapDlg::selectTab(int nIndex)
 		{
 			CString str;
 			m_code->GetWindowText(str);
-			
-			if(str.GetLength() == 6)
+
+			if (str.GetLength() == 6)
 			{
 				szcode = str;
 			}
-			else if(str.GetLength() == 0)
+			else if (str.GetLength() == 0)
 			{
 				CString sHistory = m_code->m_sHistory;
-				CString sCode = Parser(sHistory,"\t");
+				CString sCode = Parser(sHistory, "\t");
 				if (sCode.GetLength() >= 6)
-					m_code->SetEditData( sCode.Left(6) );
-				m_code->SetHistory( GetAxVariant(historyCC, _T("1301")));
+					m_code->SetEditData(sCode.Left(6));
+				m_code->SetHistory(GetAxVariant(historyCC, _T("1301")));
 				szcode = m_code->GetEditData();
 			}
 		}
 
-		CWnd *pMainWnd = NULL;
+		CWnd* pMainWnd = NULL;
 		int key = 0;
 		const CRect	rcc;
-		
-	//{"현재가", "차트", "기업개요", "관심종목", "매매동향", "외국인매매창구집계", "주문"};	
-		if(m_arMapList.GetSize() <= nIndex) return;
+
+		//{"현재가", "차트", "기업개요", "관심종목", "매매동향", "외국인매매창구집계", "주문"};	
+		if (m_arMapList.GetSize() <= nIndex) return;
 
 		mapname = m_arMapList[nIndex];//g_MapTabList[nIndex];
 
 #ifndef DF_TEST
-		if (m_pBrowser)
-			m_pBrowser->Stop();
+		if (m_bUsingEdgeBrowser)  //test edge
+		{
+			
+				
+		}
+		else
+		{
+			if (m_pBrowser)
+				m_pBrowser->Stop();
+		}
+	
 #endif
 		
 		m_pMapWnd1->ShowWindow(SW_HIDE);
 		m_pMapWnd2->ShowWindow(SW_HIDE);
 
-		if(nIndex > 0 && m_pBrowser)
-			m_pBrowser->ShowWindow(SW_HIDE);
+		if (m_bUsingEdgeBrowser)
+		{
+				if (browserEdge && nIndex > 0)
+					browserEdge->ShowWindow(SW_HIDE);
+				else
+				{
+					if(browserEdge)
+						browserEdge->ShowWindow(SW_SHOW);
+				}
+		}
 		else
-			if( m_pBrowser)
-				m_pBrowser->ShowWindow(SW_SHOW);
-
+		{
+			if (nIndex > 0 && m_pBrowser)
+				m_pBrowser->ShowWindow(SW_HIDE);
+			else
+				if (m_pBrowser)
+					m_pBrowser->ShowWindow(SW_SHOW);
+		}
 		
 		const CRect rc,rc2;
 		CString tmp; 
@@ -5482,8 +5666,74 @@ void CMapDlg::selectTab(int nIndex)
 				m_pMapWnd3->SendTrigger(szcode);
 
 #ifndef DF_TEST
-				if (m_pBrowser) //vc2019
-					m_pBrowser->Navigate2(m_szFileName);
+				//test edge
+				if (m_bUsingEdgeBrowser)
+				{
+					if (browserEdge && browserEdge->IsWindowVisible())  //test edge
+					{
+						CString strEdgeUrl;
+						strEdgeUrl = m_szFileName;
+					
+						CFileFind find;
+						BOOL bfind{};
+						BOOL bover{};
+						auto future = std::async([&]() {
+							while (1)
+							{
+								bfind = find.FindFile(m_szFileName);
+								Sleep(10);
+
+								if (bfind)
+								{
+									m_slog.Format("\r\n [edge] !!!!!!!!!!! future thread  find");
+									OutputDebugString(m_slog);
+									break;
+								}
+								else
+								{
+									m_slog.Format("\r\n [edge] future thread not find");
+									OutputDebugString(m_slog);
+								}
+								if (bover)
+								{
+									m_slog.Format("\r\n [edge] --------- future thread time over");
+									OutputDebugString(m_slog);
+									break;
+								}
+							}
+							});
+
+						const std::chrono::milliseconds wtime(2000);
+						if (future.wait_for(wtime) != std::future_status::ready)
+							bover = true;
+
+						if (!bover)
+						{
+							CString strkor = ExtractHangulCharacters(m_szFileName);
+
+							m_slog.Format("[edge] strkor = [%s] ", strkor);
+							OutputDebugString(m_slog);
+
+							std::wstring strUni = CA2W(strkor); // std::wstring에 어떤 값이 들어가 있는지에 따라 선언
+							std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+							std::string strUTF8 = converter.to_bytes(strUni);
+							std::string stdres = ToUpperCase(URLEncodeUTF8(strUTF8));
+							CString strEnCode;
+							strEnCode = stdres.c_str();
+							strEdgeUrl.Replace(strkor, strEnCode);
+							strEdgeUrl = "file:///" + strEdgeUrl;
+							std::string message_a = strEdgeUrl;
+							std::wstring wurl;
+							wurl.assign(message_a.begin(), message_a.end());
+							browserEdge->Init(wurl);
+						}
+					}
+				}
+				else
+				{
+					if (m_pBrowser) //vc2019
+						m_pBrowser->Navigate2(m_szFileName);
+				}
 #endif
 			
 				break;	
@@ -5523,7 +5773,17 @@ void CMapDlg::resizeTab(BOOL bShow)
 	m_btnPrint.GetWindowRect(rcBtnPrint);				ScreenToClient(rcBtnPrint);
 	m_btnNext.GetWindowRect(rcBtnNext);				ScreenToClient(rcBtnNext);
 	m_TimeCtrl.GetWindowRect(rcTimeCtrl);				ScreenToClient(rcTimeCtrl);
-	m_pBrowser->GetWindowRect(rcBrowser);				ScreenToClient(rcBrowser);
+	if (m_bUsingEdgeBrowser)
+	{
+		browserEdge->GetWindowRect(rcBrowser);				
+		ScreenToClient(rcBrowser);
+	}
+	else
+	{
+		m_pBrowser->GetWindowRect(rcBrowser);				
+		ScreenToClient(rcBrowser);
+	}
+	
 	m_pMapWnd1->GetWindowRect(rcMap1);				ScreenToClient(rcMap1);
 	m_pMapWnd2->GetWindowRect(rcMap2);				ScreenToClient(rcMap2);
 	m_pTab->GetWindowRect(rcTab);					ScreenToClient(rcTab);
@@ -5592,6 +5852,8 @@ void CMapDlg::resizeTab(BOOL bShow)
 	m_btnNext.MoveWindow(rcBtnNext);				
 	m_TimeCtrl.MoveWindow(rcTimeCtrl);
 	m_pBrowser->MoveWindow(rcBrowser);
+	if (browserEdge && browserEdge->IsWindowVisible())  //test edge
+		browserEdge->MoveWindow(rcBrowser);
 	m_pMapWnd1->MoveWindow(rcMap1);
 	m_pMapWnd2->MoveWindow(rcMap2);
 	m_pTab->MoveWindow(rcTab);
@@ -5610,7 +5872,12 @@ void CMapDlg::resizeTab(CRect rcBorder)
 	ScreenToClient(rcGrid);
 	m_pTab->GetWindowRect(rcTab);	
 	ScreenToClient(rcTab);
-	m_pBrowser->GetWindowRect(rcContent);
+
+	if(m_bUsingEdgeBrowser)
+		browserEdge->GetWindowRect(rcContent);
+	else
+		m_pBrowser->GetWindowRect(rcContent);
+
 	ScreenToClient(rcContent);
 	
 	rcGrid.bottom = rcBorder.top;
@@ -5621,7 +5888,14 @@ void CMapDlg::resizeTab(CRect rcBorder)
 	m_List.MoveWindow(rcGrid, TRUE);
 	m_pTab->MoveWindow(rcTab, TRUE);
 //	rcContent.top -= 15;	// 20071128
-	m_pBrowser->MoveWindow(rcContent, TRUE);
+	if (m_bUsingEdgeBrowser)
+	{
+		if (browserEdge && browserEdge->IsWindowVisible())  //test edge
+			browserEdge->MoveWindow(rcContent);
+	}
+	else
+		m_pBrowser->MoveWindow(rcContent, TRUE);
+
 	m_pMapWnd1->MoveWindow(rcContent, TRUE);
 	m_pMapWnd2->MoveWindow(rcContent, TRUE);
 	CRect	rcbtn;
@@ -6755,13 +7029,25 @@ void CMapDlg::ResizeControl()
 
 			browserRect.bottom = rc1.bottom;
 
-			m_pBrowser->MoveWindow(browserRect);
+			if (m_bUsingEdgeBrowser)
+			{
+				if (browserEdge && browserEdge->IsWindowVisible())  //test edge
+					browserEdge->MoveWindow(browserRect);
+			}
+			else
+				m_pBrowser->MoveWindow(browserRect);
 			
 			m_pMapWnd3->MoveWindow(browserRect.right+1,browserRect.top, rc1.Width() - browserRect.Width(), rc1.Height(),FALSE);
 		}
 		else
 		{
-			m_pBrowser->MoveWindow(rc1);
+			if (m_bUsingEdgeBrowser)
+			{
+				if (browserEdge && browserEdge->IsWindowVisible())  //test edge
+					browserEdge->MoveWindow(rc1);
+			}
+			else
+				m_pBrowser->MoveWindow(rc1);
 		}
 
 		m_pMapWnd1->MoveWindow(rc1);  
@@ -6946,13 +7232,25 @@ void CMapDlg::ResizeTransformControl(BOOL bFirst)
 
 			browserRect.bottom = rc1.bottom;
 
-			m_pBrowser->MoveWindow(browserRect);
-			
+			if (m_bUsingEdgeBrowser)
+			{
+				if (browserEdge && browserEdge->IsWindowVisible())  //test edge
+					browserEdge->MoveWindow(browserRect);
+			}
+			else
+				m_pBrowser->MoveWindow(browserRect);
+		
 			m_pMapWnd3->MoveWindow(browserRect.right+1,browserRect.top, rc1.Width() - browserRect.Width(), rc1.Height(),FALSE);
 		}
 		else
 		{
-			m_pBrowser->MoveWindow(rc1);
+			if (m_bUsingEdgeBrowser)
+			{
+				if (browserEdge && browserEdge->IsWindowVisible())  //test edge
+					browserEdge->MoveWindow(rc1);
+			}
+			else
+				m_pBrowser->MoveWindow(rc1);
 		}
 	
 		m_pMapWnd1->MoveWindow(rc1);  
@@ -7676,8 +7974,14 @@ void CMapDlg::TransformWnd(BOOL bFlag)
 		m_pMapWnd2->GetWindowRect(brwRect);
 		ScreenToClient(brwRect);
 		
-		m_pBrowser->MoveWindow(brwRect);
-		
+		if (m_bUsingEdgeBrowser)
+		{
+			if (browserEdge && browserEdge->IsWindowVisible())  //test edge
+				browserEdge->MoveWindow(brwRect);
+		}
+		else
+			m_pBrowser->MoveWindow(brwRect);
+	
 		//m_pMapWnd3->closeMap();
 		
 		m_pMapWnd3->MoveWindow(CRect(0,0,0,0));
@@ -7862,4 +8166,145 @@ void CMapDlg::OnButtonScrap()
 {
 	const int nIndex = m_List.GetSelectedItem();
 	ScrapNews(nIndex);
+}
+
+void CMapDlg::UploadEdgeEnv(CString sProgramName)
+{
+	struct _pidouini_item {
+		char	usid[8];				// 사용자 ID
+		char	innm[100];				// INI 파일명
+		char	senm[100];				// 섹션명
+		char	skey[100];				// KEY
+		char	valu[2000];				// VALUE
+		char	date[8];				// 업데이트 일자
+	};
+
+	struct _pidouini_mid {
+		char	gubn[1];				//구분 'Q': 조회, 'I': 입력
+		struct	_pidouini_item item;
+	};
+
+	CString strINI(_T("")), strW, stime;
+	CString strEdgeEnv, stmp;
+	char readB[256]{};
+	int readL = 0;
+
+	strINI.Format("%s\\tab\\axis.ini", m_szRootDir, m_szUser);
+	readL = GetPrivateProfileString("EDGE", "UpLoadDate", "0", readB, sizeof(readB), strINI);
+	strW = CString(readB, readL);
+
+	CTime	time;
+	time = time.GetCurrentTime();
+	stime.Format("%04d%02d%02d", time.GetYear(), time.GetMonth(), time.GetDay()); 
+
+	readL = GetPrivateProfileString("MODE", "dev", "0", readB, sizeof(readB), strINI);
+	stmp.Format("%s", readB);
+	stmp.Trim();
+
+	if (atoi(strW) >= atoi(stime) && stmp != "1")   //개발기는 계속 저장
+		return;
+
+	BOOL binstalled{};
+	HKEY hKey;
+	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"), 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+	{
+		char szSubKey[MAX_PATH];
+		DWORD dwIndex = 0;
+		DWORD dwSize = MAX_PATH;
+
+		//해당레지스트리의 하위키를 열거 한다. 
+		while (RegEnumKeyEx(hKey, dwIndex, szSubKey, &dwSize, nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS)
+		{
+			HKEY hSubKey;
+			if (RegOpenKeyEx(hKey, szSubKey, 0, KEY_READ, &hSubKey) == ERROR_SUCCESS)
+			{
+				OutputDebugString("\r\n-------------------------------------------------------------");
+				stmp.Format("\r\n szSubKey=[%s], dwindex=[%d]", szSubKey, dwIndex);
+				OutputDebugString(stmp);
+				char szDisplayName[MAX_PATH];
+				DWORD dwSize = sizeof(szDisplayName);
+
+				//패키지명 버전 확인
+				if (RegQueryValueEx(hSubKey, _T("Displayname"), nullptr, nullptr, reinterpret_cast<LPBYTE>(szDisplayName), &dwSize) == ERROR_SUCCESS)
+				{
+					CString strDisplayName(szDisplayName);
+					if (strDisplayName.Find(sProgramName) >= 0)
+					{
+						binstalled = TRUE;
+						char szDisplayVersion[MAX_PATH];
+						dwSize = sizeof(szDisplayVersion);
+						if (RegQueryValueEx(hSubKey, _T("DisplayVersion"), nullptr, nullptr, reinterpret_cast<LPBYTE>(szDisplayVersion), &dwSize) == ERROR_SUCCESS)
+						{
+							CString strDisplayVersion(szDisplayVersion);
+							strEdgeEnv += "DisplayVersion = ";
+							strEdgeEnv += strDisplayVersion;
+							strEdgeEnv += "|";
+						}
+
+						char szInstallDate[MAX_PATH];
+						dwSize = sizeof(szInstallDate);
+						if (RegQueryValueEx(hSubKey, _T("InstallDate"), nullptr, nullptr, reinterpret_cast<LPBYTE>(szInstallDate), &dwSize) == ERROR_SUCCESS)
+						{
+							CString szInstallDate(szInstallDate);
+							strEdgeEnv += "InstallDate = ";
+							strEdgeEnv += szInstallDate;
+							strEdgeEnv += "|";
+						}
+						break;
+					}
+				}
+
+			}
+			dwSize = MAX_PATH;
+			dwIndex++;
+		}//while
+	}//if
+
+	if(binstalled)
+		WritePrivateProfileString(_T("EDGE"), sProgramName, "1", strINI);
+	else
+		WritePrivateProfileString(_T("EDGE"), sProgramName, "0", strINI);
+
+	CString sdat, strLog, userID;
+	userID = Variant(userCC, "");
+	userID.TrimRight();
+
+	
+	stime.Format("%04d%02d%02d %02d:%02d:%02d", time.GetYear(), time.GetMonth(), time.GetDay(), time.GetHour(), time.GetMinute(), time.GetSecond());
+	sdat.Format("%04d%02d%02d", time.GetYear(), time.GetMonth(), time.GetDay());
+
+	WritePrivateProfileString(_T("EDGE"), _T("UpLoadDate"), stime.Left(8), strINI);
+
+
+	std::unique_ptr<char[]> pdata = std::make_unique<char[]>(sizeof(struct _pidouini_mid) + 1);
+	memset(pdata.get(), 0, sizeof(struct	_pidouini_mid) + 1);
+	struct _pidouini_mid* pmid = (struct	_pidouini_mid*)pdata.get();
+	pmid->gubn[0] = 'I';
+	memcpy(pmid->item.usid, (LPCSTR)userID, userID.GetLength());
+	memcpy(pmid->item.innm, stime, 8);
+	memcpy(pmid->item.senm, "EDGE", 4);
+	memcpy(pmid->item.skey, "IB771000", 8);
+	memcpy(pmid->item.valu, strEdgeEnv, strEdgeEnv.GetLength());
+	memcpy(pmid->item.date, sdat, 8);
+	sendTR("pidouini", pmid, sizeof(struct	_pidouini_mid), type_Edge_Env);	
+}
+
+BOOL CMapDlg::IsProgramInstalled(CString sProgramName)
+{ 
+	BOOL bInstalled{};
+	CString strINI(_T(""));
+	CString strEdgeEnv, stmp;
+	char readB[256]{};
+	int readL = 0;
+
+	strINI.Format("%s\\tab\\axis.ini", m_szRootDir, m_szUser);
+
+	CString strW, stime;
+	readL = GetPrivateProfileString("EDGE", sProgramName, "0", readB, sizeof(readB), strINI);
+	strW = CString(readB, readL);
+
+	if (strW == "1")
+		return TRUE;
+	else
+		return FALSE;
 }

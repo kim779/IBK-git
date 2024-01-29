@@ -139,8 +139,22 @@ LONG CGrpWnd::OnUser(WPARAM wParam, LPARAM lParam)
 	case DLL_INB:	// get data from out
 		return RequestHead();
 		break;
+	//test
+	case DLL_ALERT:
+		RealTimeData((char*)lParam);
+		break;
 	case DLL_ALERTx:	// realtime data		
-		RealTimeData((char *)lParam);
+	{
+		//RealTimeData((char *)lParam);
+	/*	struct _alertR* alert = (struct _alertR*)lParam;
+		for (int ii = alert->size - 1; ii >= 0; ii--)
+		{
+			DWORD* pdata = (DWORD*)alert->ptr[ii];
+			CString str;
+			str.Format("%s", pdata[23]);
+		}*/
+		//RealTimeData((struct _alertR*)lParam);
+	}
 		break;
 	case DLL_SETPAL:
 		m_fRGB = GetPalette(BGIndex);

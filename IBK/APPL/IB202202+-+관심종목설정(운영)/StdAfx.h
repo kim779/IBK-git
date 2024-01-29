@@ -34,3 +34,7 @@
 
 #define DF_SEARCH
 
+#define ROW_COMMENT '8'   //test mod
+#define ROW_BOOKMARK '9'
+
+//#define DF_USEBOOKFILE   //기존 북마크 사용하는 모드

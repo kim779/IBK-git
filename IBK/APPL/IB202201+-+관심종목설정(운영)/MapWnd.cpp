@@ -65,10 +65,17 @@ int CMapWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
+	
 
 	Variant(titleCC, idTOstring(IDS_TITLE));
 	m_user = Variant(userCC, "");
 	m_root = Variant(homeCC, "");
+	m_bBookFileProcess = CheckBookFileProcess();
+
+	m_slog.Format("[interest][IB202201] -------------------------------------");
+	OutputDebugString(m_slog);
+	m_slog.Format("[interest][IB202201][%s] m_bBookFileProcess=[%d]", __FUNCTION__, m_bBookFileProcess);
+	OutputDebugString(m_slog);
 
 	CFont* font = GetAxFont(idTOstring(IDS_DEFAULTFONT), 9, 0);
 	CRect	clientRC, btn1RC, btn2RC;
@@ -292,36 +299,36 @@ long CMapWnd::OnUpDnAction(WPARAM wParam, LPARAM lParam)
 {
 	switch (LOWORD(wParam))
 	{
-	case upACTION:
+	case upACTION:                          //사용되지 않는다?
 		updnWaitAction(0);
 		uploadAction(true);
 		break;
-	case upsequenceACTION:
+	case upsequenceACTION:			//'S'			그룹편집에 대한 결과처리
 		uploadSequence();
 		break;
-	case upnewgroupACTION:
+	case upnewgroupACTION:         //'G			새로운 그룹 추가시
 		uploadNewGroup();
 		break;
-	case upEachGroupACTION:
+	case upEachGroupACTION:         //'G'      그룹콤보에서 다른 그룹 선택하거나 하면 보고있던 그룹내용을 저장한다.	
 		uploadEachGroup(HIWORD(wParam));
 		break;
-	case upEndACTION:
+	case upEndACTION:                    // 'G'		저장버튼 누르면 그룹종목 전송
 		uploadEndGroup(HIWORD(wParam));
 		break;
-	case upOKACTION:
+	case upOKACTION:                     // 'V'		 최종상태저장  
 		uploadOK();
 		break;
-	case dnACTION:
+	case dnACTION:                         //서버에서 관심종목 받기	
 		m_sheet->EnablePage1Btn(FALSE);	// 20070620
 		updnWaitAction(0);
 		dnloadAction();
 		break;
-	case dnACTIONX:
+	case dnACTIONX:							//구버전 관심받기 (사용되지 않는다)
 		m_sheet->EnablePage1Btn(FALSE);	// 20070620
 		updnWaitAction(0);
 		dnloadActionX();
 		break;
-	case dnACTIONR:
+	case dnACTIONR:						//서버에서 관심종목 복구	
 //		m_sheet->EnablePage1Btn(FALSE);	// 20070620
 // 		updnWaitAction(0);
 // 		dnloadActionR();
@@ -343,6 +350,8 @@ long CMapWnd::OnUpDnAction(WPARAM wParam, LPARAM lParam)
 	case dnGROUPCODE:
 		Request_GroupCode(lParam);
 		break;
+	case getBOOLFILEPROCESS:
+		return m_bBookFileProcess;
 	}
 
 	return 0;
@@ -350,6 +359,11 @@ long CMapWnd::OnUpDnAction(WPARAM wParam, LPARAM lParam)
 
 void CMapWnd::uploadAction(bool init)
 {
+	m_slog.Format("[interest][IB202201] -------------------------------------");
+	OutputDebugString(m_slog);
+	m_slog.Format("[interest][IB202201][%s] init=[%d]", __FUNCTION__, init);
+	OutputDebugString(m_slog);
+
 	int	sendL = 0;
 	char	tempB[32]{};
 	std::string sendB;
@@ -423,7 +437,8 @@ void	CMapWnd::sequenceOubsUP(char* datB, int datL)
 	}
 
 	initSaveFile((char *)(datB+sz_uinfo));
-	m_sheet->initCombo();
+	//m_sheet->initCombo();
+	Request_GroupList(); //test mod
 }
 
 
@@ -720,6 +735,10 @@ TRACE("kwon L\n");
 
 void CMapWnd::uploadSequence()
 {
+	m_slog.Format("[interest][IB202201] -------------------------------------");
+	OutputDebugString(m_slog);
+	m_slog.Format("[interest][IB202201][%s]", __FUNCTION__);
+	OutputDebugString(m_slog);
 
 	int	count{};
 	struct _updn2 updn2;
@@ -745,6 +764,10 @@ void CMapWnd::uploadSequence()
 		mode = m_sheet->getManageGroupdata(i,1);		//mode (D : 삭제) N : 그룹 추가 
 		ngrs.Format("%02d",j+1);				//new
 		gnam = m_sheet->getManageGroupdata(i,3);		//name
+
+m_slog.Format("[interest][IB202201] ngrs=[%s] ogrs=[%s] gnam=[%s]", ngrs, ogrs, gnam);
+OutputDebugString(m_slog);
+
 
 		if(mode != "D")
 		{
@@ -826,6 +849,10 @@ void CMapWnd::uploadNewGroup()
 
 void CMapWnd::uploadEndGroup(int gno)
 {
+	m_slog.Format("[interest][IB202201] -------------------------------------");
+	OutputDebugString(m_slog);
+
+
 	int	sendL = 0;
 	char	tempB[32]{};
 	std::string	sendB;
@@ -856,6 +883,8 @@ void CMapWnd::uploadEndGroup(int gno)
 
 	count = m_sheet->GetUploadData(atoi(ogrs), gnam, &sendB[sendL]);
 	
+m_slog.Format("[interest][IB202201][%s] gno=[%d] ogrs=[%s] gnam=[%s]", __FUNCTION__, gno, ogrs, gnam);
+OutputDebugString(m_slog);
 
 	sendL += count * sz_jinfo;
 
@@ -898,6 +927,11 @@ void	CMapWnd::uploadOK()
 // 그룹과 종목리스트 업로드...
 void CMapWnd::uploadEachGroup(int gno)
 {	
+	m_slog.Format("[interest][IB202201] -------------------------------------");
+	OutputDebugString(m_slog);
+	m_slog.Format("[interest][IB202201][%s]", __FUNCTION__);
+	OutputDebugString(m_slog);
+
 	int	sendL = 0;
 	char	tempB[32]{};
 	std::string	sendB;
@@ -1496,15 +1530,6 @@ CString CMapWnd::Variant(int comm, CString data)
 
 void CMapWnd::sendTR(CString trCode, char* datB, int datL, int key)
 {
-	CString slog;
-	if (trCode.Find(trUPDOWN) >= 0)
-	{
-		slog.Format("\r\n-----------[202201] %.50s", datB);
-		OutputDebugString(slog);
-	}
-	
-
-
 	std::string sendB;
 	sendB.resize(L_userTH + datL + 1);
 	struct	_userTH* uTH = (struct _userTH *) sendB.data();
@@ -1678,33 +1703,38 @@ BOOL CMapWnd::ExistFile(CString fullfile)
 	return true;
 }
 
-BOOL CMapWnd::ChangeBookFile(CString strFileO, CString strFileN, CStringArray& strarr) //bookmark fix
+BOOL CMapWnd::ChangeBookFile(int index, CString strFileO, CString strFileN, CStringArray& strarr) //bookmark fix
 {
-
 	if (ExitBookFile(strFileO) == FALSE && ExitBookFile(strFileN) == FALSE)
-	{
-		m_slog.Format("\r\n [IB202201] [O=N, N=F]  strFileO=[%s]  strFileN=[%s] ", strFileO.Right(12), strFileN.Right(12));
+	{// 원래 그룹에 해당하는 북마크 파일 , 새로운 그룹에 해당하는 북마크 파일 둘다 없다
+m_slog.Format("\r\n [interest][IB202201] 그룹[%d] | 북마크파일이 둘다없다 | O=[%s] N=[%s] ", 
+index, strFileO.Right(12), strFileN.Right(12));
 		OutputDebugString(m_slog);
 		return FALSE;
 	}
 	else if (ExitBookFile(strFileO) == TRUE && ExitBookFile(strFileN) == FALSE)
-	{//O 는 북마크 파일이 있고 N는 없다  원래 북마크 있던 그룹인덱스가 새로운 그룹인덱스로 복사
+	{//원래 북마크 있던 그룹인덱스가 새로운 그룹인덱스로 복사
+	// 새로운 그룹 인덱스로 북마크 파일 생성, 기존 원본 북마크는 지운다
 		CopyFile(strFileO, strFileN + "tmp", false);
-		m_slog.Format("\r\n [IB202201] [O=T, N=F] strFileO=[%s]  strFileN=[%s] ", strFileO.Right(12), strFileN.Right(12));
+m_slog.Format("\r\n [interest][IB202201] 그룹[%d] | 북마크파일 원본O신규X 원본그룹북마크를 신규그룹북마크로 생성 후 원본그룹 삭제| O=[%s]  N=[%s] ",
+	index, strFileO.Right(12), strFileN.Right(12));
 		OutputDebugString(m_slog);
 		strarr.Add(strFileO);
 		return TRUE;
 	}
 	else if (ExitBookFile(strFileO) == FALSE && ExitBookFile(strFileN) == TRUE)
-	{
-		m_slog.Format("\r\n [IB202201] [O=F, N=T] strFileO=[%s]  strFileN=[%s] ", strFileO.Right(12), strFileN.Right(12));
-		OutputDebugString(m_slog);
+	{ //현재 이 그룹(index)이 신규가 되었지만 원래 북마크가 없으므로 복사할것도 지울것도 없다
+m_slog.Format("\r\n [interest][IB202201] 그룹[%d] | 북마크파일 원본X신규O 원래없으므로 카피도 삭제도 없다 | O=[%s] N=[%s] ", 
+	index, strFileO.Right(12), strFileN.Right(12));
+OutputDebugString(m_slog);
 		return FALSE;
 	}
 	else if (ExitBookFile(strFileO) == TRUE && ExitBookFile(strFileN) == TRUE)
-	{
-		m_slog.Format("\r\n [IB202201] [O=T, N=T] strFileO=[%s]  strFileN=[%s] ", strFileO.Right(12), strFileN.Right(12));
-		OutputDebugString(m_slog);
+	{ //둘다 북마크가 있는 그룹을 서로 바꾼다. 이는 그룹 루프를 돌면서 두번 조건에 걸린다. 
+	  //그때마다 원본파일을 tmp로 복사해두고 지우는 목록에 넣어둔다.
+m_slog.Format("\r\n [interest][IB202201] 그룹[%d] 북마크파일 원본O신규O | O=[%s]  N=[%s] ",
+	index, strFileO.Right(12), strFileN.Right(12));
+OutputDebugString(m_slog);
 		CopyFile(strFileO, strFileN + "tmp", false);
 		strarr.Add(strFileO);
 		return TRUE;
@@ -1721,55 +1751,63 @@ BOOL CMapWnd::ExitBookFile(CString strBookFile) //bookmark fix
 
 void CMapWnd::initSaveFile(char* datB, bool isSequence)
 {
-	#define MAX_JM    120             /* 최대 관심그룹 갯수   */
-	#define MAX_SIZE  4084            /* 최대 관심그룹 갯수   */
+	m_slog.Format("[interest][IB202201] -------------------------------------");
+	OutputDebugString(m_slog);
+	m_slog.Format("[interest][IB202201][%s] m_bBookFileProcess=[%d]", __FUNCTION__, m_bBookFileProcess);
+	OutputDebugString(m_slog);
+
+	if (!m_bBookFileProcess)
+		return;
+
+#define MAX_JM    120             /* 최대 관심그룹 갯수   */
+#define MAX_SIZE  4084            /* 최대 관심그룹 갯수   */
 
 	struct  glist {
-		char    ngrs[2];           /* New Group Seqn       */                                               
+		char    ngrs[2];           /* New Group Seqn       */
 		char    ogrs[2];           /* New Group Seqn       */
 		char    gnam[30];           /* Group Name           */
 	};
-	
+
 	struct  grpfold {
 		char    nrec[4];           /* Group Count          */
 		struct  glist   glist[MAX_JM];
 	};
 
-////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////
 
 	CString saveFile, saveN, moveN, portFile, saveportN, savemoveN, stmp;
 	CString m_root, m_name;
 	m_root = Variant(homeCC, "");
 	m_name = Variant(nameCC, "");
-	
-	
+
+
 	//서버에서 받은 Output이 있으면 portfolio 갱신
-	if(datB != nullptr)
+	if (datB != nullptr)
 	{
 		struct grpfold* gFold;
-		gFold = (struct grpfold *)(datB);
+		gFold = (struct grpfold*)(datB);
 
-	
+
 		CStringArray strArrDelFile{};
 		CString oldFile, newFile, tempFile, oldTempFile, newTempFile;
-		
+
 		char nrec[4];
 		CopyMemory(nrec, gFold->nrec, sizeof(gFold->nrec));
-		
+
 		const int nCount = atoi(nrec);
 		struct glist list {};
 
-		if(nCount > 0)
+		if (nCount > 0)
 		{
 			m_sheet->setManageGroup(datB);
 			const int groupCount = m_sheet->getManageCount();
 
-			CString	string = _T(""), gnoS, oldnoS, gnameS, saveS, saveTempS, saveBookS, bookS;			
+			CString	string = _T(""), gnoS, oldnoS, gnameS, saveS, saveTempS, saveBookS, bookS;
 
-			for(int i= 0 ; i< nCount ; i++)
+			for (int i = 0; i < nCount; i++)
 			{
 				memcpy(&list, &gFold->glist[i], sizeof(glist));
-				
+
 				gnoS.Format("%.2s", list.ngrs);     //new group sequence
 				oldnoS.Format("%.2s", list.ogrs);  //original group sequence
 				gnameS.Format("%.30s", list.gnam);  // 그룹명
@@ -1777,24 +1815,27 @@ void CMapWnd::initSaveFile(char* datB, bool isSequence)
 
 				gnoS.TrimLeft(); gnoS.TrimRight();
 
-				if(gnoS.IsEmpty() || atoi(gnoS) == 0) break;	//2015.04.09 KSJ 빈값이 들어오면 거기서 멈춘다.
+				if (gnoS.IsEmpty() || atoi(gnoS) == 0) break;	//2015.04.09 KSJ 빈값이 들어오면 거기서 멈춘다.
 
-				string += gnoS; 
+				string += gnoS;
 				string += ";";
-				
+
 				if (atoi(oldnoS) != atoi(gnoS))  //그룹순서가 바뀌었을때 북마크파일도 복사해주는 용도
 				{
 					//bookmark도 변경
 					oldTempFile.Format("%s\\%s\\%s\\bookmark.i%s", m_root, "user", m_name, oldnoS);
 					newTempFile.Format("%s\\%s\\%s\\bookmark.i%s", m_root, "user", m_name, gnoS);
 
-					ChangeBookFile(oldTempFile, newTempFile, strArrDelFile);
-				}	
+m_slog.Format("\r\n [interest][IB202201] i=[%d] oldnoS=[%s]  gnoS=[%s]",i, oldnoS, gnoS);
+OutputDebugString(m_slog);
+
+					ChangeBookFile(i + 1, oldTempFile, newTempFile, strArrDelFile);
+				}
 			}
 
 			for (int ii = 0; ii < strArrDelFile.GetSize(); ii++)
 			{
-				m_slog.Format("\r\n [IB202201] DeleteFile=[%s]", strArrDelFile.GetAt(ii));
+				m_slog.Format("\r\n [interest][IB202201] DeleteFile=[%s]", strArrDelFile.GetAt(ii));
 				OutputDebugString(m_slog);
 				DeleteFile(strArrDelFile.GetAt(ii));
 			}
@@ -1805,35 +1846,35 @@ void CMapWnd::initSaveFile(char* datB, bool isSequence)
 				newTempFile.Format("%s\\%s\\%s\\bookmark.i%02d", m_root, "user", m_name, ii);
 				if (ExistFile(oldTempFile))
 				{
-					m_slog.Format("\r\n [IB202201] oldTempFile=[%s] newTempFile=[%s]]", oldTempFile.Right(12), newTempFile.Right(12));
+					m_slog.Format("\r\n [interest][IB202201] 새로운 북마크파일 복사본->oldTempFile=[%s]   제대로 바꾼다->newTempFile=[%s]]", oldTempFile, newTempFile);
 					OutputDebugString(m_slog);
 					CopyFile(oldTempFile, newTempFile, false);
 					DeleteFile(oldTempFile);
 				}
 			}
 		}
-		else	//nCount > 0
+		else	//nCount<= 0
 		{
 			m_sheet->setManageGroup(datB);
 			CString	string = _T(""), gnoS, oldnoS, gnameS, saveS, saveTempS, saveBookS, bookS;
 			const int groupCount = m_sheet->getManageCount();
-			for(int i=1 ; i<= groupCount ; i++)
+			for (int i = 1; i <= groupCount; i++)
 			{
 				saveBookS.Format("%s\\%s\\%s\\bookmark.i%02d.save", m_root, "user", m_name, i);
 				bookS.Format("%s\\%s\\%s\\bookmark.i%02d", m_root, "user", m_name, i);
 
-				if(ExistFile(bookS))
+				if (ExistFile(bookS))
 					CopyFile(bookS, saveBookS, false);
-			
+
 			}
 			CString dele, book, deleFile, deletempFile, delbookFile, tempdel;
 
-			for (int i=nCount+1; i<=100; i++)
+			for (int i = nCount + 1; i <= 100; i++)
 			{
 				book.Format("bookmark.i%02d", i);
 				delbookFile.Format("%s\\%s\\%s\\%s", m_root, "user", m_name, book);
-				
-				if(ExistFile(delbookFile))
+
+				if (ExistFile(delbookFile))
 				{
 					DeleteFile(delbookFile);
 				}
@@ -1842,12 +1883,12 @@ void CMapWnd::initSaveFile(char* datB, bool isSequence)
 	}
 }
 
+
 BOOL CMapWnd::PreTranslateMessage(MSG* pMsg) 
 {
 	// TODO: Add your specialized code here and/or call the base class	
 	return CWnd::PreTranslateMessage(pMsg);
 }
-
 
 void CMapWnd::Request_GroupList()
 {
@@ -1891,3 +1932,115 @@ void CMapWnd::Request_GroupCode(int iseq)
 	sendTR(trUPDOWN, sendB.data(), sendL, dnGROUPCODE);
 }
 
+BOOL CMapWnd::CheckFileModificationTime(const CString& filePath)
+{
+	CString stmp;
+	CFileStatus fileStatus;
+	CString	fileFullpath = AxStd::FORMAT("%s/%s/%s/%s", m_root, "user", Variant(nameCC, "").TrimRight(), filePath);
+
+	int year, month, day, hour, readL;
+
+	char readB[256]{};
+	CString sPath;
+	sPath.Format("%s/%s/%s", m_root, "tab", "NOBOOKMARK.INI");
+
+	readL = GetPrivateProfileString("DATE", "date", "", readB, sizeof(readB), sPath);									
+	if (readL <= 0)
+		return FALSE;
+
+	stmp.Format("%s", readB);
+	stmp.Trim();
+	year = atoi(stmp.Left(4));
+	month = atoi(stmp.Mid(4, 2));
+	day = atoi(stmp.Mid(6, 2));
+	hour = atoi(stmp.Mid(8, 2));
+
+	if (CFile::GetStatus(fileFullpath, fileStatus))
+	{
+		CTime modificationTime = fileStatus.m_mtime;
+		CTime stime(year, month, day, hour, 0, 0);
+		if (modificationTime > stime)
+			return TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
+	return FALSE;
+}
+
+BOOL CMapWnd::CheckBookFileProcess()
+{
+#ifdef DF_USEBOOKFILE
+	return TRUE;
+#endif
+	//유저폴더 내부에 북마크 파일이 있는지 확인
+	//파일이 있다면 북마크 파일 저장 프로세스를 계속 사용한다.
+	//파일이 없다면 북마크 파일 저장 프로세스는 하지 않고 서버 저장만 한다.
+	CStringArray arrBookFile;
+	CString sname, stmp;
+	sname = Variant(nameCC, "");
+	CString	filepath = AxStd::FORMAT("%s/%s/%s", m_root, "user", sname);
+
+	CString searchPath = filepath + _T("\\*.*");
+
+	CFileFind fileFind;
+	BOOL bWorking = fileFind.FindFile(searchPath);
+	BOOL bFindBookFile = FALSE;
+
+	while (bWorking)
+	{
+		bWorking = fileFind.FindNextFile();
+
+		if (!fileFind.IsDots() && !fileFind.IsDirectory())
+		{
+			CString sname;
+			sname = fileFind.GetFileName();
+			if (sname.Find("bookmark.i") >= 0 && sname.Find("tmp") < 0)
+			{
+				bFindBookFile = TRUE;
+				arrBookFile.Add(sname);
+			}
+		}
+	}
+	fileFind.Close();
+
+	if (arrBookFile.GetSize() == 0)
+		return bFindBookFile;
+
+	BOOL bCheckAllBookFile = TRUE;
+	CFileFind cfind;
+
+	//특정 파일(NOBOOKMARK.INI)을 확인하고 그 파일이 없으면 파일 삭제 프로세스 보류
+	filepath = AxStd::FORMAT("%s/%s/%s", m_root, "tab", "NOBOOKMARK.INI");
+	if (!cfind.FindFile(filepath))
+		return bFindBookFile;
+
+	// 해당 폴더내부에 백업파일과 원본파일이 동일하게 존재하면 파일을 지운다.
+	// 파일의 수정한 날짜를 확인해서 모든 북마크 파일이 수정한 날이 
+	// 관련모듈 반영한날 다음이라면  모든 북마크 책갈피 설정이 서버 저장이 되었다고 본다
+	for (int ii = 0; ii < arrBookFile.GetSize(); ii++)
+	{
+		stmp = arrBookFile.GetAt(ii);
+		if(!CheckFileModificationTime(stmp))
+			bCheckAllBookFile = FALSE;
+	}
+
+	//전부 서버 저장 되있는게 확인 되었으면 지운다
+	if (bCheckAllBookFile)
+	{
+		for (int ii = 0; ii < arrBookFile.GetSize(); ii++)
+		{
+			stmp = arrBookFile.GetAt(ii);
+			filepath = AxStd::FORMAT("%s/%s/%s/%s", m_root, "user", sname, stmp);
+			DeleteFile(filepath);
+		//	filepath = AxStd::FORMAT("%s/%s/%s/back_%s", m_root, "user", sname, stmp);
+		//	DeleteFile(filepath);
+			filepath = AxStd::FORMAT("%s/%s/%s/%s.tmp", m_root, "user", sname, stmp);
+			DeleteFile(filepath);
+		}
+		bFindBookFile = FALSE;
+	}
+
+	return bFindBookFile;
+}

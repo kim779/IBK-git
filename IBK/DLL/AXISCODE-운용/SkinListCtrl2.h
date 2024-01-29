@@ -16,7 +16,7 @@ public:
 
 // Attributes
 public:
-
+	CString m_slog;
 // Operations
 public:
 

@@ -74,6 +74,11 @@ private:
 	std::unique_ptr<class	CMapWnd> m_pMapWnd5 = nullptr;
 	std::unique_ptr<class	CMapWnd> m_pMapWnd6 = nullptr;
 	std::unique_ptr<class	CMapWnd> m_pMapWnd7 = nullptr;
+
+
+	std::unique_ptr<class	CMapWnd> m_pMapWnd8 = nullptr;
+
+
 	std::unique_ptr<CLabel> m_label = nullptr;
 	std::unique_ptr<CLabel> m_label2 = nullptr;
 	

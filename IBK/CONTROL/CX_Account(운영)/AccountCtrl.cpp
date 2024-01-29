@@ -57,15 +57,17 @@ static char THIS_FILE[] = __FILE__;
 
 #define SC_ACCLISTBYGROUP	102		// 그룹계좌조회
 
-#define TT_INIT			1000
+#define TT_INIT						1000
 #define TT_QUERYACCNM		1001
-#define TT_GETINIT		1002
-#define TT_813REREAD		1003
-#define TRKEY_GROUP		255
-#define TRKEY_ACCNTNAME		254
-#define TRKEY_ACINFO		253
+#define TT_GETINIT					1002
+#define TT_813REREAD			1003
+#define TRKEY_GROUP			255
+#define TRKEY_ACCNTNAME	254
+#define TRKEY_ACINFO			253
 #define TRKEY_SACMQ329		252		//2013.03.12 KSJ  자금대체대리인 조회
 #define TRKEY_SACMQ748		251		//2013.10.29 MK 고객추가정보 조회
+#define TRKEY_CEHCKACC		250
+
 #define ONLY_SISE 		'9'		//객장 시세조회전용단말 아이디 앞자 "9" 로 시작
 
 #define	LEN_USID		12 
@@ -182,7 +184,55 @@ typedef struct _Osacmq329{
 
 #define STR(field)	CString(field, sizeof(field))
 
+typedef struct _Isacaq029
+{
+	char temp[5];
+	char	szAcntNo[20];
+}ISACAQ029;
+
+typedef struct _Osacaq029 {
+	char temp[5];
+	char szAgntYN;
+}OSACAQ029, *POSACAQ029;
+
+#define L_ISACAQ029	sizeof(_Isacaq029)
 //KJS
+
+void WriteLog(LPCSTR log, ...)
+{
+#if 1
+	TRY
+	{
+		char buf[1024]{};
+		GetModuleFileName(nullptr, buf, 260);
+
+		CString spath;
+		spath.Format("%s\\%s", buf, "axis.log");
+		spath.TrimRight();
+		spath.Replace("axis.exe\\", "");
+
+		FILE* fp;
+		fopen_s(&fp, spath, "a+");
+		if (!fp) return;
+
+		const CTime time = CTime::GetCurrentTime();
+		fprintf(fp, (LPCSTR)time.Format("[%Y-%m-%d %H:%M:%S] "));
+
+		va_list argptr;
+		va_start(argptr, log);
+		vfprintf(fp, log, argptr);
+		va_end(argptr);
+		fprintf(fp, "\n");
+
+		fclose(fp);
+	}
+		CATCH(CMemoryException, e)
+	{
+
+	}
+	END_CATCH
+#endif
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // CAccountCtrl
@@ -234,8 +284,52 @@ CAccountCtrl::CAccountCtrl(CWnd* pParent, _param* pParam)
 	
 	m_bGroup = FALSE;
 
-	m_mapName = (LPCTSTR)m_pParent->SendMessage(WM_USER, MAKEWPARAM(mapDLL, 0));
+	CString strMapName, strobjname;
+	strMapName = (LPCSTR)m_pParent->SendMessage(WM_USER, MAKEWPARAM(mapDLL, 0), 0);
+	//strMapName = (LPCSTR)m_pParent->SendMessage(WM_USER, MAKEWPARAM(mapDLL, 1), 0);
+	//strMapName = (LPCSTR)m_pParent->SendMessage(WM_USER, MAKEWPARAM(mapDLL, 2), 0);
 
+	int idex = 1;
+	while (1)
+	{
+		strobjname = (LPCSTR)m_pParent->SendMessage(WM_USER, MAKEWPARAM(mapDLL, idex), 0);
+		if (strobjname == strMapName)
+		{
+			if (idex == 1)
+				break;
+			else
+			{
+				strobjname = (LPCSTR)m_pParent->SendMessage(WM_USER, MAKEWPARAM(mapDLL, idex - 1), 0);
+				break;
+			}
+		}
+		idex++;
+		if (idex == 10)
+			break;
+	}
+
+	CString	Path, strTemp;
+	char	readb[10 * 1024]{};
+	int	readl;
+	Path.Format("%s\\tab\\AXIS.INI", Variant(homeCC, ""));
+	readl = GetPrivateProfileString("SACAQ029", "show", "", readb, sizeof(readb), Path);
+
+	strTemp.Format("%s", readb);
+	strTemp.Trim();
+
+	if (strTemp.Find(m_mapName) >= 0)
+		m_bCheckAgetn = true;
+
+	Path.Format("%s\\tab\\AXIS.INI", Variant(homeCC, ""));
+	readl = GetPrivateProfileString("SACAQ029", "hide", "", readb, sizeof(readb), Path);
+
+	strTemp.Format("%s", readb);
+	strTemp.Trim();
+
+	if (strTemp.Find(m_mapName) >= 0)
+		m_bCheckAgetn = false;
+
+	m_bCheckAgetn = true;
 
 	LoadAccountType();
 	Convert_V2();
@@ -295,6 +389,11 @@ BEGIN_MESSAGE_MAP(CAccountCtrl, CWnd)
 	ON_MESSAGE(WM_MOUSEWHEEL, OnMouseLeave)
 	ON_MESSAGE(WM_USER, OnMessage)
 	ON_MESSAGE(WM_EDITX, OnEditXMsg)
+	ON_WM_RBUTTONUP()
+	ON_WM_RBUTTONDOWN()
+	ON_WM_MBUTTONDOWN()
+	ON_WM_MOVE()
+	ON_WM_MOVING()
 END_MESSAGE_MAP()
 
 
@@ -322,6 +421,7 @@ BEGIN_DISPATCH_MAP(CAccountCtrl, CWnd)
 	//}}AFX_DISPATCH_MAP
 	DISP_FUNCTION_ID(CAccountCtrl, "GetShowHideAcc", dispidGetShowHideAcc, GetShowHideAcc, VT_BSTR, VTS_BSTR VTS_BSTR)
 	DISP_FUNCTION_ID(CAccountCtrl, "GetShowHideAccName", dispidGetShowHideAccName, GetShowHideAccName, VT_BSTR, VTS_BSTR VTS_BSTR)
+	DISP_FUNCTION_ID(CAccountCtrl, "EnableCtrl", dispidEnableCtrl, EnableCtrl, VT_EMPTY, VTS_I2)
 END_DISPATCH_MAP()
 
 // Note: we add support for IID_IAccountCtrl to support typesafe binding
@@ -559,7 +659,7 @@ BOOL CAccountCtrl::Initialize(BOOL bDLL)
 	m_staff = IsNumber(m_strUser);
 
 	//test 
-	if (m_strUser == "khs779")
+	if (m_strUser == "khs779" )
 		m_staff = TRUE;
 
 	InitAllowDept();  //전 계좌 가능 지점부서 초기화
@@ -577,7 +677,7 @@ BOOL CAccountCtrl::Initialize(BOOL bDLL)
 	strTemp = CString(readb, readl);
 	strTemp.Trim();
 	m_sAccnDept = strTemp;
-	
+
 	// 10 : ComboBox 안에 이미지를 넣기 위해서 CBS_OWNERDRAWFIXED 추가
 	if (!m_pCombo->Create(CBS_DROPDOWNLIST | WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_OWNERDRAWFIXED /*| CBS_AUTOHSCROLL*/,
 						  CRect(0, -2, 0, DROPDOWNHEIGHT), this, IDC_COMBO))
@@ -668,7 +768,7 @@ BOOL CAccountCtrl::Initialize(BOOL bDLL)
 		}
 	}
 
-	if (m_strUser == "khs779")   //test 20230320
+	if (m_strUser == "khs779" || m_strUser == "itest004")   //test 20230320
 		m_bEditMode = TRUE;
 
 	m_pEdit->SetEditMode(m_bEditMode);
@@ -984,17 +1084,17 @@ void CAccountCtrl::AddAcc(CString strAcc, CString strPassword, CString strAccNam
 
 	switch (_ttoi(strAcc.Mid(3, 2)))
 	{
-	case 10:	strGubn = _T("위탁    ");			break;
+	case 10:	strGubn = _T("주식/채권");			break;
 	case 11:	strGubn = _T("ELW전용 ");			break;
 	case 12:	strGubn = _T("코넥스  ");			break;
 	case 15:	strGubn = _T("연금  ");			break;
 	case 20:	strGubn = _T("선물옵션");			break;
 	case 21:	strGubn = _T("옵션전용");			break;
 	case 30:	strGubn = _T("일반저축");			break;
-	case 51:	strGubn = _T("CMA전용 ");			break;
+	case 51:	strGubn = _T("CMA");			break;
 	case 52:	strGubn = _T("RP전용  ");			break;
 	case 53:	strGubn = _T("수익증권");			break;
-	case 55:	strGubn = _T("연금  ");			break;
+	case 55:	strGubn = _T("연금저축");			break;
 	case 70:	strGubn = _T("신탁    ");			break;
 	default:	strGubn = _T("        ");			break;
 	}
@@ -1567,6 +1667,9 @@ BOOL CAccountCtrl::CreateFont()
 
 void CAccountCtrl::ShowAccountList(BOOL bGroup, BOOL bSearch)
 {
+	if (!m_bEnableCtrl)
+		return;
+
 	Invalidate();
 
 	//=====고객시세단말 접속용 아이디일 경우
@@ -1672,6 +1775,9 @@ void CAccountCtrl::ShowAccountList(BOOL bGroup, BOOL bSearch)
 
 void CAccountCtrl::ShowGroupList()
 {
+	if (!m_bEnableCtrl)
+		return;
+
 	Invalidate();
 
 	if (((m_strUser[0] == ONLY_SISE) &&(IsNumber(m_strUser))) || /*m_onlysise == 1 ||*/ m_strUser == "##ibk9")
@@ -1866,6 +1972,9 @@ void CAccountCtrl::OnComboSelChange()
 						(LPARAM)m_Param.name.GetString());
 	}
 	SaveHistory();
+
+	//test checkacc
+	QueryAccntCheck(strAccount);
 
 	Invalidate();
 }
@@ -2238,6 +2347,7 @@ CString CAccountCtrl::GetPassword(CString strAccount)
 //#define DF_SEARCH 1
 void CAccountCtrl::AccountInputComplete(CString strAccount)
 {
+
 	if (strAccount.IsEmpty())
 	{
 		if (m_Param.name.Find(_T("AN3A")) >= 0 && !m_bEditMode)
@@ -2401,6 +2511,42 @@ LRESULT CAccountCtrl::OnMessage(WPARAM wParam, LPARAM lParam)
 
 		switch ((BYTE)exth->key)
 		{
+		case TRKEY_CEHCKACC:
+		{
+			char* pBuf = (char*)exth->data;
+			CString strAccount, strAccName, strItems;
+
+			strItems = CString(((struct _ledgerH*)exth->data)->ecod, 4);
+			strItems = CString(((struct _ledgerH*)exth->data)->emsg, 99).Trim();
+
+			pBuf = pBuf + L_ledgerH + L_ISACAQ029;
+			const	OSACAQ029* osacmq329 = (OSACAQ029*)pBuf;
+
+			CString sRet;
+			sRet.Format("%c", osacmq329->szAgntYN);
+			if (sRet == "Y")
+			{
+				CRect rc;
+				GetClientRect(&rc);
+				ClientToScreen(rc);
+
+				CString sClassName = AfxRegisterWndClass(0);
+
+				m_pOubWnd = new COubWnd;
+				m_pOubWnd->m_pWizard = m_pParent;
+				m_pOubWnd->m_pParent = this;
+				int cx = 230, cy = 100;
+				if (!m_pOubWnd->CreateEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_DLGMODALFRAME, sClassName, NULL,
+					WS_POPUP | WS_BORDER, CRect(rc.left, rc.bottom, rc.left + cx, rc.bottom + cy),
+					NULL, NULL, NULL))
+				{
+					m_pOubWnd = NULL;
+				}
+				else
+					m_pOubWnd->ShowWindow(SW_SHOWNORMAL);
+			}
+		}
+		break;
 		case TRKEY_ACINFO:
 			{
 				CString strAcc;
@@ -2458,7 +2604,7 @@ LRESULT CAccountCtrl::OnMessage(WPARAM wParam, LPARAM lParam)
 		case TRKEY_GROUP:
 			{
 				const	struct _gmod* gmod = (_gmod*)exth->data;
-
+			
 				if (gmod->okgb == _T('Y'))
 					ParseGroupList(exth->data);
 			}
@@ -2501,8 +2647,44 @@ LRESULT CAccountCtrl::OnMessage(WPARAM wParam, LPARAM lParam)
 		break;
 
 	case DLL_OUB:	// NOT USED. Use DLL_OUBx!!
-		//key = HIBYTE(LOWORD(wParam));
+		//int key = HIBYTE(LOWORD(wParam));
 			
+		if (HIBYTE(LOWORD(wParam)) == TRKEY_CEHCKACC)
+		{
+			char* pBuf = (char*)lParam;
+			CString strAccount, strAccName, strItems;
+
+		/*	strItems = CString(((struct _ledgerH*)exth->data)->ecod, 4);
+			strItems = CString(((struct _ledgerH*)exth->data)->emsg, 99).Trim();*/
+
+			pBuf = pBuf + L_ledgerH + L_ISACAQ029;
+			const	OSACAQ029* osacmq329 = (OSACAQ029*)pBuf;
+
+			CString sRet;
+			sRet.Format("%c", osacmq329->szAgntYN);
+			if (sRet == "Y")
+			{
+				CRect rc;
+				GetClientRect(&rc);
+				ClientToScreen(rc);
+
+				CString sClassName = AfxRegisterWndClass(0);
+
+				m_pOubWnd = new COubWnd;
+				m_pOubWnd->m_pWizard = m_pParent;
+				m_pOubWnd->m_pParent = this;
+				int cx = 230, cy = 100;
+				if (!m_pOubWnd->CreateEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_DLGMODALFRAME, sClassName, NULL,
+					WS_POPUP | WS_BORDER, CRect(rc.left, rc.bottom, rc.left + cx, rc.bottom + cy),
+					NULL, NULL, NULL))
+				{
+					m_pOubWnd = NULL;
+				}
+				else
+					m_pOubWnd->ShowWindow(SW_SHOWNORMAL);
+			}
+			return 0;
+		}
 		//tmp.Format("%d", key);
 		//AfxMessageBox(tmp);
 			
@@ -3077,8 +3259,11 @@ bool CAccountCtrl::IsChosung(WORD wHangul, WORD &wStart, WORD &wEnd)
 
 void CAccountCtrl::ParseGroupList(char* pBuf)
 {
+	CString slog;
 	const	struct _gmod* gmod = (_gmod*)pBuf;
-	
+	slog.Format("[cx_account] [%s] 그룹=[%.4s]", CString((char*)&gmod[0], 1), gmod->grec);
+	OutputDebugString(slog);
+	//WriteLog(slog);
 	if (gmod->okgb != _T('Y'))
 		return;
 	
@@ -3289,6 +3474,7 @@ void CAccountCtrl::OnTimer(UINT nIDEvent)
 			
 			m_pEdit->SetInputData(strAccount);
 			AccountInputComplete(strAccount);
+			QueryAccntCheck(m_pEdit->GetInputData());
 		}
 
 		//2013.04.23 KSJ 계좌리스트가 전부 들어가면 이벤트를 보낸다.
@@ -3561,7 +3747,6 @@ void CAccountCtrl::ParseSACMQ329(char* pBuf)
 }
 
 //KSJ
-
 void CAccountCtrl::QueryAccntName(CString strAccount)
 {
 	struct	_userTH	udat {};
@@ -3634,7 +3819,7 @@ void CAccountCtrl::ParseAccntName(char *pBuf)
 		}
 		return;
 	}
-	
+	QueryAccntCheck(m_pEdit->GetInputData());  //test agent check
 	dept_Num = m_strAccName.Mid(0,3);
 
 	if (!IsValidAccComplete(CString(oaccnm->szAccount, sizeof(oaccnm->szAccount)), dept_Num, FALSE)&&(m_dept!="812"))
@@ -4338,7 +4523,7 @@ CString CAccountCtrl::GetAcntTypeName(CString tp)
 		switch (atoi(tp))
 		{
 		case 0:	ret = "종합";		break;
-		case 10:ret = "위탁";		break;
+		case 10:ret = "주식/채권";		break;
 		case 11:ret = "ELW전용";	break;
 		case 12:ret = "코넥스";		break;
 		case 15:
@@ -4349,9 +4534,9 @@ CString CAccountCtrl::GetAcntTypeName(CString tp)
 		case 31:ret = "생계저축";	break;
 		case 32:ret = "세우저축";	break;
 		case 37:
-		case 57:ret = "ISA";		break;
+		case 57:ret = "ISA펀드";		break;
 		case 50:ret = "자산관리";	break;
-		case 51:ret = "CMA전용";	break;
+		case 51:ret = "CMA";	break;
 		case 52:ret = "RP전용";		break;
 		case 53:ret = "수익증권";	break;
 		case 60:ret = "WRAP";		break;
@@ -5677,17 +5862,17 @@ BSTR CAccountCtrl::GetShowHideAcc(BSTR strShow,  BSTR strHide)
 		strType = strAccnum.Mid(3, 2);
 		switch (_ttoi(strType))
 		{
-		case 10:	strGubn = _T("위탁");			break;
+		case 10:	strGubn = _T("주식/채권");			break;
 		case 11:	strGubn = _T("ELW전용");			break;
 		case 12:	strGubn = _T("코넥스");			break;
 		case 15:	strGubn = _T("연금");			break;
 		case 20:	strGubn = _T("선물옵션");			break;
 		case 21:	strGubn = _T("옵션전용");			break;
 		case 30:	strGubn = _T("일반저축");			break;
-		case 51:	strGubn = _T("CMA전용");			break;
+		case 51:	strGubn = _T("CMA");			break;
 		case 52:	strGubn = _T("RP전용");			break;
 		case 53:	strGubn = _T("수익증권");			break;
-		case 55:	strGubn = _T("연금");			break;
+		case 55:	strGubn = _T("연금저축");			break;
 		case 70:	strGubn = _T("신탁");			break;
 		default:  	strGubn = _T("              ");			break;
 		}
@@ -5811,4 +5996,156 @@ BSTR CAccountCtrl::GetShowHideAccName(BSTR strShow, BSTR strHide)
 	}
 
 	return strResult.AllocSysString();
+}
+
+
+
+void CAccountCtrl::OnRButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	
+
+	CWnd::OnRButtonUp(nFlags, point);
+}
+
+
+void CAccountCtrl::OnRButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	CWnd::OnRButtonDown(nFlags, point);
+}
+
+
+void CAccountCtrl::OnMButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	CRect rc;
+	GetClientRect(&rc);
+	ClientToScreen(rc);
+
+	CString sClassName = AfxRegisterWndClass(0);
+
+	m_pOubWnd = new COubWnd;
+	m_pOubWnd->m_pWizard = m_pParent;
+	m_pOubWnd->m_pParent = this;
+	int cx = 300, cy = 100;
+	if (!m_pOubWnd->CreateEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_DLGMODALFRAME, sClassName, NULL,
+		WS_POPUP | WS_BORDER, CRect(rc.left, rc.bottom, rc.left + cx, rc.bottom + cy),
+		NULL, NULL, NULL))
+	{
+		m_pOubWnd = NULL;
+	}
+	else
+		m_pOubWnd->ShowWindow(SW_SHOWNORMAL);
+
+	CWnd::OnMButtonDown(nFlags, point);
+}
+
+
+void CAccountCtrl::QueryAccntCheck(CString strAccount)
+{
+	//if (!m_bCheckAgetn)  //test
+	//	return;
+
+	CString strData;
+	char	datb[L_userTH + L_ledgerH + L_ISACAQ029 + 128]{};
+	struct	_userTH	udat {};
+	struct	_ledgerH ledger {};
+	ISACAQ029 isacaq029{};
+	int	index = 0;
+
+	FillMemory(&ledger, L_ledgerH, ' ');
+	m_pParent->SendMessage(WM_USER, ledgerDLL, (LPARAM)&ledger);
+
+	CopyMemory(ledger.svcd, _T("SACAQ029"), sizeof(ledger.svcd));
+	CopyMemory(ledger.usid, (LPCTSTR)m_strUser, m_strUser.GetLength());
+	CopyMemory(ledger.brno, "000", ACC_DEPT);
+	CopyMemory(ledger.rcnt, _T("0000"), sizeof(ledger.rcnt));
+
+	ledger.fkey[0] = 'C';
+	ledger.mkty[0] = '3';
+	ledger.odrf[0] = '2';
+
+	strData = m_pEdit->GetInputData();
+	FillMemory(&isacaq029, L_ISACAQ029, ' ');
+	CopyMemory(isacaq029.temp, "00001", 5);
+	CopyMemory(isacaq029.szAcntNo, (LPCTSTR)strData, 11);
+
+	CopyMemory(udat.trc, "pibopbxq", sizeof(udat.trc));
+	udat.stat = US_ENC | US_KEY;
+
+	if (m_bDLL)
+	{
+		udat.key = (BYTE)TRKEY_CEHCKACC;
+		
+	}
+	else
+	{
+		udat.key = m_Param.key;
+
+		datb[index++] = (BYTE)TRKEY_CEHCKACC;
+		CopyMemory(&datb[index], (char*)m_Param.name.GetString(), m_Param.name.GetLength());
+		index += m_Param.name.GetLength();
+		datb[index++] = '\t';
+	}
+
+	CopyMemory(&datb[index], (char*)&udat, L_userTH);	index += L_userTH;
+	CopyMemory(&datb[index], (char*)&ledger, L_ledgerH);	index += L_ledgerH;
+	CopyMemory(&datb[index], (char*)&isacaq029, L_ISACAQ029);
+
+	int iret = m_pParent->SendMessage(WM_USER, MAKEWPARAM(invokeTRx, L_ISACAQ029 + L_ledgerH), (LPARAM)datb);
+}
+
+void CAccountCtrl::OnMove(int x, int y)
+{
+	CWnd::OnMove(x, y);
+
+	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+	CString slog;
+	slog.Format("\r\n ~~~~~~~~ onmove [%d]  [%d]", x, y);
+	OutputDebugString(slog);
+}
+
+
+void CAccountCtrl::OnMoving(UINT fwSide, LPRECT pRect)
+{
+	CWnd::OnMoving(fwSide, pRect);
+	CString slog;
+	slog.Format("\r\n ~~~~~~~~onmoving  [%d]  [%d]", pRect->left, pRect->top);
+	OutputDebugString(slog);
+	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+}
+
+
+void CAccountCtrl::EnableCtrl(SHORT bShow)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (bShow)
+		m_bEnableCtrl = TRUE;
+	else
+		m_bEnableCtrl = FALSE;
+
+	m_pCombo->EnableWindow(m_bEnableCtrl);
+	m_pEdit->EnableWindow(m_bEnableCtrl);
+
+	m_pCombo->Invalidate();
+	m_pEdit->Invalidate();
+	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
+}
+
+CString CAccountCtrl::GetEditData()
+{
+	if (m_pEdit)
+		return m_pEdit->GetInputData();
+	else
+		return "";
+}
+
+void CAccountCtrl::GetFontInfo(CString& sfontname, int& isize, int& itype) const
+{
+	sfontname = m_Param.fonts;
+	isize = m_Param.point;
+	itype = m_Param.style;
 }

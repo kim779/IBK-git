@@ -1522,9 +1522,13 @@ void CintGrid::OnTimer(UINT nIDEvent)
 
 							strValue = m_pParent->GetNewsData(code);
 							
+						
+						//	strValue.Format("015\t%s\n016\t%s\n1301\t%s", "엄태웅 삼양홀딩스 대표", "2023083112004 570872949", "000070");
+						//	strValue.Format("015\t%s\n016\t%s\n1301\t%s", "엄태웅 삼양홀딩스 대표", "", "000070");
+
 							CString str;
 							str.Format("IBNEWSXX /t /p5 /d %s", strValue);
-			
+						
 							if(strValue != "")
 							{
 								if(m_pViewWnd)	
@@ -6404,7 +6408,7 @@ int CintGrid::GetColumnWidth(int nCol) const
 	if (nCol < 0 || nCol >= m_nCols)
 		return -1;
 
-	return gsl::narrow_cast<int>(m_aryColWidth[nCol] * m_xRate);
+	return gsl::narrow_cast<int>(m_aryColWidth[nCol] * m_xRate); 
 }
 
 //2015.02.25 KSJ 전체화면했을때 x_rate 계산안하는거
@@ -7505,18 +7509,20 @@ void CintGrid::OnLButtonUp(UINT nFlags, CPoint point)
 				ScreenToClient(&point);
 				ScreenToClient(&start);
 
-// 				int nOldLength = GetRealColumnWidth(m_idClick.col);
-				SetColumnWidth(m_idClick.col, point.x - start.x);
-// 				int nLength = GetRealColumnWidth(m_idClick.col);
+ //				int nOldLength = GetRealColumnWidth(m_idClick.col);
+				int iwidth = point.x - start.x;
+				iwidth = abs(iwidth);
+				iwidth = (int)(iwidth / m_xRate);
+				//SetColumnWidth(m_idClick.col, point.x - start.x);
+				SetColumnWidth(m_idClick.col, iwidth);
+// 				
 
 				ResetScrollBars(); Invalidate();
-				
-/*	2014.13.28 KSJ 체결이퀄라이저 만들다가 중지한 기능이므로 주석처리함.
-				if(m_isEqualizerField)
-					MakeEqualizerBmp();
-*/
 
-// 				TRACE("MessageToParent19 row : %d", m_idClick.row);
+				int nLength = GetRealColumnWidth(m_idClick.col);
+				nLength = GetColumnWidth(m_idClick.col);
+				nLength = m_aryColWidth[m_idClick.col];
+	
 				MessageToParent(m_idClick.row, m_idClick.col, GVNM_CHGCOLSIZE);
 			}
 		}
@@ -9136,18 +9142,16 @@ void CintGrid::OnSize(UINT nType, int cx, int cy)
 
 	HideCode();
 
-/*	if(!m_originRect.IsRectEmpty())
+	if(!m_originRect.IsRectEmpty())
 	{
-		m_xRate = (double)((double)cx / (double)m_originRect.Width());
-		m_yRate = (double)((double)cy / (double)m_originRect.Height());
-		
-	
+	//	m_xRate = (double)((double)cx / (double)m_originRect.Width());
+	//	m_yRate = (double)((double)cy / (double)m_originRect.Height());
 	}
 	else
 	{
 		GetClientRect(m_originRect);
 	}
-*/
+
 	Adjust();	
 }
 

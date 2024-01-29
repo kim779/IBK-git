@@ -31,6 +31,7 @@
 #define upOKACTION			16
 #define dnGROUPLIST			17
 #define dnGROUPCODE			18
+#define getBOOLFILEPROCESS 19
 
 
 

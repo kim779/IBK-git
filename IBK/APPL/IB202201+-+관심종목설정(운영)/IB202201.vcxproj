@@ -58,7 +58,7 @@
     <IntDir>.\Debug\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>..\..\AxRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>D:\IBKS_TEST\ibks_2019\AxRules.ruleset</CodeAnalysisRuleSet>
     <EnableMicrosoftCodeAnalysis>true</EnableMicrosoftCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -162,15 +162,16 @@
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../release/IB202201.dll</OutputFile>
+      <OutputFile>F:\util\HTS\IBK투자증권 HTS\dev/IB202201.dll</OutputFile>
       <ImportLibrary>.\Release\IB202201.lib</ImportLibrary>
       <AdditionalDependencies>../../control/fx_grid/release/fx_grid.lib;../../control/fx_misc/release/fx_misc.lib;winmm.lib;Imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\IB202201.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CDlg_Slider.cpp" />
     <ClCompile Include="ColorBtn.cpp" />
     <ClCompile Include="EditEx.cpp" />
     <ClCompile Include="EditGroup.cpp" />
@@ -202,6 +203,7 @@
     <ResourceCompile Include="IB202201.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CDlg_Slider.h" />
     <ClInclude Include="ColorBtn.h" />
     <ClInclude Include="EditEx.h" />
     <ClInclude Include="EditGroup.h" />

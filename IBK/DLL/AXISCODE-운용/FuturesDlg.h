@@ -247,6 +247,8 @@ public:
 	CString GetString(char *pChar, int nMinLen);
 	int		m_type;
 	int		m_jongmuk;
+	int m_iReturnData{};
+	int getReturnData() { return m_iReturnData; };
 protected:
 	CString		m_szName;
 	CString		m_szCode;

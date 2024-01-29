@@ -5,6 +5,7 @@
 #include "IB202201.h"
 #include "Page2.h"
 #include "sheet.h"
+#include "CDlg_Slider.h"
 
 #include "../../h/axisfire.h"
 #include "../../h/axisvar.h"
@@ -215,6 +216,7 @@ BEGIN_MESSAGE_MAP(CPage2, CPropertyPage)
 	ON_CBN_SELCHANGE(IDC_CBFIELD, OnSelchangeCbfield)
 	ON_BN_CLICKED(IDC_CHK_OVERLAP, OnChkOverlap)
 	//}}AFX_MSG_MAP
+	ON_BN_CLICKED(IDC_BTN_SETTING, &CPage2::OnBnClickedBtnSetting)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1532,4 +1534,13 @@ BOOL CPage2::endSendAction() //저 장 버튼 클릭시
 	m_parent->SendMessage(WM_USER, MAKEWPARAM(procDLL, 0), (LPARAM)(LPCTSTR)string);
 	m_parent->SendMessage(WM_USER, closeDLL, 0);
 	return CPropertyPage::OnKillActive();
+}
+
+void CPage2::OnBnClickedBtnSetting()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CDlg_Slider dlg;
+	dlg.m_root = m_root;
+	dlg.m_bCustomer = m_parent->SendMessage(WM_USER, MAKEWPARAM(variantDLL, orderCC), 0L);
+	dlg.DoModal();
 }

@@ -49,6 +49,7 @@ library CX_Account
 			//}}AFX_ODL_METHOD
 			[id(21)] BSTR GetShowHideAcc(BSTR strAdd,  BSTR strDel);
 			[id(22)] BSTR GetShowHideAccName(BSTR strShow, BSTR strHide);
+			[id(23)] void EnableCtrl(SHORT bShow);
 	};
 
 	//  Class information for CAccountCtrl

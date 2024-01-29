@@ -34,10 +34,10 @@
 #define DF_TYPE_OTP		2
 #define DF_TYPE_AUTO_OTP	3
 
-#define DF_ST_TAGREG		1
-#define DF_ST_CHKREG		2
-#define DF_ST_SEARCHTRDNUM	3
-#define DF_ST_VEFYLOGIN		4
+#define DF_ST_TAGREG		1					 //서명메시지등록 
+#define DF_ST_CHKREG		2					//서명등록여부조회 주기적
+#define DF_ST_SEARCHTRDNUM	3      //직전 인증 성공한 인증거래번호를 조회
+#define DF_ST_VEFYLOGIN		4				//로그인 거래 검증
 #define DF_ST_VEFYTRADE		5
 #define DF_ST_OTPCERT		6
 

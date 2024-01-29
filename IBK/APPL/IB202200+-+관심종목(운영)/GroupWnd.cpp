@@ -665,6 +665,12 @@ LONG CGroupWnd::OnManage(WPARAM wParam, LPARAM lParam)
 		}
 	}
 	break;
+	case MK_GROUPCHANGECHECK:
+	{
+		saveWhenGroupClosed((int)lParam);
+		return ret;
+	}
+	break;
 	default:
 		ret = CBaseWnd::OnManage(wParam, lParam);
 		break;
@@ -1100,6 +1106,7 @@ void CGroupWnd::InitSetGroup()
 	m_nCurSel = gIndex - 1;
 	m_nCurSel = max(m_nCurSel, 0);
 	m_nCurSel = min(m_nCurSel, m_nGroup);
+	m_nCurSel = 0;  //check 0이 안전
 	
 	//트리, 툴 그룹 선택하기
 	m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SELGROUP, MO_SET), (LPARAM)val);
@@ -3024,3 +3031,15 @@ bool CGroupWnd::isCodeSymbol(CString code)
 	return false;
 }
 
+BOOL CGroupWnd::CheckGetRTS()
+{
+	for (int ii = 0; ii < m_nGroup; ii++)
+	{
+		if (m_GridWnd[ii] && m_GridWnd[ii]->GetSafeHwnd())
+		{
+			if(m_GridWnd[ii].get()->m_bGetHogaRTS)
+				return TRUE;
+		}
+	}
+	return FALSE;
+}

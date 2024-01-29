@@ -757,7 +757,7 @@ int CCertifyCtrl::queryDn(CString dn_name, int* nBytes, bool retry)
 	m_contextNew.sd.bForceAllCaSearchMode = 1;
 	strcpy_s(m_contextNew.sd.szUserId, E_BUFLEN, (char*)dn_name.GetString());
 	ZeroMemory(m_contextNew.sd.szOldPasswd, sizeof(m_contextNew.sd.szOldPasswd));
-	sk_if_SetKeySaferMode(9);
+	sk_if_SetKeySaferMode(1);  //9 안내받음  1기존 (IBKs 내부방화벽에서 9번관련 막힌다함..)
 	if (retry || m_encpass[0] == NULL)
 	{
 		if (pWnd && IsWindow(pWnd->GetSafeHwnd()))
@@ -892,7 +892,9 @@ CString CCertifyCtrl::checkPasswd()
 
 	src.length = 0;
 	src.value = NULL;
-	sk_if_SetKeySaferMode(9);
+
+	sk_if_SetKeySaferMode(1); //9 안내받음  1기존 (IBKs 내부방화벽에서 9번관련 막힌다함..)
+
 	if (sk_if_cert_SignData_notEncode(&m_context, encpass, &src, &des, NULL))
 	{
 		if (sk_if_GetLastErrorCode() == 2417)
@@ -1028,7 +1030,7 @@ void CCertifyCtrl::OnTimer(UINT nIDEvent)
 // updateXX_20160503
 long CCertifyCtrl::CertifyFull(long pInB, long pInL, long pOutB, long pOutL)
 {
-	m_bCloudeUse = CheckCloude();
+//	m_bCloudeUse = CheckCloude();
 	if (m_bCloudeUse)   //클라우드 로그인
 	{
 		m_slog.Format(" DEV = [%d] [%s]", m_bDev, "!!!!!!!  클라우드 로그인 !!!!!!");
@@ -1196,7 +1198,7 @@ long CCertifyCtrl::CertifyFull(long pInB, long pInL, long pOutB, long pOutL)
 			m_contextNew.sd.bForceAllCaSearchMode = 1;
 			strcpy_s(m_contextNew.sd.szUserId, E_BUFLEN, (char*)m_name.GetString());
 			ZeroMemory(m_contextNew.sd.szOldPasswd, sizeof(m_contextNew.sd.szOldPasswd));
-			sk_if_SetKeySaferMode(9);
+			sk_if_SetKeySaferMode(1);  //9 안내받음  1기존 (IBKs 내부방화벽에서 9번관련 막힌다함..)
 			if (pWnd && IsWindow(pWnd->GetSafeHwnd()))
 				sk_if_DialogModalMode(pWnd->GetSafeHwnd());
 			success = sk_if_CertSetSelectExt(&m_contextNew, CONTEXT_SELECT2, SEARCH_ALLMEDIA);
@@ -1310,7 +1312,10 @@ BOOL CCertifyCtrl::CheckCloude()
 	else
 		m_bDev = FALSE;
 
-	memset(chfile, 0x00, 500);
+	m_slog.Format("CheckCloude  m_bDev = [%d]  ", m_bDev);
+	FileLog(m_slog);
+
+	/*memset(chfile, 0x00, 500);
 	GetPrivateProfileString("CLOUDELOGIN", "USE", "0", chfile, sizeof(chfile), spath);
 
 	stmp.Format("%s", chfile);
@@ -1319,7 +1324,9 @@ BOOL CCertifyCtrl::CheckCloude()
 	if (stmp == "1")
 		return TRUE;
 	else
-		return FALSE;
+		return FALSE;*/
+
+	return TRUE;
 }
 
 int CCertifyCtrl::Cloude_Full_sign(long pOutB, long pOutL)
@@ -1378,7 +1385,7 @@ int CCertifyCtrl::Cloude_Full_sign(long pOutB, long pOutL)
 	}
 	else
 	{
-		CopyMemory((void*)pOutB, p2.value, p2.length);
+ 		CopyMemory((void*)pOutB, p2.value, p2.length);
 		*(int*)pOutL = p2.length;
 		//sk_if_cert_MemFree(p2.value); //추후에 해줘야 할수도
 		if (m_ca == caNO)
@@ -1467,7 +1474,8 @@ LONG CCertifyCtrl::CertifyCloud(LONG func)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
-	m_bCloudeUse = CheckCloude();
+	//m_bCloudeUse = CheckCloude();
+	CheckCloude();
 	InitCloude();
 	
 	int rc = 0;
@@ -1514,7 +1522,7 @@ LONG CCertifyCtrl::CertifyCloud(LONG func)
 				return rc;
 			else
 			{
-				m_slog.Format("간편비밀번호 변경 오류 sk_if_DownloadCloudtoPC rc = [%d]  errorCode=[%d] error  msg = [%s]",
+				m_slog.Format("간편비밀번호 변경 오류 sk_if_CertChangePin_inCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
 					rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
 				FileLog(m_slog);
 				return sk_if_GetLastErrorCode();
@@ -1642,9 +1650,13 @@ LONG CCertifyCtrl::CertifyCloud(LONG func)
 
 void CCertifyCtrl::InitCloude()
 {
+	m_slog.Format(" InitCloude  m_bCloudeInit = [%d]  ", m_bCloudeInit);
+	FileLog(m_slog);
+
 	if (m_bCloudeInit)
 		return;
 
+	CString slog;
 	CloudConfig config;
 	memset(&config, 0x00, sizeof(CloudConfig));
 
@@ -1657,10 +1669,15 @@ void CCertifyCtrl::InitCloude()
 	}
 	else
 	{
-		config.SITE_CODE[0] = "U1MwMDY4X0FYSVNfRA==";
+		config.SITE_CODE[0] = "U1MwMDY4X0FYSVNfRDI=";  
+											//U1MwMDY4X0FYSVNfRDI=   <-- 코드사인토큰 변경
+											//"U1MwMDY4X0FYSVNfRA==";  //기존
 		config.SERVER_HOST = REAL_CLOUDE_SERVER;
 		config.AGREEMENT_URL = REAL_AGREEMENT_URL;
 	}
+
+	slog.Format("--InitCloude-- m_bDev=[%d]   SITE_CODE=[%s]", m_bDev , config.SITE_CODE[0]);
+	FileLog(slog);
 
 	config.VERSION = "1.0.0";
 	config.SERVER_PORT = 8500;
@@ -1670,8 +1687,8 @@ void CCertifyCtrl::InitCloude()
 	sk_if_Cloud_KeyPadUse(1);
 	sk_if_Set_CloudConfig(config);
 	sk_if_DialogModalMode(m_hWnd); //모달 모드
-	int ret = sk_if_SetKeySaferMode(9);
-	CString slog;
+	int ret = sk_if_SetKeySaferMode(1);  //9 안내받음  1기존 (IBKs 내부방화벽에서 9번관련 막힌다함..)
+	
 	slog.Format("--InitCloude-- sk_if_SetKeySaferMode ret=[%d] ", ret);
 	FileLog(slog);
 	

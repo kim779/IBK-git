@@ -152,10 +152,30 @@ ULONG ProcIDFromWnd(HWND hwnd) // 윈도우 핸들로 프로세스 아이디 얻기
 }
 #pragma warning(disable : 26409)
 #pragma warning(disable : 26400)
+#define DF_DUPULICATION   //중복실행
 BOOL CAxisApp::InitInstance()
 {
 	// Parse command line for standard shell commands, DDE, file open
 	// Interface 포인터 넘겨주기
+	//0x01 -> 0001   -> 1번 코어만
+		//0x02 -> 0010   -> 2번 코어만
+		//0x03 -> 0011   -> 3번 코어만
+		//0x04 -> 0100
+		//0x05 -> 0101
+		//0x06 -> 0110
+		//0x07 -> 0111
+		//0x08 -> 1000
+	////DWORD_PTR dwProcessAffinityMask = 0x01;
+	DWORD_PTR dwProcessAffinityMask = 0x01| 0x02| 0x03| 0x04| 0x05| 0x06| 0x07| 0x08| 0x09| 0x0a;
+	if (SetProcessAffinityMask(GetCurrentProcess(),  dwProcessAffinityMask) == 0) {
+		int ierror = GetLastError();
+		CString slog;
+		slog.Format(" 프로세스 친화도 실패[%d]", ierror);
+		AfxMessageBox(slog);
+		return FALSE;
+	}
+
+
 
 	Axis::Initialize();
 
@@ -197,6 +217,8 @@ BOOL CAxisApp::InitInstance()
 		m_instance = new CAxInstance(m_regkey);
 
 	#ifndef _DEBUG
+
+#ifdef DF_DUPULICATION
 	if (!m_instance->IsFirstInstance())
 	{
 		//		// 이미 실행된 것이 있으면 해당 프로그램을 활성화 시킴
@@ -233,6 +255,64 @@ BOOL CAxisApp::InitInstance()
 			}
 		}
 	}
+#else
+	if (!m_instance->IsFirstInstance())
+	{
+
+		// 이미 실행된 것이 있으면 해당 프로그램을 활성화 시킴
+		CWnd* wnd = NULL;
+		if (m_regkey == "IBK투자증권MAC")
+		{
+			wnd = CWnd::FindWindow(NULL, "IBK hot Trading");
+		}
+		else if (m_regkey == "IBKMAC_STAFF")
+		{
+			wnd = CWnd::FindWindow(NULL, "[직원]IBK hot Trading");
+		}
+		else if (m_regkey == "IBK")
+		{
+			wnd = CWnd::FindWindow(NULL, "IBK개발");
+		}
+		else if (m_regkey == "IBK_STAFF")
+		{
+			wnd = CWnd::FindWindow(NULL, "[직원]IBK개발");
+		}
+		else if (m_regkey == "IBK_HOT_TRADING")
+		{
+			wnd = CWnd::FindWindow(NULL, "IBK hot Trading");
+		}
+
+		if (wnd && wnd->GetSafeHwnd())
+		{
+			int nResult = Axis::MessageBox("HTS는 단일 PC에서 한 개만 실행할 수 있습니다. \r\n이전 HTS를 종료하고 다시 실행하시겠습니까?", MB_YESNO);
+
+			if (nResult == IDYES)
+			{
+				ULONG processId = ProcIDFromWnd(wnd->m_hWnd);
+
+				if (!KillPID("axis.exe", processId))
+				{
+					Axis::MessageBox("HTS 강제종료에 실패했습니다.수동 종료 후 다시 시작해 주세요.");
+					return FALSE;
+				}
+			}
+			else
+			{
+				if (wnd && wnd->GetSafeHwnd())
+				{
+					if (wnd->IsWindowVisible())
+					{
+						wnd->ShowWindow(SW_RESTORE);
+						wnd->SetForegroundWindow();
+					}
+					//wnd->ShowWindow(SW_SHOW);
+				}
+				return FALSE;
+			}
+		}
+	}
+#endif
+	
 #endif
 
 

@@ -14,7 +14,7 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CLockDlg dialog
 
-
+#define WD_LOCKPASS			(WM_USER+0x8002)
 CLockDlg::CLockDlg(CWnd* pParent, CString user, CString pass)
 	: CDialog(CLockDlg::IDD, pParent)
 {
@@ -87,6 +87,14 @@ void CLockDlg::OnOK()
 	}
 	else if (m_pass.Compare(pass))
 	{
+		m_iPassErrorCnt++;
+		if (m_iPassErrorCnt == 1)  //비밀번호 5회 오류
+		{
+			Axis::MessageBox(this, "비밀번호를 5회 오류 입니다 HTS를 종료합니다.", MB_OK | MB_ICONEXCLAMATION);
+			ShowWindow(SW_HIDE);
+			GetParent()->SendMessage(WD_LOCKPASS, 1, 0);
+			return ;
+		}
 		Axis::MessageBox(this, "비밀번호를 정확히 입력하십시오.", MB_OK | MB_ICONEXCLAMATION);
 		GotoDlgCtrl(GetDlgItem(IDC_LPASS));
 	}

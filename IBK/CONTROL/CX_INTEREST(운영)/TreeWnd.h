@@ -377,5 +377,7 @@ private:
 
 public:
 	void receiveOub(CString& data, int key);
+
+	CString m_slog;
 };
  

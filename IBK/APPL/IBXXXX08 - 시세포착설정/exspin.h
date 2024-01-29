@@ -27,6 +27,8 @@
 #define	spETFKOSPI	0x00000020		// ETF KOSPI
 #define	spETFKOSDAQ	0x00000040		// ETF KOSDAQ
 #define	spRATE		0x00000080		// µî¶ô·ü
+#define	spETF		0x00000100		// ETF
+#define	spETN		0x00000200		// ETN
 
 #define	spCOLOR		0x00000100		// color edit
 

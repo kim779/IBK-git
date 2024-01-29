@@ -7,7 +7,7 @@
 #include "BaseWnd.h"
 #include "../../h/interst.h"
 #include "../../control/fx_misc/fxImgButton.h"
-#include "NewMenu.h"	// ADD PSH 20070912
+//#include "NewMenu.h"	// ADD PSH 20070912
 #include "setup.h"
 
 #include "RealCheckDlg.h"
@@ -346,7 +346,7 @@ protected:
 
 	void	parsingNews(CString datB);
 	void	InsertNews(CString datB);
-	void	parsingAlertx(LPARAM lParam);	//2012.01.19 KSJ Alertx 추가
+	
 	void	parsingNewsx(DWORD* data);	//2012.01.19 KSJ Alertx 추가
 	void	InsertNewsx(DWORD* data);	//2012.01.19 KSJ Alertx 추가
 	void	calcInClient();
@@ -438,8 +438,8 @@ protected:
 
 	BOOL				m_bMargin;
 	CMapStringToString	m_mapMargin;
-	CNewMenu			m_menuHeader;
-	CNewMenu			m_menuSubHeader;
+//	CNewMenu			m_menuHeader;
+//	CNewMenu			m_menuSubHeader;
 	BOOL				m_bSorting;
 	COLORREF			m_clrMarkerBKG;
 	COLORREF			m_clrMarkerTXT;
@@ -472,5 +472,13 @@ protected:
 	CString m_strBeginTime;		//동시호가 시작시간 xx:10:00 
 	CString m_strEndTime;		//동시호가 종료시간 xx:59:59
 	int	m_nBookMarkRow;		//2013.05.21  KSJ 북마크 넣을 Row
+
+
+public:
+	std::unordered_map<int, int>	_mRsymbol;
+	void initRSymbol();
+	void RTS_parsingAlertx(LPARAM lParam);
+	void	parsingAlertx(LPARAM lParam);	//2012.01.19 KSJ Alertx 추가
+	BOOL DataCheck(char* ptr);
 	// END ADD
 };

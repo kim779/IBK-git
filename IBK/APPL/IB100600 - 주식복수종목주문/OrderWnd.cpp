@@ -1165,12 +1165,17 @@ void COrderWnd::QuerySCHoga(BOOL bHoga, CString strCode, BOOL bStdPrc)
 		m_pParent->SendTR("PIBO1006", strSendData, bHoga ? KEY_SHOGA : KEY_SCURR, 0);
 }
 
+
 void COrderWnd::ParsingSCHoga(CString strData, BOOL bHoga, BOOL bStdPrc)	//2015.06.12 KSJ 기준가 구하기 추가
 {
 	if (strData.IsEmpty())
 		return;
 	const char chGubn = strData.GetAt(0);
 	int nCount = atoi((LPCTSTR)strData.Mid(1, 4));
+
+	CString slog;
+	slog.Format("[1006] nCount =[%d] strData=[%s] chGubnchGubn=[%c]", nCount, strData, chGubn);
+	OutputDebugString(slog);
 
 	CString strCode(_T(""));
 	CString strPrice(_T(""));
@@ -1179,6 +1184,8 @@ void COrderWnd::ParsingSCHoga(CString strData, BOOL bHoga, BOOL bStdPrc)	//2015.
 	struct o_price price {};
 
 	strData.Delete(0, 5);
+
+	
 
 	for (int i = 0; i < nCount; i++)
 	{
@@ -1201,7 +1208,10 @@ void COrderWnd::ParsingSCHoga(CString strData, BOOL bHoga, BOOL bStdPrc)	//2015.
 			const double fPercent = atof((LPCTSTR)strPercent);
 			fPrice = fPrice * fPercent / 100;
 
-			strPrice.Format("%d", (int)fPrice);
+			//strPrice.Format("%d", (int)fPrice);
+
+			strPrice = this->GetOrderPriceByMarket((int)fPrice, strCode);
+			OutputDebugString(slog);
 		}
 
 		strDan = CString(price.gdan, sizeof(price.gdan));
@@ -1695,4 +1705,102 @@ void COrderWnd::OnDestroy()
 	sval.Format("%d", ival); 
 	m_pParent->SaveBuffer(_T("JPrcUnit1"), sval);
 
+}
+
+int COrderWnd::GetValueUpDownfloor(int ival, int idelta, bool bUP)
+{
+	//내림 
+	int number = ival;
+	int result_floor{};
+	if(ival % idelta == 0)
+		result_floor = ival;
+	else if (bUP)
+		result_floor = number + (idelta - (number % idelta));
+	else
+		result_floor = number - (number % idelta);
+
+	return result_floor;
+}
+CString COrderWnd::GetOrderPriceByMarket(int iprice, CString strCode)
+{
+	CString slog;
+	CString strPrice;
+	const int code_type = GetWizard()->SendMessage(WM_USER, MAKEWPARAM(codeTYPE, 0), (LPARAM)(LPCSTR)strCode);
+	//slog.Format("[1006][%d] strPercent =[%s] strPrice=[%s] code_type=[%d]", i, strPercent, strPrice, code_type);
+	if (code_type == kospiType)
+	{
+		if (iprice < 1000)
+			strPrice.Format("%d", iprice);
+		else if (iprice >= 1000 && iprice < 5000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 5));
+		else if (iprice >= 5000 && iprice < 10000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 10));
+		else if (iprice >= 10000 && iprice < 50000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 50));
+		else if (iprice >= 50000 && iprice < 100000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 100));
+		else if (iprice >= 100000 && iprice < 500000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 500));
+		else
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 1000));
+	}
+	else if (code_type == kosdaqType)
+	{
+		if (iprice < 1000)
+			strPrice.Format("%d", iprice);
+		else if (iprice >= 1000 && iprice < 5000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 5));
+		else if (iprice >= 5000 && iprice < 10000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 10));
+		else if (iprice >= 10000 && iprice < 50000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 50));
+		else
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 100));
+	}
+	else if (code_type == thirdType)
+	{
+		if (iprice < 1000)
+			strPrice.Format("%d", iprice);
+		else if (iprice >= 1000 && iprice < 5000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 5));
+		else if (iprice >= 5000 && iprice < 10000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 10));
+		else if (iprice >= 10000 && iprice < 50000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 50));
+		else if (iprice >= 50000 && iprice < 100000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 100));
+		else if (iprice >= 100000 && iprice < 500000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 500));
+		else
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 1000));
+	}
+	else if (code_type == etfType || code_type == etnType)
+	{
+		if (iprice >= 2000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 5));
+		else
+			strPrice.Format("%d", iprice);
+	}
+	else if (code_type == elwType)
+	{
+		strPrice.Format("%d", GetValueUpDownfloor(iprice, 5));
+	}
+	else
+	{
+		if (iprice < 1000)
+			strPrice.Format("%d", iprice);
+		else if (iprice >= 1000 && iprice < 5000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 5));
+		else if (iprice >= 5000 && iprice < 10000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 10));
+		else if (iprice >= 10000 && iprice < 50000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 50));
+		else if (iprice >= 50000 && iprice < 100000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 100));
+		else if (iprice >= 100000 && iprice < 500000)
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 500));
+		else
+			strPrice.Format("%d", GetValueUpDownfloor(iprice, 1000));
+	}
+	return strPrice;
 }

@@ -108,9 +108,6 @@
     <ClCompile Include="MoveSetupDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NewMenu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="OptDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -280,9 +277,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MultiCheckListBox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NewMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OptDlg.h">

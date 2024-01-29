@@ -24,7 +24,15 @@ public:
 	CString		options;		// properties
 };
 
-
+//inters
+struct	_Ralert {
+	CString code;
+	int	stat{};				// DLL_ALERT.stat
+	int	size{};				// data record count
+	std::unique_ptr<char[]> ptr[999]{};	// data record array
+};
+#define	L_RalertR	sizeof(struct _Ralert)
+//intere
 
 class CMainWnd : public CWnd
 {
@@ -200,7 +208,12 @@ private:
 	BOOL		m_bMainClose{};
 
 	CString		m_strMarketTime;	//시장구분 (동시호가) KSJ 2012.11.26 
-
+	CString    CalMaketTime(CString strTime, bool bEnd);
+	CString m_strBeginTime = "084000";  //동시호가 시작시간 xx:10:00
+	CString m_strBeginTimeEnd = "085959";  //동시호가 종료시간 xx:59:59
+	CString m_strEndTime = "152000";  //동시호가 시작시간 xx:10:00
+	CString m_strEndTimeEnd = "155959";  //동시호가 종료시간 xx:59:59
+	
 // etc...
 	void DrawBitmap(CDC *pDC, CRect rc, CString strImage);
 	void DrawRoundBitmap(CDC *pDC, CRect rc, int nKind);
@@ -275,7 +288,8 @@ private:
 
 
 public:
-
+	void CheckRTSTimer();
+	int m_itick;
 	CString _groupName;
 	int     _groupKey = 0;
 	void Request_GroupCode(int iseq);
@@ -301,4 +315,14 @@ protected:
 	{
 		dispidSetMapName = 33L
 	};
+
+	//inters
+	CString CheckIP();
+	bool isIPInRange(CString ip, CString network_s, CString network_e);
+	unsigned int IPToUInt(CString ip);
+	bool m_bcustomer{};
+	std::map<CString, int>    _mRealtime;
+	std::map<CString, std::unique_ptr<struct _Ralert>> _mapRealData;
+
+	void RTS_RecvRTSx(LPARAM lParam);
 };

@@ -813,7 +813,7 @@ LONG CToolWnd::OnManage(WPARAM wParam, LPARAM lParam)
 		ret = (LONG)m_btCHART.IsChecked();
 		break;
 // 	case MK_TURNCODE:
-// 		m_btT9###	 	1301	000240	URN.SetCheck(false);
+// 		m_btTURN.SetCheck(false);
 // 		m_spinTIME->EnableWindow(TRUE);
 // 		break;
 	case MK_SELGROUP:
@@ -1351,14 +1351,7 @@ void CToolWnd::SetSel(int nIndex)
 {
 	const int	ncnt = m_cbGROUP.GetCount();
 	if (nIndex < 0 || nIndex >= ncnt)
-	{
-		m_slog.Format("[cx_interest][CToolWnd][SetSel][remove] return!!!!!!  nIndex=[%d] ncnt=[%d] ", nIndex, ncnt);
-		OutputDebugString(m_slog);
 		return;
-	}
-
-	m_slog.Format("[cx_interest][CToolWnd][SetSel][remove] nIndex=[%d] ncnt=[%d] ", nIndex, ncnt);
-	OutputDebugString(m_slog);
 
 	m_cbGROUP.SetCurSel(nIndex);
 	//m_btntab.SetCurSel(nIndex);
@@ -1435,10 +1428,6 @@ void CToolWnd::SendTree(int nIndex)
 	//pWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SELGROUP, MO_SET), nIndex);
 
 	const int tp = m_cbViewType.GetCurSel();
-
-	CString stmp;
-	stmp.Format("[cx_interest] CToolWnd::SendTree tp =[%d] nIndex=[%d] ", tp, nIndex);
-
 	if(tp == 1)
 	{
 		pWnd->SendMessage(WM_MANAGE, MK_VIEWTYPE, (LPARAM)0);
@@ -1473,10 +1462,6 @@ void CToolWnd::SelectGroup(UINT kind)
 	const int n1 = m_cbGROUP.GetCurSel();
 	const int n = m_cbGROUP.GetItemData(m_cbGROUP.GetCurSel());
 //	saveGroupIndex(n);
-
-	m_slog.Format("[cx_interest][CToolWnd][SelectGroup][remove] kind=[%d] ncount=[%d] n1=[%d] n=[%d] ", kind, ncount, n1, n);
-	OutputDebugString(m_slog);
-
 	SetSel(n-1);
 }
 

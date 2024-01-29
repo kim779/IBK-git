@@ -380,15 +380,17 @@ void CSheet::appendITEMS(int GroupNumber, CString codes)
 	{
 		m_page1->m_bUpdate = TRUE;
 		
-		if(GroupNumber == 0)	// 신규그룹으로만든다.
+		if (GroupNumber == 0)	// 신규그룹으로만든다.
+		{
 			m_page1->AppendNewgroup();
+			m_page1->insertList2x(codes);
+		}
 		else
 		{
 			m_page1->m_selectGroup = GroupNumber -1;
 			m_page1->ExactGroupData();
+			m_page1->AppendItem(codes);
 		}
-
-		m_page1->AppendItem(codes);
 	}
 }
 

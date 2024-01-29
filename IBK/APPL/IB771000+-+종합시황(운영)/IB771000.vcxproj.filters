@@ -22,6 +22,9 @@
     <Filter Include="PRINT">
       <UniqueIdentifier>{d325ba23-cafa-4147-a76d-1ff65759791e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Edge">
+      <UniqueIdentifier>{f9fe7b56-a371-40aa-9c15-5f7ecaec9f8b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BkUtil.cpp">
@@ -40,9 +43,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="datap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="excel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="fxTab.cpp">
@@ -126,6 +126,9 @@
     <ClCompile Include="CContentWnd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BrowserWindowEdge.cpp">
+      <Filter>Edge</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="IB771000.rc">
@@ -149,9 +152,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="datap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="excel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fxTab.h">
@@ -244,6 +244,9 @@
     <ClInclude Include="CContentWnd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BrowserWindowEdge.h">
+      <Filter>Edge</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\7710_bg.bmp">
@@ -314,5 +317,8 @@
     <CustomBuild Include="res\IB771000.rc2">
       <Filter>Resource Files</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

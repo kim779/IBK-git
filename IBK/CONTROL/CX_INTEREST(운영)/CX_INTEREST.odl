@@ -22,7 +22,6 @@ library CX_INTEREST
 			//    Use extreme caution when editing this section.
 			//{{AFX_ODL_PROP(CMainWnd)
 			[id(1)] BSTR cbGroupData;
-			
 			//}}AFX_ODL_PROP
 			
 		methods:
@@ -63,7 +62,6 @@ library CX_INTEREST
 	
 			//}}AFX_ODL_METHOD
 
-			[id(33)] void SetMapName(BSTR strMap);
 	};
 
 	//  Class information for CMainWnd

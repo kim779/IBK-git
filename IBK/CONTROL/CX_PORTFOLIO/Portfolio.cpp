@@ -107,6 +107,7 @@ void CPortfolio::_SetUserName(LPCTSTR sUser)
 
 BSTR CPortfolio::_LoadGroupNames()
 {
+	CString stmp;
 	CString strResult;
 	struct	_updn	updn {};
 
@@ -137,6 +138,10 @@ BSTR CPortfolio::_LoadGroupNames()
 
 				tmpx.Format("%02d %s\t", ival, tmps);
 				strResult = tmpx + strResult;
+
+
+stmp.Format("\r\n[interest][cx_portfolio] tmpx [%s]", tmpx);
+OutputDebugString(stmp);
 			}
 		}
 	}

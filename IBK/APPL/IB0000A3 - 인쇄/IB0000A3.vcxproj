@@ -17,7 +17,7 @@
   <PropertyGroup Label="Globals">
     <SccProjectName />
     <SccLocalPath />
-    <Keyword>MFCProj</Keyword>  
+    <Keyword>MFCProj</Keyword>
     <ProjectGuid>{8CAD60F9-6C4D-4877-A802-32BC9643E1A3}</ProjectGuid>
     <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -160,7 +160,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../dev/IB0000A3.dll</OutputFile>
+      <OutputFile>D:\IBKS_TEST\dev/IB0000A3.dll</OutputFile>
       <ImportLibrary>.\Debug\IB0000A3.lib</ImportLibrary>
       <ModuleDefinitionFile>.\IB0000A3.def</ModuleDefinitionFile>
     </Link>

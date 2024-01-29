@@ -819,6 +819,99 @@ HBRUSH CConfigDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	return hbr;
 }
 
+void	CConfigDlg::SetSpinPrcie(NM_UPDOWN* pNMUD, CEdit* pEdit)
+{
+	CString text;
+	int	value = 0, delta = 0, spVal, nRet;
+	pEdit->GetWindowText(text);
+	spVal = atoi(text);
+
+	if (m_iCodetype == kospiType)
+	{
+		if (spVal < 1000)
+			nRet = 1;
+		else if (spVal >= 1000 && spVal < 5000)
+			nRet = 5;
+		else if (spVal >= 5000 && spVal < 10000)
+			nRet = 10;
+		else if (spVal >= 10000 && spVal < 50000)
+			nRet = 50;
+		else if (spVal >= 50000 && spVal < 100000)
+			nRet = 100;
+		else if (spVal >= 100000 && spVal < 500000)
+			nRet = 500;
+		else
+			nRet = 1000;
+	}
+	else if (m_iCodetype == kosdaqType)
+	{
+		if (spVal < 1000)
+			nRet = 1;
+		else if (spVal >= 1000 && spVal < 5000)
+			nRet = 5;
+		else if (spVal >= 5000 && spVal < 10000)
+			nRet = 10;
+		else if (spVal >= 10000 && spVal < 50000)
+			nRet = 50;
+		else
+			nRet = 100;
+	}
+	else if (m_iCodetype == thirdType)
+	{
+		if (spVal < 1000)
+			nRet = 1;
+		else if (spVal >= 1000 && spVal < 5000)
+			nRet = 5;
+		else if (spVal >= 5000 && spVal < 10000)
+			nRet = 10;
+		else if (spVal >= 10000 && spVal < 50000)
+			nRet = 50;
+		else if (spVal >= 50000 && spVal < 100000)
+			nRet = 100;
+		else if (spVal >= 100000 && spVal < 500000)
+			nRet = 500;
+		else
+			nRet = 1000;
+	}
+	else if (m_iCodetype == etfType || m_iCodetype == etnType)
+	{
+		if (spVal < 2000)
+			nRet = 1;
+		else
+			nRet = 5;
+	}
+	else if (m_iCodetype == elwType)
+	{
+		nRet = 5;
+	}
+	else
+	{
+		if (spVal < 1000)
+			nRet = 1;
+		else if (spVal >= 1000 && spVal < 5000)
+			nRet = 5;
+		else if (spVal >= 5000 && spVal < 10000)
+			nRet = 10;
+		else if (spVal >= 10000 && spVal < 50000)
+			nRet = 50;
+		else if (spVal >= 50000 && spVal < 100000)
+			nRet = 100;
+		else if (spVal >= 100000 && spVal < 500000)
+			nRet = 500;
+		else
+			nRet = 1000;
+	}
+
+	if (pNMUD->iDelta > 0)
+		spVal += nRet * -1;
+	else
+		spVal += nRet;
+	
+	spVal = max(0, spVal);
+
+	text.Format("%d", spVal);
+	pEdit->SetWindowText(text);
+}
 
 void CConfigDlg::SetSpinDeltaValue(NM_UPDOWN* pNMUD, CEdit* pEdit, int iunit)
 {
@@ -878,7 +971,8 @@ void CConfigDlg::OnDeltaposSs5(NMHDR* pNMHDR, LRESULT* pResult)
 void CConfigDlg::OnDeltaposSs6(NMHDR* pNMHDR, LRESULT* pResult) 
 {
 	NM_UPDOWN* pNMUpDown = (NM_UPDOWN*)pNMHDR;
-	SetSpinDeltaValue(pNMUpDown, (CEdit*)GetDlgItem(IDC_EDIT6), 0);
+	//SetSpinDeltaValue(pNMUpDown, (CEdit*)GetDlgItem(IDC_EDIT6), 0);
+	SetSpinPrcie(pNMUpDown, (CEdit*)GetDlgItem(IDC_EDIT6));
 	*pResult = 0;
 }
 

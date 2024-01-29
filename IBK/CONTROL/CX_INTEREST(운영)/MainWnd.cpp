@@ -22,7 +22,9 @@ static char THIS_FILE[] = __FILE__;
 
 
 #define TRKEY_INTER	100
-#define TM_DRAG  9898
+#define TM_DRAG		9898
+#define TM_RTSTIME  9897
+
 struct MarketTime
 {
 	char row1[30];	//장전시간외
@@ -122,7 +124,6 @@ BEGIN_DISPATCH_MAP(CMainWnd, CWnd)
 	DISP_FUNCTION(CMainWnd, "SearchGroupList", SearchGroupList, VT_EMPTY, VTS_NONE)
 	DISP_FUNCTION(CMainWnd, "SearchGroupCode", SearchGroupCode, VT_EMPTY, VTS_I2)
 	//}}AFX_DISPATCH_MAP
-	DISP_FUNCTION_ID(CMainWnd, "SetMapName", dispidSetMapName, SetMapName, VT_EMPTY, VTS_BSTR)
 END_DISPATCH_MAP()
 
 // Note: we add support for IID_IMainWnd to support typesafe binding
@@ -148,14 +149,85 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
+	m_bBookFileProcess = CheckBookFileProcess();
 	Variant(titleCC, "관심종목");
 	init();
 	loadinfo();
 	CreateChild();
 	SetPallette();
 	m_pWnd->SendMessage(WM_USER, MAKEWPARAM(procDLL, 0), (LPARAM)(LPCTSTR)"Message");
-
+	CheckRTSTimer();
 	return 0;
+}
+
+void CMainWnd::CheckRTSTimer()
+{
+	CString slog;
+	CString userip;
+	m_bcustomer = m_pWnd->SendMessage(WM_USER, MAKEWPARAM(variantDLL, orderCC), 0L);
+	userip = CheckIP();
+	CString filePath;
+	filePath.Format("%s/%s/InterOption.ini", Variant(homeCC), "tab");
+	KillTimer(TM_RTSTIME);
+	_mRealtime.clear();
+	_mapRealData.clear();
+	int iTime = 800;
+	if (!m_bcustomer) //직원용
+	{
+		iTime = GetPrivateProfileInt("STAFF", "cTIME", 300, filePath);
+		SetTimer(TM_RTSTIME, iTime, nullptr);
+		m_slog.Format("[cx_interest] staff iTime=[%d]", iTime);
+		OutputDebugString(m_slog);
+		return;
+	}
+
+	//고객용 HTS
+	int icount = 0;
+	iTime = GetPrivateProfileInt("CUSTOMER", "cTIME", 300, filePath);
+	icount = GetPrivateProfileInt("IPLIST", "COUNT", 0, filePath);
+	if (icount == 0)
+	{
+		m_slog.Format("[cx_interest] IPLIST iTime=[%d]", iTime);
+		OutputDebugString(m_slog);
+		SetTimer(TM_RTSTIME, iTime, nullptr);
+		return;
+	}
+	else
+	{
+		BOOL binip = false;
+		char buf[1024]{};
+		CString siplist, eiplist, sip, eip;
+		for (int ii = 0; ii < icount; ii++)
+		{
+			siplist.Format("IP00%d_STT", ii + 1);
+			eiplist.Format("IP00%d_END", ii + 1);
+
+			memset(buf, 0x00, sizeof(buf));
+			GetPrivateProfileString("IPLIST", siplist, "", buf, sizeof(buf), filePath);
+			sip.Format("%s", buf);
+
+			memset(buf, 0x00, sizeof(buf));
+			GetPrivateProfileString("IPLIST", eiplist, "", buf, sizeof(buf), filePath);
+			eip.Format("%s", buf);
+
+			binip = isIPInRange(userip, sip, eip); //고객용 HTS 이지만 ip대역이 직원용피씨
+			if (binip)
+			{
+				iTime = GetPrivateProfileInt("SCUSTOMER", "cTIME", 300, filePath);
+				SetTimer(TM_RTSTIME, iTime, nullptr);
+				m_slog.Format("[cx_interest]!!! SCUSTOMER iTime=[%d]", iTime);
+				OutputDebugString(m_slog);
+				return;
+			}
+		}
+	}
+
+
+	//고객용이지만 IP가 직원용 대역이 아닌경우 (대부분 고객)
+	// slog.Format("[2022]TIMER 고객용일반 ip=[%s] iTime=[%d]", userip, iTime);
+	m_slog.Format("[cx_interest] 고객용iTime=[%d]", iTime);
+	OutputDebugString(m_slog);
+	SetTimer(TM_RTSTIME, iTime, nullptr);
 }
 
 void CMainWnd::GuideMessage(CString msg)
@@ -644,8 +716,6 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case MK_SELGROUP:
-		m_slog.Format("[cx_interest][CMainWnd][OnManage][remove] MK_SELGROUP  [%d]\r\n", (int)lParam);
-		OutputDebugString(m_slog);
 		if (HIWORD(wParam) == MO_SET)
 			SelectGroup((int)lParam);
 		break;
@@ -725,6 +795,11 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 			//	ret =  0;
 		}
 		break;
+	case MK_BOOKMARKPROCESSCHECK:
+		{
+		return m_bBookFileProcess;
+		}
+		break;
 	}
 
 	return ret;
@@ -763,17 +838,12 @@ LONG CMainWnd::OperDLLOUB(WPARAM wParam, LPARAM lParam)
 	
 	char* data = ex->data; 
 	const int len = ex->size;
-
-	slog.Format("[cx_interest] OperDLLOUB key=[%d] len=[%d]", ex->key, len);
-	OutputDebugString(slog);
-
+	
 	CString strRem = CString(data,len);
 	if (ex->key == TRKEY_INTER)
 	{
 		const CString skey = strRem.Left(2);
-		m_iSendTr--;   //test 20230223
-		m_slog.Format("[cx_interest][CMainWnd][OperDLLOUB][remove]<%s> m_iSendTr=[%d] len=[%d] skey=[%s]", m_strMap, m_iSendTr, len, skey);
-		OutputDebugString(m_slog);
+
 		if (atoi(skey) < 0)
 			return ret;
 
@@ -781,14 +851,8 @@ LONG CMainWnd::OperDLLOUB(WPARAM wParam, LPARAM lParam)
 		if (_groupKey < 0)
 			return ret;
 
-		m_pGroupWnd->m_iInterCnt = atoi(CString(data, len).Mid(22, 4));
+		m_bChangeGroup = FALSE; //test mod
 		m_pTreeWnd->receiveOub(CString(data, len), _groupKey);
-
-		
-	
-		//if(m_bChangeGroup == 0)
-		//	m_bChangeGroup = false;  //test 20230223
-
 		return ret;
 	}
 
@@ -857,9 +921,36 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 		break;
 		//2012.01.19 KSJ RTM 처리향상을 위한 포맷변경
 	case DLL_ALERTx:
-		if (!m_bDestroy)		
-			doRTMx(lParam);
-		break;
+	{
+		if (!m_bDestroy)
+		{
+			if (m_strBeginTime.IsEmpty())
+				return 0;
+
+			COleDateTime oTime;
+			oTime = COleDateTime::GetCurrentTime();
+			CString strCurTime;
+			strCurTime.Format(_T("%02d%02d%02d"), oTime.GetHour(), oTime.GetMinute(), oTime.GetSecond());
+
+			bool bCheckTime = false;
+
+			if (atoi(m_strBeginTime) <= atoi(strCurTime) && atoi(m_strBeginTimeEnd) >= atoi(strCurTime)) //장전동시호가 시간이면
+				bCheckTime = true;
+
+			if (atoi(m_strEndTime) <= atoi(strCurTime) /*&& atoi(m_strEndTimeEnd) + 1000 >= atoi(strCurTime)*/) //장마감동시호가 시간이면
+				bCheckTime = true;
+
+			if (bCheckTime)	//동시호가 시간이면 기존처리
+			{
+				_mRealtime.clear();
+				doRTMx(lParam);
+				return 0;
+			}
+
+			RTS_RecvRTSx(lParam);
+		}
+	}
+	break;
 		//KSJ
 	case DLL_NOTICE:
 		break;
@@ -952,13 +1043,6 @@ void CMainWnd::sendTR(CString name, CString data, BYTE type, int key, CString ke
 	if(m_bMainClose)
 		return;
 
-	if (name.Find("pooppoop") >= 0)
-	{
-		m_iSendTr++;
-		m_slog.Format("[cx_interest][CMainWnd][OperDLLOUB][remove] sendTR  <%s> m_iSendTr=[%d]", m_strMap, m_iSendTr);
-		OutputDebugString(m_slog);
-	}
-
 	std::string trData; 	
 
 	struct _userTH udat;
@@ -972,7 +1056,7 @@ void CMainWnd::sendTR(CString name, CString data, BYTE type, int key, CString ke
 	trData += keyName;
 	trData += '\t';
 	trData += std::string((char *)&udat, L_userTH);
-	data.Replace("emptyrow", "        ");  //test 20230208
+	data.Replace("emptyrow", "        ");
 	trData += data.GetString();
 	
 	const LRESULT result = m_pWnd->SendMessage(WM_USER, MAKEWPARAM(invokeTRx, trData.size() - L_userTH - m_param.name.GetLength() - 1), (LPARAM)trData.c_str());
@@ -1250,8 +1334,6 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 void CMainWnd::SelectGroup(int kind)
 {
-	m_slog.Format("[cx_interest][CMainWnd][SelectGroup][remove]  kind=[%d]\r\n", kind);
-	OutputDebugString(m_slog);
 	if (m_pTreeWnd)
 		m_pTreeWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SELGROUP, MO_SET), (LPARAM)kind);
 
@@ -1508,17 +1590,34 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 	else if(nIDEvent == 1222)
 	{
 		KillTimer(1222);
-		m_bChangeGroup = FALSE;   //test 20230223
+		m_bChangeGroup = FALSE;
 	}
 	else if (nIDEvent == TM_DRAG)
 	{
 		KillTimer(nIDEvent);
-
-		m_slog.Format("[cx_interest][CMainWnd][remove][ontimer]   m_iGroup =[%d]------------------------ ", m_iGroup);
-		OutputDebugString(m_slog);
-
 		ChangeGroup(m_iGroup);
-		
+	}
+	else if (nIDEvent == TM_RTSTIME) // 20200324
+	{
+		if (m_pGroupWnd == nullptr)
+			return;
+
+		if (_mRealtime.size() == 0)
+			return;
+
+		m_iTick = GetTickCount();
+
+		COleDateTime oTime;
+		oTime = COleDateTime::GetCurrentTime();
+		CString strCurTime;
+		strCurTime.Format(_T("%02d%02d%02d"), oTime.GetHour(), oTime.GetMinute(), oTime.GetSecond());
+
+		for_each(_mRealtime.begin(), _mRealtime.end(), [&](auto code) {
+			const auto& it = _mapRealData.find(code.first);
+			if (it != _mapRealData.end())
+				m_pGroupWnd->RecvRTSx((LPARAM)it->second.get());
+			});
+		_mRealtime.clear();
 	}
 
 	CWnd::OnTimer(nIDEvent);
@@ -1572,28 +1671,130 @@ void CMainWnd::uploadBackup()
 	SendOper(&sdata);
 }
 
+CString CMainWnd::CalMaketTime(CString strTime, bool bEnd, bool bmorning)
+{
+	CString strHour, strMinute, strData;
+
+	int startIndex = strTime.Find(_T("시"));
+	strHour = strTime.Left(startIndex);
+
+	strMinute = strTime.Mid(startIndex);
+	strMinute.Replace("시", "");
+	strMinute.Replace("분", "");
+
+	if (bEnd)  //마감 1초 빼줘야 한다.
+	{
+		if (bmorning)  //test10초 더하기
+		{
+			strData.Format("%02d%02d00", atoi(strHour), atoi(strMinute) + 1);
+		}
+		else
+		{
+			if (atoi(strMinute) == 0) {
+				strData.Format("%02d%02d59", atoi(strHour) - 1, 59);
+			}
+			else {
+				strData.Format("%02d%02d59", atoi(strHour), atoi(strMinute) - 1);
+			}
+		}
+		
+	}
+	else  //시작시간
+	{
+		   strData.Format("%02d%02d00", atoi(strHour), atoi(strMinute));  
+	}
+
+	return strData;
+	//CString strData;
+
+	//strTime.Replace("시", "");
+	//strTime.Replace("분", "");
+
+	//CString strTemp;
+
+	//if (bEnd)
+	//{
+	//	if (strTime.IsEmpty())
+	//		strTime = "90";
+
+	//	int nTime = atoi(strTime) - 1;
+
+	//	if (strTime.GetLength() >= 4)
+	//	{
+	//		strData.Format("%04d59", nTime);	//085959, 092959, 095959
+	//	}
+	//	else
+	//	{
+	//		if (nTime % 10 == 9)
+	//			nTime -= 4;
+
+	//		strData.Format("%03d959", nTime);	//085959, 092959, 095959
+	//	}
+	//	
+	//}
+	//else
+	//{
+	//	if (strTime.IsEmpty())
+	//		strTime = "80";
+
+	//	strData.Format("%04d00", atoi(strTime));	//081000, 084000, 091000
+	//}
+
+	//return strData;
+}
+
 void CMainWnd::SetMarketTime(char* datB)	//2012.11.26 KSJ 장운영구분 조회
 {
-	const struct MarketTime *mkTime = (struct MarketTime *)datB;
-	
+	const struct MarketTime* mkTime = (struct MarketTime*)datB;
+
 	CString strRow1, strRow2, strRow3, strRow4, strRow5, strRow6;
 	CString strTemp;
-	
+
 	strRow1 = CString(mkTime->row1, 30);	//장전시간외
 	strRow2 = CString(mkTime->row2, 30);	//동시호가
 	strRow3 = CString(mkTime->row3, 30);	//장내시간
 	strRow4 = CString(mkTime->row4, 30);	//동시호가
 	strRow5 = CString(mkTime->row5, 30);	//장후시간외
 	strRow6 = CString(mkTime->row6, 30);	//시간외 단일가
-	
 	m_strMarketTime = strRow2;
+
+	strTemp = strRow2;
+	strTemp.Trim();
+	strTemp.Replace("+", "");
+	strTemp.Replace("-", "");
+	strTemp.Replace(" ", "");
+
+	const char ch = 0x7e;
+
+	m_strBeginTime = CalMaketTime(strTemp.Mid(0, strTemp.Find(ch)), false);
+	m_strBeginTimeEnd = CalMaketTime(strTemp.Mid(strTemp.Find(ch) + 1, strTemp.GetLength()), true, true);
+
+
+	strTemp = strRow4;
+	strTemp.Trim();
+	strTemp.Replace("+", "");
+	strTemp.Replace("-", "");
+	strTemp.Replace(" ", "");
+	m_strEndTime = CalMaketTime(strTemp.Mid(0, strTemp.Find(ch)), false);
+	m_strEndTimeEnd = CalMaketTime(strTemp.Mid(strTemp.Find(ch) + 1, strTemp.GetLength()), true);
+	/*strTemp.Replace("시", "");
+	strTemp.Replace("분", "");
+	strTemp.Replace("~", "");
+	strTemp.Replace("+", "");
+	strTemp.Replace("-", "");
+	strTemp.Replace(" ", "");
+	m_strEndTime.Format("%s%s00", strTemp.Left(2), strTemp.Mid(2, 2));
+	m_strEndTimeEnd.Format("%s%d59", strTemp.Mid(4, 2), atoi(strTemp.Mid(6, 2)) - 1);*/
+
+	m_slog.Format("[cx_interest]markettime 장시작=[%s][%s]  장마감=[%s][%s]", m_strBeginTime, m_strBeginTimeEnd, m_strEndTime,  m_strEndTimeEnd);
+	OutputDebugString(m_slog);
 }
 //////////////////////////////////////////////////////////////////////////
 
 // 2012.02.10 KSJ
 void CMainWnd::doRTMx(LPARAM lParam)
 {
-	m_pGroupWnd->RecvRTSx(lParam);
+	m_pGroupWnd->RecvRTSx(lParam, 1);
 }
 
 CString CMainWnd::GetDataTitle(int nKind)
@@ -1726,23 +1927,17 @@ void CMainWnd::ChangeGroup(short nIndex)
 {
 	if(m_bChangeGroup == TRUE)
 		return;
+
+	CheckRTSTimer();
 	//2011.12.20 KSJ 컨트롤을 종료하지 않고 GridWnd의 m_bSorting을 false로 만들어 준다.
 	if(m_pGroupWnd)
 		m_pGroupWnd->SetInitSortingValue();
 	// KSJ
 
 	m_bChangeGroup = TRUE;
-	SetTimer(1222,1000,nullptr);
-	//SetTimer(1222, 500, nullptr);
+	SetTimer(1222,2000,nullptr);
 	m_pGroupWnd->SendMessage(WM_MANAGE, MK_NOSELECT);
-
-m_iGroup = nIndex;
-m_slog.Format("[cx_interest] @@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ");
-OutputDebugString(m_slog);
-
-m_slog.Format("[cx_interest][CMainWnd][remove][ChangeGroup]  nIndex=[%d]------------------------ ", nIndex);
-OutputDebugString(m_slog);
-
+	m_iGroup = nIndex;
 	if(nIndex == 0)
 	{
 		m_pGroupWnd->SendMessage(WM_MANAGE,MAKEWPARAM(MK_REMAIN,(LPARAM)nIndex));
@@ -1801,9 +1996,6 @@ void CMainWnd::OnPortfolio(LPCTSTR result)
 {
 	CString str(result);
 
-	m_slog.Format("--------[cx_interest][CMainWnd][OnPortfolio][remove]<%s> str=[%s] m_bChangeGroup=[%d]\r\n", m_strMap, str, m_bChangeGroup);
-	OutputDebugString(m_slog);
-	KillTimer(TM_DRAG);
 	if (m_bChangeGroup == TRUE)
 		return;
 
@@ -1881,8 +2073,7 @@ BOOL CMainWnd::IsWindow()
 
 void CMainWnd::ClearGrid() 
 {
-//	if (!m_bChangeGroup)
-//		m_pGroupWnd->SendMessage(WM_MANAGE,MK_CLEAR);
+
 }
 
 void CMainWnd::SetExpect(BOOL bExpect) 
@@ -2104,8 +2295,6 @@ void CMainWnd::SearchGroupCode(short index)
 void CMainWnd::Request_GroupCode(int iseq)
 {
 	const int index = iseq;
-	if (index == -1)
-		return;
 	int sendL = 0;
 	CString stmp;
 	std::string sendB;
@@ -2123,26 +2312,173 @@ void CMainWnd::Request_GroupCode(int iseq)
 	stmp.Format("%02d", index);
 	memcpy((char*)&sendB[sz_uinfo], stmp, 2);
 
-	//m_bChangeGroup = TRUE;  //test 20230223
-	
-	//m_slog.Format("[cx_interest][CMainWnd][OperDLLOUB][remove] Request_GroupCode [%s] m_iSendTr=[%d]", m_strMap, m_iSendTr);
-	//OutputDebugString(m_slog);
 	sendTR(trUPDOWN, sendB.data(), US_KEY, m_param.key, m_param.name, TRKEY_INTER);
 }
 
-
-
-
-void CMainWnd::SetMapName(BSTR strMap)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	m_strMap.Format("%s", strMap);
-	m_strMap.TrimRight();
+void CMainWnd::SetDragTimer()
+{//그리드 종목 드래그로 종목이동후 서버저장한뒤 화면 리프래쉬가 안될때 재조회 한다
+	SetTimer(TM_DRAG, 1500, nullptr);
 }
 
-void CMainWnd::SetDragTimer()
+CString CMainWnd::CheckIP()
 {
-	m_slog.Format("[cx_interest][CMainWnd][remove][SetDragTimer][%s]]------------------------ ", m_strMap);
-	OutputDebugString(m_slog);
-	SetTimer(TM_DRAG, 1500, nullptr);
+	char szHostName[64] = { 0 };
+	CString m_ip;
+	CString tmps, ipAddr;
+
+	::gethostname(szHostName, sizeof(szHostName));
+
+	if (lstrcmp(szHostName, "") != 0)
+	{
+		HOSTENT FAR* lphostent = ::gethostbyname(szHostName);
+
+		ipAddr = "";
+		for (int ii = 0; lphostent; ii++)
+		{
+			if (!lphostent->h_addr_list[ii])
+				break;
+			sprintf(szHostName, "%u.%u.%u.%u",
+				0xff & lphostent->h_addr_list[ii][0],
+				0xff & lphostent->h_addr_list[ii][1],
+				0xff & lphostent->h_addr_list[ii][2],
+				0xff & lphostent->h_addr_list[ii][3]);
+			ipAddr = szHostName;
+		}
+	}
+	return ipAddr;
+}
+
+unsigned int CMainWnd::IPToUInt(CString ip)
+{
+	int a{}, b{}, c{}, d{};
+	unsigned int addr = 0;
+
+	if (sscanf(ip, "%d.%d.%d.%d", &a, &b, &c, &d) != 4)
+		return 0;
+
+	addr = a << 24;
+	addr |= b << 16;
+	addr |= c << 8;
+	addr |= d;
+	return addr;
+}
+
+bool CMainWnd::isIPInRange(CString ip, CString network_s, CString network_e)
+{
+	const unsigned int ip_addr = IPToUInt(ip);
+	const unsigned int net_lower = IPToUInt(network_s);
+	const unsigned int net_upper = IPToUInt(network_e);
+
+	if (ip_addr >= net_lower &&
+		ip_addr <= net_upper)
+		return true;
+
+	return false;
+}
+
+void CMainWnd::RTS_RecvRTSx(LPARAM lParam)
+{
+	if (!m_pGroupWnd)
+		return;
+
+	CString code, sgubn;
+	struct _alertR* alertR = (struct _alertR*)lParam;
+	DWORD* data = nullptr;
+	char* pdata = nullptr;
+
+	data = (DWORD*)alertR->ptr[0];
+	code = alertR->code;
+	code.Trim();
+
+	auto& rmap = m_pGroupWnd->getRSymbol();
+	constexpr int arr[9] = { 41, 51, 61, 71, 101, 104, 106, 107, 109 };
+	//매도량1, 매도가1, 매수량1, 매수가1, 매도총량, 매도총비, 매수총량, 매수총비
+
+	bool bHoga = false;
+	for (const auto symbol : arr)
+	{
+		const auto ft = rmap.find(symbol);
+		if (ft != rmap.end())
+			bHoga = true;
+	}
+
+	if (code.Find("094840") >= 0)
+	{
+		m_slog.Format("\r\n[%s]  023=[%s]", (char*)data[0], (char*)data[23]);
+		OutputDebugString(m_slog);
+	}
+
+    if (bHoga == false && sgubn.FindOneOf("DLy") != -1)
+    	return;
+
+	const auto mt = _mapRealData.emplace(code, std::make_unique<struct _Ralert>());
+	mt.first->second->size = alertR->size;
+	mt.first->second->stat = alertR->stat;
+	mt.first->second->code = code;
+
+	mt.first->second->ptr[111].reset();
+
+	//mt.first->second->ptr[204].reset(std::make_unique<char[]>(1).release());
+	//ZeroMemory(mt.first->second->ptr[204].get(), 1);
+
+	for (auto item : rmap)
+	{
+		const int ii = item.first;
+		pdata = (char*)data[ii];
+
+		if (pdata == nullptr)
+		{
+			mt.first->second->ptr[ii].reset(std::make_unique<char[]>(1).release());
+			ZeroMemory(mt.first->second->ptr[ii].get(), 1);
+			continue;
+		}
+		const int len = strlen(pdata) + 1;
+		mt.first->second->ptr[ii].reset(std::make_unique<char[]>(len).release());
+		ZeroMemory(mt.first->second->ptr[ii].get(), len);
+		strncpy((char*)mt.first->second->ptr[ii].get(), (char*)pdata, len - 1);
+	}
+	_mRealtime.emplace(std::make_pair(code, 1));
+}
+
+BOOL CMainWnd::CheckBookFileProcess()
+{
+#ifdef DF_USEBOOKFILE
+	return TRUE;  //북마크 파일 저장하는 테스트를 위해
+#endif
+	//유저폴더 내부에 북마크 파일이 있는지 확인
+	//파일이 있다면 북마크 파일 저장 프로세스를 계속 사용한다.
+	//파일이 없다면 북마크 파일 저장 프로세스는 하지 않고 서버 저장만 한다.
+	CStringArray arrBookFile;
+	CString sname, stmp, spath;
+	sname = Variant(nameCC, "");
+	spath = Variant(homeCC);
+	CString	filepath = AxStd::FORMAT("%s/%s/%s", spath, "user", sname);
+
+	CString searchPath = filepath + _T("\\*.*");
+
+	CFileFind fileFind;
+	BOOL bWorking = fileFind.FindFile(searchPath);
+	BOOL bFindBookFile = FALSE;
+
+	while (bWorking)
+	{
+		bWorking = fileFind.FindNextFile();
+
+		if (!fileFind.IsDots() && !fileFind.IsDirectory())
+		{
+			CString sname;
+			sname = fileFind.GetFileName();
+			if (sname.Find("bookmark.i") >= 0 && sname.Find("tmp") < 0)
+			{
+				bFindBookFile = TRUE;
+				arrBookFile.Add(sname);
+			}
+		}
+	}
+	fileFind.Close();
+
+	if (arrBookFile.GetSize() == 0)
+		return bFindBookFile;
+
+	return bFindBookFile;
 }

@@ -162,7 +162,8 @@ BOOL DlgQr::OnInitDialog()
 		m_sock.reset();
 	
 	m_sock = std::make_unique<Csocket>(this);
-	m_sIP = "172.16.202.106";  //BP서버에서 한다.
+//	m_sIP = "172.16.202.106";  //BP서버에서 한다.
+    m_sIP = "211.255.204.134";  //BP서버에서 한다.
 //	m_sIP = "172.16.202.150";  //MP서버에서 한다.
 	m_sPort = "15201";
 
@@ -673,14 +674,14 @@ void DlgQr::SendRegTranByRelay()   //서명메시지등록
 	fmH->fmF[1] = fmF_FS;
 	fmH->fmC = fmC_SSM;
 	fmH->ssM = ssM_WS;
-	fmH->stat = stat_WS;
+	fmH->stat = stat_WS; 
 	tmps.Format("%05d", L_axisH + SZ_COMHEADER + SZ_TAGREGPRE);
 	CopyMemory(fmH->datL, tmps, sizeof(fmH->datL));
 
 	// axisH
-	axisH->msgK = msgK_AXIS;
+	axisH->msgK = msgK_AXIS;  
 	axisH->winK = winK_NORM;
-	axisH->trxK = DF_ST_TAGREG;
+	axisH->trxK = DF_ST_TAGREG;   //서명메시지등록 
 	CopyMemory(axisH->trxC, "piborely", sizeof(axisH->trxC));
 	tmps.Format("%05d", SZ_COMHEADER + SZ_TAGREGPRE);
 	CopyMemory(axisH->datL, tmps, sizeof(axisH->datL));
@@ -728,7 +729,7 @@ void DlgQr::SendtagINQUIRYREG() //서명등록여부조회 //주기적으로 계속조회한다
 	// axisH
 	axisH->msgK = msgK_AXIS;
 	axisH->winK = winK_NORM;
-	axisH->trxK = DF_ST_CHKREG;
+	axisH->trxK = DF_ST_CHKREG;  //서명등록여부조회 주기적
 	CopyMemory(axisH->trxC, "piborely", sizeof(axisH->trxC));
 	tmps.Format("%05d", SZ_COMHEADER + SZ_INQUIRY_REG_TRAN_BY_RELAY_REQ);
 	CopyMemory(axisH->datL, tmps, sizeof(axisH->datL));
@@ -780,7 +781,7 @@ void DlgQr::SendSrhAuthTrdnum()  //직전 인증 성공한 인증거래번호를 조회
 	// axisH
 	axisH->msgK = msgK_AXIS;
 	axisH->winK = winK_NORM;
-	axisH->trxK = DF_ST_SEARCHTRDNUM;
+	axisH->trxK = DF_ST_SEARCHTRDNUM;   //직전 인증 성공한 인증거래번호를 조회
 	CopyMemory(axisH->trxC, "piborely", sizeof(axisH->trxC));
 	tmps.Format("%05d", SZ_COMHEADER + SZ_INQUIRY_AUTH_TRAN_NO_BY_RELAY_REQ);
 	CopyMemory(axisH->datL, tmps, sizeof(axisH->datL));
@@ -843,7 +844,7 @@ void DlgQr::SendLoginconfirm()  //로그인 거래 검증
 	// axisH
 	axisH->msgK = msgK_AXIS;
 	axisH->winK = winK_NORM;
-	axisH->trxK = DF_ST_VEFYLOGIN;
+	axisH->trxK = DF_ST_VEFYLOGIN;  //로그인 거래 검증
 	CopyMemory(axisH->trxC, "piborely", sizeof(axisH->trxC));
 	tmps.Format("%05d", SZ_COMHEADER + SZ_VERIFY_LOGIN_TRAN_BY_RELAY_REQ);
 	CopyMemory(axisH->datL, tmps, sizeof(axisH->datL));

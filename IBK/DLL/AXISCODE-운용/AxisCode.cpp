@@ -96,6 +96,8 @@ BOOL CAxisCodeApp::LoadCode()
 		for (int ii = 0; ii < count; ii++, hjc++)
 		{
 			CString sCode = CString(hjc->code, HCodeLen).Mid(1);
+			if (sCode.Find("000") >= 0)
+				OutputDebugString("\r\n" + sCode);
 			_mapCODEx.emplace(std::move(sCode), hjc);
 			if (hjc->ssgb == jmELW)
 				continue;

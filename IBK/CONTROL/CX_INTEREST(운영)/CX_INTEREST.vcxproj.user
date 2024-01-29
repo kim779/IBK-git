@@ -5,12 +5,12 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerCommand>D:\IBKS_TEST\exe\axis.exe</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>/k IBK_TEST</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>/k IBK_TEST /a 211.255.204.134</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerCommand>D:\IBKS_TEST\exe\axis.exe</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>/k IBK_TEST</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>/k IBK_TEST /a 172.16.202.130 /i devil006 ahffkdy1 1</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

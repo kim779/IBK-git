@@ -885,7 +885,9 @@ void CControlWnd::SetControlWindow()
 
 void CControlWnd::SetWeelyBtnSHOW()  //**
 {
-	
+	if (m_pTab->GetCurSel() == 1 || m_pTab->GetCurSel() == 2)
+		return;
+
 	m_pBtnOption[0]->ShowWindow(SW_HIDE);
 	m_pBtnOption[1]->ShowWindow(SW_HIDE);
 	m_pBtnOption[2]->ShowWindow(SW_HIDE);
@@ -2405,7 +2407,7 @@ void CControlWnd::OnTabChange( NMHDR *pHeader, LRESULT *pResult )
 				nCmd3 = SW_SHOW;
 				m_bChegUpdate = FALSE;
 
-				m_pScreenWnd->ChangeMap("IB401399", "");
+				m_pScreenWnd->ChangeMap("IB401399", "");		
 			}
 			else
 			{
@@ -2459,6 +2461,14 @@ void CControlWnd::OnTabChange( NMHDR *pHeader, LRESULT *pResult )
 		//m_pBtnFuture[4]->ShowWindow(nCmd1);
 		if(m_iKind == WEEKBTN)
 			SetWeelyBtnSHOW();
+		else
+		{
+		/*	m_pBtnOption[0]->ShowWindow(SW_HIDE);
+			m_pBtnOption[1]->ShowWindow(SW_HIDE);
+			m_pBtnOption[2]->ShowWindow(SW_HIDE);
+			m_pBtnOption[3]->ShowWindow(SW_HIDE);
+			m_pBtnOption[4]->ShowWindow(SW_HIDE);*/
+		}
 	}
 }
 

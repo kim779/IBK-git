@@ -171,7 +171,7 @@
       <OptimizeReferences>
       </OptimizeReferences>
       <ModuleDefinitionFile>.\Sock.def</ModuleDefinitionFile>
-      <OutputFile>../../exe/axSock.ocx</OutputFile>
+      <OutputFile>D:\git\src\release/axSock.ocx</OutputFile>
       <RegisterOutput>false</RegisterOutput>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>

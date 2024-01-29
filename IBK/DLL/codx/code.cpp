@@ -765,7 +765,14 @@ double CCode::GetDelta(DWORD type, double value, bool prev)
 		else	delta = 10;
 		break;
 	case ETF:	// 20071030
-		delta = 5; break;
+		if (value > 2000)
+			delta = 5;
+		else if (value == 2000)
+
+			delta = prev ? 5 : 1;
+		else
+			delta = 1;
+		break;
 	case ELW:	// 2010.08.02
 		delta = 5; break;
 	case PigF:

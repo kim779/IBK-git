@@ -190,6 +190,8 @@ public:
 	void	SetVisible(bool bflag){ m_bVisible = bflag; }
 	void	WriteHistory(CString root);
 
+	//test code
+	BOOL	SearchName(CString sdata);
 public:
 	int		m_DataMode;
 	CWnd*		m_pWizard;

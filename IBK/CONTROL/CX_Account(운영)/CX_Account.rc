@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Korean resources
+// 한국어(대한민국) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
-#ifdef _WIN32
 LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
 #pragma code_page(949)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -27,18 +25,18 @@ LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE 
 BEGIN
     "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
     "#define _AFX_NO_OLE_RESOURCES\r\n"
@@ -59,7 +57,6 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
-#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -82,16 +79,13 @@ BEGIN
     BEGIN
         BLOCK "041204B0"
         BEGIN
-            VALUE "CompanyName", "\0"
-            VALUE "FileDescription", "CX_Account DLL\0"
-            VALUE "FileVersion", "1, 0, 0, 1\0"
-            VALUE "InternalName", "CX_Account\0"
-            VALUE "LegalCopyright", "Copyright (C) 2008\0"
-            VALUE "LegalTrademarks", "\0"
-            VALUE "OriginalFilename", "CX_Account.DLL\0"
-            VALUE "ProductName", "CX_Account 동적 연결 라이브러리\0"
-            VALUE "ProductVersion", "1, 0, 0, 1\0"
-            VALUE "OLESelfRegister", "\0"
+            VALUE "FileDescription", "CX_Account DLL"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "CX_Account"
+            VALUE "LegalCopyright", "Copyright (C) 2008"
+            VALUE "OriginalFilename", "CX_Account.DLL"
+            VALUE "ProductName", "CX_Account 동적 연결 라이브러리"
+            VALUE "ProductVersion", "1, 0, 0, 1"
         END
     END
     BLOCK "VarFileInfo"
@@ -100,8 +94,6 @@ BEGIN
     END
 END
 
-#endif    // !_MAC
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -110,27 +102,28 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_LIST_NULL           ICON    DISCARDABLE     "res\\idr_list.ico"
-IDR_LIST_DELETE         ICON    DISCARDABLE     "res\\list_delete.ico"
+IDR_LIST_NULL           ICON                    "res\\idr_list.ico"
+
+IDR_LIST_DELETE         ICON                    "res\\list_delete.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Cursor
 //
 
-IDC_CURSOR1             CURSOR  DISCARDABLE     "res\\cursor1.cur"
-#endif    // Korean resources
+IDC_CURSOR1             CURSOR                  "res\\cursor1.cur"
+
+#endif    // 한국어(대한민국) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// 영어(미국) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -139,8 +132,9 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON    DISCARDABLE     "res\\CX_Account.ico"
-#endif    // English (U.S.) resources
+IDR_MAINFRAME           ICON                    "res\\CX_Account.ico"
+
+#endif    // 영어(미국) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

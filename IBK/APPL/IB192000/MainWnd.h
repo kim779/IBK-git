@@ -114,47 +114,71 @@ public:
 
 // Implementation
 public:
-	CString m_choi_code;	//최근월물 코드
-	CString m_cha_code;		//차월물 코드
-	CString m_choi_curr;	//최근월 현재가
-	CString m_choi_diff;	//최근월 전일대비
+	CString m_choi_code;		//최근월물 코드
+	CString m_choi_curr;		//최근월 현재가
+	CString m_choi_diff;			//최근월 전일대비
+	CString m_choi_migyul;	//최근월 미결제
 	CString m_medo_jan;		//매도총잔량
 	CString m_mesu_jan;		//매수총잔량
 	CString	m_medo_geon;	//매도총건수
 	CString m_mesu_geon;	//매수총건수
 	CString m_meme_jan;		//매매 순잔량
 	CString m_meme_geon;	//매매 순건수
-	CString m_cha_curr;		//차근월 현재가
-	CString m_cha_diff;		//차근월 전일대비
-	CString m_basis;		//베이시스
-	CString m_migyul;		//미결제
+	CString m_basis;				//베이시스
+	CString m_migyul;			//미결제
 	CString m_sum_up1;		//가격상승수
 	CString m_sum_up2;		//거래량상승수
 	
-	CRect m_rc_choi_curr;	//최근월 현재가
-	CRect m_rc_choi_diff;	//최근월 전일대비
-	CRect m_rc_medo_jan;	//매도총잔량
-	CRect m_rc_mesu_jan;	//매수총잔량
+	CRect m_rc_choi_curr;		//최근월 현재가
+	CRect m_rc_choi_diff;		//최근월 전일대비
+	CRect m_rc_choi_migyul;		//최근월 미결제
+	CRect m_rc_medo_jan;		//매도총잔량
+	CRect m_rc_mesu_jan;		//매수총잔량
 	CRect m_rc_medo_geon;	//매도총건수
 	CRect m_rc_mesu_geon;	//매수총건수
 	CRect m_rc_meme_jan;	//매매 순잔량
 	CRect m_rc_meme_geon;	//매매 순건수
+	CRect m_rc_basis;				//베이시스
+	CRect m_rc_sum_up1;		//가격상승수
+	CRect m_rc_sum_up2;		//거래량상승수
+	CRect m_rc_dataRect;		//데이터 영역
+	CRect m_rc_title;				//제목영역
+
+	//////////////////////////////////////////////////////////////////////////////////////////
+
+	CString m_cha_code;	//차월물 코드
+	CString m_cha_curr;		//차근월 현재가
+	CString m_cha_diff;		//차근월 전일대비
+	CString m_cha_medo_jan;		//매도총잔량
+	CString m_cha_mesu_jan;		//매수총잔량
+	CString	m_cha_medo_geon;	//매도총건수
+	CString m_cha_mesu_geon;	//매수총건수
+	CString m_cha_meme_jan;		//매매 순잔량
+	CString m_cha_meme_geon;	//매매 순건수
+	CString m_cha_sum_up1;		//가격상승수
+	CString m_cha_sum_up2;		//거래량상승수
+	CString m_cha_migyul;    //미결제약정
+
+
 	CRect m_rc_cha_curr;	//차근월 현재가
 	CRect m_rc_cha_diff;	//차근월 전일대비
 	CRect m_rc_cha_migyul;	//미결제수량
-	CRect m_rc_basis;		//베이시스
-	CRect m_rc_sum_up1;		//가격상승수
-	CRect m_rc_sum_up2;		//거래량상승수
-	CRect m_rc_dataRect;    //데이터 영역
-	CRect m_rc_title;		//제목영역
+	CRect m_rc_cha_medo_jan;	//매도총잔량
+	CRect m_rc_cha_mesu_jan;	//매수총잔량
+	CRect m_rc_cha_medo_geon;	//매도총건수
+	CRect m_rc_cha_mesu_geon;	//매수총건수
+	CRect m_rc_cha_meme_jan;	//매매 순잔량
+	CRect m_rc_cha_meme_geon;	//매매 순건수
+	CRect m_rc_cha_sum_up1;		//가격상승수
+	CRect m_rc_cha_sum_up2;		//거래량상승수
 
-	double m_maxyval, m_minyval;
-	double m_maxy2val, m_miny2val;
+	double m_maxyval{}, m_minyval{};
+	double m_maxy2val{}, m_miny2val{};
 	CRect chartRect, drawChartRect;
-	CRect m_rc_Check1, m_rc_Check2;
-	bool  m_bCheck1, m_bCheck2;
-	double m_lastIChg;
-	int	   m_lastIVol;
+	CRect m_rc_Check1{}, m_rc_Check2{};
+	bool  m_bCheck1{}, m_bCheck2{};
+	double m_lastIChg{};
+	int	   m_lastIVol{};
 
 //	CArray<class ChartPoint*, class ChartPoint*> m_arCPoint;
 	CArray<std::shared_ptr<ChartPoint>, std::shared_ptr<ChartPoint>&> m_arCPoint;

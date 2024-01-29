@@ -19,7 +19,6 @@
 #include "SChild.h"
 #include "inca/npenkAppInstall5WIN.h"
 
-
 #include <vector>
 #include <algorithm>
 
@@ -192,6 +191,7 @@ int __stdcall STSDKEX_EventCallback(long lCode, void* pParam, long lParamSize);
 #define MAPN_KOBAELW_SCREEN		"IB280200"		// ELW현재가 화면
 #define MAPN_LOGINSET			"IB0000AA"		// LOGIN.XXX -> Push해주는 맵
 #define MAPN_MINIWID			"IB0000X8"		// 미니 관심종목 위젯
+#define MAPN_CDDEDD			"IB823310"     //CDD/EDD 등록화면 //testcdd
 
 #define MAPN_MULTICONNECT		"DH621600"		// 동시접속 관리
 
@@ -274,7 +274,7 @@ struct _pidouini_item {
 	char	innm[100];				// INI 파일명
 	char	senm[100];				// 섹션명
 	char	skey[100];				// KEY
-	char	valu[2000];				// VALUE  //testcode
+	char	valu[2000];				// VALUE
 	char	date[8  ];				// 업데이트 일자
 };
 
@@ -739,6 +739,20 @@ protected:
 
 	//컴파일러 업데이트 버전확인
 	void Check_HTS_Verstion();
+
+	//CDD
+	BOOL isCDDScreen(CString strScreen);
+	CString m_sjumin;
+	CStringArray m_arrCDDScreen;
+	int CheckCDDEDD();
+	void SendSACMQ101();
+	void SendSAMFQ014();
+	void ParseSAMFQ014(char* dat, int len);
+	void ParseSACMQ101(char* dat, int len);
+
+	//process kill
+	HANDLE ProcessFind(char* strProcessName);
+	void KillMySelf();
 // Operations
 public:
 
@@ -1443,10 +1457,10 @@ public:
 	void	IMAXSkinSet();
 
 	//간편인증
-	CString m_slog;
+	CString m_slog; 
 	CString m_sSimpleAuth;
 	CString m_sCustNumber; //고객번호
-	bool	m_bSimpleAuth;
+	bool	m_bSimpleAuth{};
 
 	void   signOnSimpleAuth(char* pdata);
 
@@ -1456,6 +1470,15 @@ public:
 	HWND GetHWndByKey(int key, int& msg);
 	CMap <int, int, CString, CString> m_mapHWndToKey;
 
+	//접속서버 표기
+	void CheckServer(CString strip);
+	CString m_strServer{};
+
+	//폰패드
+	CString m_strPhone;
+
+	//7805popup
+	void Popup7805();
 public:
 	void OutputWaitList();
 
@@ -1479,31 +1502,19 @@ public:
 	bool CreateWizard();
 	//as is 바탕화면 아이콘 지우기
 	void Delete_AsisICon();
+	//접속피씨 IP확인
+	BOOL m_bLOCALIP_172{};
 
-	//접속서버 확인
-	void CheckServer(CString strip);
-	CString m_strServer{};
-
-	//7805팝업
-	void PopUp7805();
-
-	//SubAxis 
-	HANDLE m_hKeyFile{};
-	CString m_strSharedMName{};
-	void CreateSubAxis();
-	HANDLE ProcessFind(char* strProcessName);
-	void CreateSharedMemory();
-	void KillMySelf();
-
-	//CLOUDE
-	void CludeCertup();
-	void CludeCertDown();
-	void CludePschange();
+	//클라우드
+	BOOL m_bCloudeUse{};
+	void CloudeCertUp();
+	void CloudeCertDown();
+	void CloudeCertPassChange();
 	void CludeUSE(bool bUseCloude);
 	void CludeFuncCall(int igubn);
 
-
-	void FileMove();
+	//제도변경 20230729
+	void   FileMove();
 protected:
 // #ifdef USE_AHNLAB_SECUREBROWSER
 // 	IAosSB *m_pAosSB;

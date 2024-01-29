@@ -2061,6 +2061,7 @@ void FillSafeArray(OLECHAR FAR* sz, int iRow, int iCol,
 
 void CMarketDlg::OnFilterlistExcel() 
 {
+#ifndef DF_NOEXCEL
 	_Application app;
 	Workbooks books;
 	_Workbook book;
@@ -2160,6 +2161,7 @@ void CMarketDlg::OnFilterlistExcel()
 
 	app.SetVisible(TRUE);
     app.SetUserControl(TRUE);
+#endif
 }
 
 void CMarketDlg::Excute(CString fname)

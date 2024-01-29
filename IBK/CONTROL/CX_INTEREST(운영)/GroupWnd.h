@@ -14,8 +14,7 @@ class CGroupWnd : public CBaseWnd
 // Construction
 public:
 	CGroupWnd(CWnd* pMainWnd);
-	CString m_slog;
-	CString m_sMap;
+
 // Attributes
 public:
 	std::vector<std::shared_ptr<_intersx>> m_Inters;
@@ -43,8 +42,6 @@ public:
 	int		m_commIndex{};
 	double	m_xRate{};
 	double	m_yRate{};
-
-	int			m_iInterCnt{};
 // Operations
 public:
 // Overrides
@@ -135,7 +132,8 @@ protected:
 	void	RecvOper(int kind, CRecvData* rdata);
 	void	RecvRTS(CRecvData* rdata);
 public:	//2012.02.13 KSJ 이벤트로 보내면 데이터가 깨져서 직접 메소드 호출함.
-	void	RecvRTSx(LPARAM lParam);	//2012.01.19 KSJ Alertx 추가
+	//void RecvRTS(LPARAM lParam);
+	void	RecvRTSx(LPARAM lParam, int igubn = 0);//2012.01.19 KSJ Alertx 추가
 
 	void	loadcfg();
 	void	loadfield();
@@ -234,6 +232,9 @@ public:	//2012.02.13 KSJ 이벤트로 보내면 데이터가 깨져서 직접 메소드 호출함.
 	void OnDestroySave();
 
 	void saveServer(int gno);
+	const std::unordered_map<int, int>& getRSymbol();
+
+	CString m_slog;
 };
 
 

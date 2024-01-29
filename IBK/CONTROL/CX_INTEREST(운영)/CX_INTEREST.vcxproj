@@ -112,7 +112,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../../release\CX_INTEREST.dll</OutputFile>
+      <OutputFile>F:\util\HTS\IBK투자증권 HTS\dev/CX_INTEREST.dll</OutputFile>
       <ImportLibrary>.\Release\CX_INTEREST.lib</ImportLibrary>
       <AdditionalDependencies>../../control/fx_misc/release/fx_misc.lib;imm32.lib;winmm.lib;Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\CX_INTEREST.def</ModuleDefinitionFile>
@@ -166,7 +166,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <ForceSymbolReferences>__DllMainCRTStartup%4012;%(ForceSymbolReferences)</ForceSymbolReferences>
-      <OutputFile>D:\IBKS_TEST\dev\CX_INTEREST.dll</OutputFile>
+      <OutputFile>D:\IBKS_TEST\dev/CX_INTEREST.dll</OutputFile>
       <ImportLibrary>.\Debug\CX_INTEREST.lib</ImportLibrary>
       <AdditionalDependencies>../../control/fx_misc/debug/fx_misc.lib;imm32.lib;winmm.lib;Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\CX_INTEREST.def</ModuleDefinitionFile>
@@ -256,7 +256,6 @@
     <ClInclude Include="CX_INTERGRID.h" />
     <ClInclude Include="DateTime.h" />
     <ClInclude Include="define.h" />
-    <ClInclude Include="description.h" />
     <ClInclude Include="DropTarget.h" />
     <ClInclude Include="excel9.h" />
     <ClInclude Include="exspin.h" />
@@ -295,7 +294,6 @@
     <ClInclude Include="sharemsg.h" />
     <ClInclude Include="ShowMsgWnd.h" />
     <ClInclude Include="StdAfx.h" />
-    <ClInclude Include="test.h" />
     <ClInclude Include="TestDlg.h" />
     <ClInclude Include="TipDlg.h" />
     <ClInclude Include="TipWnd.h" />

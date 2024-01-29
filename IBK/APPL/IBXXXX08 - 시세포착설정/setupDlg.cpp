@@ -371,6 +371,10 @@ void CSetupDlg::initControl()
 	case CG_CALL:
 	case CG_PUT:
 		sptype = spOPTION;	break;
+	case etfType:
+		sptype = spETF;	break;
+	case etnType:
+		sptype = spETN;	break;
 	}
 
 	for (int ii = 0; ii < sizeof(spininfo)/sizeof(_spininfo); ii++)

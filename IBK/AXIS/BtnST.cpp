@@ -787,34 +787,44 @@ void CButtonST::DrawTheBitmap(CDC* pDC, BOOL bHasTitle, RECT* rpItem, CRect* rpC
 
 	if (bIsDisabled && m_bShowDisabledBitmap)
 	{
-		HDC		hDC = NULL;
-		HBITMAP	hBitmap = NULL;
+		if (!m_bEnableRGBColor)  //testlogin
+		{
+			HDC		hDC = NULL;
+			HBITMAP	hBitmap = NULL;
 
-		hDC = ::CreateCompatibleDC(pDC->m_hDC);
-		hBitmap = ::CreateCompatibleBitmap(pDC->m_hDC, m_csBitmaps[byIndex].dwWidth, m_csBitmaps[byIndex].dwHeight);
-		HBITMAP	hOldBmp2 = (HBITMAP)::SelectObject(hDC, hBitmap);
+			hDC = ::CreateCompatibleDC(pDC->m_hDC);
+			hBitmap = ::CreateCompatibleBitmap(pDC->m_hDC, m_csBitmaps[byIndex].dwWidth, m_csBitmaps[byIndex].dwHeight);
+			HBITMAP	hOldBmp2 = (HBITMAP)::SelectObject(hDC, hBitmap);
 
-		RECT	rRect;
-		rRect.left = 0;
-		rRect.top = 0;
-		rRect.right = rImage.right + 1;
-		rRect.bottom = rImage.bottom + 1;
-		::FillRect(hDC, &rRect, (HBRUSH)RGB(255, 255, 255));
+			RECT	rRect;
+			rRect.left = 0;
+			rRect.top = 0;
+			rRect.right = rImage.right + 1;
+			rRect.bottom = rImage.bottom + 1;
+			::FillRect(hDC, &rRect, (HBRUSH)RGB(255, 255, 255));
 
-		const COLORREF crOldColor = ::SetBkColor(hDC, RGB(255,255,255));
+			const COLORREF crOldColor = ::SetBkColor(hDC, RGB(255, 255, 255));
 
-		::BitBlt(hDC, 0, 0, m_csBitmaps[byIndex].dwWidth, m_csBitmaps[byIndex].dwHeight, hdcMem, 0, 0, SRCAND);
-		::BitBlt(hDC, 0, 0, m_csBitmaps[byIndex].dwWidth, m_csBitmaps[byIndex].dwHeight, hdcBmpMem, 0, 0, SRCPAINT);
+			::BitBlt(hDC, 0, 0, m_csBitmaps[byIndex].dwWidth, m_csBitmaps[byIndex].dwHeight, hdcMem, 0, 0, SRCAND);
+			::BitBlt(hDC, 0, 0, m_csBitmaps[byIndex].dwWidth, m_csBitmaps[byIndex].dwHeight, hdcBmpMem, 0, 0, SRCPAINT);
 
-		::SetBkColor(hDC, crOldColor);
-		::SelectObject(hDC, hOldBmp2);
-		::DeleteDC(hDC);
+			::SetBkColor(hDC, crOldColor);
+			::SelectObject(hDC, hOldBmp2);
+			::DeleteDC(hDC);
 
-		pDC->DrawState(	CPoint(rImage.left/*+1*/, rImage.top), 
-						CSize(m_csBitmaps[byIndex].dwWidth, m_csBitmaps[byIndex].dwHeight), 
-						hBitmap, DST_BITMAP | DSS_DISABLED);
+			pDC->DrawState(CPoint(rImage.left/*+1*/, rImage.top),
+				CSize(m_csBitmaps[byIndex].dwWidth, m_csBitmaps[byIndex].dwHeight),
+				hBitmap, DST_BITMAP | DSS_DISABLED);
 
-		::DeleteObject(hBitmap);
+			::DeleteObject(hBitmap);
+		}
+		else
+		{
+			CRect rec;
+			rec.SetRect(0, 0, m_csBitmaps[byIndex].dwWidth, m_csBitmaps[byIndex].dwHeight);
+			rec.OffsetRect(3, 1);
+			pDC->FillSolidRect(rec, m_clrEnableCheck);
+		}
 	} // if
 	else
 	{

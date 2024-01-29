@@ -2028,10 +2028,15 @@ void CGroupWnd::RecvRTS(CRecvData* rdata)
 }
 
 //2012.02.10 KSJ
-void CGroupWnd::RecvRTSx(LPARAM lParam)
+void CGroupWnd::RecvRTSx(LPARAM lParam, int igubn)
 {
 	for (int ii = 0; ii < m_nGroup; ii++)
-		m_GridWnd[ii]->RecvRTSx(lParam);
+	{
+		if(igubn == 1)
+			m_GridWnd[ii]->parsingAlertx(lParam);
+		else
+			m_GridWnd[ii]->RTS_parsingAlertx(lParam);
+	}
 }
 // KSJ
 
@@ -2515,3 +2520,15 @@ void	CGroupWnd::setFontSize(int size)
 	if(m_nGroup > 1)
 		m_GridWnd[1]->SetFontSize(size);
 }
+
+const std::unordered_map<int, int>& CGroupWnd::getRSymbol()
+{
+	return gsl::not_null<CGridWnd*>(m_GridWnd[0].get())->_mRsymbol;
+}
+
+/*
+* const std::unordered_map<int, int>& CGroupWnd::getRSymbol()
+{
+	return gsl::not_null<CGridWnd*>(m_GridWnd[0].get())->_mRsymbol;
+}
+*/

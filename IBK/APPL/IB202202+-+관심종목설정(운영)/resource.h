@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
-// Used by IB202201.rc
+// Microsoft Visual C++에서 생성한 포함 파일입니다.
+// IB202201.rc에서 사용되고 있습니다.
 //
 #define IDS_TITLE                       1
 #define IDS_OK                          2
@@ -279,6 +279,7 @@
 #define IDC_CURSOR1                     14011
 #define IDC_RUP_RATE                    14012
 #define IDC_RDN_RATE                    14013
+#define IDD_DLG_SLIDER                  14013
 #define IDC_RUP_VOL                     14014
 #define IDC_RDN_VOL                     14015
 #define IDC_RUP_DIFF                    14016
@@ -326,14 +327,16 @@
 #define IDC_CBFONTSIZE_STATIC           14039
 #define IDC_CBFONTNAME_STATIC           14040
 #define IDC_COMBO_SEARCH                14041
+#define IDC_SLIDER1                     14042
+#define IDC_BTN_SETTING                 14043
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        14013
+#define _APS_NEXT_RESOURCE_VALUE        14016
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         14042
+#define _APS_NEXT_CONTROL_VALUE         14045
 #define _APS_NEXT_SYMED_VALUE           14001
 #endif
 #endif

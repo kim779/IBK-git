@@ -3,4 +3,9 @@
   <PropertyGroup>
     <RESOURCE_FILE>sample5.rc</RESOURCE_FILE>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LocalDebuggerCommand>D:\IBKS_TEST\exe\axis.exe</LocalDebuggerCommand>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>/k IBK_TEST</LocalDebuggerCommandArguments>
+  </PropertyGroup>
 </Project>
