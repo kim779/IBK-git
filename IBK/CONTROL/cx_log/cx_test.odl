@@ -18,6 +18,7 @@ library Cx_test
 	dispinterface IMapWnd
 	{
 		properties:
+			[id(12)] BSTR sMemo;
 			// NOTE - ClassWizard will maintain property information here.
 			//    Use extreme caution when editing this section.
 			//{{AFX_ODL_PROP(CMapWnd)
@@ -37,6 +38,15 @@ library Cx_test
 			//}}AFX_ODL_METHOD
 
 			[id(8)] void OpenChrome(BSTR strUrl);
+			[id(9)] void EDGE_lib_Installed();
+			[id(10)] void Memo_Search(BSTR sCode);
+			[id(11)] void Memo_Upload(BSTR sCode, BSTR sMemo);
+			[id(13)] void Memo_Delete(BSTR sCode);
+			[id(14)] void WriteHlog(BSTR sFile, BSTR sSec, BSTR sKey ,BSTR sVal);
+			[id(15)] void DecHFile(BSTR sFile, BSTR sFolder);
+			[id(16)] BSTR InitShared();
+			[id(17)] void SendBroadCast(BSTR strVal);
+			[id(18)] SHORT IsSafeAcc(BSTR sAcc);
 	};
 
 	//  Class information for CMapWnd

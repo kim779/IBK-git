@@ -19,6 +19,12 @@ public:
 	int	m_sParamKey;
 	CString m_sParamName;
 
+	CString m_strHome{};
+	CString m_slog{};
+	CString m_strMemo{};
+
+
+	HANDLE m_hKeyFile{};
 // Attributes
 public:
 	UINT AFXAPI HashDataAXIS(LPCSTR key);
@@ -44,6 +50,7 @@ protected:
 	afx_msg void OnTimer(UINT nIDEvent);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+	afx_msg long OnMessage(WPARAM wParam, LPARAM lParam);
 	// Generated OLE dispatch map functions
 	//{{AFX_DISPATCH(CMapWnd)
 	afx_msg void axlog(LPCTSTR stag, LPCTSTR slog);
@@ -60,8 +67,35 @@ protected:
 
 	enum
 	{
+		dispidIsSafeAcc = 18L,
+		dispidSendBroadCast = 17L,
+		dispidInitShared = 16L,
+		dispidDecHFile = 15L,
+		dispidWriteHlog = 14L,
+		dispidMemo_Delete = 13L,
+		dispidsMemo = 12,
+		dispidMemo_Upload = 11L,
+		dispidMemo_Search = 10L,
+		dispidEDGE_lib_Installed = 9L,
 		dispidOpenChrome = 8L
 	};
+	void EDGE_lib_Installed();
+	BOOL  CheckEdgelibInstalled();
+	void checkMemo(CString sKey);
+	void Memo_Search(BSTR sCode);
+	void SendMemoTR_Control(CString name, char* datb, int datl, char stat, int trkey, CString sKey);
+	void Memo_Upload(BSTR sCode, BSTR sMemo);
+	void OnsMemoChanged();
+	CString m_sMemo;
+	void Memo_Delete(BSTR sCode);
+	void WriteHlog(BSTR sFile, BSTR sSec, BSTR sKey,  BSTR sVal);
+	void DecHFile(BSTR sFile, BSTR sFolder);
+	BSTR InitShared();
+	void SendBroadCast(BSTR strVal);
+public:
+	afx_msg void OnDestroy();
+protected:
+	SHORT IsSafeAcc(BSTR sAcc);
 };
 
 /////////////////////////////////////////////////////////////////////////////

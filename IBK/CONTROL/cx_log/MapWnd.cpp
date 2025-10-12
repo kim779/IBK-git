@@ -4,6 +4,8 @@
 #include "stdafx.h"
 #include "cx_test.h"
 #include "MapWnd.h"
+#include "../../H/interMSG.h"
+#include "inout.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -42,7 +44,9 @@ BEGIN_MESSAGE_MAP(CMapWnd, CWnd)
 	ON_WM_LBUTTONUP()
 	ON_WM_CREATE()
 	ON_WM_TIMER()
+	ON_MESSAGE(WM_USER, OnMessage)
 	//}}AFX_MSG_MAP
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -57,6 +61,17 @@ BEGIN_DISPATCH_MAP(CMapWnd, CWnd)
 	DISP_FUNCTION(CMapWnd, "ExcuteFile", ExcuteFile, VT_EMPTY, VTS_BSTR)
 	//}}AFX_DISPATCH_MAP
 	DISP_FUNCTION_ID(CMapWnd, "OpenChrome", dispidOpenChrome, OpenChrome, VT_EMPTY, VTS_BSTR)
+	DISP_FUNCTION_ID(CMapWnd, "EDGE_lib_Installed", dispidEDGE_lib_Installed, EDGE_lib_Installed, VT_EMPTY, VTS_NONE)
+	DISP_FUNCTION_ID(CMapWnd, "Memo_Search", dispidMemo_Search, Memo_Search, VT_EMPTY, VTS_BSTR)
+	DISP_FUNCTION_ID(CMapWnd, "Memo_Upload", dispidMemo_Upload, Memo_Upload, VT_EMPTY, VTS_BSTR VTS_BSTR)
+	//DISP_PROPERTY_NOTIFY(CMapWnd, "sMemo", dispidsMemo, m_sMemo, OnsMemoChanged, VTS_BSTR)
+	DISP_PROPERTY_NOTIFY(CMapWnd, "sMemo", m_sMemo, OnsMemoChanged, VT_BSTR)
+	DISP_FUNCTION_ID(CMapWnd, "Memo_Delete", dispidMemo_Delete, Memo_Delete, VT_EMPTY, VTS_BSTR)
+	DISP_FUNCTION_ID(CMapWnd, "WriteHlog", dispidWriteHlog, WriteHlog, VT_EMPTY, VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR)
+	DISP_FUNCTION_ID(CMapWnd, "DecHFile", dispidDecHFile, DecHFile, VT_EMPTY, VTS_BSTR VTS_BSTR)
+	DISP_FUNCTION_ID(CMapWnd, "InitShared", dispidInitShared, InitShared, VT_BSTR, VTS_NONE)
+	DISP_FUNCTION_ID(CMapWnd, "SendBroadCast", dispidSendBroadCast, SendBroadCast, VT_EMPTY, VTS_BSTR)
+	DISP_FUNCTION_ID(CMapWnd, "IsSafeAcc", dispidIsSafeAcc, IsSafeAcc, VT_I2, VTS_BSTR)
 END_DISPATCH_MAP()
 
 // Note: we add support for IID_IMapWnd to support typesafe binding
@@ -73,6 +88,161 @@ END_INTERFACE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CMapWnd message handlers
+#define TRKEY_MEMO_BEFORE  117
+
+#include <sstream>
+#include <iomanip>
+// 헥사 인코딩 함수
+std::string ToHex(const std::string input) {
+	std::ostringstream oss;
+	for (unsigned char c : input) {
+		oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c);
+	}
+	return oss.str();
+}
+
+// 헥사 디코딩 함수
+std::string FromHex(const std::string& input) {
+	std::string output;
+	for (size_t i = 0; i < input.length(); i += 2) {
+		std::string byte = input.substr(i, 2);
+		char chr = static_cast<char>(std::stoi(byte, nullptr, 16));
+		output.push_back(chr);
+	}
+	return output;
+}
+
+
+long CMapWnd::OnMessage(WPARAM wParam, LPARAM lParam)
+{
+	switch (LOBYTE(LOWORD(wParam)))
+	{
+		case DLL_OUBx:
+		{
+			struct	_extTHx* exth = (struct _extTHx*)lParam;
+			m_slog.Format("\r\n[memo_cx_log][%-40s][%d][%-35s]--> key=[%s] len=[%d] key =[%d] ",
+				__FUNCTION__, __LINE__, "DLL_OUBx", GetMemoTrKeyType(exth->key), exth->size, exth->key);
+			m_slog.Trim();
+			OutputDebugString(m_slog);
+
+
+			if (exth->key == TRKEY_MEMO_INSERT || exth->key == TRKEY_MEMO_UPDATE)
+			{
+				mod_memo* poub = (mod_memo*)exth->data;
+				const char chRet = poub->chretc[0];
+				CString sEmg{}, stmp;
+
+				m_slog.Format("\r\n[memo_cx_log][%-40s][%d][%-35s]-->  ret=[%c]  msg=[%.64s] key =[%d]",
+					__FUNCTION__, __LINE__, GetMemoTrKeyType(exth->key), chRet, poub->chemsg, exth->key);
+				m_slog.Trim();
+				OutputDebugString(m_slog);
+
+				if (chRet == '1')
+				{
+					m_slog.Format("\r\n[memo_cx_log][%-40s][%d][%-35s]--> code=[%.16s]  ", __FUNCTION__, __LINE__, "save or update", poub->chcode);
+					m_slog.Trim();
+					OutputDebugString(m_slog);
+				}
+				else
+				{
+					m_slog.Format("\r\n[memo_cx_log][%-40s][%d][%-35s]-->[%s]  ", __FUNCTION__, __LINE__, "save or update",
+						exth->key == TRKEY_MEMO_INSERT ? "세이브 실패" : "업데이트 실패");
+					OutputDebugString(m_slog);
+				}
+			}
+			else if (exth->key == TRKEY_MEMO_SEARCH)
+			{
+				mod_memo* poub = (mod_memo*)exth->data;
+				const char chRet = poub->chretc[0];
+				CString sEmg{}, stmp;
+
+				m_slog.Format("\r\n[memo_cx_log][%-40s][%d][%-35s]-->ret=[%c] len=[%d] msg=[%.64s] ",
+					__FUNCTION__, __LINE__, GetMemoTrKeyType(exth->key) + " dll_oubx", chRet, exth->size, poub->chemsg);
+				OutputDebugString(m_slog);
+			
+				if (chRet == '1')
+				{
+					m_sMemo.Format("%.15360s", poub->chmemo);
+					m_sMemo.Trim();
+				
+
+					m_slog.Format("\r\n[memo_cx_log][%-40s][%d][%-35s]--> code=[%.16s] memo=[%s]",
+						__FUNCTION__, __LINE__, GetMemoTrKeyType(exth->key) + " dll_oubx", poub->chcode, CString(poub->chmemo, 64).Trim());
+					OutputDebugString(m_slog);
+
+					m_pWizard->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_sParamKey, evOnDblClk/*DblClick*/)),
+						(LPARAM)m_sParamName.GetString());
+				}
+				else 
+				{
+				
+				}
+			}
+			else if (exth->key == TRKEY_MEMO_CHECK)
+			{
+				st_mod_SDEmemo* poub = (st_mod_SDEmemo*)exth->data;
+				const char chRet = poub->chretc[0];
+				CString sEmg{}, stmp, sKey;
+
+				m_slog.Format("\r\n[memo_cx_log][%-40s][%d][%-35s]-->ret=[%c]   msg=[%.64s] ", __FUNCTION__, __LINE__,
+					GetMemoTrKeyType(exth->key) + " dll_oubx", chRet, (char*)exth->data);
+				OutputDebugString(m_slog);
+
+				sKey.Format("%.16s", poub->chcode);
+				sKey.Trim();
+
+				mid_memo* pmid = new mid_memo;
+				memset(pmid, 0x00, sizeof(mid_memo));
+				char* pData = (char*)m_pWizard->SendMessage(WM_USER, MAKEWPARAM(variantDLL, userCC), 0L);
+				if ((long)pData > 1)
+					memcpy(pmid->chusid, pData, strlen(pData));
+
+				memcpy(pmid->chcode, (char*)sKey.GetBuffer(0), sKey.GetLength());
+				memcpy(pmid->chmemo, (LPSTR)(LPCTSTR)m_strMemo, m_strMemo.GetLength());
+
+				if (chRet == '1')
+				{
+					pmid->chgubn[0] = 'U';
+					m_slog.Format("\r\n[memo_cx_log][%-40s][%d][%-35s]--> code=[%.16s] 메모 서버 존재 [%.50s]",
+						__FUNCTION__, __LINE__, GetMemoTrKeyType(exth->key) + " dll_oubx", poub->chcode, m_strMemo);
+					OutputDebugString(m_slog);
+
+					SendMemoTR_Control("pidomemo", (char*)pmid, sizeof(mid_memo), US_KEY, TRKEY_MEMO_UPDATE, sKey);
+				}
+				else
+				{
+					pmid->chgubn[0] = 'I';
+					m_slog.Format("\r\n[memo_cx_log][%-40s][%d][%-35s]--> code=[%.16s] 메모 서버없어  [%.50s]",
+						__FUNCTION__, __LINE__, GetMemoTrKeyType(exth->key) + " dll_oubx", poub->chcode, m_strMemo);
+					OutputDebugString(m_slog);
+
+					SendMemoTR_Control("pidomemo", (char*)pmid, sizeof(mid_memo), US_KEY, TRKEY_MEMO_INSERT, sKey);
+				}
+			}
+			else if (exth->key == TRKEY_MEMO_DELETE)
+			{
+				st_mod_SDEmemo* poub = (st_mod_SDEmemo*)exth->data;
+				const char chRet = poub->chretc[0];
+
+				m_slog.Format("\r\n[memo_cx_log][%-40s][%d][%-35s]--> code=[%.16s] ret=[%c]",
+					__FUNCTION__, __LINE__, GetMemoTrKeyType(exth->key) + " dll_oubx", poub->chcode, chRet);
+				OutputDebugString(m_slog);
+			}	
+		}
+		break;
+		case DLL_TRIGGER:
+		{
+			CString strTrigger((char*)lParam);
+			if(strTrigger == "1")
+				m_pWizard->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_sParamKey, evOnClick)), (LPARAM)m_sParamName.GetString());
+			else
+				m_pWizard->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_sParamKey, evOnChange)), (LPARAM)m_sParamName.GetString());
+		}
+		break;
+		default:break;
+	}
+	return 0;
+}
 
 void CMapWnd::axlog(LPCTSTR stag, LPCTSTR slog) 
 {
@@ -178,7 +348,7 @@ int CMapWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 	// TODO: Add your specialized creation code here
-
+	m_strHome = (char*)m_pWizard->SendMessage(WM_USER, MAKEWPARAM(variantDLL, homeCC), 0);
 	return 0;
 }
 
@@ -254,4 +424,565 @@ void CMapWnd::OpenChrome(BSTR strUrl)
 	sUrl.Format("%s", strUrl);
 	ShellExecute(NULL, "open", "chrome.exe", sUrl, NULL, SW_SHOWNORMAL);
 	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
+}
+
+#include <afxwin.h>
+#include <iostream>
+#include <windows.h>
+
+BOOL Is64BitWindows()
+{
+	BOOL bIsWow64 = FALSE;
+
+	// IsWow64Process is not available on all versions of Windows. Use GetProcAddress to get the function pointer.
+	typedef BOOL(WINAPI* LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
+	LPFN_ISWOW64PROCESS fnIsWow64Process;
+
+	fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandle(TEXT("kernel32")), "IsWow64Process");
+
+	if (NULL != fnIsWow64Process)
+	{
+		if (!fnIsWow64Process(GetCurrentProcess(), &bIsWow64))
+		{
+			// Handle error
+		}
+	}
+
+	return bIsWow64;
+}
+
+BOOL CheckWindowsBitness()
+{
+	if (Is64BitWindows())
+	{
+		//AfxMessageBox(_T("This is a 64-bit version of Windows."));
+		return TRUE;
+	}
+	else
+	{
+		//AfxMessageBox(_T("This is a 32-bit version of Windows."));
+		return FALSE;
+	}
+}
+
+//64ibt
+//HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}
+//HKEY_CURRENT_USER\Software\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}
+// 
+//32bit
+//HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}
+//HKEY_CURRENT_USER\Software\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}
+
+BOOL  CMapWnd::CheckEdgelibInstalled()
+{
+	BOOL b64bit = CheckWindowsBitness();
+	CStringArray arrRegEdgeKey{}, arrRegEdgeSub{};
+	if (b64bit)
+	{
+		arrRegEdgeKey.Add(_T("SOFTWARE\\WOW6432Node\\Microsoft\\EdgeUpdate")); //HKEY_LOCAL_MACHINE
+		arrRegEdgeKey.Add(_T("Software\\Microsoft\\EdgeUpdate"));  //HKEY_CURRENT_USER
+
+		arrRegEdgeSub.Add(_T("F3017226-FE2A-4295-8BDF-00C3A9A7E4C5"));
+		arrRegEdgeSub.Add(_T("F3017226-FE2A-4295-8BDF-00C3A9A7E4C5"));
+	}
+	else
+	{
+		arrRegEdgeKey.Add(_T("SOFTWARE\\Microsoft\\EdgeUpdate")); //HKEY_LOCAL_MACHINE
+		arrRegEdgeKey.Add(_T("Software\\Microsoft\\EdgeUpdate"));  //HKEY_CURRENT_USER
+
+		arrRegEdgeSub.Add(_T("F3017226-FE2A-4295-8BDF-00C3A9A7E4C5"));
+		arrRegEdgeSub.Add(_T("F3017226-FE2A-4295-8BDF-00C3A9A7E4C5"));
+	}
+
+	//Microsoft Edge WebView2 런타임
+	BOOL binstalled{};
+	CString sProgramName{}, strEdgeEnv{};
+	sProgramName = _T("Microsoft Edge WebView2 런타임");
+
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	CString sKey, stmp, sval;
+	HKEY hKey;
+	BOOL bEdgeInstalled{};
+
+	for (int ii = 0; ii < arrRegEdgeKey.GetSize(); ii++)
+	{
+		sKey = arrRegEdgeKey.GetAt(1);
+		OutputDebugString("\r\n[reg] -------------------------------------------------------------");
+
+		stmp.Format("\r\n[reg]--1--  sKey=[%s] [%s]", sKey, ii == 0 ? "LOCAL_MACHINE" : "CURRENT_USER");
+		OutputDebugString(stmp);
+
+		if (RegOpenKeyEx(ii == 0 ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER, sKey, 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+		{
+			char szSubKey[MAX_PATH];
+			DWORD dwIndex = 0;
+			DWORD dwSize = MAX_PATH;
+
+			while (RegEnumKeyEx(hKey, dwIndex, szSubKey, &dwSize, nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS)
+			{
+				HKEY hSubKey;
+				if (RegOpenKeyEx(hKey, szSubKey, 0, KEY_READ, &hSubKey) == ERROR_SUCCESS)
+				{
+					stmp.Format("\r\n\t\t[reg]--2-- szSubKey=[%s], dwindex=[%d]", szSubKey, dwIndex);
+					OutputDebugString(stmp);
+					char szDisplayName[MAX_PATH];
+					DWORD dwSize = sizeof(szDisplayName);
+
+					DWORD dwSubIndex = 0;
+					char szSubSubKey[MAX_PATH]{};
+					while (RegEnumKeyEx(hSubKey, dwSubIndex, szSubSubKey, &dwSize, nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS)
+					{
+						stmp.Format("\r\n\t\t\t\t[reg]--3-- szSubSubKey=[%s], dwSubIndex=[%d]", szSubSubKey, dwSubIndex);
+						OutputDebugString(stmp);
+						sval.Format("%s", szSubSubKey);
+						sval.Trim();
+						if (sval.Find(arrRegEdgeSub.GetAt(ii)) >= 0)
+						{
+							stmp.Format("\r\n\t\t\t\t\t\t[reg]--4--@@@@@ FOUND @@@@@ szSubSubKey=[%s], dwSubIndex=[%d]", szSubSubKey, dwSubIndex);
+							OutputDebugString(stmp);
+							return TRUE;
+						}
+						else
+						{
+							stmp.Format("\r\n\t\t\t\t\t\t[reg]--4-- !!!NOT FOUND!!! cszSubSubKey=[%s], dwSubIndex=[%d]", szSubSubKey, dwSubIndex);
+							OutputDebugString(stmp);
+						}
+						dwSize = MAX_PATH;
+						dwSubIndex++;
+					}
+				}
+				dwSize = MAX_PATH;
+				dwIndex++;
+			}//while
+		}//if
+	}//for
+
+	return FALSE;
+}
+
+DWORD WINAPI DownloadAndInstallWV2RT(LPVOID lpParameter)
+{
+	int returnCode{};
+	HRESULT hr = URLDownloadToFile(NULL, "https://newturn.ibks.com/ekp/view/doc/article/viewAtclPopup?atclNo=2024000000000225",
+		".\\MicrosoftEdgeWebview2Setup.exe", 0, 0);
+	//동기 인듯 하다. 
+	if (hr == S_OK)
+	{
+		//Either Package the WebView2 Bootstrapper with your app or download it using fwlink
+		//then invoke install at Runtime
+
+		SHELLEXECUTEINFO shExInfo = { 0 };
+		shExInfo.cbSize = sizeof(shExInfo);
+		shExInfo.fMask = SEE_MASK_NOASYNC;
+		shExInfo.hwnd = 0;
+		shExInfo.lpVerb = "runas";
+		shExInfo.lpFile = "MicrosoftEdgeWebview2Setup.exe";
+		shExInfo.lpParameters = " /silent /install";
+		shExInfo.lpDirectory = 0;
+		shExInfo.nShow = 0;
+		shExInfo.hInstApp = 0;
+
+		if (ShellExecuteEx(&shExInfo))
+		{
+			returnCode = 0;  //Install successful
+		}
+		else
+		{
+			returnCode = 1; //Install failed
+		}
+	}
+
+	returnCode = 99;
+	return returnCode;
+}
+
+void CMapWnd::EDGE_lib_Installed()
+{
+	BOOL bInstalled = CheckEdgelibInstalled();
+	CString stmp;
+	stmp.Format("[reg] --------EdgeInstalled--------=[%d]", bInstalled);
+	OutputDebugString(stmp);
+
+
+	
+	if (bInstalled)
+	{	
+		int returnCode{};
+		if (MessageBox("Microsoft Edge WebView2 설치하시겠습니까?\n", "IBKs", MB_YESNO) == IDYES)
+		{
+			if (m_pWizard->SendMessage(WM_USER, MAKEWPARAM(variantDLL, orderCC), 0))
+			{
+				uintptr_t handle = _beginthreadex(0, 0, (_beginthreadex_proc_type)DownloadAndInstallWV2RT, (void*)this, 0, 0);	 //고객이면 다운로드
+				WaitForSingleObject((HANDLE)handle, INFINITE);
+
+				DWORD exitCode = 1;
+				if (GetExitCodeThread((HANDLE)handle, &exitCode))
+				{
+					stmp.Format("[reg] --------exitCode--------=[%d]", exitCode);
+				}
+				else
+				{
+					stmp.Format("[reg] --------exitCode--------=[%d]", exitCode);
+				}
+
+				CString str;
+			}
+			else
+			{ //직원이면 로컬 다운로드
+
+				CString strfile{};
+				strfile.Format("%s\\%s", m_strHome, "MicrosoftEdgeWebview2Setup.exe");
+
+				STARTUPINFO si;
+				::ZeroMemory(&si, sizeof(STARTUPINFO));
+				si.cb = sizeof(STARTUPINFO);
+				PROCESS_INFORMATION pi;
+
+				ZeroMemory(&si, sizeof(STARTUPINFO));
+				ZeroMemory(&si, sizeof(PROCESS_INFORMATION));
+
+				si.cb = sizeof(STARTUPINFO);
+				si.dwFlags = STARTF_USESHOWWINDOW;
+				si.wShowWindow = SW_SHOWNORMAL;
+
+				if (CreateProcess(strfile,
+					nullptr,
+					nullptr,
+					nullptr,
+					FALSE,
+					0,
+					nullptr,
+					nullptr,
+					&si,
+					&pi))
+				{
+					WaitForSingleObject(pi.hThread, INFINITE);
+					CloseHandle(pi.hThread);
+				}
+			}
+		}
+	}
+}
+
+
+void CMapWnd::Memo_Search(BSTR sCode)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
+	CString strCode;
+	strCode.Format("%s", sCode);
+
+	mid_SDEmemo* pmid = new mid_SDEmemo;
+	pmid->chgubn[0] = 'S';
+
+	char* pData = (char*)m_pWizard->SendMessage(WM_USER, MAKEWPARAM(variantDLL, userCC), 0L);
+	if ((long)pData > 1)
+		memcpy(pmid->chusid, pData, strlen(pData));
+
+	memcpy(pmid->chcode, (char*)strCode.GetBuffer(0), strCode.GetLength());
+
+	SendMemoTR_Control("pidomemo", (char*)pmid, sizeof(mid_SDEmemo), US_KEY, TRKEY_MEMO_SEARCH, strCode);
+}
+
+void CMapWnd::SendMemoTR_Control(CString name, char* datb, int datl, char stat, int trkey, CString sKey)
+{
+	struct _userTH udat {};
+	char* szBuf{};
+	int	idx = m_sParamName.GetLength();
+
+	CString strtmp;
+	switch (trkey)
+	{
+	case TRKEY_MEMO_INSERT:
+		strtmp = "메모추가";
+		break;
+	case TRKEY_MEMO_SEARCH:
+		strtmp = "메모서버조회";
+		break;
+	case TRKEY_MEMO_UPDATE:
+		strtmp = "메모수정 및 업데이트";
+		break;
+	case TRKEY_MEMO_DELETE:
+		strtmp = "메모 삭제";
+		break;
+	case TRKEY_MEMO_CHECK:
+		strtmp = "메모 존재 여부 확인";
+		break;
+	}
+
+	if (trkey == TRKEY_MEMO_CHECK || trkey == TRKEY_MEMO_DELETE)
+	{
+		szBuf = new char[sizeof(st_mid_SDEmemo) + sizeof(struct _userTH) + 20];
+		CopyMemory(udat.trc, (char*)name.GetString(), name.GetLength());
+		udat.key = m_sParamKey;
+		udat.stat = stat;
+
+		//// set buffer
+		szBuf[0] = trkey;
+		idx++;
+
+		CopyMemory(&szBuf[1], (char*)m_sParamName.GetString(), m_sParamName.GetLength());
+		szBuf[idx++] = '\t';
+
+		CopyMemory(&szBuf[idx], &udat, L_userTH);
+		idx += L_userTH;
+
+		CopyMemory(&szBuf[idx], datb, datl);
+	}
+	else
+	{
+		szBuf = new char[sizeof(st_mid_memo) + sizeof(struct _userTH) + 20];
+		memset(szBuf, 0x00, sizeof(st_mid_memo) + sizeof(struct _userTH) + 20);
+		memset(szBuf, ' ', sizeof(st_mid_memo) + sizeof(struct _userTH));
+		CopyMemory(udat.trc, (char*)name.GetString(), name.GetLength());
+		udat.key = m_sParamKey;
+		udat.stat = stat;
+
+		//// set buffer
+		szBuf[0] = trkey;
+		idx++;
+
+		CopyMemory(&szBuf[1], (char*)m_sParamName.GetString(), m_sParamName.GetLength());
+		szBuf[idx++] = '\t';
+
+		CopyMemory(&szBuf[idx], &udat, L_userTH);
+		idx += L_userTH;
+
+		CopyMemory(&szBuf[idx], datb, datl);
+	}
+
+	m_slog.Format("\r\n[memo_cx_log][%-40s][%d][%-35s]--> datl=[%d] trkey=[%s] [%s][%.50s]",
+		__FUNCTION__, __LINE__, "SendMemoTR_Control",
+		datl, GetMemoTrKeyType(trkey), strtmp, datb);
+	m_slog.Trim();
+	OutputDebugString(m_slog);
+
+	if (m_pWizard->GetSafeHwnd())
+		m_pWizard->SendMessage(WM_USER, MAKEWPARAM(invokeTRx, datl), (LPARAM)szBuf);
+
+	delete szBuf;
+}
+
+
+void CMapWnd::checkMemo(CString sKey)
+{
+	m_slog.Format("\r\n[memo_cx_log][%-40s][%-35s]", __FUNCTION__, sKey);
+	m_slog.Trim();
+
+	st_mid_SDEmemo* pmid = new st_mid_SDEmemo;
+	pmid->chgubn[0] = 'E';
+
+	char* pData = (char*)m_pWizard->SendMessage(WM_USER, MAKEWPARAM(variantDLL, userCC), 0L);
+	if ((long)pData > 1)
+		memcpy(pmid->chusid, pData, strlen(pData));
+
+	memcpy(pmid->chcode, (char*)sKey.GetBuffer(0), sKey.GetLength());
+	SendMemoTR_Control("pidomemo", (char*)pmid, sizeof(st_mid_SDEmemo), US_KEY, TRKEY_MEMO_CHECK, sKey);
+
+}
+
+void CMapWnd::Memo_Upload(BSTR sCode, BSTR sMemo)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+	m_strMemo.Format("%s", sMemo);
+	m_strMemo.Trim();
+
+	m_slog.Format("\r\n[memo_cx_log][%-40s][%d][%-35s]--> sCode=[%s] m_strMemo=[%s]",
+		__FUNCTION__, __LINE__, "!!!!!!Memo_Upload!!!!!!",
+		sCode, m_strMemo);
+	m_slog.Trim();
+	OutputDebugString(m_slog);
+	CString strcode;
+	strcode.Format("%s", sCode);
+	checkMemo(strcode);
+}
+
+
+void CMapWnd::OnsMemoChanged()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	// TODO: 여기에 속성 처리기 코드를 추가합니다.
+}
+
+
+void CMapWnd::Memo_Delete(BSTR sCode)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	CString strcode;
+	strcode.Format("%s", sCode);
+
+	mid_SDEmemo* pmid = new mid_SDEmemo;
+	pmid->chgubn[0] = 'D';
+
+	char* pData = (char*)m_pWizard->SendMessage(WM_USER, MAKEWPARAM(variantDLL, userCC), 0L);
+	if ((long)pData > 1)
+		memcpy(pmid->chusid, pData, strlen(pData));
+
+	memcpy(pmid->chcode, (char*)strcode.GetBuffer(0), strcode.GetLength());
+	SendMemoTR_Control("pidomemo", (char*)pmid, sizeof(st_mid_SDEmemo), US_KEY, TRKEY_MEMO_DELETE, strcode);
+}
+
+
+void CMapWnd::WriteHlog(BSTR sFile, BSTR sSec, BSTR sKey, BSTR sVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	CString stmp{}, strSec{}, strVal{}, strKey{}, strfile{};
+	const	CTime time = CTime::GetCurrentTime();
+	CString timeS;
+	timeS.Format("%02d/%02d %02d:%02d:%02d", time.GetMonth(), time.GetDay(), time.GetHour(), time.GetMinute(), time.GetSecond());
+
+	stmp.Format("%s", sSec);
+	stmp.TrimRight();
+	if (stmp.MakeUpper() == "IB999920")
+	{
+		strfile.Format("%s\\tab\\axis.ini", m_strHome);
+		stmp.Empty();
+		char	wb[512]{};
+		
+		const DWORD dwRc = GetPrivateProfileString("ParentMap", "IB999920","", wb, sizeof(wb), strfile);
+		stmp.Format("%s", wb);
+		stmp.TrimRight();
+		std::string inputSec(stmp);
+		std::string hexEncSec = ToHex(inputSec);
+		strSec = hexEncSec.c_str();
+	}
+	else
+	{
+		std::string inputSec(stmp);
+		std::string hexEncSec = ToHex(inputSec);
+		strSec = hexEncSec.c_str();
+	}
+
+	stmp.Format("%s", sKey);
+	stmp.TrimRight();
+	if (stmp.IsEmpty())
+	{
+		std::string inputKey(timeS);
+		std::string hexEncKey = ToHex(inputKey);
+		strKey = hexEncKey.c_str();
+	}
+	else
+	{
+		stmp.Format("[%s]%s", timeS, sKey);
+		std::string inputKey(stmp);
+		std::string hexEncKey = ToHex(inputKey);
+		strKey = hexEncKey.c_str();
+	}
+
+	stmp.Format("%s", sVal);
+	std::string inputVal(stmp);  
+	std::string hexEncVal = ToHex(inputVal);
+	strVal = hexEncVal.c_str();
+
+	CString sName{}, sfile;
+	sName = (char*)m_pWizard->SendMessage(WM_USER, MAKEWPARAM(variantDLL, nameCC), 0);
+
+	sfile.Format("%s\\user\\%s\\Crashlog\\Hlog.ini", m_strHome, sName);
+	//stmp.Format("%s", sSec);
+	WritePrivateProfileString(strSec, strKey, strVal, sfile);
+	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
+}
+
+
+void CMapWnd::DecHFile(BSTR sFile, BSTR sFolder)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	CString spath{};
+	CString sName{};
+
+	sName = (char*)m_pWizard->SendMessage(WM_USER, MAKEWPARAM(variantDLL, nameCC), 0);
+
+	sName.Format("%08u", HashDataAXIS((LPCSTR)sName));
+	spath.Format("%s\\user\\%s\\%s\\%s", m_strHome, sName, sFolder, sFile);
+	CFile file;
+	if (AxStd::isFileExist(spath))
+	{
+		if (!file.Open(spath, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone))
+			return;
+
+		const int size = gsl::narrow_cast<int>(file.GetLength());
+		std::unique_ptr<char[]> m_hcB{};
+		m_hcB = std::make_unique<char[]>(size + 1);
+		const int len = file.Read(m_hcB.get(), size);
+		file.Close();
+
+		m_slog.Format("%s", m_hcB.get());
+		m_slog.Replace("[", "5b");
+		m_slog.Replace("]", "5d");
+
+		m_slog.Replace("\r", "0d");
+		m_slog.Replace("\n", "0a");
+		m_slog.Replace("=", "3d");
+
+		std::string decoding((m_slog));
+		std::string decodedString = FromHex(decoding);
+		CString decodedCString(decodedString.c_str()); 
+
+		spath.Replace(".ini", "_dec.ini");
+
+		FILE* fp;
+		fopen_s(&fp, spath, "w");
+		if (!fp)
+			return;
+
+		const char* cstr = (LPCTSTR)decodedCString;  
+		fprintf(fp, "%s\n", cstr);
+
+		fclose(fp);
+	}
+}
+
+
+BSTR CMapWnd::InitShared()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	CString strResult;
+
+	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
+
+	strResult.Format("%s", (char*)AfxGetMainWnd()->SendMessage(WM_USER, 0x09));
+
+	m_hKeyFile = ::OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, strResult);
+
+	AfxGetMainWnd()->SendMessage(WM_USER, 0x10, (LPARAM)this);
+
+	return strResult.AllocSysString();
+}
+
+
+void CMapWnd::SendBroadCast(BSTR strVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (!m_hKeyFile)
+		return;
+
+	CString sVal;
+	sVal.Format("%s", strVal);
+	AfxGetMainWnd()->SendMessage(WM_USER, 0x11, (LPARAM)(LPCSTR)sVal);
+	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
+}
+
+
+void CMapWnd::OnDestroy()
+{
+	if (m_hKeyFile)
+		AfxGetMainWnd()->SendMessage(WM_USER, 0x12, (LPARAM)this);
+
+	CWnd::OnDestroy();
+}
+
+
+SHORT CMapWnd::IsSafeAcc(BSTR sAcc)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	CString stmp;
+	stmp.Format("%s", sAcc);
+	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
+	int ret = AfxGetMainWnd()->SendMessage(WM_USER, 0x14, (LPARAM)(LPSTR)(LPCTSTR)stmp);
+	return ret;
 }
