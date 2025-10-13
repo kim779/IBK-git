@@ -37,14 +37,17 @@ CDropList::~CDropList()
 	}
 	if (m_pBkBrush)
 	{
+		m_pBkBrush->DeleteObject();
 		delete m_pBkBrush;	m_pBkBrush = NULL;
 	}
 	if (m_pBkHighlightBrush) 
 	{
+		m_pBkHighlightBrush->DeleteObject();
 		delete m_pBkHighlightBrush;	m_pBkHighlightBrush = NULL;
 	}
-	if (m_pBkPen)
+	if (m_pBkPen)	
 	{
+		m_pBkPen->DeleteObject();
 		delete m_pBkPen;	m_pBkPen = NULL;
 	}
 	ClearItems();
@@ -309,10 +312,12 @@ void CDropList::SetBkColor(COLORREF crColor)
 {
 	if (m_pBkBrush)
 	{
+		m_pBkBrush->DeleteObject();
 		delete m_pBkBrush;	m_pBkBrush = NULL;
 	}
 	if (m_pBkPen)
 	{
+		m_pBkPen->DeleteObject();
 		delete m_pBkPen;	m_pBkPen = NULL;
 	}
 	m_pBkPen	= new CPen(PS_SOLID, 1, crColor);
@@ -476,22 +481,27 @@ CDropButton::~CDropButton()
 	}
 	if (m_pBkBrush)
 	{
+		m_pBkBrush->DeleteObject();
 		delete	m_pBkBrush;	m_pBkBrush = NULL;
 	}
 	if (m_pBkOverBrush)
 	{
+		m_pBkOverBrush->DeleteObject();
 		delete	m_pBkOverBrush;	m_pBkOverBrush = NULL;
 	}
 	if (m_pBorderPen)
 	{
+		m_pBorderPen->DeleteObject();
 		delete	m_pBorderPen;	m_pBorderPen = NULL;
 	}
 	if (m_pTriBrush)
 	{
+		m_pTriBrush->DeleteObject();
 		delete	m_pTriBrush;	m_pTriBrush = NULL;
 	}
 	if (m_pTriPen)
 	{
+		m_pTriPen->DeleteObject();
 		delete	m_pTriPen;	m_pTriPen = NULL;
 	}
 	if (m_bDeleteFont)

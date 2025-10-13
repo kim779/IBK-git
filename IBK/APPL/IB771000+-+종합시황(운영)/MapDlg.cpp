@@ -9,6 +9,8 @@
 #include "OptionWnd.h"
 #include "MarketDlg.h"
 
+#include "../H/interMSG.h"  
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -37,6 +39,9 @@ static char THIS_FILE[] = __FILE__;
 #define	WAITQUERY	1100		// Timer
 #define DO_INNER_JOB	1111
 
+#define TM_HTMLFILE 1112
+#define TM_EDGECONTROLRESIZE 1113
+
 #define LENGTH_OF_LINE  130
 #define	MAXW			627
 static	int g_htmlindex = 0;		// 뉴스 내용 저장 index
@@ -46,7 +51,7 @@ static	int g_htmlindex = 0;		// 뉴스 내용 저장 index
 
 //#define NEWS_SIZEGUBN 13
 #define NEWS_SIZEGUBN 20
-
+#define DF_WHILE
 /////////////////////////////////////////////////////////////////////////////
 
 //test edge
@@ -115,6 +120,54 @@ CString ExtractHangulCharacters(const CString& input) {
 	}
 	return result;
 }
+
+CString ExtractHangulCharactersAndURLIncode(const CString& input) 
+{
+	CString result;
+	CString stmp;
+
+	int len = input.GetLength();
+	int i = 0;
+	WORD wHangul;
+
+	while (i < len) {
+		wchar_t ch = input[i];
+		char cName;
+		cName = input.GetAt(i);
+		if (cName & HANGULMSK)
+		{
+			stmp = input.Mid(i, 2);
+
+			std::wstring strUni = CA2W(stmp); // std::wstring에 어떤 값이 들어가 있는지에 따라 선언
+			std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+			std::string strUTF8 = converter.to_bytes(strUni);
+			std::string stdres = ToUpperCase(URLEncodeUTF8(strUTF8));
+			CString strEnCode;
+			strEnCode = stdres.c_str();
+			result += strEnCode;
+
+			i++;
+		}
+		else if (cName == '(' || cName == ')')
+		{
+			stmp = input.Mid(i, 1);
+
+			std::wstring strUni = CA2W(stmp); // std::wstring에 어떤 값이 들어가 있는지에 따라 선언
+			std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+			std::string strUTF8 = converter.to_bytes(strUni);
+			std::string stdres = ToUpperCase(URLEncodeUTF8(strUTF8));
+			CString strEnCode;
+			strEnCode = stdres.c_str();
+			result += strEnCode;
+		}
+		else
+			result += CString(input[i], 1);
+
+		i++;
+	}
+	return result;
+}
+
 
 CMapDlg::CMapDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CMapDlg::IDD, pParent)
@@ -366,23 +419,29 @@ LRESULT CMapDlg::OnSend(WPARAM wParam, LPARAM lParam)
 				{
 					CString strEdgeUrl;
 					strEdgeUrl.Format("%s", (char*)lParam);
-					CString strkor = ExtractHangulCharacters(m_szFileName);
 
-					m_slog.Format("[edge] strkor = [%s] ", strkor);
-					OutputDebugString(m_slog);
-
-					std::wstring strUni = CA2W(strkor); // std::wstring에 어떤 값이 들어가 있는지에 따라 선언
-					std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-					std::string strUTF8 = converter.to_bytes(strUni);
-					std::string stdres = ToUpperCase(URLEncodeUTF8(strUTF8));
-					CString strEnCode;
-					strEnCode = stdres.c_str();
-					strEdgeUrl.Replace(strkor, strEnCode);
+					strEdgeUrl = ExtractHangulCharactersAndURLIncode(m_szFileName);
 					strEdgeUrl = "file:///" + strEdgeUrl;
-					std::string message_a = strEdgeUrl;
-					std::wstring wurl;
-					wurl.assign(message_a.begin(), message_a.end());
-					browserEdge->Init(wurl);
+					std::string message = strEdgeUrl;
+					std::wstring wnewsurl;
+					wnewsurl.assign(message.begin(), message.end());
+					browserEdge->Init(wnewsurl);
+
+					//m_slog.Format("[edge][%s] strkor = [%s] ", __FUNCTION__, strkor);
+					//OutputDebugString(m_slog);
+
+					//std::wstring strUni = CA2W(strkor); // std::wstring에 어떤 값이 들어가 있는지에 따라 선언
+					//std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+					//std::string strUTF8 = converter.to_bytes(strUni);
+					//std::string stdres = ToUpperCase(URLEncodeUTF8(strUTF8));
+					//CString strEnCode;
+					//strEnCode = stdres.c_str();
+					//strEdgeUrl.Replace(strkor, strEnCode);
+					//strEdgeUrl = "file:///" + strEdgeUrl;
+					//std::string message_a = strEdgeUrl;
+					//std::wstring wurl;
+					//wurl.assign(message_a.begin(), message_a.end());
+					//browserEdge->Init(wurl);
 				}
 			}
 			else
@@ -599,7 +658,7 @@ void CMapDlg::SaveNodeSelect()
 	selectData.TrimRight(":");
 
 	WritePrivateProfileString( _T("SELITEM"), _T("ITEMS"), selectData,m_sFile);
-	WritePrivateProfileString( _T("SELITEM"), _T("VERSION"), "3",m_sFile);
+	WritePrivateProfileString( _T("SELITEM"), _T("VERSION"), "4",m_sFile);    //modi 뉴스웨이 추가 버전업 3->4
 }
 
 void CMapDlg::parsingNewsCount( char* inBuf, int len )
@@ -769,8 +828,13 @@ void CMapDlg::GetNavigate( CString str )
 	job.msg = DO_NAVIGATE;
 	job.msgBuf = str;
 
+	m_bADDING = TRUE;
+m_slog.Format("[7710] !!!!!!!!ADD[%x]!!!!!     !!!!!GetNavigate [%d] size =[%d]", this, job.msg, m_jobList.GetSize());
+OutputDebugString(m_slog);
+
 	m_jobList.AddTail(job);
 
+	m_bADDING = FALSE;
 	m_section.Unlock();
 }
 
@@ -806,12 +870,10 @@ void CMapDlg::GetObject(WPARAM wParam, LPARAM lParam )
 	{
 		if( job.key >= type_gongsi && job.key <= type_news_count_month )
 			bAdd = TRUE;
+
+		if(job.key >= TRKEY_MEMO_POPUPOOP && job.key <= TRKEY_MEMO_CHECK) 
+			bAdd = TRUE;
 	}
-
-// 	if( job.msg == DLL_ALERT )
-// 		if( IsAddAlert() )
-// 			bAlert = TRUE;
-
 		//2012.01.19 KSJ AlertX 추가
 	if( job.msg == DLL_ALERTx)
 	{
@@ -829,11 +891,9 @@ void CMapDlg::GetObject(WPARAM wParam, LPARAM lParam )
 		{
 			if( lParam != NULL )
 			{
-				char* pBytes = (char*)lParam;
+	//			char* pBytes = (char*)lParam;
 				
-				struct _extTHx* extTH = (struct _extTHx*)pBytes;
-//				pBytes += L_extTHx;
-				
+				struct _extTHx* extTH = (struct _extTHx*)lParam;
 // 				CString strTemp;
 // 				strTemp.Format("[KSJ] key[%c] size[%d]", extTH->key, extTH->size);
 // 				OutputDebugString(strTemp);
@@ -845,7 +905,6 @@ void CMapDlg::GetObject(WPARAM wParam, LPARAM lParam )
 		}
 		else
 		{
-			char* pdata = (char*)lParam;
 			job.len = HIWORD(wParam);
 			if( lParam != NULL && job.len > 0 )
 			{
@@ -855,20 +914,6 @@ void CMapDlg::GetObject(WPARAM wParam, LPARAM lParam )
 				job.msgBuf = CString( (char*)lParam );
 		}
 	}
-// 	else if( bAlert )
-// 	{
-// 		job.len = 0;
-// 		if( lParam != NULL )
-// 			job.msgBuf = CString( (char*)lParam );
-// 
-// 		CString sRealCode = SplitString(job.msgBuf, "\t");
-// 		sRealCode = Trim(sRealCode);
-// 
-// 		if (sRealCode.CompareNoCase("S0000") == 0) 		
-// 			bAlert = TRUE;		
-// 		else
-// 			bAlert = FALSE;				
-// 	}
 	//2012.01.19 KSJ AlertX 추가
 	else if (bAlertx)
 	{
@@ -887,8 +932,66 @@ void CMapDlg::GetObject(WPARAM wParam, LPARAM lParam )
 	}
 	//2012.01.19 KSJ Alertx 추가 끝
 
-	if( bAdd /*||*//* bAlert ||*//* bAlertx*/ ) 	//2012.01.19 KSJ AlertX 추가
-		m_jobList.AddTail(job);
+	if (bAdd /*||*//* bAlert ||*//* bAlertx*/) 	//2012.01.19 KSJ AlertX 추가
+	{
+		m_section.Lock();
+
+		m_bADDING = TRUE;
+//m_slog.Format("[7710]  !!!!!!!!ADD[%x]!!!!!    GetObject [%d] size =[%d] len=[%d] buf=[%.20s] m_bTriggerTR=[%d]", 
+//	this, job.msg, m_jobList.GetSize(), job.len, job.msgBuf, m_bTriggerTR);
+//OutputDebugString(m_slog);
+	
+#ifdef DF_WHILE
+		if (job.msg == DLL_TRIGGER)
+		{
+			CString tmpS = job.msgBuf;
+			CString	sSymbol;
+			sSymbol = Parser(tmpS, "\t");
+			tmpS.TrimRight();
+
+		// if (sSymbol != "IMAXSKIN")
+		//	{
+		//		m_slog.Format("[7710]  GetObject m_szCode=[%s]  tmpS=[%s] sSymbol=[%s]", m_szCode, tmpS, sSymbol);
+		//		OutputDebugString(m_slog);
+		//	}
+
+			if (sSymbol == "IMAXSKIN")
+			{
+				m_bADDING = FALSE;
+				m_section.Unlock();
+				return;
+			}
+		
+			//tests
+			//if (tmpS == "1")
+			//{
+			//	m_slog.Format("[7710]      GetObjects Symbol=[%s] [%d]  size =[%d] len=[%d] buf=[%.20s]",
+			//		sSymbol, job.msg, m_jobList.GetSize(), job.len, job.msgBuf);
+			//	OutputDebugString(m_slog);
+			//}
+			//teste
+
+			if (tmpS != m_szCode)
+			{
+				if (!m_bTriggerTR)
+					m_jobList.AddTail(job);
+			}
+			//else
+			//{
+			//   m_slog.Format("[7710]  not ADD");
+			//	OutputDebugString(m_slog);
+			//	m_bADDING = FALSE;
+			//	m_section.Unlock();
+			//	return;
+			//}
+		}
+		else
+#endif
+			m_jobList.AddTail(job);
+	
+		m_bADDING = FALSE;
+		m_section.Unlock();
+	}
 
 	m_section.Unlock();
 }
@@ -939,10 +1042,11 @@ void CMapDlg::InitSavedSize()
 			
 			if(strW != "0" && strH != "0")
 			{
-				//pparent->MoveWindow(rect.left, rect.top, atoi(strW), atoi(strH));
-				//pparent->SetWindowPos(NULL, left, top, atoi(strW), atoi(strH), SWP_SHOWWINDOW);
-
-				m_pParent->SendMessage(WM_USER, MAKEWPARAM(sizeDLL, 0), MAKELPARAM(atoi(strW)-6, atoi(strH)-24) );
+				CString slog;
+				slog.Format("\r\n [7110] [%-40s]  w=[%d] h=[%d]", __FUNCTION__, __LINE__, atoi(strW) - 16, atoi(strH) - 34 );
+				OutputDebugString(slog);
+				//m_pParent->SendMessage(WM_USER, MAKEWPARAM(sizeDLL, 0), MAKELPARAM(atoi(strW)-6, atoi(strH)-24) );  //test size
+				m_pParent->SendMessage(WM_USER, MAKEWPARAM(sizeDLL, 0), MAKELPARAM(atoi(strW) - 16, atoi(strH) - 34));  //test size
 			}
 
 			pparent->ShowWindow(SW_SHOW);
@@ -959,13 +1063,42 @@ void CMapDlg::InitSavedSize()
 void CMapDlg::DoObject(_jobObj* p )
 {
 	CString strTemp;
+
+//m_slog.Format("[7710] DoObject   msg=[%d] [%s] [%s]", p->msg , p->msg == DLL_TRIGGER?"트리거":"다른거", 
+//	p->msg == DLL_TRIGGER ? p->msgBuf:"");
+//OutputDebugString(m_slog);
 	
 	switch(p->msg)
 	{
 	case DLL_OUB:
 	case DLL_OUBx:
+
 		{
 // 			OutputDebugString("[KSJ]DLL_OUB");
+
+			switch (p->key)  
+			{
+			case TRKEY_MEMO_POPUPOOP:
+			case TRKEY_MEMO_INSERT:
+			case TRKEY_MEMO_SEARCH:
+			case TRKEY_MEMO_UPDATE:
+			case TRKEY_MEMO_DELETE:
+			case TRKEY_MEMO_CHECK:
+			{
+				CString stmp;
+				stmp.Format("[memo][IB771000]  key =[%s]   len=[%d]\r\n", GetMemoTrKeyType(p->key), p->len);
+				OutputDebugString(stmp);
+
+				CString text;
+				WPARAM	wParam{};
+				wParam = MAKEWPARAM(MAKEWORD(DLL_OUB, p->key), HIWORD(wParam));
+				text = CString((char*)(LPCTSTR)p->msgBuf, p->len);
+				m_symbol->SendMessage(WM_USER, wParam, (LPARAM)text.operator LPCTSTR());
+				break;
+			}
+			default:
+				break;
+			}
 
 			if(m_bInitSize)
 			{
@@ -998,35 +1131,15 @@ void CMapDlg::DoObject(_jobObj* p )
 			else if(p->key >= type_news_count_day && p->key <= type_news_count_month )						
 				parsingNewsCount((char*)(LPCTSTR)p->msgBuf, p->len );								
 		}
-
 		break;
-
-// 	case DLL_ALERT:
-// 		{
-// // 			OutputDebugString("DLL_OUB");
-// 			if( IsAddAlert() )
-// 			{
-// 				CStringArray arList;
-// 				SplitString(p->msgBuf, "\n", arList);
-// 
-// 				for(int i=arList.GetSize()-1; i>=0; i--)
-// 					parsingAlert(arList[i]);				
-// 			}
-// 		}
-// 
-// 		break;
-
 		//2012.01.19 KSJ Alertx 추가
 	case DLL_ALERTx:
 		{
-			// 			OutputDebugString("DLL_OUB");
 			if( IsAddAlertx() )
 			{
 				parsingAlertx(p->alertR);			
 			}
 		}
-		//2012.01.19 KSJ Alertx 추가 끝
-
 	case DLL_NOTICE:	break;
 	case DLL_SETPAL:	changeColors(); 	break;
 	case DLL_SELECT:	break;
@@ -1112,25 +1225,36 @@ void CMapDlg::DoObject(_jobObj* p )
 				m_timeTrigger = CTime::GetCurrentTime();
 				
 				const CTimeSpan timeDiff = m_timeTrigger - m_timeDomino;
+				if (timeDiff.GetTotalSeconds() <= 1)
 				
-				if(timeDiff.GetTotalSeconds() <= 1)
+				{
+m_slog.Format("[7710] DoObject break!!!!  time= [%I64d]", timeDiff.GetTotalSeconds());
+				//	m_slog.Format("[7710] DoObject break!!!! ]");
+OutputDebugString(m_slog);
 					break;
+				}
 			}
 			// KSJ
 
 			m_bTrigger = true;
 
 			CString tmpS = p->msgBuf; 
-// 
-//  			OutputDebugString("[KSJ]DLL_TRIGGER " + tmpS);
 
 			CString	sSymbol;
 			sSymbol = Parser(tmpS, "\t");
+
+
 
 			if (m_bJmyd && sSymbol =="1301" && tmpS.GetLength() == 6)
 			{				
 				const int result = m_pParent->SendMessage(WM_USER, MAKEWPARAM(codeTYPE, 0), (long)(LPCTSTR)tmpS);
 			
+
+//m_slog.Format("[7710] DoObject  m_bJmydt= [%d],result=[%d]  sSymbol=[%s] tmpS=[%s][%d]", m_bJmyd, result,sSymbol, tmpS, tmpS.GetLength());
+//OutputDebugString(m_slog);
+
+			
+
 				if(result > -1)
 				{
 					if(m_szCode != tmpS)
@@ -1193,6 +1317,7 @@ BOOL CMapDlg::OnInitDialog()
 	m_pFont = GetAxFont(8,false,"굴림체");
 
 	//Microsoft Edge WebView2 런타임
+	UploadEdgeEnv("Microsoft Edge WebView2 런타임");
 	m_bUsingEdgeBrowser = IsProgramInstalled("Microsoft Edge WebView2 런타임");
 
 	m_sFile.Format("%s/%s/%s/%s", m_szRootDir, USRDIR, m_szUser, NEWS_CHECK_FILE);
@@ -1264,9 +1389,9 @@ BOOL CMapDlg::OnInitDialog()
 // 	}
 	SetTimer(4000,500,NULL);
 
-	SetTimer( DO_INNER_JOB, 500, NULL );
+	SetTimer( DO_INNER_JOB, 100, NULL );  //test timer  500->100
 
-	UploadEdgeEnv("Microsoft Edge WebView2 런타임");
+	
 	return TRUE;
 }
 
@@ -1467,32 +1592,131 @@ void CMapDlg::OnTimer(UINT nIDEvent)
 			OnButtonViewmode();
 		}
 	}
-	/*else if( nIDEvent == DO_SIZE )
+	else if (nIDEvent == TM_HTMLFILE)
 	{
-		SetFrameSize();
-		ResizeControl();
+		KillTimer(TM_HTMLFILE);
+		CString strEdgeUrl;
+		CFileFind find;
+		BOOL bfind{};
+		strEdgeUrl = m_szFileName;
+		if (find.FindFile(m_szFileName)) 
+		{
+			strEdgeUrl = ExtractHangulCharactersAndURLIncode(m_szFileName);
+			strEdgeUrl = "file:///" + strEdgeUrl;
+			std::string message = strEdgeUrl;
+			std::wstring wnewsurl;
+			wnewsurl.assign(message.begin(), message.end());
+			browserEdge->Init(wnewsurl);
+		}
+	}
+	else if (nIDEvent == TM_EDGECONTROLRESIZE)
+	{
+		if (browserEdge && browserEdge->IsWindowVisible())
+		{
+			KillTimer(TM_EDGECONTROLRESIZE);
+			browserEdge->MoveWindow(m_rc);
+		}
+	}
 
-		KillTimer(DO_SIZE);
-	}*/
 	
 	CDialog::OnTimer(nIDEvent);
 }
 
 void CMapDlg::WorkObject( void )
 {
+#ifndef DF_WHILE
 	KillTimer(DO_INNER_JOB);
+#endif
 	m_section.Lock();	
 
 	POSITION pos = m_jobList.GetHeadPosition();
+
+bool bshow = false;
+if (pos)
+{
+	bshow = true;
+	m_slog.Format("[7710] WorkObject      ---------- START<<%d>>-----------       [%x] m_bADDING=[%d]", 
+		m_jobList.GetCount(), this, m_bADDING);
+	OutputDebugString(m_slog);
+}
+
+#ifndef DF_WHILE
 	while( pos )
 	{
 		_jobObj obj = m_jobList.GetNext( pos );
-		DoObject( &obj );		
+
+		switch (obj.msg)
+		{
+			case DLL_OUB:
+				m_slog.Format("[7710] WorkObject =[DLL_OUB] size = [%d]", m_jobList.GetSize()); break;
+			case DLL_INB:
+				m_slog.Format("[7710] WorkObject =[DLL_INB] size = [%d]", m_jobList.GetSize()); break;
+			case DLL_ALERT:
+				m_slog.Format("[7710] WorkObject =[DLL_ALERT] size = [%d]", m_jobList.GetSize()); break;
+			case DLL_TRIGGER:
+				m_slog.Format("[7710] WorkObject =[DLL_TRIGGER] size = [%d][%s]", m_jobList.GetSize(), obj.msgBuf); break;
+			case DLL_DOMINO:
+				m_slog.Format("[7710] WorkObject =[DLL_DOMINO] size = [%d][%s]", m_jobList.GetSize(), obj.msgBuf); break;
+			case DLL_NOTICE:
+				m_slog.Format("[7710] WorkObject =[DLL_NOTICE] size = [%d]", m_jobList.GetSize()); break;
+			default:
+				m_slog.Format("[7710] WorkObject =[%d] size =[%d]", obj.msg, m_jobList.GetSize());
+				break;
+		}
+		OutputDebugString(m_slog);
+
+
+		DoObject( &obj );
+		m_slog.Format("[7710]size =[%d]", m_jobList.GetSize());
+		OutputDebugString(m_slog);
 	}
 	m_jobList.RemoveAll();
+#else
+	if (!m_bADDING)
+	{
+		int isize = m_jobList.GetCount();
+		POSITION tpos = nullptr;
+		if (isize > 5)
+			isize = 5;
+
+	/*	if(isize >5)
+			isize = 5;
+		else if (isize > 10)
+			isize = 10;
+		else if (isize > 20)
+			isize = 20;
+		else if (isize > 30)
+			isize = 30;
+		else if (isize > 40)
+			isize = 40;*/
+
+
+		for (int ii = 0; ii < isize; ii++)
+		{
+			tpos = pos;
+			_jobObj obj = m_jobList.GetNext(pos);
+
+			DoObject(&obj);
+			m_jobList.RemoveAt(tpos);
+			m_slog.Format("[7710] !!!!!!remove[%x] -----------   ",this);
+			//OutputDebugString(m_slog);
+
+		}
+	}
+
+#endif
 	
+if (bshow)
+{
+	m_slog.Format("[7710] WorkObjec         -----------END<<%d>>-----------   [%x][%d] ", 
+		m_jobList.GetCount(), this, m_bADDING);
+	OutputDebugString(m_slog);
+}
+
 	m_section.Unlock();
-	SetTimer(DO_INNER_JOB,500,NULL);
+#ifndef DF_WHILE
+	SetTimer(DO_INNER_JOB,100,NULL);
+#endif
 }
 
 BOOL CMapDlg::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message) 
@@ -1645,6 +1869,10 @@ void CMapDlg::OnDestroy()
 
 	if(rect.Height() > 100)
 		WriteConfigFileInt(strINI, "IB771000", "HEIGHT", rect.Height());
+
+	CString slog;
+	slog.Format("\r\n [7110] [%-40s]  w=[%d] h=[%d]", __FUNCTION__, __LINE__, rect.Width(), rect.Height());
+	OutputDebugString(slog);
 	
 	if(rect.top > 0)
 		WriteConfigFileInt(strINI, "IB771000", "TOP", rect.top);
@@ -2286,6 +2514,9 @@ void CMapDlg::OnRadioTot()
 
 void CMapDlg::OnRadioSel() 
 {
+	//m_slog.Format("[7710] -------OnRadioSel m_bTrigger=[%d m_szCode =[%s]", m_bTrigger, m_szCode);
+	//OutputDebugString(m_slog);
+
 	m_bTotSearch = false;
 	if (m_bTotSearch)
 	{
@@ -2900,7 +3131,8 @@ void CMapDlg::CheckTab(int nIdx)
 			}
 			option = "1301\t" + sCode;
 
-// 			OutputDebugString("CheckTab " + option);
+m_slog.Format("[7710]checkTab Trigger_CC, size =[%d] option=[%s]", m_jobList.GetSize(), option);
+OutputDebugString(m_slog);
 			GetAxVariant(triggerCC, option);
 			return;
 		}
@@ -3137,6 +3369,13 @@ OutputDebugString(slog);
 slog.Format("[7710] [%s] [%s] ",m_sFile,GetConfigFileString(m_sFile,_T("SELITEM"),_T("VERSION"),_T("")));
 OutputDebugString(slog);
 						m_TreeWnd.SetCheck(hItem,TRUE);
+						m_TreeWnd.m_selItem.Add(hItem);
+						SaveNodeSelect();
+					}
+
+					if (sTitle == "뉴스웨이" && atoi(version) <= 3)  //modi 뉴스웨이
+					{
+						m_TreeWnd.SetCheck(hItem, TRUE);
 						m_TreeWnd.m_selItem.Add(hItem);
 						SaveNodeSelect();
 					}
@@ -3661,7 +3900,8 @@ void CMapDlg::RequestTitleList( BOOL bKeyword, BOOL bNext )
 // 	if(m_szCode.Compare(req.cod2))
 
 	//AfxMessageBox(req);
-	
+m_slog.Format("[7710] -------[%s] m_bTrigger=[%d m_szCode =[%s]", __FUNCTION__, m_bTrigger, m_szCode);
+OutputDebugString(m_slog);
 	sendTR("pibo7710", &req, sizeof(mid_title), m_nTrkey, true);
 }
 
@@ -4189,7 +4429,7 @@ void CMapDlg::initSymbol()
 			param.style = 1;
 			param.tRGB  = 63;
 			param.pRGB  = 181;
-			param.options = _T("/a89/b91/c92/d69/i99");
+			param.options = _T("/a89/b91/c92/d69/i99/s7710"); 
 
 			m_symbol = (*axCreate)(m_pParent, &param);
 			m_symbol->SetWindowPos(&wndTop, 0, 0, 0, 0, SWP_NOSIZE|SWP_NOMOVE);
@@ -4366,39 +4606,14 @@ void CMapDlg::sendOOP(int key, char* datb, int datl)
 			GetAxVariant(codeCC, data);
 
 			if (m_bJmyd && !m_bTrigger)
+			{
+m_slog.Format("[7710]sendOOP Trigger_CC, size =[%d] option=[%s]", m_jobList.GetSize(), data);
+OutputDebugString(m_slog);
 				GetAxVariant(triggerCC, data);
+			}
 		}
 		else	m_code->SetEditData(_T(""));
 	}
-	//delete[] wb;
-	/*char*	wb{};
-	struct	_userTH* userth{};
-
-	wb = new char[L_userTH+datl];
-	FillMemory(wb, L_userTH+datl, ' ');
-	userth = (struct _userTH *)wb;
-	CopyMemory(userth->trc, "POOPPOOP", sizeof(userth->trc));
-	userth->key  = key;
-	userth->stat = US_OOP ;
-	CopyMemory(&wb[L_userTH], datb, datl);
-
-	m_pParent->SendMessage(WM_USER, MAKEWPARAM(invokeTRx, datl), (LPARAM)wb);
-	if (m_code)
-	{
-		CString data;
-		data = m_code->GetEditData();
-		data.TrimLeft(); data.TrimRight();data.Remove(0);
-		if (!data.IsEmpty() && data.GetLength() == 6 && GetAxVariant(whichCC, data))
-		{
-			data.Insert(0, "1301\t");
-			GetAxVariant(codeCC, data);
-			
-			if (m_bJmyd && !m_bTrigger)
-				GetAxVariant(triggerCC, data);
-		}
-		else	m_code->SetEditData(_T(""));
-	}
-	delete[] wb;*/
 }
 
 void CMapDlg::sendTRA(CString trCode, char* datB, int datL, char key)
@@ -4426,7 +4641,7 @@ void CMapDlg::sendTR(CString strCode, void *m, int nLen, int key, bool bOOP )
 			return;
 
 		std::unique_ptr<char[]> cDataBuffer = std::make_unique<char[]>(4096);
-		memset(cDataBuffer.get(), 0x00, 2048);
+		memset(cDataBuffer.get(), 0x00, 4096);
 
 		_userTH* userTH = (_userTH*)&cDataBuffer[0];
 
@@ -4499,6 +4714,8 @@ void CMapDlg::CheckCodeTrigger()
 
 // 	OutputDebugString("CheckCodeTrigger " + sdata);
 
+m_slog.Format("[7710]CheckCodeTrigger Trigger_CC, size =[%d] option=[%s]", m_jobList.GetSize(), sdata);
+OutputDebugString(m_slog);
 	m_pParent->SendMessage(WM_USER, MAKEWPARAM(variantDLL, triggerCC), (LPARAM)(LPCTSTR)sdata );
 }
 
@@ -4531,7 +4748,7 @@ void CMapDlg::parsingContent(char *pBytes, int nBytes)
 
 		CFile	file;
 		CFileException filex;
-		if (!file.Open(m_szFileName, CFile::modeCreate|CFile::modeReadWrite, &filex))
+		if (!file.Open(m_szFileName, CFile::modeCreate | CFile::modeReadWrite, &filex))
 		{
 			filex.ReportError();
 			return;
@@ -4550,7 +4767,6 @@ void CMapDlg::parsingContent(char *pBytes, int nBytes)
 				strTitle += "<br>";
 	
 			strCod.Format("%.*s", nBytes-tagL, &pBytes[tagL]);		
-
 			if( m_szCurKey[8] == '0' && m_szCurKey[9] == '2' )
 			{
 				convertLink( strData, subcod );
@@ -4562,8 +4778,10 @@ void CMapDlg::parsingContent(char *pBytes, int nBytes)
 				convertLink( strData, subcod );
 			}
 
-			szWrite = strTitle+strData;
-
+			szWrite = strTitle + strData;
+			CString stmp;
+			stmp = szWrite.Right(10);
+			szWrite.Replace(stmp, stmp + "  ");
 			file.Write(szWrite, szWrite.GetLength());
 			file.Flush();
 		}
@@ -5567,10 +5785,6 @@ void CMapDlg::selectTab(int nIndex)
 				rc1.DeflateRect(0,1);
 				m_pMapWnd2->SetWindowPos( NULL, 0,0, rc1.Width(), rc1.Height(), SWP_SHOWWINDOW|SWP_NOMOVE|SWP_NOZORDER );
 				m_bCodeNews = FALSE;
-				//m_pParent->SendMessage(WM_USER, MAKEWPARAM(sizeDLL, 0), MAKELPARAM(rc1.Width(), rc1.Height()) );*/
-				//ResizeControl();
-
-				//m_pParent->SendMessage(WM_USER, MAKEWPARAM(sizeDLL, 0), MAKELPARAM(rc1.Width(), rc1.Height()) );
 				}
 
 				break;
@@ -5608,7 +5822,7 @@ void CMapDlg::selectTab(int nIndex)
 	//		default:
 				if (bChange)
 				{
-//					m_pParent->SendMessage(WM_USER, MAKEWPARAM(sizeDLL, 0), MAKELPARAM(MAXW, m_nHeight));
+
 				}
 				//asdfasdf
 				//PostMessage(WM_SEND, EVT_SENDNAVIGATE, (LPARAM)(LPCTSTR)m_szFileName);
@@ -5674,10 +5888,8 @@ void CMapDlg::selectTab(int nIndex)
 						CString strEdgeUrl;
 						strEdgeUrl = m_szFileName;
 					
-						CFileFind find;
-						BOOL bfind{};
-						BOOL bover{};
-						auto future = std::async([&]() {
+						//BOOL bover{};
+					/*	auto future = std::async([&]() {
 							while (1)
 							{
 								bfind = find.FindFile(m_szFileName);
@@ -5703,29 +5915,63 @@ void CMapDlg::selectTab(int nIndex)
 							}
 							});
 
+					
 						const std::chrono::milliseconds wtime(2000);
 						if (future.wait_for(wtime) != std::future_status::ready)
 							bover = true;
+						*/
 
-						if (!bover)
+						m_slog.Format("[edge][%s] m_szFileName = [%s] ", __FUNCTION__, m_szFileName);
+						OutputDebugString(m_slog);
+
+						CFileFind find;
+						BOOL bfind{};
+						if (find.FindFile(m_szFileName))
 						{
-							CString strkor = ExtractHangulCharacters(m_szFileName);
+							if (m_pParent->SendMessage(WM_USER, MAKEWPARAM(variantDLL, orderCC), 0))
+							{
+								strEdgeUrl = ExtractHangulCharactersAndURLIncode(m_szFileName);
+								strEdgeUrl = "file:///" + strEdgeUrl;
+								std::string message = strEdgeUrl;
+								std::wstring wnewsurl;
+								wnewsurl.assign(message.begin(), message.end());
+								browserEdge->Init(wnewsurl);
+							}
+							else
+							{
+								m_slog.Format("[edge] 직원용  [%s]", __FUNCTION__);
+								OutputDebugString(m_slog);
 
-							m_slog.Format("[edge] strkor = [%s] ", strkor);
-							OutputDebugString(m_slog);
+								CString strkor = "투자증권";
+								std::wstring strUni = CA2W(strkor); // std::wstring에 어떤 값이 들어가 있는지에 따라 선언
+								std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+								std::string strUTF8 = converter.to_bytes(strUni);
+								std::string stdres = ToUpperCase(URLEncodeUTF8(strUTF8));
+								CString strEnCode;
+								strEnCode = stdres.c_str();
 
-							std::wstring strUni = CA2W(strkor); // std::wstring에 어떤 값이 들어가 있는지에 따라 선언
-							std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-							std::string strUTF8 = converter.to_bytes(strUni);
-							std::string stdres = ToUpperCase(URLEncodeUTF8(strUTF8));
-							CString strEnCode;
-							strEnCode = stdres.c_str();
-							strEdgeUrl.Replace(strkor, strEnCode);
-							strEdgeUrl = "file:///" + strEdgeUrl;
-							std::string message_a = strEdgeUrl;
-							std::wstring wurl;
-							wurl.assign(message_a.begin(), message_a.end());
-							browserEdge->Init(wurl);
+								CString strkor1 = "(직원용)";
+								std::wstring strUni1 = CA2W(strkor1); // std::wstring에 어떤 값이 들어가 있는지에 따라 선언
+								std::wstring_convert<std::codecvt_utf8<wchar_t>> converter1;
+								std::string strUTF81 = converter1.to_bytes(strUni1);
+								std::string stdres1 = ToUpperCase(URLEncodeUTF8(strUTF81));
+								CString strEnCode1;
+								strEnCode1 = stdres1.c_str();
+
+								strEdgeUrl.Replace(strkor, strEnCode);
+								strEdgeUrl.Replace(strkor1, strEnCode1);
+								strEdgeUrl = "file:///" + strEdgeUrl;
+								std::string message_a = strEdgeUrl;
+								std::wstring wurl;
+								wurl.assign(message_a.begin(), message_a.end());
+								browserEdge->Init(wurl);
+							}
+						
+						}
+						else
+						{
+							OutputDebugString("[edge] no file timer");
+							SetTimer(TM_HTMLFILE, 2000, nullptr);
 						}
 					}
 				}
@@ -7043,8 +7289,17 @@ void CMapDlg::ResizeControl()
 		{
 			if (m_bUsingEdgeBrowser)
 			{
-				if (browserEdge && browserEdge->IsWindowVisible())  //test edge
+				if (browserEdge && browserEdge->IsWindowVisible() && m_nView)
 					browserEdge->MoveWindow(rc1);
+				else
+				{
+					if (m_nView == 0)
+					{
+						m_rc = rc1;
+						KillTimer(TM_EDGECONTROLRESIZE);
+						SetTimer(TM_EDGECONTROLRESIZE, 500, nullptr);
+					}
+				}
 			}
 			else
 				m_pBrowser->MoveWindow(rc1);
@@ -8201,64 +8456,78 @@ void CMapDlg::UploadEdgeEnv(CString sProgramName)
 	stmp.Format("%s", readB);
 	stmp.Trim();
 
+	wil::unique_cotaskmem_string version_info;
+	HRESULT hr = GetAvailableCoreWebView2BrowserVersionString(nullptr, &version_info);
+	stmp.Format("\r\n [edge][szSubKey]  version_info=[%s]", CString(version_info.get()));
+	OutputDebugString(stmp);
+
+	BOOL binstalled{};
+	if (CString(version_info.get()).IsEmpty())
+		binstalled = FALSE;
+	else
+		binstalled = TRUE;
+
 	if (atoi(strW) >= atoi(stime) && stmp != "1")   //개발기는 계속 저장
 		return;
 
-	BOOL binstalled{};
-	HKEY hKey;
-	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"), 0, KEY_READ, &hKey) == ERROR_SUCCESS)
-	{
-		char szSubKey[MAX_PATH];
-		DWORD dwIndex = 0;
-		DWORD dwSize = MAX_PATH;
+	//HKEY hKey;
+	////컴퓨터\HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Microsoft EdgeWebView
+	//if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"), 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+	//{
+	//	char szSubKey[MAX_PATH];
+	//	DWORD dwIndex = 0;
+	//	DWORD dwSize = MAX_PATH;
 
-		//해당레지스트리의 하위키를 열거 한다. 
-		while (RegEnumKeyEx(hKey, dwIndex, szSubKey, &dwSize, nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS)
-		{
-			HKEY hSubKey;
-			if (RegOpenKeyEx(hKey, szSubKey, 0, KEY_READ, &hSubKey) == ERROR_SUCCESS)
-			{
-				OutputDebugString("\r\n-------------------------------------------------------------");
-				stmp.Format("\r\n szSubKey=[%s], dwindex=[%d]", szSubKey, dwIndex);
-				OutputDebugString(stmp);
-				char szDisplayName[MAX_PATH];
-				DWORD dwSize = sizeof(szDisplayName);
+	//	//해당레지스트리의 하위키를 열거 한다. 
+	//	while (RegEnumKeyEx(hKey, dwIndex, szSubKey, &dwSize, nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS)
+	//	{
+	//		HKEY hSubKey;
+	//		if (RegOpenKeyEx(hKey, szSubKey, 0, KEY_READ, &hSubKey) == ERROR_SUCCESS)
+	//		{
+	//			OutputDebugString("\r\n-------------------------------------------------------------");
+	//			stmp.Format("\r\n szSubKey=[%s], dwindex=[%d]", szSubKey, dwIndex);
+	//			//OutputDebugString(stmp);
+	//			char szDisplayName[MAX_PATH];
+	//			DWORD dwSize = sizeof(szDisplayName);
 
-				//패키지명 버전 확인
-				if (RegQueryValueEx(hSubKey, _T("Displayname"), nullptr, nullptr, reinterpret_cast<LPBYTE>(szDisplayName), &dwSize) == ERROR_SUCCESS)
-				{
-					CString strDisplayName(szDisplayName);
-					if (strDisplayName.Find(sProgramName) >= 0)
-					{
-						binstalled = TRUE;
-						char szDisplayVersion[MAX_PATH];
-						dwSize = sizeof(szDisplayVersion);
-						if (RegQueryValueEx(hSubKey, _T("DisplayVersion"), nullptr, nullptr, reinterpret_cast<LPBYTE>(szDisplayVersion), &dwSize) == ERROR_SUCCESS)
-						{
-							CString strDisplayVersion(szDisplayVersion);
-							strEdgeEnv += "DisplayVersion = ";
-							strEdgeEnv += strDisplayVersion;
-							strEdgeEnv += "|";
-						}
+	//			//패키지명 버전 확인
+	//			if (RegQueryValueEx(hSubKey, _T("Displayname"), nullptr, nullptr, reinterpret_cast<LPBYTE>(szDisplayName), &dwSize) == ERROR_SUCCESS)
+	//			{
+	//				CString strDisplayName(szDisplayName);
+	//				if (strDisplayName.Find(sProgramName) >= 0)
+	//				{
+	//					binstalled = TRUE;
+	//					char szDisplayVersion[MAX_PATH];
+	//					dwSize = sizeof(szDisplayVersion);
+	//					if (RegQueryValueEx(hSubKey, _T("DisplayVersion"), nullptr, nullptr, reinterpret_cast<LPBYTE>(szDisplayVersion), &dwSize) == ERROR_SUCCESS)
+	//					{
+	//						CString strDisplayVersion(szDisplayVersion);
+	//						strEdgeEnv += "DisplayVersion = ";
+	//						strEdgeEnv += strDisplayVersion;
+	//						strEdgeEnv += "|";
+	//					}
 
-						char szInstallDate[MAX_PATH];
-						dwSize = sizeof(szInstallDate);
-						if (RegQueryValueEx(hSubKey, _T("InstallDate"), nullptr, nullptr, reinterpret_cast<LPBYTE>(szInstallDate), &dwSize) == ERROR_SUCCESS)
-						{
-							CString szInstallDate(szInstallDate);
-							strEdgeEnv += "InstallDate = ";
-							strEdgeEnv += szInstallDate;
-							strEdgeEnv += "|";
-						}
-						break;
-					}
-				}
+	//					char szInstallDate[MAX_PATH];
+	//					dwSize = sizeof(szInstallDate);
+	//					if (RegQueryValueEx(hSubKey, _T("InstallDate"), nullptr, nullptr, reinterpret_cast<LPBYTE>(szInstallDate), &dwSize) == ERROR_SUCCESS)
+	//					{
+	//						CString szInstallDate(szInstallDate);
+	//						strEdgeEnv += "InstallDate = ";
+	//						strEdgeEnv += szInstallDate;
+	//						strEdgeEnv += "|";
+	//					}
 
-			}
-			dwSize = MAX_PATH;
-			dwIndex++;
-		}//while
-	}//if
+	//					stmp.Format("\r\n [edge][szSubKey]  strEdgeEnv=[%s]", strEdgeEnv);
+	//					OutputDebugString(stmp);
+	//					break;
+	//				}
+	//			}
+
+	//		}
+	//		dwSize = MAX_PATH;
+	//		dwIndex++;
+	//	}//while
+	//}//if
 
 	if(binstalled)
 		WritePrivateProfileString(_T("EDGE"), sProgramName, "1", strINI);
@@ -8281,10 +8550,10 @@ void CMapDlg::UploadEdgeEnv(CString sProgramName)
 	struct _pidouini_mid* pmid = (struct	_pidouini_mid*)pdata.get();
 	pmid->gubn[0] = 'I';
 	memcpy(pmid->item.usid, (LPCSTR)userID, userID.GetLength());
-	memcpy(pmid->item.innm, stime, 8);
-	memcpy(pmid->item.senm, "EDGE", 4);
+	memcpy(pmid->item.innm, "EDGE", 8);
+	memcpy(pmid->item.senm, "EDGE", 8);
 	memcpy(pmid->item.skey, "IB771000", 8);
-	memcpy(pmid->item.valu, strEdgeEnv, strEdgeEnv.GetLength());
+	memcpy(pmid->item.valu, CString(version_info.get()), CString(version_info.get()).GetLength());
 	memcpy(pmid->item.date, sdat, 8);
 	sendTR("pidouini", pmid, sizeof(struct	_pidouini_mid), type_Edge_Env);	
 }

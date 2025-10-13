@@ -173,14 +173,13 @@ void CGubnConfigDlg::OnPaint()
 	}
 
 	dc.SelectObject(pOldFont); 
-	DeleteObject(pOldFont);
+//	DeleteObject(pOldFont);
 	
 	dc.SelectObject(pOldBrush); 
-	DeleteObject(pOldBrush);
+	brush.DeleteObject();
 
 	dc.SelectObject(pOldPen); 
-	DeleteObject(pOldPen);
-
+	pen.DeleteObject();
 	
 	// Do not call CDialog::OnPaint() for painting messages
 }

@@ -68,10 +68,9 @@ __declspec(dllexport) CWnd* WINAPI axCreate(CWnd* parent)
 	
 	AfxEnableControlContainer();
 	AfxInitRichEdit( );
-
 	CMapDlg* pDlg = NULL;
+		
 	pDlg = new CMapDlg(parent);
-
 	if (!pDlg->Create(IDD_MAIN, parent))
 	{
 		delete pDlg;

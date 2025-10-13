@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "XPButton.h"
+#include "../../h/memDc.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -131,7 +132,7 @@ void CXPButton::DoGradientFill(CDC *pDC, CRect rect)
 void CXPButton::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct) 
 {
 	CDC* ppDC = CDC::FromHandle(lpDrawItemStruct->hDC);
-	CMemDC pDC(ppDC);
+	xxx::CMemDC pDC(ppDC);
 	CRect rect = lpDrawItemStruct->rcItem;
 	const UINT state = lpDrawItemStruct->itemState;
 	CPoint pt;

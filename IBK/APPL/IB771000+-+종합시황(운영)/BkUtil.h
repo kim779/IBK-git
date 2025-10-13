@@ -66,7 +66,9 @@ public:
                 this, m_rect.left, m_rect.top, SRCCOPY);            
             
             //Swap back the original bitmap.
-            SelectObject(m_oldBitmap);        
+            SelectObject(m_oldBitmap);    
+            m_bitmap.DeleteObject();
+            m_pDC->DeleteDC();    
         } else {
             // All we need to do is replace the DC with an illegal value,
             // this keeps us from accidently deleting the handles associated with

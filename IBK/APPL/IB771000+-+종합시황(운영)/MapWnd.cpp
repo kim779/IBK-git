@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "IB771000.h"
 #include "MapWnd.h"
-#include "MemDC.h"
+#include "../../H/memDc.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -92,7 +92,7 @@ void CMapWnd::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
 	
-	CMemDC	mdc(&dc);
+	xxx::CMemDC	mdc(&dc);
 	CRect	rect;
 	GetClientRect(rect);
 	mdc.FillSolidRect(rect, RGB(200, 200, 200));

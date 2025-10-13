@@ -5,7 +5,7 @@
 #include "IB771000.h"
 #include "TipDlg.h"
 //#include "TipWnd.h"
-#include "MemDC.h"
+#include "../../h/memDc.h"
 #include "sharemsg.h"
 #define TM_CHECKTIP		101
 #define TM_CHECKTIPKEY	102
@@ -131,7 +131,7 @@ void CTipDlg::OnPaint()
 	CPaintDC dc(this); // device context for painting
 	
 	CRect	 cRc;
-	CMemDC	memDC(&dc);
+	xxx::CMemDC	memDC(&dc);
 
 	GetClientRect(cRc);
 	

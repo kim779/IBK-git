@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "fxTab.h"
-#include "memdc.h"
+#include "../../H/memDc.h"
 #include "../../control/fx_misc/misctype.h"
 
 #ifdef _DEBUG
@@ -232,7 +232,7 @@ BOOL CfxTab::OnEraseBkgnd(CDC* pDC)
 void CfxTab::OnPaint() 
 {
 	CPaintDC dc(this); // device context for painting
-	CMemDC MemDC(&dc);
+	xxx::CMemDC MemDC(&dc);
 	OnDraw(&MemDC);
 }
 

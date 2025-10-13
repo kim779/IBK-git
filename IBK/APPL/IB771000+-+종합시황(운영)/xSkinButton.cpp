@@ -50,6 +50,13 @@ CxSkinButton::CxSkinButton()
 /////////////////////////////////////////////////////////////////////////////
 CxSkinButton::~CxSkinButton()
 {
+	m_bNormal.DeleteObject();	//free previous allocated bitmap
+	m_bDown.DeleteObject();
+	m_bOver.DeleteObject();
+	m_bDisabled.DeleteObject();
+	m_bMask.DeleteObject();
+	m_bFocus.DeleteObject();
+
 	if (hClipRgn) 
 		DeleteObject(hClipRgn);	// free clip region
 }

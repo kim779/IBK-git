@@ -457,6 +457,11 @@ private:
 		std::string UrlEncode(const std::string& value);
 		void UploadEdgeEnv(CString sProgramName);
 		BOOL IsProgramInstalled(CString sProgramName);
+
+		CRect m_rc{};
+
+//endless roof
+		BOOL m_bADDING{};
 };
 
 class CCommandThread : public CWinThread {

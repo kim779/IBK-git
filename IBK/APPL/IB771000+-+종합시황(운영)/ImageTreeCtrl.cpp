@@ -561,6 +561,7 @@ void CImageTreeCtrl::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 			{
 				CBrush brush(m_crWindow);
 				pDC->FillRect(&rectItem1, &brush);		// erase entire background
+				brush.DeleteObject();
 			}
 		}
 		*pResult = CDRF_NOTIFYPOSTPAINT | CDRF_NEWFONT;

@@ -445,6 +445,10 @@ void CColorButton::DrawArrow(CDC* pDC,
 	
 	pDC->SelectObject(pOldBrush);
 	pDC->SelectObject(pOldPen);
+
+	brsArrow.DeleteObject();
+	penArrow.DeleteObject();
+
 }
 
 #pragma warning (default : 26409)
