@@ -60,7 +60,7 @@
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <FunctionLevelLinking>
       </FunctionLevelLinking>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -95,9 +95,9 @@
     </Bscmake>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>../../release/axis.exe</OutputFile>
+      <OutputFile>F:\util\HTS\IBK투자증권 HTS\exe\axis.exe</OutputFile>
       <AdditionalDependencies>../dll/axiscm/Release/axiscm.lib;../dll/sm/Release/axissm.lib;Imm32.lib;../dll/axiscp/Release/axiscp.lib;msimg32.lib;wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EnableUAC>false</EnableUAC>
       <GenerateMapFile>true</GenerateMapFile>
@@ -158,7 +158,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>D:\IBKS_TEST\exe/axis.exe</OutputFile>
+      <OutputFile>D:\IBK_VC_DEV\HTS\exe\axis.exe</OutputFile>
       <AdditionalDependencies>../dll/axiscm/Debug/axiscm.lib;../dll/sm/Debug/axissm.lib;Imm32.lib;../dll/axiscp/Debug/axiscp.lib;Msimg32.lib;wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
@@ -243,6 +243,9 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /MAPINFO:LINES /MAPINFO:EXPORTS   /MAPINFO:LINES /MAPINFO:EXPORTS </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /D /Gz"WIN32"   /D /Gz"WIN32" </AdditionalOptions>
     </ClCompile>
+    <ClCompile Include="CDlgServerOrder.cpp" />
+    <ClCompile Include="CDlg_MSGBOX.cpp" />
+    <ClCompile Include="CDLG_Notice.cpp" />
     <ClCompile Include="CertErrDialog.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /MAPINFO:LINES /MAPINFO:EXPORTS   /MAPINFO:LINES /MAPINFO:EXPORTS </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /D /Gz"WIN32"   /D /Gz"WIN32" </AdditionalOptions>
@@ -259,6 +262,7 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /MAPINFO:LINES /MAPINFO:EXPORTS   /MAPINFO:LINES /MAPINFO:EXPORTS </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /D /Gz"WIN32"   /D /Gz"WIN32" </AdditionalOptions>
     </ClCompile>
+    <ClCompile Include="CNoteWnd.cpp" />
     <ClCompile Include="Conclusion.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /MAPINFO:LINES /MAPINFO:EXPORTS   /MAPINFO:LINES /MAPINFO:EXPORTS </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /D /Gz"WIN32"   /D /Gz"WIN32" </AdditionalOptions>
@@ -271,6 +275,8 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /MAPINFO:LINES /MAPINFO:EXPORTS   /MAPINFO:LINES /MAPINFO:EXPORTS </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /D /Gz"WIN32"   /D /Gz"WIN32" </AdditionalOptions>
     </ClCompile>
+    <ClCompile Include="CSlideWnd.cpp" />
+    <ClCompile Include="CUploadFile.cpp" />
     <ClCompile Include="custsite.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /MAPINFO:LINES /MAPINFO:EXPORTS   /MAPINFO:LINES /MAPINFO:EXPORTS </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /D /Gz"WIN32"   /D /Gz"WIN32" </AdditionalOptions>
@@ -604,13 +610,19 @@
     <ClInclude Include="BmpButton.h" />
     <ClInclude Include="BtnST.h" />
     <ClInclude Include="button.h" />
+    <ClInclude Include="CDlgServerOrder.h" />
+    <ClInclude Include="CDlg_MSGBOX.h" />
+    <ClInclude Include="CDLG_Notice.h" />
     <ClInclude Include="CertErrDialog.h" />
     <ClInclude Include="CertLogin.h" />
     <ClInclude Include="Chaser.h" />
     <ClInclude Include="ChildFrm.h" />
+    <ClInclude Include="CNoteWnd.h" />
     <ClInclude Include="Conclusion.h" />
     <ClInclude Include="ContGrid.h" />
     <ClInclude Include="CpuUse.h" />
+    <ClInclude Include="CSlideWnd.h" />
+    <ClInclude Include="CUploadFile.h" />
     <ClInclude Include="custsite.h" />
     <ClInclude Include="dlgMisuAlarm.h" />
     <ClInclude Include="DlgPB.h" />

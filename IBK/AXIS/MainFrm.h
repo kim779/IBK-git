@@ -139,6 +139,12 @@ int __stdcall STSDKEX_EventCallback(long lCode, void* pParam, long lParamSize);
 #define TM_2022_CLOSE	9022
 #define TM_CB_SEARCH	9023			//서킷 브레이크
 
+
+#define TM_HTS_LOADENFORMATION	9024			//HTS 실행시 최선집행등 관련 동의 절차후 계좌비번저장 화면 오픈
+#define TM_HTS_LOADENFORMATION_POP 9025 //HTS 실행시 최선집행등 관련 동의 절차후 계좌비번저장 화면 SDI 오픈
+#define TM_MARKET 9026
+#define TM_NOSCREEN_URL 9027
+
 #define	COLOR_TB		RGB(238, 238, 238)
 
 #define	UMENUN			8
@@ -191,7 +197,7 @@ int __stdcall STSDKEX_EventCallback(long lCode, void* pParam, long lParamSize);
 #define MAPN_KOBAELW_SCREEN		"IB280200"		// ELW현재가 화면
 #define MAPN_LOGINSET			"IB0000AA"		// LOGIN.XXX -> Push해주는 맵
 #define MAPN_MINIWID			"IB0000X8"		// 미니 관심종목 위젯
-#define MAPN_CDDEDD			"IB823310"     //CDD/EDD 등록화면 //testcdd
+#define MAPN_CDDEDD			"IB823310" //CDD, EDD 등록화면 //test cdd
 
 #define MAPN_MULTICONNECT		"DH621600"		// 동시접속 관리
 
@@ -214,6 +220,8 @@ int __stdcall STSDKEX_EventCallback(long lCode, void* pParam, long lParamSize);
 #define IDX_REFUSAL	6
 
 #define MSLIST_FILE		"mslist.dat"
+
+//#define DF_CDDUSE  1
 
 // 실시간 맵반영 2011.01.26 by warship -----------------------------------------------------------------
 struct rexp_item
@@ -633,6 +641,31 @@ protected:
 	std::unique_ptr<class CNClock> m_Nclock{};
 	std::unique_ptr<class CChaser> m_chaser{};
 	std::unique_ptr<class CInfofile> m_infofile{};
+	
+	//modi  auto
+	std::unique_ptr < class CDlgServerOrder> m_pServerOrd{}; //modi 서버  
+	int		m_serverOrdHISTORY = 100;
+
+	std::unique_ptr<class CSlideWnd > m_pSlideWnd{};
+	void CreateSlideWnd();
+	void ServerOrdNotice(CString dat);
+public:
+	void	ShowServerOrdDlg();
+	void ShowSlideWnd(BOOL bShow = TRUE);
+	enum {
+		SERVERORDER_MSG_RELOAD = 0,                 //서버주문화면에게 재조회 메시지
+		SERVERORDER_MSG_SVCREGI,						//주식자동주문 서비스 신청
+		SERVERORDER_MSG_SVCTERMINATE,			//주식자동주문 서비스 해지
+		SERVERORDER_MSG_SELLCONOK,					//주식자동주문 조건만족(매도)
+		SERVERORDER_MSG_BUYCONOK,					//주식자동주문 조건만족(매수)
+		SERVERORDER_MSG_SELLNEWCONOK,			//주식자동주문 조건만족(신규편입매도)
+		SERVERORDER_MSG_CONEXPD,						//주식자동주문 조건만료
+		SERVERORDER_MSG_CONSTATUE,					////주식자동주문 감시내역
+		SERVERORDER_MSG_MISORDER,					//착오주문 관련 메시지
+		SERVERORDER_MSG_MAPPOP = 20						//주식자동주문 관련 맵화면 팝업
+	};
+	void ServerOrderMsgToMap(int igubn, bool bPop = FALSE);
+	bool MapCheckAndSendMsg(CString sMsg);
 #else
 	class CAxGuide* m_axGuide;
 	class CTTip* m_tip;
@@ -739,6 +772,7 @@ protected:
 
 	//컴파일러 업데이트 버전확인
 	void Check_HTS_Verstion();
+// Operations
 
 	//CDD
 	BOOL isCDDScreen(CString strScreen);
@@ -750,10 +784,9 @@ protected:
 	void ParseSAMFQ014(char* dat, int len);
 	void ParseSACMQ101(char* dat, int len);
 
-	//process kill
-	HANDLE ProcessFind(char* strProcessName);
+	//화면 잠금
 	void KillMySelf();
-// Operations
+	HANDLE ProcessFind(char* strProcessName);
 public:
 
 // Overrides
@@ -1029,7 +1062,7 @@ protected:
 	void	checkFirewall();
 	void    LoadSecureTools();
 	void	load_secure_agree(BOOL bAOS, BOOL bFirewall, BOOL bKeysecure);
-	void	trouble_shooting(CString strErrMsg,CString sKey);
+	void	trouble_shooting(CString strErrMsg,CString sKey, CString sSection);
 	void	SendInstallPath();
 	void	SendProcessList(); // Process list
 	void	os_report();		// OS version reporting on start
@@ -1460,7 +1493,7 @@ public:
 	CString m_slog; 
 	CString m_sSimpleAuth;
 	CString m_sCustNumber; //고객번호
-	bool	m_bSimpleAuth{};
+	bool	m_bSimpleAuth;
 
 	void   signOnSimpleAuth(char* pdata);
 
@@ -1515,6 +1548,96 @@ public:
 
 	//제도변경 20230729
 	void   FileMove();
+
+	//memo uplaoad
+	CMapStringToString m_mapMemo{};
+	void  MemoUpload();
+	void  MemoDownoad();
+	BOOL GetCodeForMemoUpload(CString& skey, CString& sval);
+	BOOL UploadEachMemo();
+	void parseMemoUpload(char* dat, int len);
+
+	//dump upload
+	void DumpUpload();
+
+	//생성형 AI
+	void SendPiboStaf();
+
+	//암호화로그
+	CString GetMapNumByKey(int nkey);
+
+	//로그 업로드
+	BOOL m_bUploadComplet{};
+	std::unique_ptr<class CUploadFile> m_pUpload{};
+
+	//shared 메모리 
+	void initShared();
+	CString m_sHSharedkey{};  //핸들 공유
+	CString m_sMSharedkey{};  //메모리 공유
+	HINSTANCE m_hSharedLib{};
+	CWnd* m_pSharedMemory{};
+
+	//ASTx
+	BOOL m_bCLOSE_ASTx{};
+	BOOL IsASTxRunning(BOOL bLog=FALSE);
+	BOOL m_bINILocal{};  //수동으로 ip 구해서
+
+	//취약점
+	BOOL GetCertLogin() { return m_bCertLogin; }
+
+	//NXT 장운영
+	int m_iNXType = 0;
+#ifdef DF_MK_CAPTION
+	int m_iKRXype = 0;
+#endif
+	void CheckNXTTime(CString sval);
+	void Sendpibojggb();
+
+	//최선집행
+	void SendSACMT279();
+	void SendPIBOpopu(CString sGubn, int ikey);
+	void CheckEdgeInstalled();
+
+	
+	//debug
+	CMapStringToString m_mapDebugKey{};
+	CMapStringToString m_mapDebugRemoveKey{};
+
+	//FDS
+	void WriteMainInfo();
+
+	//자체 무결성검증
+	CString m_sMainName{}, m_sExtraced{};
+	CString m_sExIntegrity{}, m_sIntegrityMSG{};
+	CStringArray		m_arraySelfItgy{};
+	int Self_VerifyIntegrity();
+	void AddUniqueFromBtoA(CStringArray& arrA, const CStringArray& arrB);
+
+	//SDI 가상화면 visible
+	//HTS 실행시 현재 가상화면이 아닌 다른 가상화면들의 SDI가 보이는 현상 수정
+	void SetVirtualSDIVisible(int vsN, bool bshow);
+#ifdef DF_MK_CAPTION
+	//해외고객권한  ex)0000000000000000000000000000000011  (실시간시세)
+	CString m_sCustomerAuth{};
+
+	//거래소 선택가능한지
+	CMapStringToString m_mapPermissions{};
+	void ReadMarketFile();
+	int GetMarketType(const CString& screenNo);
+	bool IsCurrentTimeBetween(int startHour, int startMin, int endHour, int endMin);
+	bool m_isFirstTimer{};
+	void CheckMarketStat();
+	void CheckMarketByMNG(CString sval);
+	bool m_bCSAT{};
+#endif
+	//화면 삭제
+	//std::unique_ptr<CDlg_MSGBOX> m_pMDLSdlg{};
+	int m_iKey{};
+	CString m_sTriggerUrl{};
+	CMapStringToString m_mapManage{};
+	void ReadManageMapInfo();
+	int ScreenCheck(CString mapname, int igubn = 0);
+
 protected:
 // #ifdef USE_AHNLAB_SECUREBROWSER
 // 	IAosSB *m_pAosSB;

@@ -62,12 +62,16 @@
 #include "TOP10Dialog.h"
 #include "CertErrDialog.h"
 #include "DlgPB.h"
+#include "CUploadFile.h"
+#include "CSlideWnd.h"
+#include "CDlgServerOrder.h"
 
 #include "../dll/sm/smheader.h"
 #include "../dll/sm/TransparentMgr.h"
 #include "../dll/axiscp/cpheader.h"
 #include "XZip.h"
 #include "XUnzip.h"
+#include "CDlg_MSGBOX.h"
 
 #include <io.h>
 #include <math.h>
@@ -93,6 +97,8 @@
 
 #include "EmpPassChangeDlg.h"
 #include "EmpPassChangeNotifyDlg.h"
+
+#include "CDLG_Notice.h"
 
 #include "../H/interMSG.h"
 
@@ -151,6 +157,18 @@ LPFN_ISWOW64PROCESS fnIsWow64Process;
 
 //** macho end
 
+CString MarketToString(CString smarket)
+{
+	if (smarket =="1")
+		return "KRX";
+	else if (smarket == "2")
+		return "NXT";
+	else if (smarket == "3")
+		return "통합";
+	else
+		return "KRX";
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame
 #define WM_NCMOUSELEAVE		0x02A2
@@ -189,9 +207,96 @@ static BOOL GetVersion(OSVERSIONINFOEX* os) {
 	return  TRUE;
 }
 
+
+//#define DF_SLIDEWND			//스티커
+#define DF_SERVERAUTO    //서버자동
+#define DF_GLBFILE_CNVS  //axglb.ini 파일 변환
+
+#define DF_SERVERORDER_LOG "serverOrder.ini"
+#define SERVER_ORDER DF_SERVERORDER_LOG
+#define SERVER_ORDERMAP "IB102000"
+#define SERVER_ORDER_MSGEDIT  "edServerMsg"
+
+#define DF_POPSDI
+
+#define DF_SHOWITGYLOG
+
+#define DF_NUSE 0					    //#0x00 사용불가      0
+#define DF_YUSE 1					     //#0x01 사용가능      1
+#define DF_NUSE_AFTERDAY 2  //#0x02 특정날짜이후 사용가능    2
+#define DF_YUSE_AFTERDAY 4  //#0x02 특정날짜이후 사용중지    4
+#define DF_YUSE_MANAGER 8  //#0x08 관리자전용  8
+#define DF_YUSE_DEBUG   16   //#0x10 디버그기능 포함   16
+/*
+	#0x00 사용불가      0
+	#0x01 사용가능      1
+	#0x02 특정날짜이후 사용중지    2
+	#0x04 특정날짜이후 사용가능    4
+	#0x08 관리자전용                        8
+	#0x10 디버그기능 포함                16
+	#0x20 시작할때만 안띄움             32
+	*/
+
+void WriteLog_File(CString sFile, CString sData, ...)
+{
+	return;
+	sFile.TrimRight();
+	if (sFile.IsEmpty())
+		sFile = DF_SERVERORDER_LOG;
+
+	CString spath;
+	spath.Format("%s%s%s", Axis::home, "\\exe\\", sFile);
+
+	FILE* fp;
+	fopen_s(&fp, spath, "a+");
+	if (!fp)
+		return;
+
+	const CTime time = CTime::GetCurrentTime();
+	fprintf(fp, (LPCSTR)time.Format("[%Y-%m-%d %H:%M:%S] "));
+
+	va_list argptr;
+	va_start(argptr, sData);
+	vfprintf(fp, sData, argptr);
+	va_end(argptr);
+	fprintf(fp, "\n");
+
+	fclose(fp);
+}
+
+void WriteUpLog(LPCSTR sfile, LPCSTR log, ...)
+{
+	return;
+	TRY
+	{
+		CString stfFile;
+		stfFile = Axis::home + "\\user\\" + Axis::user + "\\Crashlog\\" + sfile;
+
+		FILE* fp;
+		fopen_s(&fp, stfFile, "a+");
+		if (!fp) return;
+
+		const CTime time = CTime::GetCurrentTime();
+		fprintf(fp, (LPCSTR)time.Format("[%Y-%m-%d %H:%M:%S] "));
+
+		va_list argptr;
+		va_start(argptr, log);
+		vfprintf(fp, log, argptr);
+		va_end(argptr);
+		fprintf(fp, "\n");
+
+		fclose(fp);
+	}
+		CATCH(CMemoryException, e)
+	{
+
+	}
+	END_CATCH
+}
+
 void WriteLog( LPCSTR log, ... )
 {
-#if 1
+#if 0
 	TRY
 	{
 		CString slog;
@@ -650,7 +755,14 @@ bool axiscall(int msg, WPARAM wParam, LPARAM lParam)
 	case AXI_TABCHANGE:
 		m_pMain->ChangeTabView((LPCSTR)lParam, (int)wParam);
 		break;
-	case AXI_SHOWDEAL:			m_pMain->ShowConclusion();		break;
+	case AXI_SHOWDEAL:			
+	{
+		m_pMain->ShowConclusion();
+#ifdef DF_SERVERAUTO
+		m_pMain->ShowServerOrdDlg();
+#endif
+	}		
+	break;
 	case AXI_BAR2ACTION:		m_pMain->Action(wParam, lParam);	break;
 	case AXI_SETALL:			m_pMain->childAll((char *) lParam);	break;
 	case AXI_GETMAPNUM:			m_pMain->GetDispN((char *) lParam);	break;
@@ -805,6 +917,7 @@ CMainFrame::CMainFrame()
 	m_regkey	= ((CAxisApp*)m_axis)->m_regkey;
 #ifdef DF_USE_CPLUS17
 	m_axMisc = std::make_unique<CAxMisc>(Axis::home, m_regkey);
+	m_axMisc->m_pMain = this;
 	m_axGuide = std::make_unique<CAxGuide>(LOWORD(position), Axis::home);
 #else
 	m_axMisc	= new CAxMisc(Axis::home, m_regkey);
@@ -1007,21 +1120,49 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CMDIFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
+
+	//if (!SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS))
+	//{
+	//	OutputDebugString("[SetPriorityClass] Fail");
+	//}
+
 	::DeleteFile(Axis::home + "\\exe\\axis.log");
-	m_slog.Format("OnCreate regkey=[%s]", m_regkey);
-	WriteLog(m_slog);
+
+	const char obExe[] = "\x61\x78\x69\x73\x2E\x65\x78\x65";
+	char wb[32]{};
+	sprintf(wb, "%s", obExe);
+
+	m_sMainName.Format("%s", wb);
+	m_sMainName.TrimRight();
+	m_sMainName.MakeUpper();
+
+	m_slog.Format("[AXIS][core] OnCreate regkey=[%s] m_sMainName=[%s]", m_regkey, m_sMainName);
+WriteLog(m_slog);
 	InitMapHK();
-	WriteLog("CMainFrame  InitMapHK");
-	
+	WriteMainInfo();
 
 	CString fname;
 	fname = Axis::home + "\\exe\\BLDINFO.INI";
 	CFileFind finder;
 	if (!finder.FindFile(fname))
 	{
-		WritePrivateProfileString("Build", "BuildNumber", "1.4.1.71", fname);
-		WritePrivateProfileString("Build", "State", "1", fname);
-		WritePrivateProfileString("Build", "Version", "1.4.1.1", fname);
+		WritePrivateProfileString("Build", "BuildNumber", "1.7.0.83", fname);
+		WritePrivateProfileString("Build", "State", "3", fname);
+		WritePrivateProfileString("Build", "Version", "1.7.0.3", fname);
+	}
+	else
+	{
+		char buf[512]{};
+		DWORD dw = GetPrivateProfileString("Build", "BuildNumber", "", buf, sizeof(buf), fname);
+		CString stmp;
+		stmp.Format("%s", buf);
+		stmp.TrimRight();
+		if (stmp != "1.7.0.83")
+		{
+			WritePrivateProfileString("Build", "BuildNumber", "1.7.0.83", fname);
+			WritePrivateProfileString("Build", "State", "3", fname);
+			WritePrivateProfileString("Build", "Version", "1.7.0.3", fname);
+		}
 	}
 
 	Axis::sFiller = "";
@@ -1344,11 +1485,30 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				case 'f':
 				case 'F':
 					{
+					
 					if (GetKeyState(VK_CONTROL) & 0x8000)
 					{
 						if (GetKeyState(VK_SHIFT) & 0x8000)
 						{
-							os_report();  //test
+							CString	Path;
+							Path.Format("%s\\%s\\ACCNTDEPT.INI", Axis::home, "tab");
+
+							char readB[1024];
+							int readL;
+							readL = GetPrivateProfileString("ACCNTDEPT", "DEPT", "811", readB, sizeof(readB), Path);
+							CString tDept(readB, readL);
+							tDept.TrimLeft(); tDept.TrimRight();
+
+							readL = GetPrivateProfileString("ACCNTDEPT", "KEYINPUT", "0", readB, sizeof(readB), Path);
+							CString stmp(readB, readL);
+m_slog.Format("[AXIS] tDept =[%s] m_Dept=[%s] keyin=[%s]", tDept, m_dept, stmp);
+WriteLog(m_slog);
+
+							if (stmp == "1")
+							{
+								ShowControlBar(m_TotalAcc, TRUE, FALSE);
+								m_TotalAcc->Refresh813(1);
+							}
 						}
 					}
 					
@@ -1400,41 +1560,88 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 						} 
 					}
 					break;
+				case 'd':
+				case 'D':
+				{
+					m_mapDebugKey.RemoveAll();
+					m_mapDebugRemoveKey.RemoveAll();
+				}
+				break;
 				case 'z':
 				case 'Z':
 					{
-						CString stmp;
-						//stmp = Variant(getFOCUS);
-						//AfxMessageBox(stmp);
+						m_mapDebugKey.RemoveAll();
+						m_mapDebugRemoveKey.RemoveAll();
+						CString file, repo, key, dat;
+						file.Format("%s\\exe\\Debug.TXT", Axis::home);
+						if (IsFileExist(file))
+						{
+							char	buf[256]{};
+							DWORD dw = GetPrivateProfileString("DEBUG", "key", "", buf, sizeof(buf), file);
 
-						char ca[100];
-						int ret;
+							if (dw)
+							{
+								CString stmp;
+								
+								m_slog.Format("%s", buf);
+								while (m_slog.GetLength() > 0)
+								{
+									stmp = Parser(m_slog, ";");
+									m_mapDebugKey.SetAt(stmp, stmp);
+								}
+							}	
 
-						memset(ca, ' ', 100);
-						memcpy(ca, "testtest", 8);
-						//CopyMemory(ca,m_axConnect->GetCPass(),m_axConnect->GetCPass().GetLength());
+							dw = GetPrivateProfileString("DEBUG", "remove", "", buf, sizeof(buf), file);
+							if (dw)
+							{
+								CString stmp;
+								
+								m_slog.Format("%s", buf);
+								while (m_slog.GetLength() > 0)
+								{
+									stmp = Parser(m_slog, ";");
+									m_mapDebugRemoveKey.SetAt(stmp, stmp);
+								}
+							}
+						}
+				/*	CString stmp, stitle;
+					stmp.Format("950\t3\t951\t20240708173000\t952\t조건 만족 주문내역 확인");
+					ConclusionNotice(stmp, stitle);
+					stmp.Format("950\t6\t951\t20240708173000\t952\t조건만료 감시내역 확인");
+					ConclusionNotice(stmp, stitle);*/
+						//ref 테스트코드
+						//enum en_gnbn { ACC = 0, AI, AUTOORDERLIST, SERVERORDADD };  //계좌입력기  ,  AI버튼,   자동주문리스트
+						//int ival = AUTOORDERLIST;
+						//switch (ival)
+						//{
+						//	case ACC:
+						//	{
+						//		ShowControlBar(m_TotalAcc, TRUE, FALSE);
+						//	}
+						//	break;
+						//	case AI:
+						//	{
+						//		char	buf[256]{};
+						//		CString	file, strmap, strname;
+						//		file.Format("%s\\tab\\axisAI.ini", Axis::home);
+						//		DWORD dw = GetPrivateProfileString("MAP", "num", "IB999900", buf, sizeof(buf), file);
+						//		strmap.Format("%s", buf);
+						//		strmap.TrimRight();
 
-						m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
-							(BYTE*)(VTS_I4 VTS_I4), MAKEWPARAM(setACCG, 0), (long)(const char*)&ca[0]);
+						//		memset(buf, 0x00, 256);
+						//		dw = GetPrivateProfileString("MAP", "name", "IBK AI", buf, sizeof(buf), file);
+						//		strname.Format("%s", buf);
+						//		strname.TrimRight();
 
-						
-
-
-						char ca1[6776];
-				
-						memset(ca1, ' ', 6776);
-						//CopyMemory(ca,m_axConnect->GetCPass(),m_axConnect->GetCPass().GetLength());
-
-						m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void*)&ret,
-							(BYTE*)(VTS_I4 VTS_I4), MAKELONG(groupCC, 0), ca1);
-
-						m_slog.Format("\r\n----------------------------------[%d] \r\n", ret);
-						OutputDebugString(m_slog);
-						AfxMessageBox(m_slog);
-
-						CString str;
+						//		CString strmenu;
+						//		strmenu.Format("도우미\t#%s\t%s\t%s", strname, strmap, strname);
 					}
 					break;
+				case 's':
+				case 'S':
+				{
+				
+				}
 			}	
 	}
 
@@ -2414,6 +2621,12 @@ void CMainFrame::OnUpdateRunCommand(CCmdUI* pCmdUI)
 
 void CMainFrame::OnClose() 
 {
+	if (!m_bCLOSE_ASTx)
+	{
+		MemoUpload();  //memo
+		//DumpUpload();
+	}
+	
 	CString file;
 
 	OutputDebugString("MAIN ONCLOSE\n");
@@ -2464,6 +2677,7 @@ void CMainFrame::OnClose()
 
 			if(m_top10 != nullptr && m_top10->GetSafeHwnd())
 				m_top10->ShowWindow(SW_HIDE);
+
 			CExitD exit(NULL, IsNewExitImage());
 			exit.SetTime(m_connectT);
 			const UINT modalResult = exit.DoModal();
@@ -2728,8 +2942,12 @@ void CMainFrame::OnClose()
 		}
 	}
 	
+	if (m_hSharedLib)
+	{
+		FreeLibrary(m_hSharedLib);
+		m_hSharedLib = nullptr;
+	}
 	OutputDebugString("Complete Main Close\n");
-	
 	CMDIFrameWnd::OnClose();
 }
 
@@ -2816,10 +3034,28 @@ LONG CMainFrame::OnAXIS(WPARAM wParam, LPARAM lParam)
 	CChildFrame* child{};
 	CStringArray	arr;
 	CString		tmps = _T(""), title = _T("");
+	CString axisfile;
 	CString slog;
+	char buff[64]{};
 
 	switch (LOWORD(wParam))
 	{
+	case axUPLODING_LOG:
+	{
+		if (m_pUpload)
+		{
+			if (m_pUpload.get()->m_arrFile.GetSize() == 0)
+				m_bUploadComplet = true;
+			else
+				m_bUploadComplet = false;
+		}
+
+slog.Format("[AXIS] uaxUPLODING_LOG m_bUploadComplet = [%d]", m_bUploadComplet);
+WriteLog(slog);
+		
+		return m_bUploadComplet;
+	}
+		break;
 	case axSTART:	// start step
 		{
 			if(m_bUseNewLogin)
@@ -2850,8 +3086,19 @@ LONG CMainFrame::OnAXIS(WPARAM wParam, LPARAM lParam)
 
 			if (!getConnectInfo(tmps, value)) 
 			{
-				Axis::MessageBox(this, "설치정보를 확인하세요", MB_ICONINFORMATION);
-				m_axConnect->SetLoginBtnEnable(true);
+				if (m_bUseNewLogin)
+					m_axConnect->SetGuide("");
+				else
+					m_axConnectOld->SetGuide("");
+
+				Axis::MessageBox(this, "설치정보를 확인하세요(GLB)", MB_ICONINFORMATION);
+				if (m_bUseNewLogin)
+					m_axConnect->SetLoginBtnEnable(true);
+				/*m_slog.Format("접속 실패하였습니다 [%d]", GetLastError());
+				if (m_bUseNewLogin)
+					m_axConnect->SetGuide(m_slog);
+				else
+					m_axConnectOld->SetGuide(m_slog);*/
 				return 0;
 			}
 			strcpy_s(wb, 128, tmps);
@@ -2860,11 +3107,6 @@ LONG CMainFrame::OnAXIS(WPARAM wParam, LPARAM lParam)
 			m_ip = tmps;
 			m_port.Format("%d", value);
 			
-		
-m_slog.Format("[axis] axstart onaxis m_ip=[%s] m_port=[%s]\n", m_ip,m_port);
-//OutputDebugString(m_slog);
-WriteLog(m_slog);
-
 			((CAxisApp*)m_axis)->m_conIP = m_ip;
 
 			CString file, axisfile, usnm = Axis::user;
@@ -2914,13 +3156,8 @@ WriteLog(m_slog);
 				}
 			}
 
-#ifdef _DEBUG
 			m_wizard->InvokeHelper(DI_RUN, DISPATCH_METHOD, VT_BOOL, (void *)&rc,
-						(BYTE *)(VTS_I4 VTS_I4 VTS_I4), loginAXIS, (long)wb, value);
-#else
-			m_wizard->InvokeHelper(DI_RUN, DISPATCH_METHOD, VT_BOOL, (void*)&rc,
-				(BYTE*)(VTS_I4 VTS_I4 VTS_I4), loginAXISx, (long)wb, value);
-#endif
+						(BYTE *)(VTS_I4 VTS_I4 VTS_I4), loginAXISx, (long)wb, value);
 
 			if (rc)
 			{
@@ -2949,13 +3186,104 @@ WriteLog(m_slog);
 	case axRUN:	break;
 	case axAXIS:
 		{
+		   //SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+
+			CheckEdgeInstalled();
+			if (Axis::isCustomer)
+				SendPIBOpopu("S", 231);
+			//ref 보안프로그래(ASTx) 가동 확인
+			int iRet = Self_VerifyIntegrity();
+			if (!IsASTxRunning(TRUE)|| iRet > 0)
+			{
+				m_bExit = false;
+				m_forceClose = true;
+				m_bCLOSE_ASTx = TRUE;
+
+				m_wizard->InvokeHelper(DI_RUN, DISPATCH_METHOD, VT_BOOL, (void*)&rc,
+					(BYTE*)(VTS_I4 VTS_I4 VTS_I4), loginAXISx, 0, -1);
+
+				PostMessage(WM_AXISCLOSE, 99, 0);
+				return 0;
+			}
+
+			char	buf[512];
+			CString	file, stmp, smap;
+			file.Format("%s\\tab\\axis.ini", Axis::home);
+			DWORD dw = GetPrivateProfileString("ASTx", "interval", "30000", buf, sizeof(buf), file);
+			stmp.Format("%s", buf); stmp.TrimRight();
+m_slog.Format("[ASTx] interval = [%s] ", stmp);
+WriteLog(m_slog);
+			SetTimer(TM_AOS_ALIVE, atoi(stmp), NULL);
+
+#ifdef DF_MK_CAPTION
+		 ////장운영 타이머
+		 //// 현재 시간 가져오기
+		     file.Format("%s\\%s\\AXISFILE.INI", Axis::home, TABDIR);
+			GetPrivateProfileString("Market", "CSAT", "", buff, sizeof(buff), file);
+			stmp.Format("%s", buff);
+			stmp.TrimRight();
+
+			CTime dnow = CTime::GetCurrentTime();
+			CString today;
+			today.Format("%04d%02d%02d", dnow.GetYear(), dnow.GetMonth(), dnow.GetDay());
+
+			if (today == stmp)
+				m_bCSAT = TRUE;
+			else
+				m_bCSAT = FALSE;
+
+
+
+			memset(buff, 0x00, 64);
+			GetPrivateProfileString("Market", "EarlyYear", "", buff, sizeof(buff), file);
+			stmp.Format("%s", buff);
+			stmp.TrimRight();
+
+			if (m_bCSAT == FALSE)
+			{
+				if (today == stmp)
+					m_bCSAT = TRUE;
+			}
+
+			CheckMarketStat();
+
+			CTime now = CTime::GetCurrentTime();
+			int curMin = now.GetMinute();
+			int curSec = now.GetSecond();
+
+			// 다음 10분 단위 시각까지 남은 초 계산
+			int nextTenMin = ((curMin / 10) + 1) * 10; // 다음 10분 단위 분값 (ex: 8:04 -> 10, 8:30->40)
+			if (nextTenMin >= 60)
+				nextTenMin = 0; // 자정 넘어갈 때 처리
+
+			// 현재 시각을 분+초로 환산
+			int curTotalSec = curMin * 60 + curSec;
+			int nextTotalSec = nextTenMin * 60; // 다음 10분 단위의 초 환산
+
+			// 남은 초 계산 (다음 10분 단위까지)
+			int diffSec = 0;
+			if (nextTotalSec > curTotalSec)
+				diffSec = nextTotalSec - curTotalSec;
+			else
+				diffSec = (60 * 60) - curTotalSec + nextTotalSec; // 1시간 넘어갈 때 처리
+
+			UINT initialInterval = diffSec * 1000; // 밀리초 단위
+#endif
+			//ref
+
 			
+			file.Format("%s\\%s\\%s\\Crashlog", Axis::home, USRDIR, Axis::user);
+
+			CFileFind ff;
+			if (!ff.FindFile(file))
+				::CreateDirectory(file, NULL);
+
 		    const bool onlysise = m_axis->GetProfileInt(WORKSTATION, "OnlySise", 0) ? TRUE : FALSE;
 			if(m_bCertLogin && onlysise)
 				m_axis->WriteProfileInt(WORKSTATION, "OnlySise", 0);
 
 			m_bInit = TRUE;
-			WriteLog("OnAxis-axAXIS - Step 1\n");
+WriteLog("[AXIS] OnAxis-axAXIS - Step 1\n");
 			const int screenX = GetSystemMetrics(SM_CXVIRTUALSCREEN);
 			const int screenY = GetSystemMetrics(SM_CYVIRTUALSCREEN);
 			int x  = m_axis->GetProfileInt(INFORMATION, "win_x", 0);
@@ -3024,7 +3352,7 @@ slog.Format("[MIAN_MONITOR] iFull_width[%d] < x[%d]  or  iFull_height[%d] < y[%d
 			}
 
 			UpdateWindow();
-			WriteLog("OnAxis-axAXIS - Step 2\n");
+WriteLog("[AXIS] OnAxis-axAXIS - Step 2\n");
 
 			if(m_bUseNewLogin)
 			{
@@ -3063,54 +3391,55 @@ slog.Format("[MIAN_MONITOR] iFull_width[%d] < x[%d]  or  iFull_height[%d] < y[%d
 				}
 			}
 
-			WriteLog("OnAxis-axAXIS - Step 3");
+WriteLog("[AXIS] OnAxis-axAXIS - Step 3");
 
 			ClearRepositoryLog();
 
 			endWorkstation();
 
-			WriteLog("OnAxis-axAXIS - Step 4");
+WriteLog("[AXIS] OnAxis-axAXIS - Step 4");
 			
-			if (m_bdnInterest)
+			if (m_bdnInterest && !Axis::isCustomer)      //test 핵심
 				dnloadAction();
 			//초기 관심종목 다운로드 안되게 수정시 아래 주석제거
 			//SetTimer(TM_DNINTEREST, 1000, NULL);
 	
-		 	WriteLog("OnAxis-axAXIS - Step 5");
+WriteLog("[AXIS] OnAxis-axAXIS - Step 5");
 			
 			OpenAnnouncement();
 
-			WriteLog("OnAxis-axAXIS - Step 6");
+WriteLog("[AXIS] OnAxis-axAXIS - Step 6");
 			SetHome();
 
-			WriteLog("OnAxis-axAXIS - Step 7");
+WriteLog("[AXIS] OnAxis-axAXIS - Step 7");
 
 			checkOpenedList();	// 20070627 kwon
 
-			WriteLog("OnAxis-axAXIS - Step 8");
+WriteLog("[AXIS] OnAxis-axAXIS - Step 8");
 
 			//checkDelayList();	// 20071205 won
 
-			WriteLog("OnAxis-axAXIS - Step 9");
+WriteLog("[AXIS] OnAxis-axAXIS - Step 9");
 
 			m_tInfo1->RedrawWindow();
 
 			// 2010.06.01 보안프로그램이 모두 해제되었을 경우 && 고객일경우
-			const BOOL pcAOS = AfxGetApp()->GetProfileInt(INFORMATION, "AOS", 1);
-			const BOOL pcFirewall = AfxGetApp()->GetProfileInt(INFORMATION, "PCFirewall", 0);
-			const BOOL pcKeyProtect = AfxGetApp()->GetProfileInt(ENVIRONMENT, "KeyProtect", 0);
-			if ( (!pcFirewall || !pcKeyProtect || !pcAOS) && Axis::isCustomer )
-			{
-				load_secure_agree(pcAOS, pcFirewall, pcKeyProtect);
-			}
+			//modi ASTx 202409  보안모듈 미실행시 위에서 HTS 강제 종료
+			//const BOOL pcAOS = AfxGetApp()->GetProfileInt(INFORMATION, "AOS", 1);
+			//const BOOL pcFirewall = AfxGetApp()->GetProfileInt(INFORMATION, "PCFirewall", 0);
+			//const BOOL pcKeyProtect = AfxGetApp()->GetProfileInt(ENVIRONMENT, "KeyProtect", 0);
+			//if ( (!pcFirewall || !pcKeyProtect || !pcAOS) && Axis::isCustomer )
+			//{
+			//	load_secure_agree(pcAOS, pcFirewall, pcKeyProtect);
+			//}
 
-			WriteLog("OnAxis-axAXIS - Step 10");
+WriteLog("[AXIS] OnAxis-axAXIS - Step 10");
 
 			// 2010.06.01 사용자 OS를 Report한다.
 			// 2012.02.13 박현철과장 제거 지시.BY DUKKI
 			//os_report();
 
-			WriteLog("OnAxis-axAXIS - Step 11");
+WriteLog("[AXIS] OnAxis-axAXIS - Step 11");
 
 			// 2010.09.03 접속 Ethernet Card의 MAC을 Report 한다.
 			//mac_report();
@@ -3122,14 +3451,17 @@ slog.Format("[MIAN_MONITOR] iFull_width[%d] < x[%d]  or  iFull_height[%d] < y[%d
 			// 2010.07.21 숨김처리 Hotkey 로딩
 			LoadHotkeySetting();
 
-			WriteLog("OnAxis-axAXIS - Step 12");
+WriteLog("[AXIS] OnAxis-axAXIS - Step 12");
 
 			// 공지사항 체크
 			//sendTR("PIHONOTI", "Y", 1, US_PASS, 'l');
 
-			WriteLog("OnAxis-axAXIS - Step 13");
+WriteLog("[AXIS] OnAxis-axAXIS - Step 13");
 
 			CreateHistoryBar();
+
+		//	if (atoi(m_axis->GetProfileString(INFORMATION, "Port")) == 80)
+			trouble_shooting(m_axis->GetProfileString(INFORMATION, "Port"), "Port", "Port");
 			
 			//CString strFile;
 			////7805 팝업 
@@ -3254,6 +3586,8 @@ slog.Format("[MIAN_MONITOR] iFull_width[%d] < x[%d]  or  iFull_height[%d] < y[%d
 // 			}
 
 			m_bInit = FALSE;
+
+			
 		}
 		break;
 	case axSIGNON:	
@@ -3523,8 +3857,74 @@ slog.Format("[MIAN_MONITOR] iFull_width[%d] < x[%d]  or  iFull_height[%d] < y[%d
 			ChangeLogo();
 		}
 		break;
-	}
+#ifdef DF_MK_CAPTION
+		case axGetMarKetType:
+		{
+			int permissionFlag = LOWORD(wParam);
 
+			CString* pMapNum = reinterpret_cast<CString*>(lParam);
+			if (pMapNum == nullptr)
+				return FALSE; 
+
+			CString screenNo = *pMapNum;
+			delete pMapNum;
+
+			int selectable = GetMarketType(screenNo);
+
+			return selectable;
+		}
+		break;
+		case axSetMarKetType:
+		{
+			CString* pMapInfo = reinterpret_cast<CString*>(lParam);
+			if (pMapInfo == nullptr)
+				return FALSE;
+
+			CString sInfo = *pMapInfo;
+			delete pMapInfo;
+
+			CString screenNo;
+			screenNo = Parse(sInfo, "\t");
+
+			CString tmp;
+			int	key = 0;
+			CChildFrame* pChild = NULL;
+			CSChild* sChild = NULL;
+			for (int ii = 0; ii < 6; ii++)
+			{
+				POSITION	pos = m_arMDI[ii].GetStartPosition();
+				while (pos)
+				{
+					m_arMDI[ii].GetNextAssoc(pos, key, pChild);
+					if (pChild->m_mapN == screenNo)
+					{
+						tmp.Format("edMarketTrigger\t%s", sInfo);
+						m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY,
+							(void*)NULL, (BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, pChild->m_key), (LPARAM)(const char*)tmp);
+
+						break;
+					}
+				}
+
+				pos = m_arSDI[ii].GetStartPosition();
+				while (pos)
+				{
+					m_arSDI[ii].GetNextAssoc(pos, key, sChild);
+					tmp.Format("edMarketTrigger\t%s", sInfo);
+
+					if (sChild->m_mapN == screenNo)
+					{
+						m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY,
+							(void*)NULL, (BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, sChild->m_key), (LPARAM)(const char*)tmp);
+					}
+				}
+			}
+			
+
+		}
+		break;
+#endif
+	}
 	return 0;
 }
 
@@ -3771,6 +4171,371 @@ LONG CMainFrame::OnUSER(WPARAM wParam, LPARAM lParam)
 		case MMSG_RESTORECONDLG:
 			ShowConclusion();
 			break;
+		case MMSG_RESTORESERVERORD:  //mod 서버
+		{
+#ifdef DF_SERVERAUTO
+			switch ((int)lParam)
+			{
+			case SERVERORDER_MSG_MAPPOP:
+				ShowServerOrdDlg();
+				break;
+			case SERVERORDER_MSG_SVCREGI: break;  //서비스 신청되었음
+			case SERVERORDER_MSG_SVCTERMINATE: break; //서비스 해지
+			case SERVERORDER_MSG_SELLCONOK:  //(매도) 감시조건을 충족  /주문내역보기
+			case SERVERORDER_MSG_BUYCONOK:  //(매수) 감시조건을 충족  /주문내역보기 
+			case SERVERORDER_MSG_SELLNEWCONOK: //(신규편입매도) 감시조건을 충족  /주문내역보기
+			case SERVERORDER_MSG_CONEXPD: //조건만료  /감시내역보기
+			case SERVERORDER_MSG_MISORDER: //착오주문
+				ServerOrderMsgToMap((int)lParam, true);  //서버자동주문 내역창 클릭시 오는 메시지이기 때문에 관련맵화면이 열려있지 않으면 팝업한다
+			break;
+			case SERVERORDER_MSG_CONSTATUE:  //감시현황
+			{
+			}
+			break;
+			default:
+
+				break;
+			}
+#endif
+		}
+		break;
+		case MMSG_SHARED_GETKEY:  //cx_log 에 공유메모리키 
+		{
+			return (LONG)m_sMSharedkey.GetBuffer(0);
+		}
+		break;
+		case MMSG_SHARED_REGWND:  //cx_shared 에 관리를 할 윈도우 주소 등록
+		{
+			if (m_pSharedMemory)
+				m_pSharedMemory->SendMessage(WM_USER, MAKEWPARAM(MAKEWORD(MMSG_SHARED_REGWND,1 ), 1), (LPARAM)lParam);
+		}
+		break;
+		case MMSG_SHARED_BROADCAST:  //cx_shared 에 관리를 하고 있는 윈도우에게 문자열 브로드 캐스팅
+		{
+			if (m_pSharedMemory)
+				m_pSharedMemory->SendMessage(WM_USER, MAKEWPARAM(MAKEWORD(MMSG_SHARED_BROADCAST, 1), 1), (LPARAM)lParam);
+		}
+		break;
+		case MMSG_SHARED_CTRLDESTROY:
+		{
+			if (m_pSharedMemory)
+				m_pSharedMemory->SendMessage(WM_USER, MAKEWPARAM(MAKEWORD(MMSG_SHARED_CTRLDESTROY, 1), 1), (LPARAM)lParam);
+		}
+		break;
+		case MMSG_SHARED_GETHANDLECNT:
+		{
+			if (m_pSharedMemory)
+				return (int)(m_pSharedMemory->SendMessage(WM_USER, MAKEWPARAM(MAKEWORD(MMSG_SHARED_CTRLDESTROY, 1), 1), (LPARAM)lParam));
+		}
+		break;
+		case MMSG_SHARED_GUIDEMESSAGE:
+		{
+			displayGuide((char*)lParam);
+			return 1;
+		}
+		break;
+		case MMSG_POP_MAP:
+		{
+			switch (HIWORD(wParam))
+			{
+				case 0:
+				{
+					m_slog.Format("%s", (char*)lParam);
+					m_mapHelper->CreatePopup((char*)lParam, 1, WK_POPUP, CenterPOS);
+				}
+				break;
+				case 1:
+				{
+					//m_mapHelper->CreateModal((char*)lParam, 0, 0x9f - 4, 99);
+					SendSACMT279();
+				}
+				break;
+				case 2:
+				{
+					m_slog.Format("%s", (char*)lParam);
+					m_mapHelper->CreateModal((char*)lParam, 0, 0x9f - 4, 6);
+				}
+				break;
+				case 3:
+				{
+					CString sval;
+					sval.Format("%s", (char*)lParam);
+					sval.TrimRight();
+					InputScreenNo(sval);
+				}
+				break;
+			}
+		}
+		break;
+		case MMSG_GETDN_CERTIFY:
+		{
+			m_slog.Format("[%s]<%d> [FDS] m_strDN=[%s]\n", __FUNCTION__, __LINE__, m_strDN);
+			WriteLog(m_slog);
+			return (LRESULT)(LPCTSTR)m_strDN;
+		}
+		break;
+#ifdef DF_MK_CAPTION
+		case MMSG_MKMSG_FROM_MAPNMAP:
+		{
+			CString sMapN, sMarket, sPermission, stmp, stemp;
+			int major{};
+			stmp.Format("%s", lParam);
+			stemp = stmp;
+			sMapN = Parser(stemp, "\t"); sMapN.TrimRight();
+			sMarket = Parser(stemp, "\t");  sMarket.TrimRight();
+			sPermission = Parser(stemp, "\t");  sPermission.TrimRight();
+			major = atoi(Parser(stemp, "\t"));
+
+			if (sMapN.IsEmpty())
+				return 0;
+
+			m_slog.Format("[AXIS][MARKET] 시작 MMSG_MKMSG_FROM_MAPNMAP");
+			OutputDebugString(m_slog);
+m_slog.Format("[AXIS][MARKET] MMSG_MKMSG_FROM_MAPNMAP    sMapN=[%s] sMarket=[%s] sPermission=[%s] major=[%d]", 
+						sMapN, MarketToString(sMarket), sPermission, major);
+OutputDebugString(m_slog);
+
+			int nActGroup = 0;
+
+			CChildFrame* actChild{};
+			CSChild* actSchild{};
+
+			if (m_arMDI[m_vsN].Lookup(m_activeKey, actChild))
+			{
+				nActGroup = actChild->m_xcaption.GetGroup();
+			}
+			else if (m_arSDI[m_vsN].Lookup(m_activeKey, actSchild))
+			{
+				nActGroup = actSchild->m_xcaption.GetGroup();
+			}
+
+			CChildFrame* child{};
+			CSChild* schild{};
+
+			int	key{};
+			const long	rc = 0;
+			POSITION pos;
+
+			for (pos = m_arMDI[m_vsN].GetStartPosition(); pos; )
+			{
+				m_arMDI[m_vsN].GetNextAssoc(pos, key, child);
+
+				//if (nActGroup == child->m_xcaption.GetGroup())
+				{
+					if (sMapN == child->m_xcaption.GetMapNum())
+					{
+						if (!child->m_xcaption.m_MkLock && child->m_xcaption.m_marketN != 4)   //자물통이거나 선택불가 아니고
+						{
+							//if(major == key)   //우선 1000번 예외
+							//if (major == key || sMapN == "IB100000")
+							if (major == key )
+							{
+								if ((int)atoi(sMarket) != child->m_xcaption.m_marketN)
+									child->m_xcaption.SetMarket((int)atoi(sMarket));
+
+							m_slog.Format("[AXIS][MARKET] ---찾음--- MMSG_MKMSG_FROM_MAPNMAP  sPermission =[%d] sMarket=%s] sMapN=[%s][%d] GetMapNum() =[%s][%d]  ", 
+								sPermission, MarketToString(sMarket), sMapN, major, child->m_xcaption.GetMapNum(), key);
+								OutputDebugString(m_slog);
+
+								if (0)
+									child->m_xcaption.SetMapPermission(atoi(sPermission));
+								else
+									child->m_xcaption.m_iMkPermission = atoi(sPermission);
+							}
+						}
+					}
+				}
+			}
+
+			for (pos = m_arSDI[m_vsN].GetStartPosition(); pos; )
+			{
+				m_arSDI[m_vsN].GetNextAssoc(pos, key, schild);
+
+				//if (nActGroup == schild->m_xcaption.GetGroup())
+				{
+					if (!schild->m_xcaption.m_MkLock && schild->m_xcaption.m_marketN != 4)
+						if ((int)atoi(sMarket) != schild->m_xcaption.m_marketN)
+							schild->m_xcaption.SetMarket((int)atoi(sMarket));
+			
+					if (0)
+						schild->m_xcaption.SetMapPermission(atoi(sPermission));
+					else
+						schild->m_xcaption.m_iMkPermission = atoi(sPermission);
+				}
+			}
+		}
+		break;
+		case MMSG_MKMSG_FROM_MAP:
+		{
+			CChildFrame* actChild{};
+			CSChild* actSchild{};
+
+			if (m_arMDI[m_vsN].Lookup(m_activeKey, actChild))
+			{
+				if (!actChild->m_xcaption.m_MkLock && actChild->m_xcaption.m_marketN != 4)
+				{
+
+					m_slog.Format("[AXIS][MARKET] ---찾음2--- MMSG_MKMSG_FROM_MAP  maketType = [%s]  ", MarketToString(CString((char*)lParam)));
+					OutputDebugString(m_slog);
+
+					CString stmp;
+					stmp.Format("%s", (char*)lParam);
+					stmp.TrimRight();
+					actChild->m_xcaption.SetMarket(atoi(stmp));
+				}
+			}
+			else if (m_arSDI[m_vsN].Lookup(m_activeKey, actSchild))
+			{
+				if (!actSchild->m_xcaption.m_MkLock && actSchild->m_xcaption.m_marketN != 4)
+					actSchild->m_xcaption.SetMarket((int)lParam);
+			}
+		}
+		break;
+		case MMSG_MKMSG_FROM_MAPSMAP:
+		{
+			CString sMapN, sMarket, sPermission, stmp, stemp;
+			int major{};
+			stmp.Format("%s", lParam);
+			stemp = stmp;
+			sMapN = Parser(stemp, "\t"); sMapN.TrimRight();
+			sMarket = Parser(stemp, "\t");  sMarket.TrimRight();
+		/*	sPermission = Parser(stemp, "\t");  sPermission.TrimRight();
+			major = atoi(Parser(stemp, "\t"));*/
+
+			CChildFrame* actChild{};
+			CSChild* actSchild{};
+
+			if (m_arMDI[m_vsN].Lookup(m_activeKey, actChild))
+			{
+				if (!actChild->m_xcaption.m_MkLock || actChild->m_xcaption.m_marketN != 4)
+				{
+
+					m_slog.Format("[AXIS][MARKET] ---찾음3--- MMSG_MKMSG_FROM_MAP  maketType = [%s]  ", MarketToString(CString((char*)lParam)));
+					OutputDebugString(m_slog);
+
+					CString stmp;
+					stmp.Format("%s", (char*)lParam);
+					stmp.TrimRight();
+					actChild->m_xcaption.SetMarket(atoi(stmp));
+				}
+			}
+			else if (m_arSDI[m_vsN].Lookup(m_activeKey, actSchild))
+			{
+				if (!actSchild->m_xcaption.m_MkLock || actSchild->m_xcaption.m_marketN != 4)
+					actSchild->m_xcaption.SetMarket((int)lParam);
+			}
+
+		}
+		break;
+		case MMSG_MKMSG_GET_MAP_BLOCK:  //화면 내부의 cxMarket 클릭시 거래소선택기능 락 여부 확인
+		{
+			CChildFrame* actChild{};
+			CSChild* actSchild{};
+
+			if (m_arMDI[m_vsN].Lookup(m_activeKey, actChild))
+				return actChild->m_xcaption.m_MkLock;
+			else if (m_arSDI[m_vsN].Lookup(m_activeKey, actSchild))
+				return actSchild->m_xcaption.m_MkLock;	
+		}
+		break;
+		case MMSG_MKMSG_FROM_SM:   //HTS 툴바에서 전체 장구분자 바꾸기 메시지 관련
+		{
+			int mkgubn = HIWORD(wParam);
+			CString tmp;
+			int	key = 0;
+			CChildFrame* pChild = NULL;
+			CSChild* sChild = NULL;
+			for (int ii = 0; ii < 6; ii++)
+			{
+				POSITION	pos = m_arMDI[ii].GetStartPosition();
+				while (pos)
+				{
+					m_arMDI[ii].GetNextAssoc(pos, key, pChild);
+
+					if (pChild->m_xcaption.m_MkLock || pChild->m_xcaption.m_marketN == 4)
+						continue;
+
+					int ibit{};
+					if (mkgubn == 1)
+						ibit = 1;
+					else if (mkgubn == 2)
+						ibit = 2;
+					else if (mkgubn == 3)
+						ibit = 4;
+			
+					if ((pChild->m_xcaption.m_iMkPermission & ibit) == 0)
+					{
+					/*	if (pChild->m_xcaption.m_iMkPermission & 1) mkgubn = 1;
+						else if (pChild->m_xcaption.m_iMkPermission & 2) mkgubn = 2;
+						else if (pChild->m_xcaption.m_iMkPermission & 4) mkgubn = 3;*/
+						
+						 if (pChild->m_xcaption.m_iMkPermission & 4) mkgubn = 3;
+						 else if (pChild->m_xcaption.m_iMkPermission & 1) mkgubn = 1;
+						 else if (pChild->m_xcaption.m_iMkPermission & 2) mkgubn = 2;
+					}
+
+					pChild->m_xcaption.SetMarket(mkgubn);
+
+					tmp.Format("edMarketTrigger\t%s", mkgubn == 1 ? "KRX" : mkgubn == 2 ? "NXT" : "통합");
+					OutputDebugString(tmp);
+					m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY,
+						(void*)NULL, (BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, pChild->m_key), (LPARAM)(const char*)tmp);
+				}
+
+				pos = m_arSDI[ii].GetStartPosition();
+				while (pos)
+				{
+					m_arSDI[ii].GetNextAssoc(pos, key, sChild);
+
+					if (sChild->m_xcaption.m_MkLock || sChild->m_xcaption.m_marketN == 4)
+						continue;
+
+
+
+
+					sChild->m_xcaption.SetMarket(mkgubn);
+
+					tmp.Format("edMarketTrigger\t%s", mkgubn == 1 ? "KRX" : mkgubn == 2 ? "NXT" : "통합");
+					OutputDebugString(tmp);
+					m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY,
+						(void*)NULL, (BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, sChild->m_key), (LPARAM)(const char*)tmp);
+				}
+			}
+		}
+		break;
+		case MMSG_SET_USER_ABORAD_AUTH:
+		{
+			m_sCustomerAuth.Format("%s", (char*)lParam);
+			m_sCustomerAuth.TrimRight();
+		}
+		break;
+		case MMSG_GET_USER_ABORAD_AUTH:
+		{
+			return (LRESULT)(LPCTSTR)m_sCustomerAuth;
+		}
+		break;
+		case MMSG_MKMSG_GET_MAP_INFO:
+		{
+			CChildFrame* actChild{};
+			CSChild* actSchild{};
+			
+			if (m_arMDI[m_vsN].Lookup(m_activeKey, actChild))
+				m_slog.Format("%s\t%d", actChild->m_mapN, actChild->m_xcaption.m_marketN);
+			else if (m_arSDI[m_vsN].Lookup(m_activeKey, actSchild))
+				m_slog.Format("%s\t%d", actSchild->m_mapN, actSchild->m_xcaption.m_marketN);
+
+			return (LRESULT)(LPCTSTR)m_slog;
+		}
+		break;
+		case MMSG_MKMSG_GET_MAP_MARKET:
+		{
+			CString mapN;
+			mapN.Format("%s", (char*)lParam);
+			mapN.TrimRight();
+			return GetMarketType(mapN);
+		}
+		break;
+#endif
 	}
 	return 0;
 }
@@ -4185,7 +4950,7 @@ int CMainFrame::OnFireRec(int type, WPARAM wParam, LPARAM lParam)
 					m_axConnectOld->SetGuide(_T("서버와 연결되었습니다."));
 			}
 			str = m_axis->GetProfileString(INFORMATION, "Port");
-			WriteLog("CMainFrame::OnFireRec FEV_OPEN Port=[%s]", str);
+WriteLog("[AXIS] CMainFrame::OnFireRec FEV_OPEN Port=[%s]", str);
 			if (atoi(str) == portEmployee)
 				m_bCustomer = false;
 
@@ -4194,7 +4959,7 @@ int CMainFrame::OnFireRec(int type, WPARAM wParam, LPARAM lParam)
 		}
 	case FEV_CLOSE:
 		{
-			WriteLog("CMainFrame::OnFireRec  FEV_CLOSE m_step=[%d] m_arrGlb size=%d m_iGlbIndex=%d \n", m_step, m_arrGlb.GetSize(), m_iGlbIndex);
+WriteLog("[AXIS] CMainFrame::OnFireRec  FEV_CLOSE m_step=[%d] m_arrGlb size=[%d] m_iGlbIndex=[%d] \n", m_step, m_arrGlb.GetSize(), m_iGlbIndex);
 	
 			if(m_step == axOPENRSM && m_arrGlb.GetSize() - 1> m_iGlbIndex)
 			{
@@ -4226,7 +4991,7 @@ int CMainFrame::OnFireRec(int type, WPARAM wParam, LPARAM lParam)
 			m_update = true;
 			m_axMisc->GetGuide(AE_UPDATE, str);
 
-WriteLog("CMainFrame::OnFireRec FEV_RUN  lParame EXIST [%s]\n", str);
+WriteLog("[AXIS] CMainFrame::OnFireRec FEV_RUN  lParame EXIST [%s]\n", str);
 
 			if(m_bUseNewLogin)
 			{
@@ -4250,7 +5015,7 @@ WriteLog("CMainFrame::OnFireRec FEV_RUN  lParame EXIST [%s]\n", str);
 					m_axMisc->GetGuide(AE_EUPDATE, str);
 					m_axConnect->SetGuide(str);
 
-					WriteLog("CMainFrame::OnFireRec FEV_RUN  lParame RunVers [%s]\n", str);
+WriteLog("[AXIS] CMainFrame::OnFireRec FEV_RUN  lParame RunVers [%s]\n", str);
 
 					Sleep(700);  //test2019
 				}
@@ -4270,7 +5035,7 @@ WriteLog("CMainFrame::OnFireRec FEV_RUN  lParame EXIST [%s]\n", str);
 		}
 		else
 		{
-			WriteLog("CMainFrame::OnFireRec (lparam null )     FEV_RUN\n");
+WriteLog("[AXIS] CMainFrame::OnFireRec (lparam null )     FEV_RUN\n");
 			SetForegroundWindow();
 			// 무결성 검증 프로세스 
 			//signOn();
@@ -4334,7 +5099,8 @@ WriteLog("CMainFrame::OnFireRec FEV_RUN  lParame EXIST [%s]\n", str);
 			break;
 		case runAXIS:
 			{
-				WriteLog("CMainFrame::OnFireRec  FEV_AXIS  runAXIS\n");
+WriteLog("[AXIS] CMainFrame::OnFireRec  FEV_AXIS  runAXIS\n");
+				//SendPiboStaf();
 				// 인증 로그인시 사용자 아이디 설정
 				if(m_bCertLogin)
 				{
@@ -4507,6 +5273,13 @@ WriteLog("CMainFrame::OnFireRec FEV_RUN  lParame EXIST [%s]\n", str);
 			if (HIWORD(wParam))
 			{
 				str = parseData((char *) lParam);
+
+				if (str.Find("Upload") >= 0)
+				{
+					DumpUpload();
+					break;
+				}
+
 				
 				if (!str.IsEmpty())
 				{
@@ -4573,7 +5346,7 @@ OutputDebugString(slog);
 				PostMessage(WM_AXIS, MAKEWPARAM(axDIALOG, HIWORD(wParam)), lParam);
 				break;
 			case 0x99:
-WriteLog("CMainFrame::OnFireRect  0x99  [%s] ", str);
+WriteLog("[AXIS] CMainFrame::OnFireRect  0x99  [%s] ", str);
 				if (str.GetLength()>0)
 				{
 					switch(str.GetAt(0))
@@ -4728,7 +5501,7 @@ WriteLog("CMainFrame::OnFireRect  0x99  [%s] ", str);
 			}
 			break;
 		case closeAXIS:
-			WriteLog("CMainFrame::OnFireRect  closeAXIS RunVers [%d] ",  HIWORD(wParam));
+WriteLog("[AXIS] CMainFrame::OnFireRect  closeAXIS RunVers [%d] ",  HIWORD(wParam));
 			//HIWORD(wParam) = true  일때 Reboot하여 Login Dialog 상태로..
 			//HIWORD(wParam) = false 일때 Axis 종료
 			if (HIWORD(wParam))
@@ -4775,9 +5548,12 @@ WriteLog("CMainFrame::OnFireRect  0x99  [%s] ", str);
 				}
 			}
 		}
-		break;
+		break;		
 	case FEV_ERROR:
-		WriteLog("CMainFrame::OnFireRect  FEV_ERROR  m_step= [%d] msg=[%s] enum	{axNONE, axOPEN, axOPENPPP, axOPENRSM, axOPENWSH, axOPENSIGN, axDONE, axCLOSE} m_step;", m_step, (const char*)lParam);
+
+WriteLog("[AXIS] CMainFrame::OnFireRect  FEV_ERROR  m_step= [%d] msg=[%s] enum	{axNONE[0], axOPEN[1], axOPENPPP[2], \
+																																			 axOPENRSM[3], axOPENWSH[4], axOPENSIGN[5],\
+																																			 axDONE[6], axCLOSE[7]} m_step;", m_step, (const char*)lParam);
 		switch (m_step)
 		{
 		case axOPENRSM:
@@ -4800,7 +5576,7 @@ WriteLog("CMainFrame::OnFireRect  0x99  [%s] ", str);
 				{
 					if (lParam && m_axConnect)
 					{
-						WriteLog("FEV_ERROR=======================+=======axOPENSIGN\n");
+						WriteLog("[AXIS] axOPENSIGN=======================+=======axOPENSIGN\n");
 						{	// 직원 중복접속일 경우.
 							CString msg((const char*)lParam);
 							if (msg.GetLength() > 4 && atoi(msg.Left(4)) == 3192)
@@ -4903,7 +5679,7 @@ WriteLog("CMainFrame::OnFireRect  0x99  [%s] ", str);
 				{
 					if (lParam && m_axConnectOld)
 					{
-						WriteLog("FEV_ERROR  axOPENSIGN\n");
+						WriteLog("[AXIS] FEV_ERROR  axOPENSIGN\n");
 						{	// 직원 중복접속일 경우.
 							CString msg((const char*)lParam);
 							if (msg.GetLength() > 4 && atoi(msg.Left(4)) == 3192)
@@ -5026,7 +5802,7 @@ WriteLog("CMainFrame::OnFireRect  0x99  [%s] ", str);
 		case axDONE:
 			if (lParam) 
 			{
-				WriteLog("FEV_ERROR==============================axDONE\n");
+				WriteLog("[AXIS] axDONE==============================\n");
 				if (LOWORD(wParam))
 				{
 					if (HIWORD(wParam) == '4')	// messagebox
@@ -5155,10 +5931,11 @@ bool CMainFrame::CreateWizard()
 	registerControl();
 	OutputDebugString("[axis]CMainFrame::CreateWizard ");
 	m_wizard = std::make_unique<CWnd>();
+
 	if (!m_wizard->CreateControl("AxisWizard.WizardCtrl.IBK2019", NULL, WS_CHILD, CRect(0, 0, 0, 0), this, -1))
 	{
 		m_wizard = nullptr;
-		WriteLog("---------------[axis]createwizard fail---------------");
+		WriteLog("[AXIS] ---------------[axis]createwizard fail---------------");
 		return false;
 	}
 	return true;
@@ -5684,6 +6461,9 @@ bool CMainFrame::Start(CString user)
 		nInternalMember = 1;
 		m_bNoProtect = TRUE;
 		fclose(fp);
+
+		m_slog.Format("[AXIS] Start  NOAOS.TXT exist");
+		WriteLog(m_slog);
 	}
 
 	GetLocalIP();
@@ -5692,9 +6472,11 @@ bool CMainFrame::Start(CString user)
 		nInternalMember = 1;
 		m_bNoProtect = TRUE;
 		m_bLOCALIP_172 = TRUE;
+
+		m_slog.Format("[AXIS] Start  Intranet");
+		WriteLog(m_slog);
 	}
 	
-
 	if (nInternalMember == 1)
 	{
 		AfxGetApp()->WriteProfileInt(INFORMATION, "AOS", 0);
@@ -5709,18 +6491,52 @@ bool CMainFrame::Start(CString user)
 	}
 #endif
 
-	m_slog.Format("Start  m_ipAddr=[%s]", m_ipAddr);
-	WriteLog(m_slog);
-
 	GetLocalIP();
-	WriteLog("CMainFrame  GetLocalIP");
-
+	
 	CString s;
 	s.Format("PASSWORD START [%s]\n",user);
 	OutputDebugString(s);
 	Check_XECUREPATH();
 	if (!user.IsEmpty())
 	{
+#ifdef DF_ENCUSER
+		int	pos = user.Find('\t');
+	
+		if (pos >= 0)
+		{
+			CString sDEC{}, sENC;
+			sENC = user.Left(pos++);
+			sENC.TrimRight();
+			if (AxStd::axDECAES((LPSTR)(LPCTSTR)sENC, sDEC))
+				Axis::userID = sDEC;
+
+			user = user.Mid(pos);
+			pos = user.Find('#');
+
+			if (pos == -1)
+			{
+				if (AxStd::axDECAES((LPSTR)(LPCTSTR)user, sDEC))
+					m_pass = sDEC;
+			}
+			else
+			{
+				sENC = user.Left(pos++);
+				sENC.TrimRight();
+				if (AxStd::axDECAES((LPSTR)(LPCTSTR)sENC, sDEC))
+					m_pass = sDEC;
+
+				sENC = user.Mid(pos);
+				sENC.TrimRight();
+				if (AxStd::axDECAES((LPSTR)(LPCTSTR)sENC, sDEC))
+					m_cpass = sDEC;
+
+				s.Format("[%s][%s]<%d>  user =[%s]         m_pass=[%s]          m_cpass=[%s]", DF_LOGKEY, __FUNCTION__, __LINE__, Axis::userID, m_pass, m_cpass);
+				OutputDebugString(s);
+				s.Format("[%s]", DF_LOGKEY);
+				OutputDebugString(s);
+			}
+		}
+#else
 		int	pos  = user.Find('\t');
 
 		if (pos >= 0)
@@ -5738,7 +6554,7 @@ bool CMainFrame::Start(CString user)
 				m_cpass = user.Mid(pos);
 			}
 		}
-
+#endif
 		Axis::userID.TrimLeft(); 
 		Axis::userID.TrimRight();
 		m_pass.TrimLeft(); 
@@ -5748,12 +6564,44 @@ bool CMainFrame::Start(CString user)
 
 		if(m_bUseNewLogin)
 		{
+#ifdef DF_ENCUSER
+			CString file, usnm = Axis::user;
+			char	buf[512];
+			file.Format("%s\\%s\\axisENC.ini", Axis::home, "tab");
+			DWORD dw = GetPrivateProfileString("RETRY", "retry", "0", buf, sizeof(buf), file);
+			CString stemp{};
+			stemp.Format("%s", buf);
+			stemp.TrimRight();
+
+			s.Format("[%s][%s]<%d>  retry =[%s]   nInternalMember =[%d]    file=[%s]", DF_LOGKEY, __FUNCTION__, __LINE__, stemp, nInternalMember, file);
+			OutputDebugString(s);
+
+			if (stemp == "1")
+			{
+				WritePrivateProfileString("RETRY", "retry", "0", file);
+				if (!Axis::userID.IsEmpty())
+					m_axConnect->SetUserID(Axis::userID);
+				if (!m_pass.IsEmpty())
+					m_axConnect->SetPassword(m_pass);  //여기타면서 자동로그인 활성화
+				if (!m_cpass.IsEmpty())
+					m_axConnect->SetCPass(m_cpass);
+			}
+			else
+			{
+				s.Format("[%s][%s]<%d>  비번,  공동비번 모두 지움   ", DF_LOGKEY, __FUNCTION__, __LINE__);
+				OutputDebugString(s);
+				Axis::userID = "";
+				m_pass.Empty();
+				m_cpass.Empty();
+			}
+#else
 			if (!Axis::userID.IsEmpty())	
 				m_axConnect->SetUserID(Axis::userID);
 			if (!m_pass.IsEmpty())	
 				m_axConnect->SetPassword(m_pass);
 			if (!m_cpass.IsEmpty())	
 				m_axConnect->SetCPass(m_cpass);
+#endif
 		}
 		else
 		{
@@ -5978,7 +6826,7 @@ void CMainFrame::registerControl()
 		if (hLib < (HINSTANCE)HINSTANCE_ERROR)
 		{
 			TRACE("LoadLibrary error....[%s] error=[%d]\n", path, GetLastError());
-			m_slog.Format("[axis][registerControl] LoadLibrary error....[%s] error=[%d]\n", path, GetLastError());
+			m_slog.Format("[AXIS] [registerControl] LoadLibrary error....[%s] error=[%d]\n", path, GetLastError());
 			OutputDebugString(m_slog);
 			WriteLog(m_slog);
 			continue;
@@ -5996,7 +6844,7 @@ void CMainFrame::registerControl()
 		(*lpDllEntryPoint)();
 		FreeLibrary(hLib);
 
-		m_slog.Format("[axis][registerControl] LoadLibrary%s] \n", path);
+		m_slog.Format("[AXIS] [registerControl] LoadLibrary%s] \n", path);
 		OutputDebugString(m_slog);
 		WriteLog(m_slog);
 	}
@@ -6019,9 +6867,7 @@ BOOL CMainFrame::getConnectInfo(CString& ips, int& port)
 	memcpy(ip, m_ipAddr, m_ipAddr.GetLength());
 
 	CString ss;
-	ss.Format("GLB getConnectInfo FORCEIP [%s]\n",((CAxisApp*)m_axis)->m_forceIP);
-	WriteLog(ss);
-	
+
 	if (((CAxisApp*)m_axis)->m_forceIP.IsEmpty() == FALSE)
 	{
 		ips = ((CAxisApp*)m_axis)->m_forceIP;
@@ -6039,25 +6885,47 @@ BOOL CMainFrame::getConnectInfo(CString& ips, int& port)
 		{
 			if (m_axConnect)
 			{
-				if ((Axis::userID.Find("##ibk")==-1) && (Axis::userID.Find("##opuser")==-1))
+				CString shashID{};
+				shashID.Format("%08u", HashDataAXIS(Axis::userID.Left(5)));
+
+				if(shashID.Find("42882716") == -1)
 				{
-					if (m_axConnect->IsNumber(Axis::userID))
-						port = portEmployee;
-					else if ((port != portCustomer)&&(port !=portProxy))
-						port = portCustomer;
+					shashID.Empty();
+					shashID.Format("%08u", HashDataAXIS(Axis::userID));
+
+					if(shashID.Find("3729776228") == -1)
+					{
+						if (m_axConnect->IsNumber(Axis::userID))
+							port = portEmployee;
+						else if ((port != portCustomer) && (port != portProxy))
+							port = portCustomer;
+					}
 				}
 			}
+			//modi 강제서버 IP 설정하면 무조건 15101,15201 이었는데 이제 설정 따라가게 직원은 그대로 항상15101
+			if (Axis::isCustomer)
+				port = atoi(m_axis->GetProfileString(INFORMATION, "Port"));
+ss.Format("[AXIS] GLB getConnectInfo [%s] FORCE IP=[%s]  port=[%d]\n", Axis::isCustomer==TRUE?"customer":"staff",((CAxisApp*)m_axis)->m_forceIP, port);
+WriteLog(ss);
 		}
 		else
 		{
 			if (m_axConnectOld)
 			{
-				if ((Axis::userID.Find("##ibk")==-1) && (Axis::userID.Find("##opuser")==-1))
+				CString shashID{};
+				shashID.Format("%08u", HashDataAXIS(Axis::userID.Left(5)));
+
+				if (shashID.Find("42882716") == -1)
 				{
-					if (m_axConnectOld->IsNumber(Axis::userID))
-						port = portEmployee;
-					else if ((port != portCustomer)&&(port !=portProxy))
-						port = portCustomer;
+					shashID.Empty();
+					shashID.Format("%08u", HashDataAXIS(Axis::userID));
+					if (shashID.Find("3729776228") == -1)
+					{
+						if (m_axConnectOld->IsNumber(Axis::userID))
+							port = portEmployee;
+						else if ((port != portCustomer) && (port != portProxy))
+							port = portCustomer;
+					}
 				}
 			}
 		}
@@ -6077,7 +6945,7 @@ BOOL CMainFrame::getConnectInfo(CString& ips, int& port)
 
 		m_axis->WriteProfileInt(WORKSTATION, "cust", Axis::isCustomer ? 1: 0);
 
-slog.Format("GLB getConnectInfo m_iGlbIndex = %d", m_iGlbIndex);
+slog.Format("[AXIS] GLB getConnectInfo m_iGlbIndex = %d  port=[%d]", m_iGlbIndex , port);
 OutputDebugString(slog);
 
 		if(m_iGlbIndex == 0)
@@ -6085,15 +6953,16 @@ OutputDebugString(slog);
 		else
 			ips = get_glb_addr_Index(ip, (LPSTR)(LPCTSTR)m_ipAddr);
 
-		CString str;
-		str.Format("GLB getConnectInfo get_glb_addr IP [%s]   m_ipAddr = [%s]\n",ips,  m_ipAddr);
-		OutputDebugString(str);
+CString str;
+str.Format("[AXIS] GLB getConnectInfo(..)  GLB로 받은IP [%s]  m_ipAddr = [%s] port=[%d]",ips,  m_ipAddr, port);
+WriteLog(str);
 
 		//**m_axis->WriteProfileString(INFORMATION, "Server", ips);	// 변경되면 서버저장
 
 		if (ips.IsEmpty())	
 		{
 			OutputDebugString("GLB glb moudule fail");
+			WriteLog("[AXIS] GLB glb moudule fail");
 			return FALSE;
 		}
 
@@ -6191,9 +7060,12 @@ void CMainFrame::closeMapByName(CString strName)
 
 void CMainFrame::endWorkstation()
 {
+#ifdef DF_CDDUSE
 	CheckCDDEDD();   //test CDD
+#endif
+	initShared();
 	SetPCData();
-	WriteLog("endWorkstation - Step 1");
+	WriteLog("[AXIS] endWorkstation - Step 1");
 	m_dept = Variant(getDEPT);
 	m_bar1->setDept(m_dept);
 	//CString str = Variant(accountCC);
@@ -6213,7 +7085,7 @@ void CMainFrame::endWorkstation()
 	tDept.TrimLeft();tDept.TrimRight();
 
 CString s;
-s.Format("ACCTEST Main endWorkstation 로그인부서=[%s] 파일부서=[%s] \n",m_dept, tDept);
+s.Format("[AXIS] ACCTEST Main endWorkstation 로그인부서=[%s] 파일부서=[%s] \n",m_dept, tDept);
 OutputDebugString(s);
 WriteLog(s);
 ///	if ( (m_dept != "813") && (m_dept != "828") && m_dept != "812" && m_dept != tDept)
@@ -6241,11 +7113,11 @@ WriteLog(s);
 	
 	Axis::SetSkin(GetSkinName());
 
-	WriteLog("endWorkstation - Step 2");
+	WriteLog("[AXIS] endWorkstation - Step 2");
 
 	ChangeLogo();
 
-	WriteLog("endWorkstation - Step 3");
+	WriteLog("[AXIS] endWorkstation - Step 3");
 
 	m_bOnlySise = m_axis->GetProfileInt(WORKSTATION, "OnlySise", 0);
 	deleteNewsfile();
@@ -6254,7 +7126,7 @@ WriteLog(s);
 	m_resourceHelper->ChangeRES(Axis::skinName);
 	ResourceHelper()->ChangeRES(Axis::skinName);
 
-	WriteLog("endWorkstation - Step 4");
+	WriteLog("[AXIS] endWorkstation - Step 4");
 
 	m_axMisc->LoadGuide();
 #ifdef DF_USE_CPLUS17
@@ -6269,16 +7141,15 @@ WriteLog(s);
 //	m_bar3->Change_Skin(Axis::skinName);
 	m_smain->Change_Skin(Axis::skinName);
 
-	WriteLog("endWorkstation - Step 5");
+	WriteLog("[AXIS] endWorkstation - Step 5");
 
 	if (!m_bExit)	
 		return;
 
-	WriteLog("endWorkstation - Step 6");
+	WriteLog("[AXIS] endWorkstation - Step 6");
 	
 	preload_screen();
 
-	//test_main
 	CString sfile, tmps, usnm = Axis::user;
 	sfile.Format("%s\\%s\\%s\\%s.ini", Axis::home, USRDIR, usnm, usnm);
 	tmps.Format("%d", (int)this->m_hWnd);
@@ -6345,19 +7216,19 @@ WriteLog(s);
 	}
 	/////////////////////////////////////////////////////////
 
-	WriteLog("endWorkstation - Step 7");
+	WriteLog("[AXIS] endWorkstation - Step 7");
 	load_tabview();
 
-	WriteLog("endWorkstation - Step 8");
+	WriteLog("[AXIS] endWorkstation - Step 8");
 	load_history();
 	
-	WriteLog("endWorkstation - Step 9");
+	WriteLog("[AXIS] endWorkstation - Step 9");
 	if (! m_bdnInterest)
 	{	
-		WriteLog("endWorkstation - Step 10-1");
+		WriteLog("[AXIS] endWorkstation - Step 10-1");
 		load_eninfomation();
 
-		WriteLog("endWorkstation - Step 10-2");
+		WriteLog("[AXIS] endWorkstation - Step 10-2");
 
 		//** 신용정보제공 동의 여부 점검 화면
 
@@ -6368,16 +7239,16 @@ WriteLog(s);
 			//CString date(p.GetString(noticeMapName, "DATE", "20080601"));
 			//if (atoi(date) < atoi(CTime::GetCurrentTime().Format("%Y%m%d")))
 			//m_mapHelper->ChangeChild(trust, 1, 0, CenterPOS);
-			load_hidescreen(trust); 
+			load_hidescreen(trust);
 		}
 		
 		
-		WriteLog("endWorkstation - Step 10-3");
+		WriteLog("[AXIS] endWorkstation - Step 10-3");
 		
 		//** 초기공지사항 OPEN	
 		load_start_notice();
 
-		WriteLog("endWorkstation - Step 10-4");
+		WriteLog("[AXIS] endWorkstation - Step 10-4");
 	}
 
 // 	const char* trust = "IB0000X8";
@@ -6390,15 +7261,15 @@ WriteLog(s);
 
 	load_mngSetup();
 
-	WriteLog("endWorkstation - Step 11");
+	WriteLog("[AXIS] endWorkstation - Step 11");
 
 	load_hkey();
 
-	WriteLog("endWorkstation - Step 12");
+	WriteLog("[AXIS] endWorkstation - Step 12");
 	
 	SetConclusion();
 
-	WriteLog("endWorkstation - Step 13");
+	WriteLog("[AXIS] endWorkstation - Step 13");
 
 	m_smcall = new CSmcall();
 
@@ -6408,7 +7279,7 @@ WriteLog(s);
 	m_smcall->Set_Infomation(axiscall, m_tMenu);
 #endif
 
-	WriteLog("endWorkstation - Step 14");
+	WriteLog("[AXIS] endWorkstation - Step 14");
 
 	if (m_Nclock)
 	{
@@ -6434,7 +7305,7 @@ WriteLog(s);
 			m_Nclock->SetMini(TRUE);
 	}
 
-	WriteLog("endWorkstation - Step 15");
+	WriteLog("[AXIS] endWorkstation - Step 15");
 #ifdef NDEBUG
 	PostMessage(WM_ELOG);
 	if (!m_bCustomer && m_accTool)
@@ -6443,20 +7314,20 @@ WriteLog(s);
 
 	SetForegroundWindow();
 
-	WriteLog("endWorkstation - Step 16");
+	WriteLog("[AXIS] endWorkstation - Step 16");
 
 	CChildFrame*	child = NULL;
 	child = load_hidescreen(MAPN_SISECATCH1);
 	if(child != nullptr)
 		m_arHide.Add(child);
 
-	WriteLog("endWorkstation - Step 17");
+	WriteLog("[AXIS] endWorkstation - Step 17");
 
 	m_winVer = m_cpu.GetPlatform();	
 
 	m_bar2->ShowInformation();
 
-	WriteLog("endWorkstation - Step 19");	
+	WriteLog("[AXIS] endWorkstation - Step 18");	
 
 	if (! m_bdnInterest)
 	{	
@@ -6464,11 +7335,11 @@ WriteLog(s);
 		m_mapHelper->ChangeChild(trust, 1, 0, CenterPOS);
 	}	
 
-	WriteLog("endWorkstation - Step 20");
+	WriteLog("[AXIS] endWorkstation - Step 19");
 	
 	ProcessInitMap();	
 
-	WriteLog("endWorkstation - Step 21");
+	WriteLog("[AXIS] endWorkstation - Step 20");
 
 	//CreateHistoryBar();
 
@@ -6496,7 +7367,6 @@ WriteLog(s);
 
 	ScrapInformation();
 	///////////////////////
-	//trouble_shooting("테스트 오류 메시지");
 	SetTimer(TM_INITSIZE, 1000, NULL);
 
 	strFile.Format("%s\\tab\\TOP10.ini", Axis::home); 
@@ -6666,7 +7536,10 @@ OutputDebugString("GLB signOnCert");
 
 	GetLocalIP();
 
-	if(Axis::userID == "##ibk9")
+	CString shashID{};
+	shashID.Format("%08u", HashDataAXIS(Axis::userID));
+
+	if (shashID == "1415129685")
 	{
 		if(!isIPInRange(m_ipAddr,"172.17.0.0") && !isIPInRange(m_ipAddr,"172.20.0.0"))
 		{
@@ -6913,7 +7786,9 @@ void CMainFrame::signOn()
 			GetLocalIP();
 		}
 
-		if(Axis::userID == "##ibk9")
+		CString shashID{};
+		shashID.Format("%08u", HashDataAXIS(Axis::userID));
+		if (shashID == "1415129685")
 		{
 			if(!isIPInRange(m_ipAddr,"172.17.0.0") && !isIPInRange(m_ipAddr,"172.20.0.0"))
 			{
@@ -7090,7 +7965,9 @@ OutputDebugString("GLB not m_bUseNewLogin");
 			GetLocalIP();
 		}
 
-		if(Axis::userID == "##ibk9")
+		CString shashID{};
+		shashID.Format("%08u", HashDataAXIS(Axis::userID));
+		if (shashID == "1415129685")
 		{
 			if(!isIPInRange(m_ipAddr,"172.17.0.0") && !isIPInRange(m_ipAddr,"172.20.0.0"))
 			{
@@ -7313,6 +8190,9 @@ int CMainFrame::create_Newview(int actkey, char* data)
 	
 	userWH = (struct _userWH *)data;
 	mapN   = CString(userWH->maps);
+
+	if (ScreenCheck(mapN) == DF_NUSE)
+		return 0;
 	
 	if (ExceptionProcess(mapN))	return 1;
 	if (userWH->pos.x == -1)
@@ -7329,7 +8209,17 @@ int CMainFrame::create_Newview(int actkey, char* data)
 			positionWindow(actkey, key, position);
 		return key;
 	case typeMODAL:
+	{
+		CString sMapN;
+		sMapN = GetMapNumByKey(m_activeKey);
+		if (mapN.Find("IB999920") >= 0)
+		{
+			CString	sfile, stmp, smap;
+			sfile.Format("%s\\tab\\axis.ini", Axis::home);
+			WritePrivateProfileString("ParentMap", "IB999920", sMapN, sfile);
+		}
 		return m_mapHelper->CreateModal(mapN, userWH->group, userWH->key, position, actkey, point);
+	}
 	case typePOPUP:
 		return m_mapHelper->CreatePopup(mapN, userWH->group, userWH->key, position, actkey, point);
 	case typePOPUPX:
@@ -7548,65 +8438,124 @@ void CMainFrame::write_err()
 
 void CMainFrame::update_ticker(int kind, struct _alertR* alertR)
 {
-	CString symbol;
-	CString sData;
-	CString stmp;
-
-	symbol = alertR->code;
-
-	DWORD* data{};
-	int i = 0;
-	for(int i=0;i<alertR->size;i++)
+	if (0)
 	{
-		data = (DWORD*)alertR->ptr[i];
+		CString symbol;
+		CString sData, str;
+		CString stmp;
 
+		symbol = alertR->code;
+		if (!(alertR->stat & alert_SCR))
+			return;
+
+		DWORD* data = reinterpret_cast<DWORD*>(alertR->ptr[0]);
 		sData.Format("%s", (char*)data[0]);
 		if (sData == "d" || sData == "D")
 			return;
 
-		CString	str;
-		if (!symbol.IsEmpty() && (symbol.GetAt(0) == 'X' || symbol.GetAt(0) == 'x'))
+		//[xxx] 시세만...
+		if (kind == 0)
 		{
+
+
 			// 장운영정보를 위해 추가
 			if (symbol.CompareNoCase(SYM_MNG) == 0)
 			{
-			
 				CTime time;
 				time = CTime::GetCurrentTime();
 				CString str;
 				str.Format("\r\n update_ticker[%02d:%02d:%02d] kind[%d] sym[%s] dat[%.200s]\n", time.GetHour(), time.GetMinute(), time.GetSecond(), kind, symbol, data);
 				OutputDebugString(str);
 				ShowMngInfo(data);
+
 				return;
 			}
 			else
 			{
+
 				str = ReplaceExpectSymbol(symbol);
 				if (!str.IsEmpty())
 					symbol = str;
 			}
-		}
-		
-		if (kind != 0)
-		{
-			if (kind == 6)
-			{
-				const char* szNewsRTS = "S0000";
-				
-				if (m_tInfo1)	
-					m_tInfo1->ProcessRTS(szNewsRTS, data);
-				if (m_tInfo2)	
-					m_tInfo2->ProcessRTS(szNewsRTS, data);
-			}
-			return;
-		}
-		
-		if (i == 0)
-		{
+
+
 			if (m_tInfo1 && m_tInfo1->IsVisible())
 				m_tInfo1->ProcessRTS(symbol, data);
 			if (m_tInfo2 && m_tInfo2->IsVisible())
 				m_tInfo2->ProcessRTS(symbol, data);
+		}
+		else if (kind == 6) //[xxx] 뉴스만...
+		{
+			const char* szNewsRTS = "S0000";
+			if (m_tInfo1)
+				m_tInfo1->ProcessRTS(szNewsRTS, data);
+			if (m_tInfo2)
+				m_tInfo2->ProcessRTS(szNewsRTS, data);
+		}
+	}
+	else
+	{
+		CString symbol;
+		CString sData;
+		CString stmp;
+
+		symbol = alertR->code;
+
+		DWORD* data{};
+		int i = 0;
+		for (int i = 0; i < alertR->size; i++)
+		{
+			data = (DWORD*)alertR->ptr[i];
+
+			sData.Format("%s", (char*)data[0]);
+			if (sData == "d" || sData == "D")
+				return;
+
+			CString	str;
+			if (!symbol.IsEmpty() && (symbol.GetAt(0) == 'X' || symbol.GetAt(0) == 'x'))
+			{
+				// 장운영정보를 위해 추가
+				if (symbol.CompareNoCase(SYM_MNG) == 0)
+				{
+
+					CTime time;
+					time = CTime::GetCurrentTime();
+					CString str;
+					str.Format("\r\n update_ticker[%02d:%02d:%02d] kind[%d] sym[%s] dat[%.200s]\n", time.GetHour(), time.GetMinute(), time.GetSecond(), kind, symbol, data);
+					OutputDebugString(str);
+					ShowMngInfo(data);
+
+					return;
+				}
+				else
+				{
+					str = ReplaceExpectSymbol(symbol);
+					if (!str.IsEmpty())
+						symbol = str;
+				}
+			}
+
+			if (kind != 0)
+			{
+				if (kind == 6)
+				{
+					const char* szNewsRTS = "S0000";
+
+					if (m_tInfo1)
+						m_tInfo1->ProcessRTS(szNewsRTS, data);
+					if (m_tInfo2)
+						m_tInfo2->ProcessRTS(szNewsRTS, data);
+				}
+				return;
+			}
+
+			if (i == 0)
+			{
+				if (m_tInfo1 && m_tInfo1->IsVisible())
+					m_tInfo1->ProcessRTS(symbol, data);
+				if (m_tInfo2 && m_tInfo2->IsVisible())
+					m_tInfo2->ProcessRTS(symbol, data);
+			}
 		}
 	}
 }
@@ -7664,6 +8613,10 @@ void CMainFrame::change_Skin()
 
 void CMainFrame::IMAXSkinSet()
 {
+#ifdef DF_MK_CAPTION
+	return;
+#endif
+
 	int nkey{}, nSkinKind{};
 	CString tmp, sSkinName;
 	CSChild* schild{};
@@ -8325,6 +9278,10 @@ void CMainFrame::changeSize(int key, CSize size)
 			else	
 				gapY = GetFrameGap().cy;
 
+			//testcode
+			gapX -= 4;
+			gapY -= 10;
+
 			nCx = size.cx + gapX;
 			nCy = size.cy + gapY;
 			Gpop->SetSize(nCx, nCy);
@@ -8373,7 +9330,8 @@ void CMainFrame::changeSize(int key, CSize size)
 		else
 		{
 			nCx = size.cx + gapX;
-			nCy = size.cy + gapY+4;
+			//nCy = size.cy + gapY+4;  //testcode
+			nCy = size.cy + gapY + 8;
 			schild->SetSize(nCx, nCy);
 		}
 
@@ -8714,7 +9672,7 @@ void CMainFrame::createUserScreen(CString mapN, bool allVS)
 
 	CString s;
 	
-	WriteLog("CreateUserScrren========================\n");
+	WriteLog("[AXIS] CreateUserScrren========================\n");
 	// 어떤 맵이 포커스를 가져야하는지에 대한 정보
 	// 2013.01.02 김덕기
 // 	dwRc = GetPrivateProfileString(mapN, "LASTSTATFOCUS", "", wb, sizeof(wb), file);
@@ -8802,7 +9760,9 @@ void CMainFrame::createUserScreen(CString mapN, bool allVS)
 					break;
 				}
 			}
+#ifdef DF_CDDUSE
 			bpopCDD = isCDDScreen(mapName);
+#endif
 			if (IsNoSaveLastmap(mapName)) continue;
 			if (ExceptMap(mapName.Left(L_MAPN)))	continue;
 			
@@ -8813,10 +9773,13 @@ void CMainFrame::createUserScreen(CString mapN, bool allVS)
 			
 		}
 	}
+
+#ifdef DF_CDDUSE
 	if (bpopCDD)  //test CDD
 	{
 
 	}
+#endif
 	m_bLoadScreen = true;
 
 	m_slog.Format("--------------------[createUserScreen][cx_account]  end-------------");
@@ -10371,6 +11334,8 @@ void CMainFrame::beginWait(int key)
 	}
 
 	m_waitlist.Add(key);
+	//m_slog.Format("[WAIT][%s]<%d> key=[%d] m_waitlist size = [%d]", __FUNCTION__, __LINE__, key, m_waitlist.GetSize());
+	//OutputDebugString(m_slog);
 	if (key == m_activeKey)
 		::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_WAIT));
 }
@@ -10382,7 +11347,11 @@ void CMainFrame::endWait(int key)
 	{
 		endkey = m_waitlist.GetAt(ii);
 		if (endkey == key)
+		{
 			m_waitlist.RemoveAt(ii--);
+			//m_slog.Format("[WAIT][%s]<%d> key=[%d] 1. m_waitlist size = [%d]", __FUNCTION__, __LINE__, key, m_waitlist.GetSize());
+			//OutputDebugString(m_slog);
+		}
 	}
 
 	if (key & 0x80)
@@ -10405,6 +11374,8 @@ void CMainFrame::endWait(int key)
 		else	child->m_cursor = 0;
 	}
 
+	//m_slog.Format("[WAIT][%s]<%d> key=[%d] 2. m_waitlist size = [%d]", __FUNCTION__, __LINE__, key, m_waitlist.GetSize());
+	//OutputDebugString(m_slog);
 	::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
 }
 
@@ -11060,7 +12031,12 @@ void CMainFrame::KillUpdateAgent()
 
 void CMainFrame::load_eninfomation(bool first)
 {
+	ReadManageMapInfo();
+#ifdef DF_MK_CAPTION
+	ReadMarketFile();
+#else
 	FileMove();
+#endif
 	CString		file, key, mapN, userN;
 	int		value{};
 	long		rc = 0;
@@ -11068,7 +12044,7 @@ void CMainFrame::load_eninfomation(bool first)
 	CProfile profile(pkEnvironment);
 
 	file.Format("%s\\%s\\%s\\%s", Axis::home, USRDIR, Axis::user, SETUPFILE);
-	WriteLog("load_eninformation========================1\n");
+	WriteLog("[AXIS] load_eninformation========================1\n");
 	//처음 접속자는 디폴트로 팝업되게 변경
 	if(Axis::isCustomer)
 	{
@@ -11127,7 +12103,10 @@ void CMainFrame::load_eninfomation(bool first)
 // 			base->SendMessage(WD_ADD_CODE,(WPARAM)0,(LPARAM)"TR");
 // 		}
 	}
-	WriteLog("load_eninformation========================2\n");
+	WriteLog("[AXIS] load_eninformation========================2\n");
+
+	m_slog.Format("[axis][CMainFrame] 사용자 화면 띄우기 전\n");
+	WriteLog(m_slog);
 
 	value = profile.GetInt(szScreen, "STARTMAP");
 	if (first)
@@ -11139,7 +12118,7 @@ void CMainFrame::load_eninfomation(bool first)
 		default:			break;
 		}
 	}
-	WriteLog("load_eninformation========================3\n");
+	WriteLog("[AXIS] load_eninformation========================3\n");
 	m_posChild = profile.GetInt(szScreen, "CHILDPOS");
 	m_fontSize = profile.GetInt(szScreen, "FONTSIZE", 9);
 	if (m_fontSize < 8) m_fontSize = 8;
@@ -11173,7 +12152,7 @@ void CMainFrame::load_eninfomation(bool first)
 		ShowWindow(SW_HIDE);
 	}
 	changeFontSize();
-	WriteLog("load_eninformation========================4\n");
+	WriteLog("[AXIS] load_eninformation========================4\n");
 	value = profile.GetInt(szScreen, "UNFLESH") ? 0 : 1;
 	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void *)&rc,
 			(BYTE *)(VTS_I4 VTS_I4), MAKELONG(setFCB, 0), value);
@@ -11187,7 +12166,8 @@ void CMainFrame::load_eninfomation(bool first)
 	
 	m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_I4, (void *)&rc,
 			(BYTE *)(VTS_I4 VTS_I4), MAKELONG(setVID, m_vsN), MAKELONG(0, 0));
-//	change_VirtualScreen(V_SCREEN1);
+	//change_VirtualScreen(V_SCREEN1);
+	SetVirtualSDIVisible(m_vsN, false);
 
 	m_axGuide->SetPos(profile.GetInt(szScreen, "MSGPOS"));
 
@@ -11206,11 +12186,11 @@ void CMainFrame::load_eninfomation(bool first)
 // 			base->SendMessage(WD_ADD_CODE,(WPARAM)0,(LPARAM)"TR");
 // 		}
 // 	}
-	WriteLog("load_eninformation========================5\n");
+	WriteLog("[AXIS] load_eninformation========================5\n");
 	LoadHotkeySetting();
 	
 	m_bMustRetry = CheckMasterFile();
-	WriteLog("load_eninformation========================6\n");
+	WriteLog("[AXIS] load_eninformation========================6\n");
 }
 
 BOOL CMainFrame::CheckMasterFile()
@@ -11280,78 +12260,13 @@ BOOL CMainFrame::CheckMasterFile()
 	return FALSE;
 }
 
+#ifdef DF_MK_CAPTION
 void CMainFrame::load_mngSetup()
 {
 	CProfile profile(pkManageSetup);
 	CString szTotal, szUnit;
 
-	if (!profile.GetInt(szMessage, "Init"))
-	{
-		CString	strTotal = _T("");
-
-		static	struct	_msginfo {
-			int	val;
-			char	desc[20];
-		} msgOPEN[] = { 
-				{1,	"30분전" },
-				{21,	"10분전" },
-				{26,	"5분전" },
-				{30,	"1분전" },
-				{33,	"30초전" },
-				{31,	"10초전" }
-				};
-
-		static struct _msginfo msgCLOSE[] = 
-			{
-				{ 121,	"10분전" },
-				{ 126,	"5분전" },
-				{ 130,	"1분전" },
-				{ 133,	"30초전" },
-				{ 131,	"10초전" }
-			};
-
-		int	ncnt = sizeof(msgOPEN) / sizeof(_msginfo);
-		
-		strTotal = _T("");
-		for ( int ii = 0 ; ii < ncnt ; ii++ )
-		{
-			strTotal += Format("%d, ", msgOPEN[ii].val);
-		}
-
-		profile.Write(szMessage, "OPEN", strTotal);
-		strTotal = _T("");
-
-		ncnt = sizeof(msgCLOSE) / sizeof(_msginfo);
-		
-		for ( int ii = 0 ; ii < ncnt ; ii++ )
-		{
-			strTotal += Format("%d, ", msgCLOSE[ii].val);
-		}
-
-		profile.Write(szMessage, "CLOSE", strTotal);
-		profile.Write(szMessage, "INIT", "1");
-	}
-
-	// 장개시
-	szTotal = profile.GetString(szMessage, "OPEN");
-	m_mapAlarmList.RemoveAll();
-	while (!szTotal.IsEmpty())
-	{
-		szUnit = Parser(szTotal, ",");
-		Trim(szUnit);
-		if (!szUnit.IsEmpty())
-			m_mapAlarmList.SetAt(szUnit, "");
-	}
-
-	// 장마감
-	szTotal = profile.GetString(szMessage, "CLOSE");
-	while (!szTotal.IsEmpty())
-	{
-		szUnit = Parser(szTotal, ",");
-		Trim(szUnit);
-		if (!szUnit.IsEmpty())
-			m_mapAlarmList.SetAt(szUnit, "");
-	}	
+	const int iret = profile.GetInt(szMessage, "Init");
 
 	m_bSound = profile.GetInt("Setup", "SOUND") == 1;
 	m_nInfoPos = profile.GetInt("Setup", "POS", 2);
@@ -11360,15 +12275,347 @@ void CMainFrame::load_mngSetup()
 
 	// KOBA ELW 장운영 알림 설정
 	const int val = profile.GetInt("Manage", MNG_INFO_KOBAELW, -1);
-	if (val==-1)
+	if (val == -1)
 	{
 		m_bKobaElwNotify = true;
 	}
-	else 
+	else
 	{
-		m_bKobaElwNotify = (val==1) ? true : false;
+		m_bKobaElwNotify = (val == 1) ? true : false;
 	}
+
+	m_mapAlarmList.RemoveAll();
+	if (iret == 0)  //유저폴더에  없는 상태
+	{	//디폴트 장운영을 넣어준다.
+		m_mapAlarmList.SetAt("851", "");	//장전 동시호가 개시
+		m_mapAlarmList.SetAt("801", "");	//장개시
+		m_mapAlarmList.SetAt("21", "");		//장개시 10분전
+		m_mapAlarmList.SetAt("26", "");		//장개시 5분전
+		m_mapAlarmList.SetAt("30", "");		//장개시 1분전
+		m_mapAlarmList.SetAt("35", "");		//장개시 10초전
+		m_mapAlarmList.SetAt("852", "");	//장후 동시호개 개시
+		m_mapAlarmList.SetAt("809", "");	//장마감
+		m_mapAlarmList.SetAt("126", "");	//장마감 5분전
+		m_mapAlarmList.SetAt("130", "");	//장마감 1분전
+		m_mapAlarmList.SetAt("135", "");	//장마감 10초전
+		m_mapAlarmList.SetAt("817", "");	//서킷브레이커발동
+		m_mapAlarmList.SetAt("818", "");	//서킷브레이커해제
+		m_mapAlarmList.SetAt("804", "");	//시간외종가 매매개시
+		m_mapAlarmList.SetAt("853", "");	//시간외종가 매매종료, 시간외단일가 매매개시 
+		m_mapAlarmList.SetAt("806", "");	//시간외단일가 매매종료
+		m_mapAlarmList.SetAt("846", "");	//KOBA ELW 조기종료
+		m_mapAlarmList.SetAt("871", "");	//사이드카 발동
+		m_mapAlarmList.SetAt("872", "");	 //사이드카 해제
+
+		 //version 4  NXT 
+		m_mapAlarmList.SetAt("881", "NXT 프리마켓 개시");  /* 08:00            */
+		m_mapAlarmList.SetAt("882", "NXT 프리마켓 마감");  /* 08:50            */
+		m_mapAlarmList.SetAt("884", "NXT 메인마켓 개시"); /* 09:00:30         */
+		m_mapAlarmList.SetAt("885", "NXT 메인마켓 마감");  /* 15:20            */
+		m_mapAlarmList.SetAt("887", "NXT 단일가 호가개시"); /* 15:30~15:40      */
+		m_mapAlarmList.SetAt("888", "NXT 애프터마켓 개시");  /* 15:40            */
+		m_mapAlarmList.SetAt("889", "NXT 애프터마켓 마감"); /* 20:00            */
+	}
+	else if (iret == 3)
+	{	//기존 설정  //디폴트 장운영을 넣어준다.
+		profile.Write(szMessage, "OPEN", "");
+		profile.Write(szMessage, "CLOSE", "");
+		m_mapAlarmList.SetAt("851", "");	//장전 동시호가 개시
+		m_mapAlarmList.SetAt("801", "");	//장개시
+		m_mapAlarmList.SetAt("21", "");		//장개시 10분전
+		m_mapAlarmList.SetAt("26", "");		//장개시 5분전
+		m_mapAlarmList.SetAt("30", "");		//장개시 1분전
+		m_mapAlarmList.SetAt("35", "");		//장개시 10초전
+		m_mapAlarmList.SetAt("852", "");	//장후 동시호개 개시
+		m_mapAlarmList.SetAt("809", "");	//장마감
+		m_mapAlarmList.SetAt("126", "");	//장마감 5분전
+		m_mapAlarmList.SetAt("130", "");	//장마감 1분전
+		m_mapAlarmList.SetAt("135", "");	//장마감 10초전
+		m_mapAlarmList.SetAt("817", "");	//서킷브레이커발동
+		m_mapAlarmList.SetAt("818", "");	//서킷브레이커해제
+		m_mapAlarmList.SetAt("804", "");	//시간외종가 매매개시
+		m_mapAlarmList.SetAt("853", "");	//시간외종가 매매종료, 시간외단일가 매매개시 
+		m_mapAlarmList.SetAt("806", "");	//시간외단일가 매매종료
+		m_mapAlarmList.SetAt("846", "");	//KOBA ELW 조기종료
+		m_mapAlarmList.SetAt("871", "");	//사이드카 발동
+		m_mapAlarmList.SetAt("872", "");	 //사이드카 해제
+
+		 //version 4  NXT 
+		m_mapAlarmList.SetAt("881", "NXT 프리마켓 개시");  /* 08:00            */
+		m_mapAlarmList.SetAt("882", "NXT 프리마켓 마감");  /* 08:50            */
+		m_mapAlarmList.SetAt("884", "NXT 메인마켓 개시"); /* 09:00:30         */
+		m_mapAlarmList.SetAt("885", "NXT 메인마켓 마감");  /* 15:20            */
+		m_mapAlarmList.SetAt("887", "NXT 단일가 호가개시"); /* 15:30~15:40      */
+		m_mapAlarmList.SetAt("888", "NXT 애프터마켓 개시");  /* 15:40            */
+		m_mapAlarmList.SetAt("889", "NXT 애프터마켓 마감"); /* 20:00            */
+	}
+	else if (iret == 4)  //version 4  NXT 
+	{//설정화면을 이미 다녀왔다. 
+		//ref 장운영 추가 
+		CString file;
+		file.Format("%s\\%s\\%s\\mngsetup.ini", Axis::home, USRDIR, Axis::user);
+		char	ssb[1024 * 4];
+		DWORD ssL = GetPrivateProfileSection("Manage", ssb, sizeof(ssb), file);
+		if (ssL <= 0)
+			return;
+
+		CString subitem, keys, value, string = CString(ssb, ssL);
+		for (; !string.IsEmpty(); )
+		{
+			int idx = string.Find('\0');
+			if (idx == -1)	break;
+
+			subitem = string.Left(idx++);
+			string = string.Mid(idx);
+
+			idx = subitem.Find('=');
+			if (idx == -1)	continue;
+
+			keys = subitem.Left(idx++);
+			value = subitem.Mid(idx);
+
+			if (atoi(value) == 1)
+				m_mapAlarmList.SetAt(keys, "");
+		}
+
+
+		ssL = GetPrivateProfileSection("NXT", ssb, sizeof(ssb), file);
+		if (ssL <= 0)
+			return;
+
+		string = CString(ssb, ssL);
+		for (; !string.IsEmpty(); )
+		{
+			int idx = string.Find('\0');
+			if (idx == -1)	break;
+
+			subitem = string.Left(idx++);
+			string = string.Mid(idx);
+
+			idx = subitem.Find('=');
+			if (idx == -1)	continue;
+
+			keys = subitem.Left(idx++);
+			value = subitem.Mid(idx);
+
+			if (atoi(value) == 1)
+				m_mapAlarmList.SetAt(keys, "");
+		}
+	}
+
+	CString sym, vals{};
+	if (m_mapAlarmList.Lookup("871", vals)) //사이드카 발동
+	{
+		m_mapAlarmList.SetAt("873", "");
+		m_mapAlarmList.SetAt("875", "");
+		m_mapAlarmList.SetAt("877", "");
+	}
+
+	vals.Empty();
+	if (m_mapAlarmList.Lookup("872", vals)) //사이드카 해제
+	{
+		m_mapAlarmList.SetAt("874", "");
+		m_mapAlarmList.SetAt("876", "");
+		m_mapAlarmList.SetAt("878", "");
+	}
+
+	//NXT
+	//m_mapAlarmList.SetAt("883", "NXT 오전 휴장");  /* 08:50~09:00:30   */
+	//m_mapAlarmList.SetAt("886", "NXT 오후 휴장"); /* 15:20~15:30      */
+	//m_mapAlarmList.SetAt("890", "NXT 장마감"); /* 20:00            */
+	//m_mapAlarmList.SetAt("896", "NXT 종가매매 호가개시");  /* 15:00~15:30      */      
+	//m_mapAlarmList.SetAt("897", "NXT 종가매매 마감");  /* 16:00            */
+	//m_mapAlarmList.SetAt("900", "NXT SHUTDOWN발동");
+	//m_mapAlarmList.SetAt("901", "NXT 주식(코스피) CB발동");
+	//m_mapAlarmList.SetAt("902", "NXT 주식(코스피) CB해제");
+	//m_mapAlarmList.SetAt("903", "NXT 주식(코스피) 사이드카 매도발동");
+	//m_mapAlarmList.SetAt("904", "NXT 주식(코스피) 사이드카 매도발동해제");
+	//m_mapAlarmList.SetAt("905", "NXT 주식(코스피) 사이드카 매수발동");
+	//m_mapAlarmList.SetAt("906", "NXT 주식(코스피) 사이드카 매수발동해제");
+	//m_mapAlarmList.SetAt("907", "NXT 주식(코스피) 시장임시정지");
+	//m_mapAlarmList.SetAt("908", "NXT 주식(코스피) 시장임시정지해제");
+	//m_mapAlarmList.SetAt("909", "NXT 주식(코스피) 시장호가접수정지");
+	//m_mapAlarmList.SetAt("910", "NXT 주식(코스피) 시장호가접수정지해제");
+	//m_mapAlarmList.SetAt("911", "NXT 주식(코스닥) CB발동");
+	//m_mapAlarmList.SetAt("912", "NXT 주식(코스닥) CB해제");
+	//m_mapAlarmList.SetAt("913", "NXT 주식(코스닥) 사이드카 매도발동");
+	//m_mapAlarmList.SetAt("914", "NXT 주식(코스닥) 사이드카 매도발동해제");
+	//m_mapAlarmList.SetAt("915", "NXT 주식(코스닥) 사이드카 매수발동");
+	//m_mapAlarmList.SetAt("916", "NXT 주식(코스닥) 사이드카 매수발동해제");
+	//m_mapAlarmList.SetAt("917", "NXT 주식(코스닥) 시장임시정지");
+	//m_mapAlarmList.SetAt("918", "NXT 주식(코스닥) 시장매매재개");
+	//m_mapAlarmList.SetAt("919", "NXT 주식(코스닥) 시장호가접수정지");
+	//m_mapAlarmList.SetAt("920", "NXT 주식(코스닥) 시장호가접수재개");
+
+	//if (Axis::devMode)
+	//{
+	//	m_mapAlarmList.SetAt("300", "");
+	//}
 }
+#else
+void CMainFrame::load_mngSetup()
+{
+	CProfile profile(pkManageSetup);
+	CString szTotal, szUnit;
+
+	const int iret = profile.GetInt(szMessage, "Init");
+
+	m_bSound = profile.GetInt("Setup", "SOUND") == 1;
+	m_nInfoPos = profile.GetInt("Setup", "POS", 2);
+	m_bUseAlarm = profile.GetInt("Setup", "USE", 1);
+	m_nBkMode = profile.GetInt(szBkNotice, "MODE");
+
+	// KOBA ELW 장운영 알림 설정
+	const int val = profile.GetInt("Manage", MNG_INFO_KOBAELW, -1);
+	if (val == -1)
+	{
+		m_bKobaElwNotify = true;
+	}
+	else
+	{
+		m_bKobaElwNotify = (val == 1) ? true : false;
+	}
+
+	m_mapAlarmList.RemoveAll();
+	if (iret == 0)  //유저폴더 없는 상태
+	{	//디폴트 장운영을 넣어준다.
+		m_mapAlarmList.SetAt("851", "");	//장전 동시호가 개시
+		m_mapAlarmList.SetAt("801", "");	//장개시
+		m_mapAlarmList.SetAt("21", "");		//장개시 10분전
+		m_mapAlarmList.SetAt("26", "");		//장개시 5분전
+		m_mapAlarmList.SetAt("30", "");		//장개시 1분전
+		m_mapAlarmList.SetAt("35", "");		//장개시 10초전
+		m_mapAlarmList.SetAt("852", "");	//장후 동시호개 개시
+		m_mapAlarmList.SetAt("809", "");	//장마감
+		m_mapAlarmList.SetAt("126", "");	//장마감 5분전
+		m_mapAlarmList.SetAt("130", "");	//장마감 1분전
+		m_mapAlarmList.SetAt("135", "");	//장마감 10초전
+		m_mapAlarmList.SetAt("817", "");	//서킷브레이커발동
+		m_mapAlarmList.SetAt("818", "");	//서킷브레이커해제
+		m_mapAlarmList.SetAt("804", "");	//시간외종가 매매개시
+		m_mapAlarmList.SetAt("853", "");	//시간외종가 매매종료, 시간외단일가 매매개시 
+		m_mapAlarmList.SetAt("806", "");	//시간외단일가 매매종료
+		m_mapAlarmList.SetAt("846", "");	//KOBA ELW 조기종료
+		m_mapAlarmList.SetAt("871", "");	//사이드카 발동
+		m_mapAlarmList.SetAt("872", "");	 //사이드카 해제
+	}
+	else if (iret == 1)
+	{	//기존 설정  //디폴트 장운영을 넣어준다.
+		profile.Write(szMessage, "OPEN", "");
+		profile.Write(szMessage, "CLOSE", "");
+		m_mapAlarmList.SetAt("851", "");	//장전 동시호가 개시
+		m_mapAlarmList.SetAt("801", "");	//장개시
+		m_mapAlarmList.SetAt("21", "");		//장개시 10분전
+		m_mapAlarmList.SetAt("26", "");		//장개시 5분전
+		m_mapAlarmList.SetAt("30", "");		//장개시 1분전
+		m_mapAlarmList.SetAt("35", "");		//장개시 10초전
+		m_mapAlarmList.SetAt("852", "");	//장후 동시호개 개시
+		m_mapAlarmList.SetAt("809", "");	//장마감
+		m_mapAlarmList.SetAt("126", "");	//장마감 5분전
+		m_mapAlarmList.SetAt("130", "");	//장마감 1분전
+		m_mapAlarmList.SetAt("135", "");	//장마감 10초전
+		m_mapAlarmList.SetAt("817", "");	//서킷브레이커발동
+		m_mapAlarmList.SetAt("818", "");	//서킷브레이커해제
+		m_mapAlarmList.SetAt("804", "");	//시간외종가 매매개시
+		m_mapAlarmList.SetAt("853", "");	//시간외종가 매매종료, 시간외단일가 매매개시 
+		m_mapAlarmList.SetAt("806", "");	//시간외단일가 매매종료
+		m_mapAlarmList.SetAt("846", "");	//KOBA ELW 조기종료
+		m_mapAlarmList.SetAt("871", "");	//사이드카 발동
+		m_mapAlarmList.SetAt("872", "");	 //사이드카 해제
+	}
+	else if (iret == 3 || iret == 2)
+	{//설정화면을 이미 다녀왔다. 
+		//ref 장운영 추가 
+		CString file;
+		file.Format("%s\\%s\\%s\\mngsetup.ini", Axis::home, USRDIR, Axis::user);
+		char	ssb[1024 * 4];
+		const DWORD ssL = GetPrivateProfileSection("Manage", ssb, sizeof(ssb), file);
+		if (ssL <= 0)
+			return;
+
+		CString subitem, keys, value, string = CString(ssb, ssL);
+		for (; !string.IsEmpty(); )
+		{
+			int idx = string.Find('\0');
+			if (idx == -1)	break;
+
+			subitem = string.Left(idx++);
+			string = string.Mid(idx);
+
+			idx = subitem.Find('=');
+			if (idx == -1)	continue;
+
+			keys = subitem.Left(idx++);
+			value = subitem.Mid(idx);
+
+			if (atoi(value) == 1)
+				m_mapAlarmList.SetAt(keys, "");
+		}
+
+		if (iret < 3)  //최종버전보다 낮으면 
+		{
+			m_mapAlarmList.SetAt("871", "1");	//사이드카 발동
+			m_mapAlarmList.SetAt("872", "1");	 //사이드카 해제
+		}
+	}
+
+	CString sym, vals{};
+	if (m_mapAlarmList.Lookup("871", vals)) //사이드카 발동
+	{
+		m_mapAlarmList.SetAt("873", "");
+		m_mapAlarmList.SetAt("875", "");
+		m_mapAlarmList.SetAt("877", "");
+	}
+
+	vals.Empty();
+	if (m_mapAlarmList.Lookup("872", vals)) //사이드카 해제
+	{
+		m_mapAlarmList.SetAt("874", "");
+		m_mapAlarmList.SetAt("876", "");
+		m_mapAlarmList.SetAt("878", "");
+	}
+
+	//NXT
+	m_mapAlarmList.SetAt("881", "NXT 프리마켓 개시");  /* 08:00            */
+	m_mapAlarmList.SetAt("882", "NXT 프리마켓 마감");  /* 08:50            */
+	m_mapAlarmList.SetAt("883", "NXT 오전 휴장");  /* 08:50~09:00:30   */
+	m_mapAlarmList.SetAt("884", "NXT 메인마켓 개시"); /* 09:00:30         */
+	m_mapAlarmList.SetAt("885", "NXT 메인마켓 마감");  /* 15:20            */
+	m_mapAlarmList.SetAt("886", "NXT 오후 휴장"); /* 15:20~15:30      */
+	m_mapAlarmList.SetAt("887", "NXT 단일가 호가개시"); /* 15:30~15:40      */
+	m_mapAlarmList.SetAt("888", "NXT 애프터마켓 개시");  /* 15:40            */
+	m_mapAlarmList.SetAt("889", "NXT 애프터마켓 마감"); /* 20:00            */
+	m_mapAlarmList.SetAt("890", "NXT 장마감"); /* 20:00            */
+	m_mapAlarmList.SetAt("896", "NXT 종가매매 호가개시");  /* 15:00~15:30      */
+	m_mapAlarmList.SetAt("897", "NXT 종가매매 마감");  /* 16:00            */
+	m_mapAlarmList.SetAt("900", "NXT SHUTDOWN발동");
+	m_mapAlarmList.SetAt("901", "NXT 주식(코스피) CB발동");
+	m_mapAlarmList.SetAt("902", "NXT 주식(코스피) CB해제");
+	m_mapAlarmList.SetAt("903", "NXT 주식(코스피) 사이드카 매도발동");
+	m_mapAlarmList.SetAt("904", "NXT 주식(코스피) 사이드카 매도발동해제");
+	m_mapAlarmList.SetAt("905", "NXT 주식(코스피) 사이드카 매수발동");
+	m_mapAlarmList.SetAt("906", "NXT 주식(코스피) 사이드카 매수발동해제");
+	m_mapAlarmList.SetAt("907", "NXT 주식(코스피) 시장임시정지");
+	m_mapAlarmList.SetAt("908", "NXT 주식(코스피) 시장임시정지해제");
+	m_mapAlarmList.SetAt("909", "NXT 주식(코스피) 시장호가접수정지");
+	m_mapAlarmList.SetAt("910", "NXT 주식(코스피) 시장호가접수정지해제");
+	m_mapAlarmList.SetAt("911", "NXT 주식(코스닥) CB발동");
+	m_mapAlarmList.SetAt("912", "NXT 주식(코스닥) CB해제");
+	m_mapAlarmList.SetAt("913", "NXT 주식(코스닥) 사이드카 매도발동");
+	m_mapAlarmList.SetAt("914", "NXT 주식(코스닥) 사이드카 매도발동해제");
+	m_mapAlarmList.SetAt("915", "NXT 주식(코스닥) 사이드카 매수발동");
+	m_mapAlarmList.SetAt("916", "NXT 주식(코스닥) 사이드카 매수발동해제");
+	m_mapAlarmList.SetAt("917", "NXT 주식(코스닥) 시장임시정지");
+	m_mapAlarmList.SetAt("918", "NXT 주식(코스닥) 시장매매재개");
+	m_mapAlarmList.SetAt("919", "NXT 주식(코스닥) 시장호가접수정지");
+	m_mapAlarmList.SetAt("920", "NXT 주식(코스닥) 시장호가접수재개");
+
+	//if (Axis::devMode)
+	//{
+	//	m_mapAlarmList.SetAt("300", "");
+	//}
+}
+#endif
 
 void CMainFrame::load_hkey()
 {
@@ -11484,37 +12731,116 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 		/*
 	case TM_CB_SEARCH:
 		{
-			KillTimer(TM_CB_SEARCH);	
+			KillTimer(TM_CB_SEARCH);
 			SendCBSerachTR();
 		}
 		break;
 		*/
-	case TM_HISTORY:
+	case TM_HTS_LOADENFORMATION_POP:
+	case TM_HTS_LOADENFORMATION:
+	{
+		KillTimer(nIDEvent);
+		load_eninfomation();
+		//핵심 
+		const char* trust = "IB820850";
+		if (!IsExistMap(trust))
+			load_hidescreen(trust);
+
+		CString	PathCookie;
+
+		PathCookie.Format("%s\\%s\\NOTICECOOKIE.INI", Axis::home, "tab");
+
+		CString date;
+
+		CTime time;
+		time = CTime::GetCurrentTime();
+
+		date.Format("%04d%02d%02d", time.GetYear(), time.GetMonth(), time.GetDay());
+
+		char readB[1024];
+		int readL;
+
+		readL = GetPrivateProfileString("7700", "TODAY", "", readB, sizeof(readB), PathCookie);
+
+		CString strDate(readB, readL);
+
+		strDate.TrimLeft();
+		strDate.TrimRight();
+
+		if (strDate != "")
 		{
-			KillTimer(TM_HISTORY);
-			m_bar3->del_AllButton();
-						
-			CreateHistoryBar();
-			m_bHistory = FALSE;
+			if (date == strDate)
+			{
+				const int update = GetPrivateProfileInt("7700", "FIRST", 1, PathCookie);
+				if (update == 1)
+				{
+					trust = "IB770000";
+					m_mapHelper->ChangeChild(trust, 1, 0, CenterPOS);
+				}
+			}
+			else
+			{
+				WritePrivateProfileString("7700", "TODAY", date, PathCookie);
+				WritePrivateProfileString("7700", "FIRST", "1", PathCookie);
+
+				trust = "IB770000";
+				m_mapHelper->ChangeChild(trust, 1, 0, CenterPOS);
+			}
 		}
-		break;
+		else
+		{
+			trust = "IB770000";
+			m_mapHelper->ChangeChild(trust, 1, 0, CenterPOS);
+		}
+
+		ReadNoticeMap();
+
+		if (nIDEvent == TM_HTS_LOADENFORMATION_POP)
+		{
+			int key = m_mapHelper->CreateSDI("IB999962", 0, 0, 1, 0);
+			CSChild* schild = NULL;
+			if (!m_arSDI[m_vsN].Lookup(key, schild))
+				return;
+
+			schild->SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOSIZE);
+			schild->CenterWindow();
+
+			schild->SetFocus();
+			schild->SendMessage(WM_NCACTIVATE, TRUE, 0);
+			//schild->SendMessage(WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(5, 5));
+			//schild->SendMessage(WM_LBUTTONUP, 0, MAKELPARAM(5, 5));
+		}
+#ifdef  DF_MK_CAPTION
+		Sendpibojggb();  //NXT
+#endif
+	}
+	break;
+	case TM_HISTORY:
+	{
+		KillTimer(TM_HISTORY);
+		m_bar3->del_AllButton();
+
+		CreateHistoryBar();
+		m_bHistory = FALSE;
+	}
+	break;
 	case TM_AUTOHIDE:
-		WriteLog("OnTimer - TM_AUTOHIDE");
+		WriteLog("[AXIS] OnTimer - TM_AUTOHIDE");
 		KillTimer(nIDEvent);
 		if (m_conAUTOTIME)
 			m_conclusion->ShowWindow(SW_HIDE);
 		break;
 	case TM_AUTOMSN:
-		WriteLog("OnTimer - TM_AUTOMSN");
-		m_Econclusion->HideSlide();	
+		WriteLog("[AXIS] OnTimer - TM_AUTOMSN");
+		m_Econclusion->HideSlide();
 		break;
 	case TM_AUTOMNGINFO:
-		WriteLog("OnTimer - TM_AUTOMNGINFO");
+		WriteLog("[AXIS] OnTimer - TM_AUTOMNGINFO");
 		m_mngInfo->HideSlide();
 		KillTimer(TM_AUTOMNGINFO);
 		break;
 	case TM_IDLE:
-		WriteLog("OnTimer - TM_IDLE");
+		WriteLog("[AXIS] OnTimer - TM_IDLE");
 		KillTimer(nIDEvent);
 		LockProg();
 		break;
@@ -11534,21 +12860,21 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 		if (m_pDoctor)	m_pDoctor->HideSlide();
 		break;
 	case TM_RTSQUEUE:
-// 		WriteLog("OnTimer - TM_RTSQUEUE");
-// 		checkRTSQueue();
+		// 		WriteLog("OnTimer - TM_RTSQUEUE");
+		// 		checkRTSQueue();
 		break;
 	case TM_SCRLOG:
-		WriteLog("OnTimer - TM_SCRLOG");
+		WriteLog("[AXIS] OnTimer - TM_SCRLOG");
 		writeOpenedList();
 		break;
 	case TM_TEST:
-		WriteLog("OnTimer - TM_TEST");
+		WriteLog("[AXIS] OnTimer - TM_TEST");
 		{
 			KillTimer(TM_TEST);
 		}
 		break;
 	case TM_INITSIZE:
-		WriteLog("OnTimer - TM_INITSIZE");
+		WriteLog("[AXIS] OnTimer - TM_INITSIZE");
 		{
 			KillTimer(TM_INITSIZE);
 			CString name = "IBINITSIZE";
@@ -11561,7 +12887,7 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 		}
 		break;
 	case TM_NOTICE:
-		WriteLog("OnTimer - TM_NOTICE");
+		WriteLog("[AXIS] OnTimer - TM_NOTICE");
 		{
 			KillTimer(TM_NOTICE);
 			//ReadNotice();
@@ -11569,61 +12895,62 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 		}
 		break;
 	case TM_DNINTEREST:
-		WriteLog("OnTimer - TM_DNINTEREST");
+		WriteLog("[AXIS] OnTimer - TM_DNINTEREST");
 		{
-			WriteLog("TM_DNINTEREST - Step 1");
+			WriteLog("[AXIS] TM_DNINTEREST - Step 1");
 			KillTimer(TM_DNINTEREST);
 			if (m_info_interest)
 			{
 				m_info_interest->SetOK();
 			}
 
-			WriteLog("TM_DNINTEREST - Step 2");
+			WriteLog("[AXIS] TM_DNINTEREST - Step 2");
 			SetForegroundWindow();
 
-			WriteLog("TM_DNINTEREST - Step 3");
+			WriteLog("[AXIS] TM_DNINTEREST - Step 3");
 			if (m_bdnInterest)
 			{
-				WriteLog("TM_DNINTEREST - Step 4-1");
-				load_eninfomation();
-				WriteLog("TM_DNINTEREST - Step 4-2");
-		
-				const char* trust = "IB820850"; 
-				//if (!IsExistMap(trust))    //test820850
-				//	load_hidescreen(trust);
-				
-				WriteLog("TM_DNINTEREST - Step 4-3");
+				WriteLog("[AXIS] TM_DNINTEREST - Step 4-1");
+				if (!Axis::isCustomer)
+					load_eninfomation();
+				WriteLog("[AXIS] TM_DNINTEREST - Step 4-2");
+
+				const char* trust = "IB820850";
+				if (!IsExistMap(trust))
+					load_hidescreen(trust);
+
+				WriteLog("[AXIS] TM_DNINTEREST - Step 4-3");
 				//load_start_notice();
-				WriteLog("TM_DNINTEREST - Step 4-4");
+				WriteLog("[AXIS] TM_DNINTEREST - Step 4-4");
 
 				CString	PathCookie;
 
 				PathCookie.Format("%s\\%s\\NOTICECOOKIE.INI", Axis::home, "tab");
 
 				CString date;
-				
+
 				CTime time;
 				time = CTime::GetCurrentTime();
-				
-				date.Format("%04d%02d%02d",time.GetYear(),time.GetMonth(),time.GetDay());
-				
+
+				date.Format("%04d%02d%02d", time.GetYear(), time.GetMonth(), time.GetDay());
+
 				char readB[1024];
 				int readL;
-				
-				readL = GetPrivateProfileString("7700","TODAY","",readB,sizeof(readB),PathCookie);
-				
-				CString strDate(readB,readL);
+
+				readL = GetPrivateProfileString("7700", "TODAY", "", readB, sizeof(readB), PathCookie);
+
+				CString strDate(readB, readL);
 
 				strDate.TrimLeft();
 				strDate.TrimRight();
 
-				if(strDate != "")
+				if (strDate != "")
 				{
-					if(date == strDate)
+					if (date == strDate)
 					{
-						const int update = GetPrivateProfileInt("7700","FIRST",1,PathCookie);
-						
-						if(update == 1)
+						const int update = GetPrivateProfileInt("7700", "FIRST", 1, PathCookie);
+
+						if (update == 1)
 						{
 							trust = "IB770000";
 							//if (!IsExistMap(trust))
@@ -11634,8 +12961,8 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 					}
 					else
 					{
-						WritePrivateProfileString("7700","TODAY",date,PathCookie);
-						WritePrivateProfileString("7700","FIRST","1",PathCookie);
+						WritePrivateProfileString("7700", "TODAY", date, PathCookie);
+						WritePrivateProfileString("7700", "FIRST", "1", PathCookie);
 
 						trust = "IB770000";
 						//if (!IsExistMap(trust))
@@ -11656,16 +12983,16 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 				ReadNoticeMap();
 				//긴급장애공지
 				//MessageBox("시스템 점검작업으로 인하여 일부시세 정보제공이 안 되고 있습니다. \n불편을 드려 죄송합니다. 감사합니다.", "IBK투자증권");
-				WriteLog("TM_DNINTEREST - Step 4-5");
+				WriteLog("[AXIS] TM_DNINTEREST - Step 4-5");
 			}
 		}
 		break;
 	case TM_SLIDE:
-		WriteLog("OnTimer - TM_SLIDE");
-		if(m_slideMsg != "")
+		WriteLog("[AXIS] OnTimer - TM_SLIDE");
+		if (m_slideMsg != "")
 		{
 			m_mngInfo->SetData(m_slideMsg, 3);
-			
+
 			const CRect		mRc;
 			WINDOWPLACEMENT	pl;
 			GetWindowPlacement(&pl);
@@ -11679,91 +13006,284 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 				break;
 			}
 			m_mngInfo->ShowWindow(SW_HIDE);
-			
+
 			MngInfoPos();
-			
+
 			m_slideMsg = "";
 
 			KillTimer(TM_SLIDE);
 		}
 		break;
 	case TM_ITGY:
-		{
+	{
 
-WriteLog("OnTimer - TM_ITGY 50초동안 piboitgy 응답이 안왔다?");
+		WriteLog("[AXIS] OnTimer - TM_ITGY 50초동안 piboitgy 응답이 안왔다?");
 
-			m_bItgy = FALSE;
+		m_bItgy = FALSE;
 
-			KillTimer(TM_ITGY);
+		KillTimer(TM_ITGY);
 
-			if(m_bCertLogin)
-				signOnCert();
-			else
-			{
-				signOn();
-			}
-		}
-		break;
-	case TM_WINES_KIUP:
+		if (m_bCertLogin)
+			signOnCert();
+		else
 		{
-			WriteLog("OnTimer - TM_WINES_KIUP");
-			KillTimer(TM_WINES_KIUP);
-			m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY, (void *)NULL,
-			(BYTE *)(VTS_I4 VTS_I4), MAKELONG(setFDC, m_nKiupKey), (LPARAM)(const char*)m_sKiupDomino);
-		}
-		break;
-	case TM_NPROTECT_ALIVE:
-		{
-			WriteLog("OnTimer - TM_NPROTECT_ALIVE");
-			const BOOL pcFirewall = AfxGetApp()->GetProfileInt(INFORMATION, "PCFirewall", 0);
-			if(pcFirewall && Axis::isCustomer)
-				InitFirewall();
-		}
-		break;
-	case TM_AOS_ALIVE:
-		{
-// 			OutputDebugString("AOS 재기동 검사 실행....");
-// 
-// 			BOOL pcAOS = AfxGetApp()->GetProfileInt(INFORMATION, "AOS", 1);
-// 
-// 			if(pcAOS)
-// 			{
-// 				if(!isRunningSDKPd(AOSSDK_SERVICE_CODE_SB))
-// 				{
-// 					OutputDebugString("AOS 비정상 종료로 인한 재실행....");
-// 					if (initAOSSDK())
-// 						initSBSDK();
-// 				}
-// 			}
-			KillTimer(TM_AOS_ALIVE);
-		}
-		break;
-	case TM_POPUP_JISU:
-		{
-			KillTimer(TM_POPUP_JISU);
-
-			//PopupWeb("http://www.ibks.com/worldstocks/ws_list.do?popup=Y&nPro_YN=N&keyB_YN=Y",800,715);
-#ifndef _DEBUG
-			const char* trust = "IB780500";
-			m_mapHelper->ChangeChild(trust, 1, 0, CenterPOS);
-#endif
-		}
-		break;
-	case TM_TOP10_2018:
-		{
-			//KillTimer(TM_TOP10_2018);
-			//Send2018();
-		}
-		break;
-	case TM_2022_CLOSE:
-		{
-			PostMessage(WM_CLOSE);
+			signOn();
 		}
 	}
+	break;
+	case TM_WINES_KIUP:
+	{
+		WriteLog("[AXIS] OnTimer - TM_WINES_KIUP");
+		KillTimer(TM_WINES_KIUP);
+		m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY, (void*)NULL,
+			(BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, m_nKiupKey), (LPARAM)(const char*)m_sKiupDomino);
+	}
+	break;
+	case TM_NPROTECT_ALIVE:
+	{
+		WriteLog("[AXIS] OnTimer - TM_NPROTECT_ALIVE");
+		const BOOL pcFirewall = AfxGetApp()->GetProfileInt(INFORMATION, "PCFirewall", 0);
+		if (pcFirewall && Axis::isCustomer)
+			InitFirewall();
+	}
+	break;
+	case TM_AOS_ALIVE:
+	{  //ref 보안프로그래(ASTx) 가동 확인
 
+		int iret = Self_VerifyIntegrity();
+		if (!IsASTxRunning() || iret > 0)
+		{
+			KillTimer(TM_AOS_ALIVE);
+			BOOL		rc{};
+			m_bExit = false;
+			m_forceClose = true;
+			m_bCLOSE_ASTx = TRUE;
+
+			m_wizard->InvokeHelper(DI_RUN, DISPATCH_METHOD, VT_BOOL, (void*)&rc,
+				(BYTE*)(VTS_I4 VTS_I4 VTS_I4), loginAXISx, 0, -1);
+
+			PostMessage(WM_AXISCLOSE, 99, 0);
+			return;
+		}
+	}
+	break;
+	case TM_POPUP_JISU:
+	{
+		KillTimer(TM_POPUP_JISU);
+
+		//PopupWeb("http://www.ibks.com/worldstocks/ws_list.do?popup=Y&nPro_YN=N&keyB_YN=Y",800,715);
+		const char* trust = "IB780500";
+		m_mapHelper->ChangeChild(trust, 1, 0, CenterPOS);
+	}
+	break;
+	case TM_TOP10_2018:
+	{
+		//KillTimer(TM_TOP10_2018);
+		//Send2018();
+	}
+	break;
+	case TM_2022_CLOSE:
+	{
+		PostMessage(WM_CLOSE);
+	}
+	break;
+	case TM_NOSCREEN_URL:
+	{
+		KillTimer(TM_NOSCREEN_URL);
+		m_slog.Format("ScreenCheck Ontimer key=[%d] url=[%s]", m_iKey, m_sTriggerUrl);
+		OutputDebugString(m_slog);
+		if (m_iKey > 0)
+		{
+			m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY,
+				(void*)NULL, (BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, m_iKey), (LPARAM)(const char*)m_sTriggerUrl);
+			m_iKey = 0;
+			m_sTriggerUrl.Empty();
+		}
+	}
+	break;
+	}
 	//WriteLog("End OnTimer");
 	CMDIFrameWnd::OnTimer(nIDEvent);
 }
+
+#ifdef DF_MK_CAPTION
+void CMainFrame::CheckMarketByMNG(CString sval)
+{
+	/*
+	KRX
+	0 장마감, 1 시간외,  2 정규장, 3 단일가
+		809       802,804        801          805
+	NXT
+	0 장마감, 1 프리, 2 메인, 3 애프터
+		890        881        884      888
+	*/
+
+	int igubn = atoi(sval);
+
+	switch (igubn)
+	{
+		case 801:   //KRX 정규장 시작
+		{
+			m_iKRXype = 2;  //정규장
+		}
+		break;
+		case 802:  //KRX 장전시간외 시작     8:30~
+		case 804:  //KRX 장후시간외 시작     15:40~
+		{
+			m_iKRXype = 1;   //시간외
+		}
+		break;
+		case 805: //KRX 단일가 시작
+		{
+			m_iKRXype = 3;  //단일가
+		}
+		break;
+		case 809: //KRX 장마감 시작 15:30~
+		case 803: //KRX 장마감 시작 8:40~
+		case 806: //KRX 장마감 시작 18:00~
+		{
+			m_iKRXype = 0;  //장마감
+		}
+		break;
+	}
+	m_bar1->SetShowAIBtn(m_iKRXype, -1);   
+
+	switch (igubn)
+	{
+		case 881:  //NXT 프리 시작
+		{
+			m_iNXType = 1;  //프리
+		}
+		break;
+		case 884:   //NXT 메인 시작
+		{
+			m_iNXType = 2;  //정규장
+		}
+		break;
+		case 888:  //NXT 애프터 시작
+		{
+			m_iNXType = 3;    //애프터
+		}
+		break;
+		case 883:    //NXT 장마감 8:50~
+		case 890:   //NXT 장마감  20:00~
+		{
+			m_iNXType = 0;  //장마감
+		}
+		break;
+		case 886:    //NXT 단일가개시 15:20~
+		{
+			m_iNXType = 4;  //장마감
+		}
+		break;
+	}
+
+	m_bar1->SetShowAIBtn(-1, m_iNXType);   
+}
+
+void CMainFrame::CheckMarketStat()
+{
+	/*
+KRX
+0 장마감, 1 시간외,  2 정규장, 3 단일가
+    809       802,804        801          805
+NXT
+0 장마감, 1 프리, 2 메인, 3 애프터
+    890        881        884      888
+*/
+	if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 0, 8 + (m_bCSAT * 1), 30))  //8 00 ~ 8 30
+	{
+		m_iKRXype = 0;   //장마감
+		m_iNXType = 1;  //프리
+	}
+	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 30, 8 + (m_bCSAT * 1), 40))  //8 30 ~ 8 40
+	{
+		m_iKRXype = 1;   //장전시간외
+		m_iNXType = 1;  //프리
+	}
+	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 40, 8 + (m_bCSAT * 1), 50))  //8 40 ~ 8 50
+	{
+		m_iKRXype = 0;  //장마감
+		m_iNXType = 1;  //프리
+	}
+	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 50, 9 + (m_bCSAT * 1), 00))  //8 50 ~ 9 00
+	{
+		m_iKRXype = 0;  //장마감
+		m_iNXType = 0;  //장마감
+	}
+	else if (IsCurrentTimeBetween(9 + (m_bCSAT * 1), 0, 15 + (m_bCSAT * 1), 0))  //9 00 ~ 15 00
+	{
+		m_iKRXype = 2;  //정규장
+		m_iNXType = 2;  //정규장
+	}
+	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 0, 15 + (m_bCSAT * 1), 20))  //15 00 ~ 15 20
+	{
+		m_iKRXype = 2;  //정규장
+		m_iNXType = 2;  //정규장
+	}
+	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 20, 15 + (m_bCSAT * 1), 30))  //15 20 ~ 15 30
+	{
+		m_iKRXype = 2;  //정규장
+		m_iNXType = 0;  //장마감
+	}
+	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 30, 15 + (m_bCSAT * 1), 40))  //15 30 ~ 15 40
+	{
+		m_iKRXype = 0;  //장마감
+		m_iNXType = 3;  //애프터
+	}
+	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 40, 16 + (m_bCSAT * 1), 0))  //15 40 ~ 16 00
+	{
+		m_iKRXype = 1;  //장후시간외
+		m_iNXType = 3;  //애프터
+	}
+	else if (IsCurrentTimeBetween(16 + (m_bCSAT * 1), 0, 18 + (m_bCSAT * 1), 0))  //16 00 ~ 18 00
+	{
+		m_iKRXype = 3;  //단일가
+		m_iNXType = 3;  //애프터
+	}
+	else if (IsCurrentTimeBetween(18 + (m_bCSAT * 1), 0, 20 + (m_bCSAT * 1), 0))  //18 00 ~ 20 00
+	{
+		m_iKRXype = 0;    //장마감
+		m_iNXType = 3;    //애프터
+	}
+	else if (IsCurrentTimeBetween(20 + (m_bCSAT * 1), 0, 24 + (m_bCSAT * 1), 0))  //20 00 ~ 24 00
+	{
+		m_iKRXype = 0;  //장마감
+		m_iNXType = 0;  //장마감
+	}
+	else
+	{
+		m_iKRXype = 0;  //장마감
+		m_iNXType = 0;  //장마감
+	}
+
+#ifdef   DF_MK_CAPTION
+	m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);   
+#endif
+}
+
+bool CMainFrame::IsCurrentTimeBetween(int startHour, int startMin, int endHour, int endMin)
+{
+	CTime now = CTime::GetCurrentTime();
+	int curMinutes = now.GetHour() * 60 + now.GetMinute();
+	int startMinutes = startHour * 60 + startMin;
+	int endMinutes = endHour * 60 + endMin;
+
+	// 시작 시간이 종료 시간보다 앞에 있는 경우 (같은 날)
+	if (startMinutes < endMinutes)
+	{
+		return (curMinutes >= startMinutes && curMinutes < endMinutes);
+	}
+	else if (startMinutes > endMinutes)
+	{
+		return (curMinutes >= startMinutes || curMinutes < endMinutes);
+	}
+	else
+	{
+		return false;
+	}
+}
+#endif
 
 CWnd* CMainFrame::getActiveView(int key)
 {
@@ -12116,6 +13636,71 @@ void CMainFrame::SetConclusion()
 		(BYTE *)(VTS_I4 VTS_I4), MAKELONG(setNOMSG, 0), (value ? 0 : 1));
 }
 
+//modi 서버주문
+void CMainFrame::ShowServerOrdDlg()
+{
+	char	buf[256]{};
+	CString	file, strtmp;;
+	file.Format("%s\\tab\\axisAI.ini", Axis::home);
+	DWORD dw = GetPrivateProfileString("ServerOrd", "show", "0", buf, sizeof(buf), file);
+
+	if (dw < 0)
+		return;
+
+	strtmp.Format("%s", buf);
+
+	if (m_pServerOrd && (strtmp == "1"))
+	{
+		if (m_pServerOrd->GetStyle() & WS_VISIBLE)
+			m_pServerOrd->SetWindowPos(NULL, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_SHOWWINDOW | SWP_NOACTIVATE);
+		else
+		{
+			int	x{}, y{};
+			CRect	mRc, wRc;
+
+			mRc = GetWndRect();
+			m_pServerOrd->GetWindowRect(wRc);
+
+			switch (m_conPOS)
+			{
+			case 5:
+			{
+				x = mRc.right - wRc.Width() - GetSystemMetrics(SM_CXFIXEDFRAME);
+				y = mRc.bottom - wRc.Height() - GetSystemMetrics(SM_CYFIXEDFRAME);
+				if (x < 0)	x = 0;
+				if (y < 0)	y = 0;
+
+				if (m_conclusion)
+				{
+					CRect rec;
+					m_conclusion->GetWindowRect(rec);
+					y -= rec.Height();
+				}
+				else
+					y -= 185;
+			}
+			break;
+			default:
+				x = mRc.right - wRc.Width() - GetSystemMetrics(SM_CXFIXEDFRAME);
+				y = mRc.bottom - wRc.Height() - GetSystemMetrics(SM_CYFIXEDFRAME);
+				if (x < 0)	x = 0;
+				if (y < 0)	y = 0;
+
+				x -= 10;
+				y += 30;
+				break;
+			}
+
+			m_pServerOrd->SetWindowPos(NULL, x, y, 0, 0, SWP_NOSIZE | SWP_SHOWWINDOW | SWP_NOACTIVATE);
+			m_pServerOrd->MoveWindow(x, y, wRc.Width(), wRc.Height());
+			CString slog;
+			slog.Format("[conclusion] x=[%d] y=[%d] w=[%d] H=[%d]", x, y, wRc.Width(), wRc.Height());
+			OutputDebugString(slog);
+
+		}
+	}
+}
+
 void CMainFrame::ShowConclusion()
 {
 	if (m_conclusion)
@@ -12269,7 +13854,10 @@ void CMainFrame::ShowMngInfo(DWORD* dat)
 			}
 		}
 
-		if (atoi(val) <= NO_CHECK)
+#ifdef DF_MK_CAPTION
+		CheckMarketByMNG(val);
+#endif
+
 		{
 			if (!m_mapAlarmList.Lookup(val, str))
 				return;
@@ -12454,13 +14042,77 @@ void CMainFrame::ShowMngInfo(CString dat)
 		}
 
 		ShowMngInfo(msgS, kind);
+	//	//ref 장운영  데이터를 우선 서버자동주문에 넣어봤다.. 추후게 지워야함 
+	//	CTime time;
+	//	time = CTime::GetCurrentTime();
+	//	val.Empty();
+	//	if (!fms.Lookup(MNG_FLAG, val))	// KEY(601)
+	//		return;
+	//	
+	//	str.Format("update_ticker[%02d:%02d:%02d]\t  sym[%s] msgS[%s]", time.GetHour(), time.GetMinute(), time.GetSecond(), val, msgS);
+	//	if (m_pServerOrd && Axis::devMode)
+	//		m_pServerOrd->AddServerOrd(str, 100);
 	}
 }
 
+//modi 서버자동
+void CMainFrame::ServerOrdNotice(CString dat)
+{
+	if (!m_runAxis)	return;
+
+	CString			str, value, jcode;
+	CMapStringToString	ary;
+
+	CProfile profile(pkOrderSetup);
+
+	NoticeParse(dat, ary);
+	dat.Empty();
+	
+	if (m_pServerOrd)
+	{
+		if (ary.Lookup("951", value))	  // time
+			dat = value;
+		else	dat.Empty();
+		dat += "\t";
+
+		if (ary.Lookup("952", value))	// contents
+		{
+			str.Format("%s", value);
+			str.TrimRight();
+			str.TrimLeft();
+			dat += str;
+		}
+		dat += "\t";
+
+		if (ary.Lookup("950", value))	// contents type
+		{
+			value.TrimRight();
+			value.TrimLeft();
+			dat += value;
+		}
+		dat += "\t";
+
+	
+		if(atoi(value) == SERVERORDER_MSG_RELOAD)  //화면에서 내역재조회
+			ServerOrderMsgToMap(atoi(value));
+		//else if(atoi(value) == SERVERORDER_MSG_MISORDER)  //착오주문
+		//	ServerOrderMsgToMap(atoi(value));
+		else
+		{
+			m_pServerOrd->AddServerOrd(dat, m_serverOrdHISTORY);
+			ShowServerOrdDlg();
+		}
+	}
+
+	ary.RemoveAll();
+}
 
 BOOL CMainFrame::ConclusionNotice(CString dat, CString& title)
 {
 	//if ((m_dept == "811") || (m_dept == "812")) return false;
+	CString strback;
+	strback = dat;
+
 	if (m_chaser && m_chaser->GetSafeHwnd())
 	{
 		OnCHASER(MAKEWPARAM(dat.GetLength(), x_CONs),
@@ -12478,8 +14130,21 @@ BOOL CMainFrame::ConclusionNotice(CString dat, CString& title)
 
 	NoticeParse(dat, ary);
 
+#ifdef DF_SERVERAUTO
+	if (ary.Lookup("950", str) && ary.Lookup("951", str) && ary.Lookup("952", str))
+	{
+		ServerOrdNotice(dat);  //modi 서버자동 noticePAN
+		return FALSE;
+	}
+#endif
+
 	if (!ary.Lookup("902", str))		// user ID
 	{
+m_slog.Format("no 902 symbol  Alldata = [%s]", strback);
+
+//m_slog.Format("[NOTICE] 902 유저아이디 없다!!  리턴 = [%s]  ", str);
+//OutputDebugString(m_slog);
+
 		ary.RemoveAll();
 		return FALSE;
 	}
@@ -12505,6 +14170,8 @@ BOOL CMainFrame::ConclusionNotice(CString dat, CString& title)
 	if (FALSE)
 #endif
 	{
+m_slog.Format("notice ID = [%s]  login ID not same =[%s]  alldata=[%s]", str, Axis::userID, strback);
+WriteUpLog("notice.ini", m_slog);
 		ary.RemoveAll();
 		return FALSE;
 		//strOdrUser = _T("★ ");
@@ -12526,6 +14193,8 @@ BOOL CMainFrame::ConclusionNotice(CString dat, CString& title)
 
 	if (!ary.Lookup("988", str))		// 처리구분
 	{
+//m_slog.Format("[NOTICE] no 988 symbol  Alldata = [%s]", strback);
+//WriteUpLog("notice.ini", m_slog);
 		ary.RemoveAll();
 		return FALSE;
 	}
@@ -12685,6 +14354,8 @@ BOOL CMainFrame::ConclusionNotice(CString dat, CString& title)
 		// 주문접수처리... filter........
 		if (!bFail && !ary.Lookup("992", str))		// conclusion count
 		{
+m_slog.Format("no 992 symbol and bFail failse  Alldata = [%s]", strback);
+WriteUpLog("notice.ini", m_slog);
 			ary.RemoveAll();
 			return FALSE;
 		}
@@ -12719,6 +14390,21 @@ BOOL CMainFrame::ConclusionNotice(CString dat, CString& title)
 		{
 			str.Format("%d", atoi(value));
 			dat += str;
+		}
+		dat += "\t";
+
+		if (ary.Lookup("926", value))	//장구분자
+		{
+			if (value == "1")
+				value = "KRX";
+			else if (value == "2")
+				value = "NXT";
+			else if (value == "6")
+				value = "J";
+			else if (value == "S")
+				value = "SOR";
+
+			dat += value;
 		}
 		dat += "\t";
 
@@ -13155,6 +14841,7 @@ BOOL CMainFrame::ExistMenu(CString mapN)
 {
 	if (!m_tMenu)	return FALSE;
 	if (mapN == "IB985000") return true; //직원 비밀번호 설정 화면이라면 메뉴에 있는듯 인식시켜줌
+	if(mapN == "IBAI0000")  return true;
 	return m_tMenu->ExistMenu(mapN);
 }
 
@@ -13173,6 +14860,27 @@ int CMainFrame::ExceptionProcess(CString mapN)
 		}
 	}
 	*/
+	if (!mapname.CompareNoCase("IB100400"))
+	{
+		if (m_axMisc->MsgBox("HTS를 종료하셔도 최대 한달간 유지되는 \r\n새로운 주식자동주문을 이용하시겠어요?", "IBK 투자증권", MB_YESNO) == IDYES)
+		{
+			m_mapHelper->ChangeChild("IB102000");
+			return TRUE;
+		}
+		else
+			return FALSE;
+	}
+	if (!mapname.CompareNoCase("IB100500"))
+	{
+		if (m_axMisc->MsgBox("HTS를 종료하셔도 최대 한달간 유지되는 \r\n새로운 주식자동주문을 이용하시겠어요?", "IBK 투자증권", MB_YESNO) == IDYES)
+		{
+			m_mapHelper->ChangeChild("IB102000");
+			return TRUE;
+		}
+		else
+			return FALSE;
+	}
+
 	if (!mapname.CompareNoCase("IBXXXX00"))
 		return 1;
 	if (!mapname.CompareNoCase(MAPN_REALTIMEJANGO))
@@ -13641,6 +15349,20 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 		ShowControlBar(m_bar0, TRUE, FALSE);
 #endif
 
+	//modi CMainFrame::OnSize
+#ifdef DF_SLIDEWND
+	if (m_pSlideWnd && m_pSlideWnd.get()->GetSafeHwnd())
+	{
+		if (m_pSlideWnd.get()->GetStyle() & WS_VISIBLE)
+		{
+			CRect rec, recAuto;
+			m_pSlideWnd.get()->GetWindowRect(&recAuto);  //SWP_NOSIZE
+			rec = GetWndRect();
+			m_pSlideWnd->MoveWindow(rec.left, rec.top, rec.Width() / 5, rec.Height());
+			m_pSlideWnd->Invalidate();
+		}
+	}
+#endif
 
 	if(m_top10 != nullptr && m_top10->GetSafeHwnd())
 	{
@@ -13709,7 +15431,18 @@ void CMainFrame::OnSizing(UINT fwSide, LPRECT pRect)
 void CMainFrame::OnMove(int x, int y) 
 {
 	CMDIFrameWnd::OnMove(x, y);
-
+#ifdef DF_SLIDEWND
+	//modi CMainFrame::OnMove
+	if (m_pSlideWnd && m_pSlideWnd.get()->GetSafeHwnd())
+	{
+		if (m_pSlideWnd.get()->GetStyle() & WS_VISIBLE)
+		{
+			CRect rec;
+			rec = GetWndRect();
+			m_pSlideWnd->SetWindowPos(nullptr, rec.left, rec.top, 0, 0, SWP_NOSIZE);
+		}
+	}
+#endif
 	if (m_Nclock && m_Nclock->GetSafeHwnd())
 	{
 		if (m_Nclock->GetStyle() & WS_VISIBLE)
@@ -14085,6 +15818,257 @@ void CMainFrame::processFMX(WPARAM wParam, LPARAM lParam)
 	case 250:   m_bar0->ParingGroupCode((char*)lParam, HIWORD(wParam)); break;  //axissm::Categorypopup
 	case 236:  ParseSAMFQ014((char*)lParam, len); break;   //test CDD
 	case 235:  ParseSACMQ101((char*)lParam, len); break;  //test CDD
+	case 234:  parseMemoUpload((char*)lParam, len); break;
+	case 233 : 
+	{
+		if (m_pUpload)
+			m_pUpload->ParseOub(wParam, lParam);
+	}
+	break;
+	case 232:
+	{
+		CString str;  //btnai  SetPosition()
+		char* pdata = (char*)lParam;
+
+		m_slog.Format("[AXIS] [%s] ID=[%s]  pdata=[%.10s]", __FUNCTION__,  Axis::userID, pdata);
+		OutputDebugString(m_slog);
+		WriteLog(m_slog);
+
+		for (int ii = 1; ii < 5; ii++)
+		{
+			str.Format("%c", pdata[ii]);
+			if (isdigit(pdata[ii]))
+				TRACE("\r\n" + str);
+			else
+				return;
+		}
+
+		m_slog.Format("[AXIS] 고객아이디로 접속한 직원 [%s]", Axis::userID );
+		OutputDebugString(m_slog);
+		WriteLog(m_slog);
+
+		char	buf[256]{};
+		CString	file, strmap, strname;
+		file.Format("%s\\tab\\axisAI.ini", Axis::home);
+		DWORD dw = GetPrivateProfileString("MAP", "num", "IB999900", buf, sizeof(buf), file);
+		strmap.Format("%s", buf);
+		strmap.TrimRight();
+
+		memset(buf, 0x00, 256);
+		dw = GetPrivateProfileString("MAP", "name", "IBK AI", buf, sizeof(buf), file);
+		strname.Format("%s", buf);
+		strname.TrimRight();
+
+		CString strmenu;
+		strmenu.Format("도우미\t#%s\t%s\t%s", strname, strmap, strname);
+
+#ifdef  DF_MK_CAPTION
+			//m_bar1.get()->SetShowAIBtn(0);  //안쓴다
+#endif
+
+		m_bar1.get()->SetPosition();
+
+		//m_tMenu->AddMenu(strmenu);
+	}
+	break;
+	case 231:  //pibopopu  조회
+	{
+		CString sRes;
+
+		struct PIBOpopu_mod //최선집행의무 pibopopu 조회
+		{
+			char popup[1];
+			char emsg[99];
+			char nrec[4];
+		};
+
+		char* pbuf = new char[1024];
+		FillMemory(pbuf, 1024, 0x00);
+		memcpy(pbuf, (char*)lParam, sizeof(struct PIBOpopu_mod));
+		PIBOpopu_mod* pdata = (PIBOpopu_mod*)pbuf;
+		m_slog.Format("[axis][CMainFrame] 최선집행 pibo조회!!  nrec= [%.4s] emsg  = [%s]  \n", (char*)pdata->nrec, pdata->emsg);
+		WriteLog(m_slog);
+
+		bool btest = false;
+		for (int ii = 0; ii < 4; ii++)
+		{
+			m_slog.Format("%s", (char*)&pdata->nrec[ii]);
+			m_slog.TrimRight();
+			if (m_slog == "0" || m_slog == "1")
+				btest = true;
+			else
+				btest = false;
+		}
+
+		m_slog.Format("pibopopu nrect=[%.4s]", (char*)pdata->nrec);
+		WriteLog(m_slog);
+
+		delete[] pbuf;
+		if (!btest)
+		{
+			if (Axis::isCustomer)
+			{
+#ifndef DF_POPSDI
+				CDLG_Notice dlg(this);
+				dlg.m_bDev = Axis::devMode;
+				dlg.m_sRoot = Axis::home;
+				dlg.m_sUser = Axis::user;
+				if (dlg.DoModal() == IDOK)
+				{
+
+				}
+#else
+				m_slog.Format("[axis][CMainFrame] 최선집행 SDI 팝업 timer start \n");
+				WriteLog(m_slog);
+				SetTimer(TM_HTS_LOADENFORMATION_POP, 1000, nullptr);
+				return;
+#endif
+			}
+		}
+
+		m_slog.Format("[axis][CMainFrame] 최선집행 팝업후 \n");
+		WriteLog(m_slog);
+
+		SetTimer(TM_HTS_LOADENFORMATION, 2000, nullptr);
+		//load_eninfomation();
+	
+	}
+	break;
+	case 230:
+	{
+		CString sRes;
+
+		struct PIBOpopu_mod //최선집행의무 pibopopu 조회
+		{
+			char popup[1];
+			char emsg[99];
+			char nrec[4];
+		};
+
+		char* pbuf = new char[1024];
+		FillMemory(pbuf, 1024, 0x00);
+		memcpy(pbuf, (char*)lParam, sizeof(struct PIBOpopu_mod));
+		PIBOpopu_mod* pdata = (PIBOpopu_mod*)pbuf;
+		m_slog.Format("[axis][CMainFrame] 최선집행 pibo등록!!  nrec= [%.4s] emsg  = [%s]  \n", (char*)pdata->nrec, pdata->emsg);
+		WriteLog(m_slog);
+		m_slog.Format("%s", pdata->emsg);
+		m_slog.TrimRight();
+		if (m_slog.Find("이벤트") >= 0 && m_slog.Find("신청") >= 0 && m_slog.Find("완료") >= 0)
+		{
+			char	buf[512];
+			CString	file, stmp, smap;
+			file.Format("%s\\tab\\AXNXT.ini", Axis::home);
+			DWORD dw = GetPrivateProfileString("PDF", "sucess_msg", "중요약관/설명서 확인이 완료되었습니다.", buf, sizeof(buf), file);
+
+			m_slog.Format("%s", buf); m_slog.TrimRight();
+
+			displayGuide(m_slog);
+		}
+
+		delete[] pbuf;
+	}
+	break;
+	case 229:
+	{
+		_ledgerH* ledger = (_ledgerH*)lParam;;
+		CString ecod(ledger->ecod, sizeof(ledger->ecod));
+		CString emsg(ledger->emsg, sizeof(ledger->emsg));
+
+		m_slog.Format("[axis][CMainFrame] 코스콤 최선집행 등록 결과 [%d]   [%s]",atoi(ecod), emsg);
+
+		if (atoi(ecod) < 1000 )
+			this->SendPIBOpopu("I", 230);
+
+		WriteLog(m_slog);
+	}
+	break;
+	case 228:
+	{
+		CString sRes;
+
+		struct PIBOjggb_mod //장운영
+		{
+			char gubn[1];
+		};
+
+		char* pbuf = new char[16];
+		FillMemory(pbuf, 16, 0x00);
+		memcpy(pbuf, (char*)lParam, sizeof(struct PIBOjggb_mod));
+		PIBOjggb_mod* pdata = (PIBOjggb_mod*)pbuf;
+		m_slog.Format("[axis][CMainFrame] 장시장구분(PIBOjggb) 조회결과 !!  gubn= [%s]  \n", (char*)pdata->gubn);
+		WriteLog(m_slog);
+
+		sRes.Format("%s", (char*)pdata->gubn);
+		sRes.TrimRight();
+
+#ifdef DF_MK_CAPTION
+		switch (atoi(sRes))
+		{
+			case 0:  //휴장일                       
+			{
+				m_iKRXype = 0;   //KRX 장마감
+				m_iNXType = 0;   //NXT 장마감  
+			}
+			break;
+			case 1:  //1. 장전              ~08:00               
+			{
+				m_iKRXype = 0;   //KRX 장마감
+				m_iNXType = 0;   //NXT 장마감  
+			}
+			break;
+			case 2:  // 2. 프리마켓     08:00~08:50       
+			{
+				m_iKRXype = 0;   //KRX 장마감
+				m_iNXType = 1;   //NXT 프리마켓
+			}
+			break;
+			case 3:  //3. 오전휴장     08:50~09:00                
+			{
+				m_iKRXype = 0;   //KRX 장마감
+				m_iNXType = 0;   //NXT 장마감
+			}
+			break;
+			case 4:  //메인마켓     09:00~15:20                    
+			{
+				m_iKRXype = 2;   
+				m_iNXType = 2;   
+			}
+			break;
+			case 5:  //오후휴장     15:20~15:30                    
+			{
+				m_iKRXype = 2;
+				m_iNXType = 0;
+			}
+			break;
+			case 6:  //단일가매매   15:30~15:40                 
+			{
+				m_iKRXype = 0;
+				m_iNXType = 3;
+			}
+			break;
+			case 7:  //에프터마켓   15:40~20:00                       
+			{
+				m_iKRXype = 1;
+				m_iNXType = 3;
+			}
+			break;
+			case 8:  //장마감       20:00~                    
+			{
+				m_iKRXype = 0;
+				m_iNXType = 0;
+			}
+			break;
+			default:
+			{
+				m_iKRXype = -1;
+				m_iNXType = -1;
+			}
+		}
+
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //HTS 시작후 장상태조회  pibojggb
+#endif
+	}
+	break;
 //	case 249: ParingGroupList(wParam, lParam); break;												  //axiscp::
 //	case 248: ParingGroupCode(wParam, lParam); break;
 		/*
@@ -14126,7 +16110,10 @@ void CMainFrame::SendSACMQ101() //test CDD
 	memcpy((char*)&data[L_ledgerH], "00001", 5);
 	memcpy((char*)&data[L_ledgerH + 5], (LPSTR)m_sjumin.GetBuffer(0), m_sjumin.GetLength());
 
-	sendTR("pibopbxq", data, L_ledgerH + 25, US_KEY, 235);
+	bool bret = sendTR("pibopbxq", data, L_ledgerH + 25, US_KEY, 235);
+	m_slog.Format("[AXIS] [%s][cdd] ret=[%d] ID=[%s] ip=[%s] jumin=[%s]", __FUNCTION__,bret, Axis::userID, Axis::userIP, m_sjumin);
+	OutputDebugString(m_slog);
+	WriteLog(m_slog);
 }
 
 void CMainFrame::SendSAMFQ014() //test CDD
@@ -14142,7 +16129,10 @@ void CMainFrame::SendSAMFQ014() //test CDD
 	ledger->mkty[0] = '3';
 	memcpy(ledger->pcip, Axis::userIP, Axis::userIP.GetLength());
 
-	sendTR("pibopbxq", data, L_ledgerH, US_KEY, 236);
+	bool bret = sendTR("pibopbxq", data, L_ledgerH, US_KEY, 236);
+	m_slog.Format("[AXIS] [%s][cdd] ret =[%d]  ID=[%s] ip=[%s]", __FUNCTION__, bret, Axis::userID, Axis::userIP);
+	OutputDebugString(m_slog);
+	WriteLog(m_slog);
 }
 
 void CMainFrame::SendSBPGT336(CString sData)
@@ -14166,15 +16156,72 @@ void CMainFrame::SendSBPGT336(CString sData)
 	sendTR("pibopbxq", data, L_ledgerH + sizeof(SBPGT336_mid), US_ENC, 'c');
 }
 
+void CMainFrame::SendSACMT279()
+{
+	struct SACMT279_mid //최선집행의무 등록
+	{
+		char In[5];
+		char TrxTp[1];
+		char CIninfTy[1];
+		char CIntNo[20];
+		char pwd[8];
+		char DlvrDt[8];
+		char DlvrMthdCode[2];
+		char RtpstTp[1];
+		char RtpstDt[8];
+		char RtpstRsnCode[2];
+	};
+
+	char data[1024];
+	FillMemory(data, sizeof(data), ' ');
+	_ledgerH* ledger = (_ledgerH*)&data[0];
+
+	memcpy(ledger->svcd, "SACMT279", 8);
+	memcpy(ledger->fkey, "5   ", 4);
+
+	SACMT279_mid* mid = (SACMT279_mid*)&data[L_ledgerH];
+	memcpy(mid->In, "00001", 5);
+	memcpy(mid->TrxTp, "1", 1);
+	memcpy(mid->CIninfTy, "4", 1);
+	memcpy(mid->CIntNo, Axis::userID, Axis::userID.GetLength());
+
+	const CTime tm(CTime::GetCurrentTime());
+	CString today;
+	today.Format("%04d%02d%02d", tm.GetYear(), tm.GetMonth(), tm.GetDay());
+	memcpy(mid->DlvrDt, today, today.GetLength());
+
+	memcpy(mid->DlvrMthdCode, "05", 2);
+	memcpy(mid->RtpstTp, "0", 1);
+	memcpy(mid->RtpstDt, "00000000", 8);
+
+	sendTR("pibopbxq", data, L_ledgerH + sizeof(SACMT279_mid), US_ENC, 229);
+}
+
+void CMainFrame::SendPIBOpopu(CString sGubn, int ikey)
+{
+	struct PIBOpopu_mid //최선집행의무 등록
+	{
+		char gubn[4];
+		char usid[16];
+		char type[1];
+		char data[4];
+	};
+
+	char data[100];
+	FillMemory(data, sizeof(data), ' ');
+	
+	PIBOpopu_mid* mid = (PIBOpopu_mid*)&data[0];
+	memcpy(mid->gubn, "NXTS", 4);   //NXTF->NXTS
+	memcpy(mid->type, sGubn, 1);
+	memcpy(mid->data, "0100", 4);
+	memcpy(mid->usid, Axis::userID, Axis::userID.GetLength());
+
+	sendTR("pibopopu", data, sizeof(PIBOpopu_mid), US_ENC, ikey);
+}
+
 #define DF_DEV 
-//#define DEV_REAL
 void CMainFrame::ParseSACMQ101(char* dat, int len)   //test CDD
 {
-	if (len > 400)
-	{
-		m_slog.Format("ParseSACMQ101 len=[%d]", len);
-		return;
-	}
 	struct st_out_SACMQ101
 	{
 		char out_in[25];
@@ -14205,6 +16252,10 @@ void CMainFrame::ParseSACMQ101(char* dat, int len)   //test CDD
 	CString sres(psacmq101->out_realnamegubn, sizeof(psacmq101->out_realnamegubn));
 	sres.TrimRight();
 
+	m_slog.Format("[AXIS] [%s][cdd] len=[%d] ecod=[%s] sres=[%s]", __FUNCTION__, len, ecod, sres);
+	OutputDebugString(m_slog);
+	WriteLog(m_slog);
+
 	if (sres.Find("주민등록") >= 0)
 	{
 		CString file, axisfile, usnm = Axis::user;
@@ -14212,7 +16263,7 @@ void CMainFrame::ParseSACMQ101(char* dat, int len)   //test CDD
 		WritePrivateProfileString("CDD/EDD", "popIB8224", "1", file);
 	}
 	else
-		m_axGuide->SetGuide("CDD EDD 온라인 등록은 개인 고객만 가 능합니다.", this);
+		displayGuide("CDD EDD 온라인 등록은 개인 고객만 가 능합니다.");
 		//m_axMisc->MsgBox("CDD EDD 온라인 등록은 개인 고객만 가 능합니다.", "IBK 투자증권");
 }
 
@@ -14226,6 +16277,10 @@ void CMainFrame::ParseSAMFQ014(char* dat, int len)  //test CDD
 	//char* pdata = (char*)&dat[L_ledgerH]; 
 	char pdata[5];
 	memcpy(pdata, (char*)&dat[L_ledgerH], 5);
+
+	m_slog.Format("[AXIS] [%s][cdd] len=[%d] ecod=[%s] pdata=[%s]", __FUNCTION__, len, ecod, pdata);
+	OutputDebugString(m_slog);
+	WriteLog(m_slog);
 
 	if (atoi(pdata) == 1)
 		SendSACMQ101();
@@ -14271,7 +16326,7 @@ void CMainFrame::ParseSBPGT336(char* pdata, int len)
 
 void CMainFrame::processNEWS(char* dat, int len)
 {
-	WriteLog("ProcessNEWS - Step 1");
+	WriteLog("[AXIS] ProcessNEWS - Step 1");
 	CString sdata(_T(""));
 	sdata = (char*) dat;
 	//dat = dat+4;
@@ -14280,32 +16335,32 @@ void CMainFrame::processNEWS(char* dat, int len)
 
 	Path.Format("%s\\%s\\%s\\notice.dat", Axis::home, USRDIR, Axis::user);
 
-	WriteLog("ProcessNEWS - Step 2");
+	WriteLog("[AXIS] ProcessNEWS - Step 2");
 	
 	TRY
 	{
-		WriteLog("ProcessNEWS - Step 3");
+		WriteLog("[AXIS] ProcessNEWS - Step 3");
 		CFile	file;
 		if (!file.Open(Path, CFile::modeCreate|CFile::modeWrite))
 		{
 			TRACE("Create Failed\n");
 			return;
 		}
-		WriteLog("ProcessNEWS - Step 4");
+		WriteLog("[AXIS] ProcessNEWS - Step 4");
 		file.Write(dat, len);
-		WriteLog("ProcessNEWS - Step 5");
+		WriteLog("[AXIS] ProcessNEWS - Step 5");
 		file.Close();
-		WriteLog("ProcessNEWS - Step 6");
+		WriteLog("[AXIS] ProcessNEWS - Step 6");
 	}
 	CATCH (CFileException, e) 
 	{
 		char emsg[1024];
 		e->GetErrorMessage(emsg, 1024);
-		WriteLog("ProcessNEWS Error- %s", emsg);
+		WriteLog("[AXIS] ProcessNEWS Error- %s", emsg);
 	}
 	END_CATCH;
 	
-	WriteLog("SetTimer -> %d", SetTimer(TM_NOTICE, 1000, NULL));
+	WriteLog("[AXIS] SetTimer -> %d", SetTimer(TM_NOTICE, 1000, NULL));
 }
 
 void CMainFrame::processTICK(CString dat)
@@ -14454,7 +16509,7 @@ void CMainFrame::processELOG(char* dat)
 
 void CMainFrame::sendTicInfo()
 {
-WriteLog("CMainFrame::sendTicInfo");
+WriteLog("[AXIS] CMainFrame::sendTicInfo");
 
 	CString	section, keys;
 	char	buf[1024 * 2]{}, ticInfo[255]{};
@@ -14703,6 +16758,49 @@ void CMainFrame::actionCaption(int key, int action)
 	case IDX_SINGLE:	
 		convertSDI(key, m_vsN);		
 		break;
+#ifdef DF_MK_CAPTION
+	case IDX_LOCK:
+	{
+		child->m_xcaption.ChangeLock();
+	}
+	break;
+	case IDX_MARKET:
+	{
+		if (child->m_xcaption.m_marketN == MK_NON)
+			return;
+
+		if (child->m_xcaption.m_MkLock)
+		{
+			MessageBox("거래소 잠금 해제 후 선택 가능합니다", "IBK투자증권", MB_OK);
+			return;
+		}
+
+		value = child->m_xcaption.ClickMK();
+
+		if (value < 1)
+			return;
+
+		m_slog.Format("[AXIS][NXT][%s]<%d> Market =[%d]", __FUNCTION__, __LINE__, value);
+		child->m_xcaption.SetMarket(value);
+		child->m_xcaption.Invalidate();
+
+		CString tmp;
+		tmp.Format("edMarketTrigger\t%s", value == 1?"KRX": value == 2?"NXT":"통합");
+		OutputDebugString(tmp);
+		m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY,
+			(void*)NULL, (BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, child->m_key), (LPARAM)(const char*)tmp);
+
+		/*tmp.Format("Testproc\t%s", value == 1 ? "KRX" : value == 2 ? "NXT" : "통합");
+		if (m_pSharedMemory)
+			m_pSharedMemory->SendMessage(WM_USER, MAKEWPARAM(MAKEWORD(MMSG_SHARED_PROCDLL, child->m_key), child->m_key), (LPARAM)(LPSTR)(LPCTSTR)tmp);*/
+		/*
+			   tmp.Format("edMarketTrigger\t%d", value);
+			   OutputDebugString(tmp);
+			   m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY, (
+				   void*)NULL, (BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, m_activeKey), (LPARAM)(const char*)tmp);*/
+	}
+	break;
+#endif
 	case IDX_GROUP:
 		value = child->m_xcaption.ChangeGroup();
 		if (value >= 0)	set_Trigger(key, value);
@@ -14818,6 +16916,38 @@ void CMainFrame::actionSCaption(int key, int action)
 		else	schild->SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
 		break;
 	case IDX_SINGLE:	convertMDI(key, m_vsN);		break;
+#ifdef DF_MK_CAPTION
+	case IDX_LOCK:
+	{
+		schild->m_xcaption.ChangeLock();
+	}
+	break;
+	case IDX_MARKET:
+	{
+		if (schild->m_xcaption.m_marketN == MK_NON)
+			return;
+
+		if (schild->m_xcaption.m_MkLock)
+			return;
+
+		value = schild->m_xcaption.ClickMK();
+		m_slog.Format("[AXIS][NXT][%s]<%d> Market =[%d]", __FUNCTION__, __LINE__, value);
+		schild->m_xcaption.SetMarket(value);
+		schild->m_xcaption.Invalidate();
+
+		CString tmp;
+		tmp.Format("edMarketTrigger\t%s", value == 1 ? "KRX" : value == 2 ? "NXT" : "통합");
+		OutputDebugString(tmp);
+		m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY,
+			(void*)NULL, (BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, schild->m_key), (LPARAM)(const char*)tmp);
+		/*
+			   tmp.Format("edMarketTrigger\t%d", value);
+			   OutputDebugString(tmp);
+			   m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY, (
+				   void*)NULL, (BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, m_activeKey), (LPARAM)(const char*)tmp);*/
+	}
+	break;
+#endif
 	case IDX_GROUP:
 		value = schild->m_xcaption.ChangeGroup();
 		if (value >= 0)	set_STrigger(key, value, m_vsN);
@@ -14900,6 +17030,9 @@ int CMainFrame::InputScreenNo(CString dispN)
 	if (m_tMenu)
 	{
 		CString mapN = m_tMenu->GetMap(dispN);
+		if (ScreenCheck(mapN) == DF_NUSE)
+			return 0;
+
 		if (!ExistMenu(mapN))	
 			return 0;
 // 		if (IsForeignMap(mapN))
@@ -14955,6 +17088,12 @@ void CMainFrame::ConfigFrame()
 	if (!m_conclusion->Create(IDD_CONCLUSIONLIST))
 		m_conclusion = nullptr;
 	else	m_conclusion->Init();
+
+	m_pServerOrd = std::make_unique<CDlgServerOrder>(this);   //modi 서버주문 리스트
+	if (!m_pServerOrd->Create(IDD_DLG_SERVERORDER))
+		m_pServerOrd = nullptr;
+	else	m_pServerOrd->Init();
+
 	OutputDebugString("--------------------------------4--------------------\n");
 	m_kobanotify = std::make_unique<CKobaElwNotify>(this);   
 	if (!m_kobanotify->Create(IDD_KOBA_NOTIFY))
@@ -14971,6 +17110,11 @@ void CMainFrame::ConfigFrame()
 	m_mngInfo = std::make_unique<CManageInfo>(this);
 	if (!m_mngInfo->Create(IDD_MNGINFO))
 		m_mngInfo = nullptr;
+
+	//modi createslidewnd
+#ifdef DF_SLIDEWND
+	CreateSlideWnd();
+#endif
 
 	OutputDebugString("--------------------------------7--------------------\n");
 	m_top10 = std::make_unique<CTOP10Dialog>(this);
@@ -15220,11 +17364,54 @@ LONG CMainFrame::OnCHASER(WPARAM wParam, LPARAM lParam)
 // 		OutputDebugString(s);
 // 	}
 
-	CString	winCaption;
-	winCaption.Format("AxisChaser for %s", m_regkey);
-	CWnd* wnd = CWnd::FindWindow(NULL, winCaption);
-	 if (wnd->GetSafeHwnd())
-		::SendMessage(wnd->m_hWnd, WM_COPYDATA, 0, (LPARAM) &cs);
+	CString	winCaption, slog;
+	slog.Format("%s", bufx + L_cds);
+	OutputDebugString(slog);
+
+	if (m_mapDebugKey.GetCount() == 0)
+	{
+		CString str;
+		winCaption.Format("AxisChaser for %s", m_regkey);
+		CWnd* wnd = CWnd::FindWindow(NULL, winCaption);
+		if (wnd->GetSafeHwnd())
+			::SendMessage(wnd->m_hWnd, WM_COPYDATA, 0, (LPARAM)&cs);
+
+		m_sync.Unlock();
+		return 0;
+	}
+
+
+	bool bfind = false;
+	CString skey, stemp;
+	for (POSITION pos = m_mapDebugKey.GetStartPosition(); pos; )
+	{
+		m_mapDebugKey.GetNextAssoc(pos, skey, stemp);
+		skey.TrimRight();
+		if (slog.Find(skey) >= 0 && skey.GetLength() > 0)
+		{
+			bfind = true;
+			break;
+		}
+	}
+	if (bfind)
+	{
+		for (POSITION pos = m_mapDebugRemoveKey.GetStartPosition(); pos; )
+		{
+			m_mapDebugRemoveKey.GetNextAssoc(pos, skey, stemp);
+			skey.TrimRight();
+			if (slog.Find(skey) >= 0 && skey.GetLength() > 0)
+			{
+				return 0;
+			}
+		}
+
+		CString str;
+		winCaption.Format("AxisChaser for %s", m_regkey);
+		CWnd* wnd = CWnd::FindWindow(NULL, winCaption);
+		if (wnd->GetSafeHwnd())
+			::SendMessage(wnd->m_hWnd, WM_COPYDATA, 0, (LPARAM)&cs);
+	}
+
 	m_sync.Unlock();
 	return 0;
 }
@@ -15375,16 +17562,16 @@ LRESULT CMainFrame::OnAxisClose(WPARAM wParam, LPARAM lParam)
 	switch (m_step)
 	{
 	case axOPENRSM:
-		{
-			if(m_bUseNewLogin)
-				m_axConnect->SetProgress(false);
-			else
-				m_axConnectOld->SetProgress(false);
-		}
+	{
+		if (m_bUseNewLogin)
+			m_axConnect->SetProgress(false);
+		else
+			m_axConnectOld->SetProgress(false);
+	}
 	case axOPENWSH:
 	case axOPENSIGN:
 		m_step = axNONE;
-		if(m_bUseNewLogin)
+		if (m_bUseNewLogin)
 		{
 			m_axConnect->SetStatus(SM_EXIT);
 			if (m_axConnect->GetStyle() & WS_VISIBLE)
@@ -15420,7 +17607,7 @@ LRESULT CMainFrame::OnAxisClose(WPARAM wParam, LPARAM lParam)
 		//종료전 마지막화면 저장
 		saveExitMap();
 
-		if(m_bUseNewLogin)
+		if (m_bUseNewLogin)
 		{
 			if (m_axConnect && IsWindow(m_axConnect->GetSafeHwnd()) && m_axConnect->ContinueModal())
 				m_axConnect->EndDialog(IDCANCEL);
@@ -15432,6 +17619,27 @@ LRESULT CMainFrame::OnAxisClose(WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case axDONE:
+		//ref 보안프로그램(ASTx) 미가동으로 인한 프로세스 종료
+		if (wParam == 99)
+		{
+			char	buf[512];
+			CString	file, stmp, smap;
+			file.Format("%s\\tab\\axis.ini", Axis::home);
+			if (m_sIntegrityMSG.IsEmpty())
+			{
+				DWORD dw = GetPrivateProfileString("ASTx", "msg", "보안프로그램(ASTx) 미가동!!", buf, sizeof(buf), file);
+				str.Format("%s", buf); stmp.TrimRight();
+
+				m_axMisc->MsgBox(str, title);
+			}
+			else
+				m_axMisc->MsgBox(m_sIntegrityMSG, title);
+
+			PostMessage(WM_CLOSE);
+			return 0;
+		}
+		//ref
+
 		msg.LoadString(ST_MSG_DISCONNECT_RETRY);
 		title.LoadString(ST_TEXT_OK);
 		//2014.02.04 dkkim
@@ -15544,6 +17752,11 @@ void CMainFrame::ProcessInfofile(bool upload)
 		}
 
 		load_dbar2();
+	}
+	else
+	{
+		if (m_infofile->GetUploadMemoYN())
+			MemoUpload();
 	}
 
 #ifdef DF_USE_CPLUS17
@@ -16052,7 +18265,7 @@ void CMainFrame::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStru
 		m_tMenu->MeasureMenuItem(nIDCtl,lpMeasureItemStruct); 
 }
 
-void CMainFrame::trouble_shooting( CString strErrMsg ,CString sKey)
+void CMainFrame::trouble_shooting( CString strErrMsg ,CString sKey, CString sSection)
 {	
 	CString sdat,stime,strLog;
 
@@ -16072,8 +18285,8 @@ void CMainFrame::trouble_shooting( CString strErrMsg ,CString sKey)
 	memset(&mid, 0, sizeof(mid));
 	mid.gubn[0] = 'I';
 	memcpy(mid.item.usid, (LPCSTR)Axis::userID, Axis::userID.GetLength());
-	memcpy(mid.item.innm, stime, 8);
-	memcpy(mid.item.senm, "OS", 2);
+	memcpy(mid.item.innm, sKey, sKey.GetLength());
+	memcpy(mid.item.senm, sSection, sSection.GetLength());
 	memcpy(mid.item.skey, sKey, 8);
 	sprintf(mid.item.valu, strLog);
 	memcpy(mid.item.date, sdat, 8);
@@ -16227,7 +18440,6 @@ void writeError(CString strlog)
 
 void CMainFrame::ErrReport(CString eMsg)
 {
-	//trouble_shooting(eMsg);
 	writeError(eMsg);
 	if(!m_bClose)
 		WriteErrFile((char *)(const char*)eMsg, eMsg.GetLength());
@@ -18414,7 +20626,94 @@ bool CMainFrame::ExceptMap(CString mapN)
 		return true;
 	}
 
+	if (ScreenCheck(mapname, 1) == DF_NUSE)
+		return true;
+
 	return false;
+}
+
+int CMainFrame::ScreenCheck(CString mapname,int  igubn)
+{
+//#define DF_NUSE 0					    //#0x00 사용불가      0  
+//#define DF_YUSE 1					     //#0x01 사용가능      1
+//#define DF_NUSE_AFTERDAY 2    //#0x02 특정날짜이후 사용가능    2
+//#define DF_YUSE_AFTERDAY 4  //#0x02 특정날짜이후 사용중지    4
+//#define DF_YUSE_MANAGER 8  //#0x08 관리자전용  8
+//#define DF_YUSE_DEBUG   16   //#0x10 디버그기능 포함   16
+//#define DF_YUSE_DEBUG   32   //#0x20 시작할때만 안띄움 32
+
+	m_slog.Format("[ScreenCheck] mapname=%s igubn=[%d]", mapname, igubn);
+	OutputDebugString(m_slog);
+
+	CString sData{};
+	if(!m_mapManage.Lookup(mapname, sData))
+	{
+		if (mapname.Left(2) == "00")
+		{
+			mapname = "IB" + mapname.Mid(2);
+			if (!m_mapManage.Lookup(mapname, sData))
+			{
+				m_slog.Format("[ScreenCheck]1 YESUSE mapname=%s igubn=[%d]", mapname, igubn);
+				OutputDebugString(m_slog);
+				return DF_YUSE;
+			}
+		}
+		else
+		{
+			m_slog.Format("[ScreenCheck]2 YESUSE mapname=%s igubn=[%d]", mapname, igubn);
+			OutputDebugString(m_slog);
+			return DF_YUSE;
+		}
+	}
+
+	CString sval, sDate, sPopType, sPopMap, sUrl;
+	sval = Parse(sData, "|");
+	sPopType = Parse(sData, "|");
+	sDate = Parse(sData, "|");
+	sPopMap = Parse(sData, "|");
+	sUrl = Parse(sData, "|");
+
+	if (igubn == 1 && sval == "32")
+	{  //HTS 시작할때는
+		m_slog.Format("[ScreenCheck] HTS 시작시 DF_NUSE mapname=%s", mapname);
+		OutputDebugString(m_slog);
+		return DF_NUSE;
+	}
+
+
+	if (sval == "0")     //사용안하는 화면에 대한 처리
+	{
+		if (!sPopMap.IsEmpty())   //맵으로 띄우는 안내팝업에 대한 내용이 있을경우
+		{
+
+			if (sPopType.IsEmpty())
+				sPopType = "1";
+
+			if (sPopType == "1")  //일반화면
+				m_mapHelper->ChangeChild(sPopMap);
+			else if (sPopType == "2")
+				m_mapHelper->CreateModal(sPopMap);
+			else if (sPopType == "2")
+				m_mapHelper->CreatePopup(sPopMap);
+		}
+		else	if (sPopType == "0")  //그냥 안띄우고 넘어감
+			return DF_NUSE;
+		else //url 팝업을 띄운다
+		{
+			CDlg_MSGBOX dlg;
+			if(dlg.DoModal() == IDOK)
+			{
+				m_iKey = m_mapHelper->ChangeChild("IB980001");
+				
+				m_sTriggerUrl.Format("edUrlTrigger\t%s", sUrl);
+
+				SetTimer(TM_NOSCREEN_URL, 1000, nullptr);
+			}
+		}
+		return DF_NUSE;
+	}
+
+	return DF_YUSE;
 }
 
 int CMainFrame::GetMacAddr(char* ipaddr, char* data)
@@ -18675,6 +20974,9 @@ void CMainFrame::RemoveMdi(int vsn, int key)
 void CMainFrame::AddSdi(int vsn, int key, CSChild* pChild)
 {
 	//m_groupBymapN.SetAt(pChild->m_mapN,CString(pChild->m_xcaption.GetGroup()));
+	CString s;
+	s.Format("MAP NAME SDI : [%s] GROUP : [%d]    key=[%d]\n", pChild->m_mapN, pChild->m_xcaption.GetGroup(), key);
+	OutputDebugString(s);
 
 	m_arSDI[vsn].SetAt(key, pChild);
 	RedrawVS();
@@ -20162,6 +22464,8 @@ void CMainFrame::AcctPasswordConfig()
 		return;
 	
 	m_mapHelper->CreateModal("IB0000A1", 0, 0x9f-4, 99);
+
+	//m_mapHelper->CreatePopup("IB0000A1", 1, WK_POPUP, CenterPOS);
 }
 
 void CMainFrame::AcctAliasConfig()
@@ -20345,8 +22649,139 @@ void CMainFrame::processMapVersionInfo(WPARAM wParam, LPARAM lParam)
 	}
 }
 
+#ifdef DF_MK_CAPTION
+void CMainFrame::CheckNXTTime(CString msg)
+{
+	/*
+	  KRX
+      0 장마감, 1 시간외,  2 정규장, 3 단일가
+	  NXT
+      0 장마감, 1 프리, 2 메인, 3 애프터
+	*/
+
+	if (msg.Find("NXT 프리마켓 개시") >= 0)  //08:00~
+	{
+		m_iKRXype = 0;   //KRX 장마감
+		m_iNXType = 1;  //NXT 프리마켓
+	}
+	else if (msg.Find("-------") >= 0)  //08:30~08:40
+	{
+		m_iKRXype = 1;   //KRX 시간외
+		m_iNXType = 1;   //NXT 프리마켓  
+	}
+	else if (msg.Find("-------") >= 0)  //08:40~08:50
+	{
+		m_iKRXype = 0;   //KRX 장마감
+		m_iNXType = 1;   //NXT 프리마켓  
+	}
+	else if (msg.Find("NXT 오전 휴장") >= 0)  //08:50~09:00:30
+	{
+		m_iKRXype = 0;   //KRX 장마감
+		m_iNXType = 0;   //NXT 장마감  
+	}
+	else if (msg.Find("NXT 메인마켓 개시") >= 0)  //09:00:30~15:20
+	{
+		m_iKRXype = 2;  //KRX 정규장
+		m_iNXType = 2; //NXT 정규장
+	}
+	else if (msg.Find("NXT 오후 휴장") >= 0)  //15:20~15:30
+	{
+		m_iKRXype = 2;  //KRX 정규장
+		m_iNXType = 0;  //NXT 장마감
+	}
+	else if (msg.Find("NXT 단일가 호가개시") >= 0)  //15:30~15:40
+	{
+		m_iKRXype = 0;  //KRX 장마감
+		m_iNXType = 3;  //NXT after
+	}
+	else if (msg.Find("NXT 애프터마켓 개시") >= 0)  //15:40~16:00
+	{
+		m_iKRXype = 1;  //KRX 시간외
+		m_iNXType = 3;  //NXT after
+	}
+	else if (msg.Find("NXT 애프터마켓 개시") >= 0)  //16:00~18:00
+	{
+		m_iKRXype = 3;  //KRX 단일가
+		m_iNXType = 3;  //NXT after
+	}
+	else if (msg.Find("NXT 애프터마켓 개시") >= 0)  //18:00~20:00
+	{
+		m_iKRXype = 0;  //KRX 장마감
+		m_iNXType = 3;  //NXT after
+	}
+	else if (msg.Find("NXT 애프터마켓 마감") >= 0)  // 20:00~ 
+	{
+		m_iKRXype = 0;
+		m_iNXType = 0;
+	}
+	else
+	{
+		m_iKRXype = -1;
+		m_iNXType =  -1;
+	}
+
+	CString sval;
+	sval.Format("[axis]NXT_TIME\t%d", m_iNXType);
+	OutputDebugString(sval);
+	WriteLog(sval);
+#ifdef  DF_MK_CAPTION
+	m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //CheckNXTTime(CString msg)
+#endif
+	//if (m_iNXType)
+	{
+		if (m_pSharedMemory)
+			m_pSharedMemory->PostMessage(WM_USER, MAKEWPARAM(MAKEWORD(MMSG_SHARED_BROADCAST, 1), 1), (LPARAM)(LPSTR)(LPCTSTR)sval);
+	}
+}
+#else
+void CMainFrame::CheckNXTTime(CString msg) // #else
+{
+	if (msg.Find("NXT 프리마켓 개시") >= 0)  //08:00~08:50
+		m_iNXType = 2;
+	else if (msg.Find("NXT 오전 휴장") >= 0)  //08:50~09:00:30
+		m_iNXType = 3;
+	else if (msg.Find("NXT 메인마켓 개시") >= 0)  //09:00:30~15:20
+		m_iNXType = 4;
+	else if (msg.Find("NXT 오후 휴장") >= 0)  //15:20~15:30
+		m_iNXType = 5;
+	else if (msg.Find("NXT 단일가 호가개시") >= 0)  //15:30~15:40
+		m_iNXType = 6;
+	else if (msg.Find("NXT 애프터마켓 개시") >= 0)  //15:40~20:00
+		m_iNXType = 7;
+	else if (msg.Find("NXT 애프터마켓 마감") >= 0)  // 20:00~ 
+		m_iNXType = 8;
+	else
+		m_iNXType = 0;
+
+	CString sval;
+	sval.Format("[axis]NXT_TIME\t%d", m_iNXType);
+	OutputDebugString(sval);
+	WriteLog(sval);
+#ifdef DF_SHOW_MARKET
+	m_bar1.get()->SetShowAIBtn(m_iNXType);  //#else  CheckNXTTime(CString msg)
+#endif
+	//if (m_iNXType)
+	{
+		if (m_pSharedMemory)
+			m_pSharedMemory->SendMessage(WM_USER, MAKEWPARAM(MAKEWORD(MMSG_SHARED_BROADCAST, 1), 1), (LPARAM)(LPSTR)(LPCTSTR)sval);
+	}
+}
+#endif
 void CMainFrame::ShowMngInfo(CString msg, int kind)
 {
+#ifdef DF_MK_CAPTION
+
+#else
+	CString sval;
+	sval.Format("[axis]NXT_TIME  msg=[%s]", msg);
+	OutputDebugString(sval);
+	WriteLog(sval);
+
+	if(msg.Find("NXT") >= 0 && msg.Find("종가") < 0 && msg.Find("발동") < 0 && msg.Find("주식") < 0)
+		CheckNXTTime(msg);
+
+#endif
+
 	m_mngInfo->SetData(msg, kind);
 
 	WINDOWPLACEMENT	pl;
@@ -20413,233 +22848,9 @@ CString CMainFrame::GetMapName(const char* mapName)
 	return m_tMenu->GetDesc(Format("IB%s00", mapName));
 }
 
-//CString CMainFrame::get_glb_addr(char* macaddr, char* ip)
-//{
-//	OutputDebugString("GLB -------get_glb_addr------\n");
-//	CString file;
-//	file.Format("%s\\exe\\axisglb.dll", Axis::home);
-//
-//	typedef long (WINAPI* GETGLBFUNC)(char*, char*, int, char*, int, bool);
-//	HMODULE hModule = LoadLibrary(file);
-//	CString ips("");
-//
-//	if (hModule)
-//	{
-//		GETGLBFUNC func = (GETGLBFUNC)GetProcAddress(hModule, "axGetGLB");
-//		if (func)
-//		{
-//			typedef struct {
-//				char user[12];
-//				char pass[8];
-//				char dats[10];
-//				char cpas[30];
-//				char uips[15];
-//				char madr[16];
-//				char fill[32];
-//			} axglbM;
-//
-//			typedef struct {
-//				char result;  // R: ok  X: failed (ip는 준다) ===> X, R 이외의 플래그일 경우 추후 메시지 처리 가능.
-//				char ip[16];
-//				char ecod[1];
-//				char verx[32];
-//			} axglbRcv;
-//
-//			axglbM* mid{};
-//			mid = new axglbM;
-//			//axglbRcv* mod{};
-//			//mod = new axglbRcv;
-//			char* pdata{};
-//			pdata = new char[sizeof(axglbRcv) + 50];
-//			memset(pdata, ' ', sizeof(axglbRcv) + 50);
-//			axglbRcv* mod = (axglbRcv*)pdata;
-//
-//			if (m_bUseNewLogin)
-//			{
-//				CString str = m_axConnect->GetSignInfo();
-//
-//				Axis::userID = m_axConnect->GetUserID();
-//				m_pass = m_axConnect->GetPassword();
-//				m_cpass = m_axConnect->GetCPass();
-//
-//				memset(mid, ' ', sizeof(axglbM));
-//				memset(mod, ' ', sizeof(axglbRcv));
-//				//보안상의 이유로 비밀번호 제거 - 2012.10.07
-//				FormatCopy(mid->user, Axis::userID);
-//				FormatCopy(mid->pass, "");
-//				CopyMemory(mid->dats, str, str.GetLength());
-//				FormatCopy(mid->cpas, "");
-//				FormatCopy(mid->uips, ip);
-//				FormatCopy(mid->madr, macaddr);
-//
-//				if (m_regkey.Find("STAFF") >= 0)
-//					FormatCopy(mid->fill, "HTS_HOT_STAFF_0001");   //vc2019
-//				else
-//					FormatCopy(mid->fill, "HTS_HOT_0001");
-//
-//				int len = func((char*)(const char*)(Axis::home + "\\" + TABDIR),
-//					(char*)mid, sizeof(axglbM), (char*)mod, sizeof(axglbRcv), (bool)!Axis::isCustomer);
-//
-//				ips = CString(mod->ip, sizeof(mod->ip));
-//				ips.TrimRight();
-//				m_slog.Format("GLB IP = [%s]\n", ips);
-//				OutputDebugString(m_slog);
-//				WriteLog(m_slog);
-//
-//			}
-//			else
-//			{
-//				CString str = m_axConnectOld->GetSignInfo();
-//
-//				Axis::userID = m_axConnectOld->GetUserID();
-//				m_pass = m_axConnectOld->GetPassword();
-//				m_cpass = m_axConnectOld->GetCPass();
-//
-//				memset(mid, ' ', sizeof(axglbM));
-//				memset(mod, ' ', sizeof(axglbRcv));
-//				//보안상의 이유로 비밀번호 제거 - 2012.10.07
-//				FormatCopy(mid->user, Axis::userID);
-//				FormatCopy(mid->pass, "");
-//				CopyMemory(mid->dats, str, str.GetLength());
-//				FormatCopy(mid->cpas, "");
-//				FormatCopy(mid->uips, ip);
-//				FormatCopy(mid->madr, macaddr);
-//
-//				if (m_regkey.Find("STAFF") >= 0)
-//					FormatCopy(mid->fill, "HTS_HOT_STAFF_0001");   //vc2019
-//				else
-//					FormatCopy(mid->fill, "HTS_HOT_0001");
-//
-//				int len = func((char*)(const char*)(Axis::home + "\\" + TABDIR),
-//					(char*)mid, sizeof(axglbM), (char*)mod, sizeof(axglbRcv), (bool)!Axis::isCustomer);
-//
-//				ips = CString(mod->ip, sizeof(mod->ip));
-//				ips.TrimRight();
-//				WriteLog(m_slog);
-//			}
-//
-//			m_axis->WriteProfileString(INFORMATION, "Server", ips);
-//		}
-//		FreeLibrary(hModule);
-//	}
-//
-//	return ips;
-//}
-//
-//CString CMainFrame::get_glb_addr_Index(char* macaddr, char* ip)
-//{
-//	OutputDebugString("GLB -------get_glb_addr_Index------\n");
-//
-//
-//	CString file;
-//	file.Format("%s\\exe\\axisglb.dll", Axis::home);
-//
-//	typedef long (WINAPI* GETGLBFUNC)(char*, char*, int, char*, int, int, bool);
-//	HMODULE hModule = LoadLibrary(file);
-//	CString ips("");
-//
-//	if (hModule)
-//	{
-//		GETGLBFUNC func = (GETGLBFUNC)GetProcAddress(hModule, "axGetGLB_Index");
-//		if (func)
-//		{
-//			typedef struct {
-//				char user[12];
-//				char pass[8];
-//				char dats[10];
-//				char cpas[30];
-//				char uips[15];
-//				char madr[16];
-//				char fill[32];
-//			} axglbM;
-//
-//			typedef struct {
-//				char result;  // R: ok  X: failed (ip는 준다) ===> X, R 이외의 플래그일 경우 추후 메시지 처리 가능.
-//				char ip[16];
-//				char ecod[1];
-//				char verx[32];
-//			} axglbRcv;
-//
-//			axglbM* mid{};
-//			mid = new axglbM;
-//			//axglbRcv* mod{};
-//			//mod = new axglbRcv;
-//			char* pdata{};
-//			pdata = new char[sizeof(axglbRcv) + 50];
-//			memset(pdata, ' ', sizeof(axglbRcv) + 50);
-//			axglbRcv* mod = (axglbRcv*)pdata;
-//
-//			if (m_bUseNewLogin)
-//			{
-//				CString str = m_axConnect->GetSignInfo();
-//
-//				Axis::userID = m_axConnect->GetUserID();
-//				m_pass = m_axConnect->GetPassword();
-//				m_cpass = m_axConnect->GetCPass();
-//
-//				memset(mid, ' ', sizeof(axglbM));
-//				memset(mod, ' ', sizeof(axglbRcv));
-//				//보안상의 이유로 비밀번호 제거 - 2012.10.07
-//				FormatCopy(mid->user, Axis::userID);
-//				FormatCopy(mid->pass, "");
-//				CopyMemory(mid->dats, str, str.GetLength());
-//				FormatCopy(mid->cpas, "");
-//				FormatCopy(mid->uips, ip);
-//				FormatCopy(mid->madr, macaddr);
-//				if (m_regkey.Find("STAFF") >= 0)
-//					FormatCopy(mid->fill, "HTS_HOT_STAFF_0001");   //vc2019
-//				else
-//					FormatCopy(mid->fill, "HTS_HOT_0001");
-//
-//				int len = func((char*)(const char*)(Axis::home + "\\" + TABDIR),
-//					(char*)mid, sizeof(axglbM), (char*)mod, sizeof(axglbRcv), m_iGlbIndex, (bool)!Axis::isCustomer);
-//
-//				ips = CString(mod->ip, sizeof(mod->ip));
-//				ips.TrimRight();
-//				m_slog.Format("GLB IP = [%s]\n", ips);
-//				OutputDebugString(m_slog);
-//				WriteLog(m_slog);
-//			}
-//			else
-//			{
-//				CString str = m_axConnectOld->GetSignInfo();
-//
-//				Axis::userID = m_axConnectOld->GetUserID();
-//				m_pass = m_axConnectOld->GetPassword();
-//				m_cpass = m_axConnectOld->GetCPass();
-//
-//				memset(mid, ' ', sizeof(axglbM));
-//				memset(mod, ' ', sizeof(axglbRcv));
-//				//보안상의 이유로 비밀번호 제거 - 2012.10.07
-//				FormatCopy(mid->user, Axis::userID);
-//				FormatCopy(mid->pass, "");
-//				CopyMemory(mid->dats, str, str.GetLength());
-//				FormatCopy(mid->cpas, "");
-//				FormatCopy(mid->uips, ip);
-//				FormatCopy(mid->madr, macaddr);
-//				if (m_regkey.Find("STAFF") >= 0)
-//					FormatCopy(mid->fill, "HTS_HOT_STAFF_0001");   //vc2019
-//				else
-//					FormatCopy(mid->fill, "HTS_HOT_0001");
-//
-//				int len = func((char*)(const char*)(Axis::home + "\\" + TABDIR),
-//					(char*)mid, sizeof(axglbM), (char*)mod, sizeof(axglbRcv), m_iGlbIndex, (bool)!Axis::isCustomer);
-//
-//				ips = CString(mod->ip, sizeof(mod->ip));
-//				ips.TrimRight();
-//				WriteLog(m_slog);
-//			}
-//
-//			m_axis->WriteProfileString(INFORMATION, "Server", ips);
-//		}
-//		FreeLibrary(hModule);
-//	}
-//
-//	return ips;
-//}
-
 CString CMainFrame::get_glb_addr(char* macaddr, char* ip)
 {
+	WriteLog("");
 	OutputDebugString("GLB -------get_glb_addr------\n");
 	CString file;
 	file.Format("%s\\exe\\axisglb.dll", Axis::home);
@@ -20701,9 +22912,6 @@ CString CMainFrame::get_glb_addr(char* macaddr, char* ip)
 				int len = func((char*)(const char*)(Axis::home + "\\" + TABDIR),
 					(char*)mid, sizeof(axglbM), (char*)mod, sizeof(axglbRcv), (bool)!Axis::isCustomer);
 
-				m_slog.Format("GLB   [%s]\n", mod->ip);
-				OutputDebugString(m_slog);
-				WriteLog(m_slog);
 				ips = CString(mod->ip, sizeof(mod->ip));
 				ips.TrimRight();
 			}
@@ -21209,6 +23417,16 @@ void CMainFrame::DoFunc(int funcID)
 		OpenPBNews();
 		break;
 	case 12: // reserved..
+		{
+			char	buf[256]{};
+			CString	file, strmap, strname;
+			file.Format("%s\\tab\\axisAI.ini", Axis::home);
+			DWORD dw = GetPrivateProfileString("MAP", "num", "IBAI0000", buf, sizeof(buf), file);
+			strmap.Format("%s", buf);
+			strmap.TrimRight();
+
+			m_mapHelper->ChangeChild(strmap);
+		}
 		break;
 	}
 }
@@ -21251,6 +23469,11 @@ void CMainFrame::ShowSingleWindows(BOOL bShow)
 
 CString CMainFrame::GetUserPassword()
 {
+	m_slog.Format("[AXIS][WEB] m_bCertLogin=[%d] m_pass=[%s] ", m_bCertLogin, m_pass);
+	OutputDebugString(m_slog);
+	//WriteLog(m_slog);
+	if (m_bCertLogin)
+		return _T("");
 	return m_pass;
 }
 
@@ -21284,13 +23507,29 @@ void CMainFrame::GetLocalIP()
 {
 	if (m_ipAddr.GetLength() > 0)
 		return;
-	//m_ipAddr = "172.17.2.74";
-	//return;
-	char szHostName[64] = {0};
-	m_slog.Format("GetLocalIP");
-	WriteLog(m_slog);
 
+WriteLog("");
+m_slog.Format("[AXIS] GetLocalIP start");
+WriteLog(m_slog);
+	char buf[256]{};
+	CString	file, stmp, smap;
+	file.Format("%s\\tab\\axis.ini", Axis::home);
+	DWORD dw = GetPrivateProfileString("IP", "local", "", buf, sizeof(buf), file);
+	
+	if (dw > 0)
+	{
+		m_bINILocal = TRUE;
+		m_ipAddr.Format("%s", buf);
+		m_slog.Format("[AXIS] GetLocalIP By ini m_ipAddr=[%s]", m_ipAddr);
+WriteLog(m_slog);
+		return;
+	}
+
+	char szHostName[64] = {0};
 	::gethostname(szHostName, sizeof(szHostName));
+	stmp.Format("[AXIS] gethostname=[%s]", szHostName);
+
+WriteLog(stmp);
 
 	if(lstrcmp(szHostName, "") != 0)
 	{
@@ -21304,7 +23543,7 @@ void CMainFrame::GetLocalIP()
 		CSocket	sock;
 		sock.Create();
 
-		m_slog.Format("GetLocalIP serverips =[%s] [%s]", serverips, szHostName);
+		m_slog.Format("[AXIS] GetLocalIP serverips =[%s] [%s]  port=[%d]", serverips, szHostName, port);
 		WriteLog(m_slog);
 
 		if (serverips.GetLength() > 0 && sock.Connect(serverips, port))
@@ -21335,6 +23574,9 @@ void CMainFrame::GetLocalIP()
 			}
 		}
 	}
+
+m_slog.Format("[AXIS] GetLocalIP end local ip = [%s]", m_ipAddr);
+WriteLog(m_slog);
 }
 
 //** FIRE WALL (INCA)
@@ -21401,6 +23643,16 @@ void CMainFrame::FreeFirewall()
 
 LRESULT CMainFrame::OnPhonePad(WPARAM wParam, LPARAM lParam)
 {
+	CString file;
+	char	buf[512];
+	file.Format("%s\\%s\\axisENC.ini", Axis::home, "tab");
+	DWORD dw = GetPrivateProfileString("USE", "OnPhonePad", "1", buf, sizeof(buf), file);
+	CString stemp{};
+	stemp.Format("%s", buf);
+	stemp.TrimRight();
+	if (stemp == "0")
+		return 0;
+
 	//MessageBox((char*)lParam);
 	m_slog.Format("[phonepad] OnPhonePad ");
 	OutputDebugString(m_slog);
@@ -22709,8 +24961,8 @@ void CMainFrame::RunPhonePad()
 		}
 	}*/
 
-	m_pMain->m_mapHelper->CreatePopup("IB877700", TRIGGERN, winK_POPUP, 
-			1, 1, CPoint(-1, -1), false);
+	m_pMain->m_mapHelper->CreatePopup("IB877700", TRIGGERN, winK_POPUP,
+		1, 1, CPoint(-1, -1), false);
 }
 
 BOOL CMainFrame::IsPhonePad(const char *map)
@@ -23872,9 +26124,20 @@ void CMainFrame::processSecureTool(char *data, int dlen)
 		PostMessage(WM_SECUREDLG, 0, 0);
 }
 
+
 LRESULT CMainFrame::OnSecureDlg(WPARAM wParam, LPARAM lParam)
 {
-	const BOOL pcAOS = AfxGetApp()->GetProfileInt(INFORMATION, "AOS", 1);
+	CString file;
+	char	buf[512];
+	file.Format("%s\\%s\\axisENC.ini", Axis::home, "tab");
+	DWORD dw = GetPrivateProfileString("USE", "OnSecureDlg", "1", buf, sizeof(buf), file);
+	CString stemp{};
+	stemp.Format("%s", buf);
+	stemp.TrimRight();
+	if (stemp == "0")
+		return 0;
+
+	const BOOL pcAOS = AfxGetApp()->GetProfileInt(INFORMATION, "AOS", 1); //modi ASTx 202409 이제 아래함수는 호출될 일이 없다
 	const BOOL pcFirewall = AfxGetApp()->GetProfileInt(INFORMATION,   "PCFirewall", 0);
 	const BOOL pcKeyProtect = AfxGetApp()->GetProfileInt(ENVIRONMENT, "KeyProtect", 0);
 	CSecureDlg dlg(this, pcAOS, pcFirewall, pcKeyProtect);
@@ -23895,7 +26158,7 @@ LRESULT CMainFrame::OnSecureDlg(WPARAM wParam, LPARAM lParam)
 			}
 		}
 		
-		AfxGetApp()->WriteProfileInt(INFORMATION, "AOS", 1);
+		AfxGetApp()->WriteProfileInt(INFORMATION, "AOS", 1);    //modi ASTx 202409 이제 아래함수는 호출될 일이 없다
 		AfxGetApp()->WriteProfileInt(INFORMATION, "PCFirewall", 1);
 		AfxGetApp()->WriteProfileInt(ENVIRONMENT, "KeyProtect", 1);
 	}
@@ -23968,19 +26231,12 @@ void CMainFrame::os_report()
 #endif
 	
 	memcpy(mid.item.skey, "VERSION", 7);
-	//VER[10.0] BUILD[19045] PLATFORM[2] OS[WINDOWS 10] OS BIT[64 Bit] CPU[6542672] 
-	//CPU NUMBER[16] MEMORY PHYS[6563912M] SKIN [Blue]
-	sprintf_s(mid.item.valu, "VER[%s] BUILD[%d] PLATFORM[%d] OS[%s] OS BIT[%s] "
-									  "CPU[%d] CPU NUMBER[%d] MEMORY PHYS[%dM] SKIN [%s]",
-		m_sysInfo->GetWindowVersion(), 
-		info.dwBuildNumber,
-		info.dwPlatformId, 
-		m_sysInfo->GetWindowInfo(), 
-		IsWow64(), 
-		m_sysInfo->GetCPUInfo(), 
-		sysinfo.dwNumberOfProcessors, 
-		m_sysInfo->GetMemoryInfo(), 
-		skinName);
+// 	sprintf(mid.item.valu, "VER[%d.%d] BUILD[%d] PLATFORM[%d] OS[%s] OS BIT[%s] CPU[%d] CPU NUMBER[%d] MEMORY PHYS[%dM] SKIN [%s]", 
+// 		info.dwMajorVersion, info.dwMinorVersion, info.dwBuildNumber,
+// 		info.dwPlatformId, m_sysInfo->GetWindowInfo(),IsWow64(),m_sysInfo->GetCPUInfo(),sysinfo.dwNumberOfProcessors,m_sysInfo->GetMemoryInfo(),skinName);
+	sprintf(mid.item.valu, "VER[%s] BUILD[%d] PLATFORM[%d] OS[%s] OS BIT[%s] CPU[%s] CPU NUMBER[%d] MEMORY PHYS[%sM] SKIN [%s]",
+		m_sysInfo->GetWindowVersion(), info.dwBuildNumber,
+		info.dwPlatformId, m_sysInfo->GetWindowInfo(), IsWow64(), m_sysInfo->GetCPUInfo(), sysinfo.dwNumberOfProcessors, m_sysInfo->GetMemoryInfo(), skinName);
 	memcpy(mid.item.date, sdat, 8);
 
 // 	CString s;
@@ -24110,10 +26366,59 @@ LONG CMainFrame::OnHotKey(WPARAM wp, LPARAM lp)
 
 void CMainFrame::LoadSecureTools()
 {	
+#ifdef DF_GLBFILE_CNVS
+	CString tmps, temps;
+	tmps = m_axis->GetProfileString(INFORMATION, "Port", Format("%d", m_bCustomer ? portProxy : portEmployee));
+	const UINT	port = atoi(tmps);
+
+	CString fname;
+	fname = Axis::home + "\\tab\\AXGLB.INI";
+	CFileFind finder;
+	if (port == portProxy)
+	{
+		if (finder.FindFile(fname))
+		{
+			WritePrivateProfileString("Server_PORT", "00", "80", fname);
+			WritePrivateProfileString("Server_PORT", "01", "80", fname);
+		}
+	}
+	else
+	{
+		if (finder.FindFile(fname))
+		{
+			WritePrivateProfileString("Server_PORT", "00", "15101", fname);
+			WritePrivateProfileString("Server_PORT", "01", "15201", fname);
+		}
+	}
+
+	char buf[16]{};
+	DWORD dw = GetPrivateProfileString("Server_PORT", "00", "", buf, sizeof(buf), fname);
+	tmps.Format("%s", buf); tmps.TrimRight();
+	
+	memset(buf, 0x00, 16);
+	dw = GetPrivateProfileString("Server_PORT", "01", "", buf, sizeof(buf), fname);
+	temps.Format("%s", buf); temps.TrimRight();
+
+	if (tmps.GetLength() > 0 && temps.GetLength() > 0)
+	{
+m_slog.Format("[AXIS] LoadSecureTools   port=[%s][%s]\n ", tmps, temps);
+OutputDebugString(m_slog);
+WriteLog(m_slog);
+	}
+	else
+	{
+m_slog.Format("[AXIS] LoadSecureTools  file error");
+OutputDebugString(m_slog);
+	}
+
+#endif
+
 	DWORD dwError = STSDKEX_ERROR_SUCCESS;
 	
-	const BOOL pcAOS = AfxGetApp()->GetProfileInt(INFORMATION, "AOS", 1);
-	
+	//modi ASTx 202409  무조건 실행
+	//const BOOL pcAOS = AfxGetApp()->GetProfileInt(INFORMATION, "AOS", 1);
+	BOOL pcAOS = TRUE;
+
 	if(pcAOS && Axis::isCustomer)
 	{
 		if(m_bNoProtect)
@@ -24235,19 +26540,11 @@ BOOL CMainFrame::OnCreateClient( LPCREATESTRUCT lpcs, CCreateContext* pContext )
 BOOL CMainFrame::IsSuperUser()
 {
 	CString s;
-	if (Axis::userID = "khs779")
-		return TRUE;
+	//if (!Axis::isCustomer)
+	//	return (Axis::userID=="071006"); 
 
-	if (!Axis::isCustomer)
-		return (Axis::userID=="071006" || Axis::userID=="081394" || Axis::userID=="091120" || Axis::userID=="##ibk9" || Axis::userID=="890307" || Axis::userID == "071003" || Axis::userID == "171059" || Axis::userID == "191099"); 
-
-	else
+	//else
 	{
-// 		if(Axis::userID == "warship" || Axis::userID == "hwanmun" || Axis::userID == "dundas" || Axis::userID == "minkyu42" || Axis::userID == "fly2com" || Axis::userID == "onetym00" || Axis::userID == "" || Axis::userID == "haejoy" || Axis::userID == "devilswo" || Axis::userID == "june6365" || Axis::userID == "jingga")
-// 		{
-// 			return TRUE;
-// 		}
-
 		CString strFile;
 		strFile.Format("%s\\tab\\EXECSCREEN.ini", Axis::home); 
 
@@ -25195,7 +27492,7 @@ void CMainFrame::ScrapInformation()
 void CMainFrame::QueryPihoitgyList()
 {
 	const int nItgy	   = m_axis->GetProfileInt(WORKSTATION, "itgy", 0);
-WriteLog("CMainFrame::QueryPihoitgyList  nItgy=[%d] ", nItgy);
+
 	if(nItgy != 0 )
 	{
 		m_axis->WriteProfileInt(WORKSTATION, "itgy", 0);
@@ -25249,7 +27546,7 @@ WriteLog("CMainFrame::QueryPihoitgyList  nItgy=[%d] ", nItgy);
 	CopyMemory(mid.gubn, "1", sizeof(mid.gubn));
 	CopyMemory(mid.nrec, "0", sizeof(mid.nrec));
 	CopyMemory(mid.grid2, "", sizeof(mid.grid2));
-WriteLog("CMainFrame::QueryPihoitgyList  pihoitgy send ");
+WriteLog("[AXIS] CMainFrame::QueryPihoitgyList  pihoitgy send ");
 	sendTR("pihoitgy", (char*)&mid, sizeof(pihoitgy_mid), 0, 255);
 
 	SetTimer(TM_ITGY,5000,NULL);
@@ -25517,6 +27814,12 @@ void CMainFrame::ParsePihoitgyList(char* dat, int len)
 			if(!gubn.CompareNoCase("PLF"))
 			{
 				tmpG = "EXE";
+
+#ifdef DF_SHOWITGYLOG
+				m_slog.Format("[core] 조회해온 itgylist mnam=[%s] ", mnam);
+				OutputDebugString(m_slog);
+#endif
+
 			}
 			else
 			{
@@ -25538,7 +27841,11 @@ void CMainFrame::ParsePihoitgyList(char* dat, int len)
 			char* str = GetFileSHA256(filename,hModule);
 
 			gridItem.Format("%-3s%-47s%-44s",gubn,mnam,str);
-	
+
+#ifdef DF_SHOWITGYLOG	
+			m_slog.Format("[core] 조회해온 모듈의 sha256  mnam=[%s] sha=[%s]  ", mnam, str);
+			OutputDebugString(m_slog);
+#endif
 			m_arrayItgy.Add(gridItem);
 		}
 	}
@@ -25574,6 +27881,64 @@ void CMainFrame::ParsePihoitgyList(char* dat, int len)
 	}
 }
 
+void CMainFrame::AddUniqueFromBtoA(CStringArray& arrA, const CStringArray& arrB)
+{
+	for (int i = 0; i < arrB.GetSize(); ++i)
+	{
+		BOOL bExists = FALSE;
+		for (int j = 0; j < arrA.GetSize(); ++j)
+		{
+			if (arrA[j].Compare(arrB[i]) == 0)
+			{
+				bExists = TRUE;
+				break;
+			}
+		}
+
+		if (!bExists)
+		{
+			arrA.Add(arrB[i]);
+		}
+	}
+}
+
+int CMainFrame::Self_VerifyIntegrity()
+{
+	m_sIntegrityMSG.Empty();
+	CString file;
+	char	buf[512];
+	file.Format("%s\\%s\\axisENC.ini", Axis::home, "tab");
+	DWORD dw = GetPrivateProfileString("Integrity", "Except", "", buf, sizeof(buf), file);
+
+	m_sExIntegrity.Format("%s", buf);
+	m_sExIntegrity.TrimRight();
+
+	m_slog.Format("[core] [%s]<%d> m_sExIntegrity= [%s] \n", __FUNCTION__, __LINE__, m_sExIntegrity);
+	OutputDebugString(m_slog);
+
+	CString strPath;
+	char chfile[500]{};
+	GetModuleFileName(nullptr, chfile, 260);
+	strPath.Format("%s", chfile);
+
+	int nPos = strPath.ReverseFind('\\');
+	if (nPos != -1)
+		m_sExtraced = strPath.Mid(nPos + 1);
+	else
+		m_sExtraced = strPath;
+
+	m_slog.Format("[core] [%s]<%d>  [%s] [%s]\n", __FUNCTION__, __LINE__, m_sExtraced, m_sMainName);
+	OutputDebugString(m_slog);
+
+	//실행파일명을 고의로 변경했는지 비교해본다.
+	if (m_sExtraced.CompareNoCase(m_sMainName) == 0)
+		return 0;
+
+
+	//m_arraySelfItgy.Add(m_sMainName);
+	return 1;
+}
+
 void CMainFrame::ParsePihoitgy(char* dat, int len)
 {	
 	CString s;
@@ -25593,6 +27958,11 @@ void CMainFrame::ParsePihoitgy(char* dat, int len)
 	CString		gubn, mnam, itgy;
 	const pihoitgy_mod* mod = (struct pihoitgy_mod*) dat;
 	int	cnt = atoi(CString(mod->nrec, sizeof(mod->nrec)));
+
+#ifdef DF_SHOWITGYLOG
+	m_slog.Format("[core] [%s]<%d> itgy검증결과  >>>>>>>>>>    cnt =  [%d]\n", __FUNCTION__, __LINE__, cnt);
+	OutputDebugString(m_slog);
+#endif
 
 	if(cnt == 0)
 	{
@@ -25622,10 +27992,21 @@ void CMainFrame::ParsePihoitgy(char* dat, int len)
 
 		if(gubn == "PLF")
 		{
+
+#ifdef DF_SHOWITGYLOG
+			m_slog.Format("[core] 조회결과 :  변조된  platform 파일 =[%s] ", mnam);
+			OutputDebugString(m_slog);
+#endif
+
 			m_arrayPlfItgy.Add(mnam);
 		}
 		else
 		{
+
+#ifdef DF_SHOWITGYLOG
+			m_slog.Format("[core] 조회결과 :  변조된   파일 =[%s] ", mnam);
+			OutputDebugString(m_slog);
+#endif
 			m_arrayItgy.Add(mnam);
 		}
 	}
@@ -25752,6 +28133,10 @@ void CMainFrame::UpdateInfo(bool rsc)
 // 					}
 					if (line.Find(delRsc) > -1)
 					{
+#ifdef DF_SHOWITGYLOG
+		m_slog.Format("[core] [%s]<%d> ---- 변조되었다고 판단되어 infoAxis 파일 생성시 배제 !!!  delRsc=[%s] \n", __FUNCTION__, __LINE__, delRsc);
+		OutputDebugString(m_slog);
+#endif
 						match = true;
 						break;
 					}
@@ -26553,7 +28938,7 @@ BOOL CMainFrame::initASTx()
 
 	m_bSdkInitialized = TRUE;
 
-	m_slog.Format("[AStx][initASTx] 메모리 보안 실행 정상  m_bSdkInitialized=[%d]\n ", m_bSdkInitialized);
+	m_slog.Format("[AStx][initASTx]  정상  m_bSdkInitialized=[%d]\n ", m_bSdkInitialized);
 	WriteLog(m_slog);
 
 	return TRUE;
@@ -26581,7 +28966,7 @@ BOOL CMainFrame::uninitASTx()
 	
 	m_bSdkInitialized = FALSE;
 
-	m_slog.Format("[AStx][initASTx] 메모리 보안 실행 종료 m_bSdkInitialized=[%d]\n ", m_bSdkInitialized);
+	m_slog.Format("[AStx][uninitASTx]   m_bSdkInitialized=[%d]\n ", m_bSdkInitialized);
 	WriteLog(m_slog);
 
 	return TRUE;
@@ -26606,12 +28991,12 @@ BOOL CMainFrame::startPB()
 	if( STSDKEX_ERROR_SUCCESS == dwResult || STSDKEX_ERROR_NOT_ABLE_BECAUSE_PRIORITY_RULE == dwResult || STSDKEX_ERROR_FUNCTION_ALREADY_STARTED == dwResult )
 	{
 		OutputDebugString("[ASTx]해킹방지 기능이 정상적으로 시작되었습니다.");
-		WriteLog("[ASTx]해킹방지 기능이 정상적으로 시작되었습니다. [메모리] startPB()"); 
+		WriteLog("[ASTx][startPB] 해킹방지 기능이 정상적으로 시작되었습니다. [메모리]"); 
 	}
 	else
 	{
 		CString szMsg;
-		szMsg.Format(_T("해킹방지 기능 시작중 문제가 발생하였습니다.\r\n(result=0x%08x, %s)"), dwResult, Err2Str(dwResult));
+		szMsg.Format(_T("[startPB]해킹방지 기능 시작중 문제가 발생하였습니다.\r\n(result=0x%08x, %s)"), dwResult, Err2Str(dwResult));
 		AfxMessageBox(szMsg);
 	}
 
@@ -26638,17 +29023,17 @@ BOOL CMainFrame::stopPB()
 	if( STSDKEX_ERROR_SUCCESS == dwResult )
 	{
 		OutputDebugString("[ASTx] 해킹방지 기능이 종료 되었습니다.");
-		WriteLog("[ASTx]해킹방지 기능이 종료 되었습니다. [메모리] stopPB()");
+		WriteLog("[ASTx][stopPB]해킹방지 기능이 종료 되었습니다. [메모리]");
 	}
 	else if( STSDKEX_ERROR_FUNCTION_ALREADY_STOPPED == dwResult )
 	{
 		OutputDebugString("[ASTx] 해킹방지 기능이 동작중이지 않습니다.");
-		WriteLog("[ASTx]해킹방지 기능이 동작중이지 않습니다. [메모리] stopPB()");
+		WriteLog("[ASTx][stopPB]해킹방지 기능이 동작중이지 않습니다. [메모리]");
 	}
 	else
 	{
 		CString szMsg;
-		szMsg.Format(_T("해킹방지 기능 종료중 문제가 발생하였습니다.\r\n(result=0x%08x, %s)"), dwResult, Err2Str(dwResult));
+		szMsg.Format(_T("[stopPB]해킹방지 기능 종료중 문제가 발생하였습니다.\r\n(result=0x%08x, %s)"), dwResult, Err2Str(dwResult));
 		AfxMessageBox(szMsg);
 	}
 
@@ -26670,7 +29055,7 @@ BOOL CMainFrame::startFW()
 	if( STSDKEX_ERROR_SUCCESS == dwResult || STSDKEX_ERROR_NOT_ABLE_BECAUSE_PRIORITY_RULE == dwResult || STSDKEX_ERROR_FUNCTION_ALREADY_STARTED == dwResult )
 	{
 		OutputDebugString("[ASTx] 방화벽 기능이 정상적으로 기동되었습니다.");
-		WriteLog("[ASTx]방화벽 기능이 정상적으로 기동되었습니다. [방화벽] startFW()");
+		WriteLog("[ASTx][startFW]방화벽 기능이 정상적으로 기동되었습니다. [방화벽]");
 	}
 	else
 	{
@@ -26818,7 +29203,7 @@ BOOL CMainFrame::startAK()
 	if(FALSE == m_bSdkInitialized)
 	{
 		OutputDebugString("[ASTx] 초기화 되지않았습니다.");
-		WriteLog("[ASTx]초기화 되지않았습니다. [키보드보안] startAK()");
+		WriteLog("[ASTx][startAK] m_bSdkInitialized=[FALSE] 초기화 되지않았습니다. [키보드보안])");
 		return FALSE;
 	}
 	
@@ -26831,7 +29216,7 @@ BOOL CMainFrame::startAK()
 	if( g_pIAstxAkSDK == NULL )
 	{
 		OutputDebugString("[ASTx] AK SDK 초기화에 실패했습니다.");
-		WriteLog("[ASTx]AK SDK 초기화에 실패했습니다. [키보드보안] startAK()");
+		WriteLog("[ASTx][startAK] AK SDK 초기화에 실패했습니다. [키보드보안]");
 		return FALSE;
 	}
 
@@ -26842,7 +29227,7 @@ BOOL CMainFrame::startAK()
 	if( dwErr != STSDKEX_ERROR_SUCCESS )
 	{
 		OutputDebugString("[ASTx] AK 초기화에 실패했습니다.");
-		WriteLog("[ASTx] AK 초기화에 실패했습니다 [키보드보안] startAK()");
+		WriteLog("[ASTx][startAK] AK 초기화에 실패했습니다 [키보드보안]");
 		return FALSE;
 	}
 	
@@ -26864,7 +29249,7 @@ BOOL CMainFrame::startAK()
 // 	}
 // 
 // 	m_axConnect->SetAK(g_pIAstxAkSDK);
-	WriteLog("[ASTx]방화벽 기능이 정상적으로 기동되었습니다. [키보드보안] startAK()");
+	WriteLog("[ASTx][startAK] 키보드보안 기능이 정상적으로 기동되었습니다");
 	return TRUE;
 }
 
@@ -26881,7 +29266,7 @@ BOOL CMainFrame::stopAK()
 		}
 		
 		g_pIAstxAkSDK = NULL;
-		WriteLog("[ASTx]키보드 보안기능이  정상적으로 종료되었습니다. [키보드보안] stopAK()");
+		WriteLog("[ASTx][stopAK]키보드 보안기능이  정상적으로 종료되었습니다. [키보드보안]");
 	}
 
 	return TRUE;
@@ -27617,6 +30002,103 @@ void   CMainFrame::FileMove()
 	}
 }
 
+bool CMainFrame::MapCheckAndSendMsg(CString sMsg)
+{
+	int key{};
+	const long rc = 0;
+	POSITION pos;
+	CChildFrame* child{};
+	CSChild* schild{};
+
+	bool bfind{};
+	for (int ii = 0; ii < 6; ii++)
+	{
+		for (pos = m_arMDI[ii].GetStartPosition(); pos;)
+		{
+			m_arMDI[ii].GetNextAssoc(pos, key, child);
+			if (child->m_mapN == SERVER_ORDERMAP)
+			{
+				bfind = true;
+				m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY, (void*)NULL,
+					(BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, key), (LPARAM)(const char*)sMsg);
+			}
+		}
+	}
+
+	for (int ii = 0; ii < 6; ii++)
+	{
+		for (pos = m_arSDI[ii].GetStartPosition(); pos;)
+		{
+			m_arSDI[ii].GetNextAssoc(pos, key, schild);
+			if (schild->m_mapN == SERVER_ORDERMAP)
+			{
+				bfind = true;
+				m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY, (void*)NULL,
+					(BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, key), (LPARAM)(const char*)sMsg);
+			}
+		}
+	}
+	return bfind;
+}
+
+void CMainFrame::ServerOrderMsgToMap(int igubn, bool bPop)
+{
+	bool bSend{};
+	CString smsg;
+	switch (igubn)
+	{
+		case SERVERORDER_MSG_RELOAD:
+		{
+			smsg.Format("%s\t%d", SERVER_ORDER_MSGEDIT, igubn);
+			MapCheckAndSendMsg(smsg);
+		}
+		break;
+		case SERVERORDER_MSG_SVCREGI: break;  //서비스 신청되었음
+		case SERVERORDER_MSG_SVCTERMINATE: break; //서비스 해지
+		case SERVERORDER_MSG_SELLCONOK:  //(매도) 감시조건을 충족  /주문내역보기
+		case SERVERORDER_MSG_BUYCONOK:  //(매수) 감시조건을 충족  /주문내역보기 
+		case SERVERORDER_MSG_SELLNEWCONOK: //(신규편입매도) 감시조건을 충족  /주문내역보기
+		{
+			smsg.Format("%s\t%d", SERVER_ORDER_MSGEDIT, igubn);
+			bSend = MapCheckAndSendMsg(smsg);
+			if (!bSend && bPop)
+			{
+				smsg.Format("%s%s\t%d", SERVER_ORDERMAP, SERVER_ORDER_MSGEDIT, igubn);
+				m_mapHelper->CreateChild(smsg, 0);
+			}
+		}
+		break;
+		case SERVERORDER_MSG_CONEXPD: //조건만료  /감시내역보기
+		{
+			smsg.Format("%s\t%d", SERVER_ORDER_MSGEDIT, igubn);
+			bSend = MapCheckAndSendMsg(smsg);
+			if (!bSend && bPop)
+			{
+				smsg.Format("%s%s\t%d", SERVER_ORDERMAP, SERVER_ORDER_MSGEDIT, igubn);
+				m_mapHelper->CreateChild(smsg, 0);
+			}
+		}
+		break;
+		case SERVERORDER_MSG_MISORDER: //착오주문 관련
+		{
+			smsg.Format("%s\t%d", SERVER_ORDER_MSGEDIT, igubn);
+			bSend = MapCheckAndSendMsg(smsg);
+			if (!bSend && bPop)
+			{
+				smsg.Format("%s%s\t%d", SERVER_ORDERMAP, SERVER_ORDER_MSGEDIT, igubn);
+				m_mapHelper->CreateChild(smsg, 0);
+			}
+		}
+		case SERVERORDER_MSG_CONSTATUE:  //감시현황
+		{
+		}
+		break;
+		default:
+			
+			return;
+			break;
+	}
+}
 
 #pragma warning (default : 4477)
 /*
@@ -28079,11 +30561,21 @@ void CMainFrame::CludeUSE(bool bUseCloude)
 
 BOOL CMainFrame::isCDDScreen(CString strScreen)  //test CDD
 {
+	m_slog.Format("[axis][%s][CDD] isCDDScreen = [%s]", __FUNCTION__, strScreen);
+	OutputDebugString(m_slog);
+
+	if (m_arrCDDScreen.GetSize() <= 0)
+		return FALSE;
+
 	char	wb[512];
 	CString file, axisfile, usnm = Axis::user, stmp;
 	file.Format("%s\\%s\\%s\\%s.ini", Axis::home, USRDIR, usnm, usnm);
 
 	const DWORD dwRc = GetPrivateProfileString("CDD/EDD", "popIB8224", "", wb, sizeof(wb), file);
+
+	m_slog.Format("[axis][%s][CDD] popIB8224 = [%s]", __FUNCTION__, wb);
+	OutputDebugString(m_slog);
+
 	if (dwRc <= 0)
 		return FALSE;
 
@@ -28091,10 +30583,6 @@ BOOL CMainFrame::isCDDScreen(CString strScreen)  //test CDD
 	stmp.TrimRight();
 	if (stmp == "0")
 		return FALSE;
-
-	if (m_arrCDDScreen.GetSize() == 0)
-		return FALSE;
-
 
 	for (int ii = 0; ii < m_arrCDDScreen.GetSize(); ii++)
 	{
@@ -28126,8 +30614,12 @@ int CMainFrame::CheckCDDEDD()  //test CDD
 		}
 	}
 
-	if (m_arrCDDScreen.GetSize() <= 0)
+	if (m_arrCDDScreen.GetSize() <= 0 )
+	{
+		m_slog.Format("[axis][%s][CDD] m_arrCDDScreen size = 0", __FUNCTION__);
+		OutputDebugString(m_slog);
 		return 0;
+	}
 
 	CString str;
 	long  rc;
@@ -28138,9 +30630,11 @@ int CMainFrame::CheckCDDEDD()  //test CDD
 
 	m_sjumin.Format("%s", (char*)data);
 	m_sjumin.TrimRight();
-
-	SendSAMFQ014();
-
+	m_slog.Format("[AXIS] [%s][CDD] m_sjumin = [%s]", __FUNCTION__, m_sjumin);
+	OutputDebugString(m_slog);
+	WriteLog(m_slog);
+	if(!m_sjumin.IsEmpty())
+		SendSAMFQ014();
 	return 0;
 }
 
@@ -28230,64 +30724,570 @@ HANDLE CMainFrame::ProcessFind(char* strProcessName)
 	return nullptr;
 }
 
-//void CMainFrame::CreateSubAxis()
-//{
-//	if (ProcessFind("SubAxis"))
-//		return;
-//
-//	CreateSharedMemory();
-//
-//	CString	aps, cmds, exes;
-//	STARTUPINFO		si;
-//	PROCESS_INFORMATION	pi;
-//
-//	ZeroMemory(&si, sizeof(STARTUPINFO));
-//	ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
-//
-//	si.cb = sizeof(STARTUPINFO);
-//	si.dwFlags = STARTF_USESHOWWINDOW;
-//	si.wShowWindow = SW_SHOW;
-//
-//	char	buffer[1024];
-//	GetClassName(m_hWnd, buffer, sizeof(buffer));
-//	cmds.Format(" /c %s", m_strSharedMName);
-//	aps.Format("%s\\%s\\SubAxis.exe", Axis::home, RUNDIR);
-//
-//	const BOOL bRc = CreateProcess(
-//		aps,				// application name
-//		(char*)(const char*)cmds,// command line
-//		NULL,				// process attribute
-//		NULL,				// thread attribute
-//		FALSE,				// is inherit handle
-//		0,					// creation flags
-//		NULL,				// environment
-//		NULL,				// current directory
-//		&si,				// STARTUPINFO
-//		&pi);				// PROCESS_INFORMATION
-//
-//	if (bRc)
-//	{
-//
-//	}
-//}
-//
-//void CMainFrame::CreateSharedMemory()
-//{
-//	DWORD processID = GetCurrentProcessId();
-//	m_strSharedMName.Format("%s%d", "Axis", processID);
-//	m_hKeyFile = ::OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, m_strSharedMName);
-//
-//	if (m_hKeyFile == nullptr)
-//	{
-//		m_hKeyFile = CreateFileMapping((HANDLE)0xffffffff,
-//			nullptr,
-//			PAGE_READWRITE,
-//			0,
-//			1024 * 50,
-//			m_strSharedMName);
-//	}
-//}
+void  CMainFrame::MemoDownoad()
+{
 
+}
+
+
+typedef struct st_mid_memo
+{
+	char chgubn[1]{}; //구분: S-조회 . I-등록, U-수정, D-삭제
+	char chusid[16]{}; //user ID
+	char chcode[16]{}; //종목코드 
+	char chmemo[15 * 1024]{}; //종목메모
+}mid_memo;
+
+void  CMainFrame::MemoUpload()
+{
+	CString str, rDir, dat;
+	rDir.Format("%s\\%s\\%s\\memo.mmo", Axis::home, USER, Axis::user);
+
+	char key[12]{}, lBytes[4]{};
+
+	CFileFind	finder;
+	if (!finder.FindFile(rDir))
+		return;
+
+	CFile rFile(rDir, CFile::modeRead);
+
+	m_mapMemo.RemoveAll();
+
+	UINT nBytesRead;
+	do
+	{
+		FillMemory(key, sizeof(key), ' ');
+		FillMemory(lBytes, sizeof(lBytes), ' ');
+
+		nBytesRead = rFile.Read(&key, sizeof(key));
+		if (nBytesRead == sizeof(key))
+		{
+			nBytesRead = rFile.Read(&lBytes, sizeof(lBytes));
+			if (nBytesRead == sizeof(lBytes))
+			{
+				int lSize = atoi(CString(lBytes, 4));
+				nBytesRead = rFile.Read(dat.GetBuffer(lSize), lSize);
+
+				if ((int)nBytesRead != lSize)
+					break;
+
+				str.Format("%s", key);
+				m_mapMemo.SetAt(str, dat);
+				dat.ReleaseBuffer();
+			}
+			else
+				break;
+		}
+		else
+			break;
+
+	} while ((int)nBytesRead);
+
+	if (m_mapMemo.GetCount() > 0)
+		UploadEachMemo();
+}
+
+BOOL CMainFrame::UploadEachMemo()
+{
+	mid_memo* pmid = new mid_memo;
+	pmid->chgubn[0] = 'I';
+
+	memcpy(pmid->chusid, Axis::userID, Axis::userID.GetLength());
+
+	CString skey, sval;
+	GetCodeForMemoUpload(skey, sval);
+	memcpy(pmid->chcode, (char*)skey.GetBuffer(0), skey.GetLength());
+	memcpy(pmid->chmemo, (char*)sval.GetBuffer(0), sval.GetLength());
+	int bret = sendTR("pidomemo", (char*)pmid, sizeof(mid_memo), 0, 234);
+	delete pmid;
+	return bret;
+}
+
+void CMainFrame::parseMemoUpload(char* dat, int len)
+{
+	if (m_mapMemo.GetCount() <= 0)
+	{
+		CString str, rDir, bDir;
+		rDir.Format("%s\\%s\\%s\\memo.mmo", Axis::home, USER, Axis::user);
+		bDir.Format("%s\\%s\\%s\\memo.mmo_back", Axis::home, USER, Axis::user);	
+		CopyFile(rDir, bDir, TRUE);
+		::DeleteFile(rDir);
+		return;
+	}
+	UploadEachMemo();
+}
+
+BOOL CMainFrame::GetCodeForMemoUpload(CString& skey, CString& sval)
+{
+	CString key, sdata;
+	POSITION pos{};
+	for (pos = m_mapMemo.GetStartPosition(); pos; )
+	{
+		m_mapMemo.GetNextAssoc(pos, key, sdata);
+		skey = key;
+		sval = sdata;
+		m_mapMemo.RemoveKey(key);
+		break;
+	}
+	return FALSE;
+}
+
+void CMainFrame::DumpUpload()
+{
+	CString	Path;
+	Path.Format("%s\\%s\\AXIS.INI", Axis::home, "tab");
+
+	char readB[1024];
+	int readL;
+
+	readL = GetPrivateProfileString("LOGUPLOAD", "ALL", "0", readB, sizeof(readB), Path);
+	CString sALL(readB, readL);
+	sALL.TrimLeft(); sALL.TrimRight();
+
+	/*readL = GetPrivateProfileString("LOGUPLOAD", "DUMP", "0", readB, sizeof(readB), Path);
+	CString sDump(readB, readL);
+	sDump.TrimLeft(); sDump.TrimRight();
+
+	readL = GetPrivateProfileString("LOGUPLOAD", "NOTICE", "0", readB, sizeof(readB), Path);
+	CString sNOTICE(readB, readL);
+	sNOTICE.TrimLeft(); sNOTICE.TrimRight();*/
+
+	//m_slog.Format("DumpUpload  sALL =[%s]  sDump =[%s]  sNOTICE =[%s] ", sALL, sDump, sNOTICE);
+	m_slog.Format("[AXIS] DumpUpload  sALL =[%s]", sALL);
+	WriteLog(m_slog);
+
+		if (!m_pUpload)
+			m_pUpload = std::make_unique<class CUploadFile>(m_wizard.get());
+
+		if (1)
+		{
+			m_bUploadComplet = FALSE;
+			m_slog.Format("[AXIS] DumpUpload  sALL == 1   path = [% s]  ", Axis::home + "\\user\\" + Axis::user + "\\Crashlog");
+			WriteLog(m_slog);
+
+			if (m_pUpload->uploadfolder(Axis::home + "\\user\\" + Axis::user + "\\Crashlog"))
+				m_bUploadComplet = TRUE;
+		}
+		else
+			m_bUploadComplet = TRUE;
+
+	/*if (!m_pUpload)
+	{
+		m_pUpload = std::make_unique<class CUploadFile>(m_wizard.get());
+
+		if (sALL == "1")
+		{
+			m_bUploadComplet = FALSE;
+			m_slog.Format("[AXIS] DumpUpload  sALL == 1   path = [% s]  ", Axis::home + "\\user\\" + Axis::user + "\\Crashlog");
+			WriteLog(m_slog);
+
+			if(m_pUpload->uploadfolder(Axis::home + "\\user\\" + Axis::user + "\\Crashlog"))
+				m_bUploadComplet = TRUE;
+		}
+		else
+			m_bUploadComplet = TRUE;*/
+
+
+	/*	else
+		{
+			if (sDump == "1")
+				m_pUpload->uploadfolder(Axis::home + "\\user\\" + Axis::user + "\\Crashlog");
+
+			if (sNOTICE == "1")
+				m_pUpload->uploadfolder(Axis::home + "\\user\\" + Axis::user + "\\log");
+		}*/
+	//}
+
+}
+
+void CMainFrame::SendPiboStaf()
+{  //testAI
+	char data[16];
+	FillMemory(data, sizeof(data), ' ');
+	sendTR("pibostaf", data, 16, US_KEY, 232);
+}
+
+//modi auto   CMainFrame::CreateSlideWnd()
+void CMainFrame::CreateSlideWnd()
+{
+	m_pSlideWnd = std::make_unique<CSlideWnd>(this);
+	if (!m_pSlideWnd->Create(IDD_DLG_SLIDEWND))
+		m_pSlideWnd = nullptr;
+
+	m_pSlideWnd->ShowWindow(SW_HIDE);
+	CRect rect;
+	m_pSlideWnd->GetWindowRect(&rect);
+	ScreenToClient(rect);
+	rect.OffsetRect((-1 * rect.left) - rect.Width(), 0);
+	m_pSlideWnd->MoveWindow(rect);
+	//m_pAutoOrderList->SetWindowPos(&wndTop, -rect.Width(), 0, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+
+}
+
+//modi auto   CMainFrame::ShowAutoOrderList()
+void CMainFrame::ShowSlideWnd(BOOL bShow)
+{
+	WINDOWPLACEMENT	pl;
+	GetWindowPlacement(&pl);
+	switch (pl.showCmd)
+	{
+	case SW_HIDE:case SW_MINIMIZE:case SW_SHOWMINIMIZED:
+		m_pSlideWnd->ShowWindow(bShow);
+		return;
+	default:
+		break;
+	}
+
+
+	int	x{}, y{};
+	CRect	mRc;
+	int	width = 0, height = 0;
+
+	mRc = GetWndRect();
+
+	x = mRc.left;	y = mRc.top;
+	if (x < 0)	x = 0;
+	if (y < 0)	y = 0;
+
+	CRect rect;
+	m_pSlideWnd->GetWindowRect(rect);
+
+	rect.left = x;
+	rect.top = y;
+	rect.right = rect.left + mRc.Width() / 5;
+	rect.bottom = rect.top + mRc.Height();
+
+	if (!m_pSlideWnd->IsWindowVisible())
+		m_pSlideWnd->SlideOpen(rect);
+	else
+		m_pSlideWnd->SlideClose(rect);
+
+	m_pSlideWnd->GetWindowRect(rect);
+	ScreenToClient(rect);
+
+	m_slog.Format("%d %d %d %d", rect.left, rect.top, rect.right, rect.bottom);
+	OutputDebugString(m_slog);
+}
+
+CString CMainFrame::GetMapNumByKey(int nkey)
+{
+	CString sMapnum{};
+	CChildFrame* actChild{};
+	CSChild* actSchild{};
+
+	if (m_arMDI[m_vsN].Lookup(m_activeKey, actChild))
+		sMapnum = actChild->m_mapN;
+	else if (m_arSDI[m_vsN].Lookup(m_activeKey, actSchild))
+		sMapnum = actSchild->m_mapN;
+
+	return sMapnum;
+}
+//modi shared
+void CMainFrame::initShared()
+{
+	char	buf[512];
+	CString	file, stmp, smap;
+	file.Format("%s\\tab\\axshared.ini", Axis::home);
+	DWORD dw = GetPrivateProfileString("Mode", "noshared", "0", buf, sizeof(buf), file);
+	stmp.Format("%s", buf); stmp.TrimRight();
+
+	m_slog.Format("[AXIS] initShared noshared =[%s]", stmp);
+	WriteLog(m_slog);
+
+	if (stmp == "1")
+		return;
+
+	CString path;
+	path.Format("%s\\%s\\%s", Axis::home, DEVDIR, "cx_shared.dll");
+	m_hSharedLib = LoadLibrary(path);
+
+	if (!m_hSharedLib)
+	{
+		WriteLog("[AXIS] cx_shared.dll LoadLibrary fail");
+		return;
+	}
+
+	CWnd* (APIENTRY * axCreate)(CWnd*, void*);
+	axCreate = (CWnd * (APIENTRY*)(CWnd*, void*))GetProcAddress(m_hSharedLib, "axCreate");
+
+	if (axCreate == nullptr)
+	{
+		WriteLog("[AXIS] cx_shared.dll axcreate fail");
+		return;
+	}
+
+	DWORD processID = GetCurrentProcessId();
+	m_sHSharedkey.Format("%s%s%d", Axis::userID, "_HsharedCtrl_", processID);   //ex  ##ibkmts_HsharedCtrl_PROCESSID
+	m_sMSharedkey.Format("%s%s%d", Axis::userID, "_MsharedCtrl_", processID); //ex  ##ibkmts_MsharedCtrl_PROCESSID
+
+	CString strkey;
+	strkey = m_sHSharedkey + "|" + m_sMSharedkey;
+
+	WriteLog(strkey);
+
+	std::unique_ptr <char[]> pchar;
+	pchar = std::make_unique<char[]>(strkey.GetLength() + 1);
+	memcpy(pchar.get(), (LPSTR)(LPCTSTR)strkey, strkey.GetLength());
+	m_pSharedMemory = axCreate(this, (LPVOID)pchar.get());
+
+	m_slog.Format("[axis] m_pSharedMemory = [%x]", m_pSharedMemory);
+	WriteLog(m_slog);
+}
+
+BOOL CMainFrame::IsASTxRunning(BOOL bLog)
+{
+	CString file;
+	file.Format("%s\\exe\\CHECKAOS.TXT", Axis::home);
+	bool bExistFile = IsFileExist(file);
+
+	if(m_bNoProtect || bExistFile)  //CHECKAOS 파일이 있거나 내부망이면 ASTx 가동 안함
+	{
+		m_slog.Format("[AXIS] !!!!!!!!!  [ASTx] IsASTxRunning pass not workingm_bNoProtect=[%d] bExistFile=[%d] ip=[%s]", m_bNoProtect, bExistFile, m_ipAddr);
+		OutputDebugString(m_slog);
+		if(bLog)
+			WriteLog(m_slog);
+		return TRUE;
+	}
+
+	DWORD ret = STSDKEX_IsRunningFuncA("ibkstock", STSDKEX_FUNC_CODE_PB);
+	if (ret == STSDKEX_ERROR_SUCCESS)
+	{
+		m_slog.Format("[AXIS] !!!!!!!!!!! [ASTx] IsASTxRunning ASTx on[%d] m_bNoProtect=[%d] bExistFile=[%d] ", ret, m_bNoProtect,bExistFile);
+		OutputDebugString(m_slog);
+		if (bLog)
+			WriteLog(m_slog);
+		return TRUE;
+	}
+	else
+	{
+		m_slog.Format("[AXIS] !!!!!!!!!!! IsASTxRunning ASTx not running[%lx]", ret);
+		OutputDebugString(m_slog);
+		WriteLog(m_slog);
+		return FALSE;
+	}
+}
+
+void CMainFrame::CheckEdgeInstalled()
+{
+	CString stmp, sProgramName, strEdgeEnv;
+	sProgramName = "Microsoft Edge WebView2 런타임";
+	BOOL bInstalled{};
+	HKEY hKey;
+	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"), 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+	{
+		char szSubKey[MAX_PATH];
+		DWORD dwIndex = 0;
+		DWORD dwSize = MAX_PATH;
+
+		//해당레지스트리의 하위키를 열거 한다. 
+		while (RegEnumKeyEx(hKey, dwIndex, szSubKey, &dwSize, nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS)
+		{
+			HKEY hSubKey;
+			if (RegOpenKeyEx(hKey, szSubKey, 0, KEY_READ, &hSubKey) == ERROR_SUCCESS)
+			{
+				stmp.Format("\r\n[Edge] szSubKey=[%s], dwindex=[%d]", szSubKey, dwIndex);
+				OutputDebugString(stmp);
+				char szDisplayName[MAX_PATH];
+				DWORD dwSize = sizeof(szDisplayName);
+
+				//패키지명 버전 확인
+				if (RegQueryValueEx(hSubKey, _T("Displayname"), nullptr, nullptr, reinterpret_cast<LPBYTE>(szDisplayName), &dwSize) == ERROR_SUCCESS)
+				{
+					CString strDisplayName(szDisplayName);
+					if (strDisplayName.Find(sProgramName) >= 0)
+					{
+						bInstalled = TRUE;
+						char szDisplayVersion[MAX_PATH];
+						dwSize = sizeof(szDisplayVersion);
+						if (RegQueryValueEx(hSubKey, _T("DisplayVersion"), nullptr, nullptr, reinterpret_cast<LPBYTE>(szDisplayVersion), &dwSize) == ERROR_SUCCESS)
+						{
+							CString strDisplayVersion(szDisplayVersion);
+							strEdgeEnv += "DisplayVersion = ";
+							strEdgeEnv += strDisplayVersion;
+							strEdgeEnv += "|";
+						}
+
+						char szInstallDate[MAX_PATH];
+						dwSize = sizeof(szInstallDate);
+						if (RegQueryValueEx(hSubKey, _T("InstallDate"), nullptr, nullptr, reinterpret_cast<LPBYTE>(szInstallDate), &dwSize) == ERROR_SUCCESS)
+						{
+							CString szInstallDate(szInstallDate);
+							strEdgeEnv += "InstallDate = ";
+							strEdgeEnv += szInstallDate;
+							strEdgeEnv += "|";
+						}
+
+						stmp.Format("\r\n  !!!!!!!!!!!!!!!!!!!EDGE Installed!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  \r\n[Edge] strEdgeEnv=[%s], dwindex=[%d]", strEdgeEnv);
+						OutputDebugString(stmp);
+
+						break;
+					}
+				}
+
+			}
+			dwSize = MAX_PATH;
+			dwIndex++;
+		}
+	}
+
+
+	char	bufA[128]{};
+	char	bufB[128]{};
+	CString	file;
+	file.Format("%s\\%s\\%s\\userconf.ini", Axis::home, USRDIR, Axis::user);
+	if (!bInstalled)  //edge 미설치시
+		WritePrivateProfileString("PDF_CONFIRM", "pop", "browser", file);   //매매
+	else
+		WritePrivateProfileString("PDF_CONFIRM", "pop", "map", file);   //매매	
+}
+
+void CMainFrame::Sendpibojggb()
+{
+	struct PIBOjggb_mid 
+	{
+		char gubn[1];
+		char intype[2];
+	};
+
+	char data[100];
+	FillMemory(data, sizeof(data), ' ');
+
+	PIBOjggb_mid* mid = (PIBOjggb_mid*)&data[0];
+	memcpy(mid->gubn, "N", 1);
+
+
+	sendTR("pibojggb", data, sizeof(PIBOjggb_mid), US_ENC, 228);
+}
+
+void CMainFrame::WriteMainInfo()
+{
+	CString sPath;
+	CString strFilePath;
+	CFile	file;
+	CString sBuf;
+	TCHAR	chFileName[128]{};
+
+	GetModuleFileName(NULL, chFileName, MAX_PATH);
+
+	strFilePath.Format(_T("%s"), chFileName);
+
+	strFilePath = strFilePath.Left(strFilePath.ReverseFind('\\'));
+	strFilePath.Replace("\\exe", "");
+
+	CString sMainAdd, sfile;
+	sMainAdd.Format("%d", (int)this->m_hWnd);
+
+	CString sHandle{};
+	DWORD pid = ::GetCurrentProcessId();
+	HANDLE hProcess = ::OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
+	sHandle.Format("%d", (int)hProcess);
+	sfile.Format("%s\\%s\\AXISENC.ini", strFilePath, "tab");
+	WritePrivateProfileString("ADDRESS", "main", sMainAdd, sfile);
+	WritePrivateProfileString("ADDRESS", "PROCESS_HANDLE", sHandle, sfile);
+}
+
+void CMainFrame::SetVirtualSDIVisible(int vsN, bool bshow)
+{
+	CSChild* schild{};
+	POSITION pos;
+	int key{};
+
+	UINT			nFlags{};
+
+	if (bshow) nFlags = SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER;
+	else	nFlags = SWP_HIDEWINDOW | SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER;
+
+	for (int ii = 0; ii < 6; ii++)
+	{
+		for (pos = m_arSDI[ii].GetStartPosition(); pos; )
+		{
+			m_arSDI[ii].GetNextAssoc(pos, key, schild);
+
+			if (vsN != ii)
+				schild->SetWindowPos(&wndTop, 0, 0, 0, 0, nFlags);
+		}
+	}
+}
+
+void CMainFrame::ReadManageMapInfo()
+{
+	CString sfile;
+	sfile.Format("%s\\%s\\AXSCREENMANAGE.INI", Axis::home, "tab");
+	CStdioFile file;
+	CString line;
+
+	if (!file.Open(sfile, CFile::modeRead | CFile::typeText))
+		return;
+
+	while (file.ReadString(line))
+	{
+		line.TrimRight(); // 앞뒤 공백 제거
+
+		// 빈 줄, 주석은 건너뜀
+		if (line.IsEmpty() || line[0] == _T('#') || line[0] == _T(';'))
+			continue;
+
+		int pos = line.Find(_T('='));
+		if (pos > 0)
+		{
+			CString key = line.Left(pos);
+			CString value = line.Mid(pos + 1);
+
+			key.TrimRight();
+			value.TrimRight();
+
+			if (!key.IsEmpty())
+				m_mapManage.SetAt(key, value);
+		}
+	}
+	file.Close();
+}
+
+#ifdef DF_MK_CAPTION
+void CMainFrame::ReadMarketFile()
+{
+	CString sfile;
+	sfile.Format("%s\\%s\\AXISMARKET.INI", Axis::home, "tab");
+	CStdioFile file;
+	CString line;
+
+	if (!file.Open(sfile, CFile::modeRead | CFile::typeText))
+		return;
+
+	while (file.ReadString(line))
+	{
+		line.TrimRight(); // 앞뒤 공백 제거
+
+		// 빈 줄, 주석은 건너뜀
+		if (line.IsEmpty() || line[0] == _T('#') || line[0] == _T(';'))
+			continue;
+
+		int pos = line.Find(_T('='));
+		if (pos > 0)
+		{
+			CString key = line.Left(pos);
+			CString value = line.Mid(pos + 1);
+
+			key.TrimRight();
+			value.TrimRight();
+
+			if (!key.IsEmpty())
+				m_mapPermissions.SetAt(key, value);
+		}
+	}
+	file.Close();
+}
+
+int CMainFrame::GetMarketType(const CString& screenNo)
+{
+	CString valStr;
+	if (!m_mapPermissions.Lookup(screenNo, valStr))
+		return 0; // 화면번호가 없으면 권한 없음
+
+	int perm = _ttoi(valStr); // 문자열을 정수로 변환
+	return perm;
+}
+#endif
 //CString ip;
 //	ip.Format("%s", ipaddr);
 //	ip.TrimLeft(), ip.TrimRight();
@@ -28450,197 +31450,4 @@ HANDLE CMainFrame::ProcessFind(char* strProcessName)
 						TRACE(sRet);*/
 
 
-//CString CMainFrame::get_glb_addr(char* macaddr, char* ip)
-//{
-//OutputDebugString("GLB -------get_glb_addr------\n");
-//	CString file;
-//	file.Format("%s\\exe\\axisglb.dll", Axis::home);
-//
-//	typedef long (WINAPI *GETGLBFUNC)(char*, char*, int, char*, int, bool);
-//	HMODULE hModule = LoadLibrary(file);
-//	CString ips("");
-//	
-//	if (hModule)
-//	{
-//		GETGLBFUNC func = (GETGLBFUNC)GetProcAddress(hModule, "axGetGLB");
-//		if (func)
-//		{
-//			typedef struct {
-//				char user[12];
-//				char pass[8];
-//				char dats[10];
-//				char cpas[30];
-//				char uips[15];
-//				char madr[16];
-//				char fill[32];
-//			} axglbM;
-//
-//			typedef struct {
-//				char result;  // R: ok  X: failed (ip는 준다) ===> X, R 이외의 플래그일 경우 추후 메시지 처리 가능.
-//				char ip[16];
-//				char ecod[1];
-//				char verx[32];
-//			} axglbRcv; 
-//
-//			axglbM mid{};
-//			axglbRcv mod{};
-//
-//			if(m_bUseNewLogin)
-//			{
-//				CString str = m_axConnect->GetSignInfo();
-//
-//				Axis::userID = m_axConnect->GetUserID();
-//				m_pass = m_axConnect->GetPassword();
-//				m_cpass  = m_axConnect->GetCPass();
-//
-//				memset(&mid, ' ', sizeof(mid));
-//				memset(&mod, ' ', sizeof(mod));
-//				//보안상의 이유로 비밀번호 제거 - 2012.10.07
-//				FormatCopy(mid.user, Axis::userID);
-//				FormatCopy(mid.pass, "");
-//				CopyMemory(mid.dats, str, str.GetLength());
-//				FormatCopy(mid.cpas, "");
-//				FormatCopy(mid.uips, ip);
-//				FormatCopy(mid.madr, macaddr);
-//
-//				FormatCopy(mid.fill, "HTS_vc2019");
-//
-//				int len =  func((char*)(const char*)(Axis::home + "\\" + TABDIR), 
-//					(char*)&mid, sizeof(axglbM), (char*)&mod, sizeof(axglbRcv), (bool)!Axis::isCustomer);
-//
-//				ips = CString(mod.ip, sizeof(mod.ip));
-//				ips.TrimRight();
-//			}
-//			else
-//			{
-//				CString str = m_axConnectOld->GetSignInfo();
-//				
-//				Axis::userID = m_axConnectOld->GetUserID();
-//				m_pass = m_axConnectOld->GetPassword();
-//				m_cpass  = m_axConnectOld->GetCPass();
-//				
-//				memset(&mid, ' ', sizeof(mid));
-//				memset(&mod, ' ', sizeof(mod));
-//				//보안상의 이유로 비밀번호 제거 - 2012.10.07
-//				FormatCopy(mid.user, Axis::userID);
-//				FormatCopy(mid.pass, "");
-//				CopyMemory(mid.dats, str, str.GetLength());
-//				FormatCopy(mid.cpas, "");
-//				FormatCopy(mid.uips, ip);
-//				FormatCopy(mid.madr, macaddr);
-//
-//				FormatCopy(mid.fill, "HTS_vc2019");
-//				
-//				int len =  func((char*)(const char*)(Axis::home + "\\" + TABDIR), 
-//					(char*)&mid, sizeof(axglbM), (char*)&mod, sizeof(axglbRcv), (bool)!Axis::isCustomer);
-//				
-//				ips = CString(mod.ip, sizeof(mod.ip));
-//				ips.TrimRight();
-//			}
-//
-//			m_axis->WriteProfileString(INFORMATION, "Server", ips);	
-//		}
-//		FreeLibrary(hModule);
-//	}
-//
-//	return ips;
-//}
-//
-//CString CMainFrame::get_glb_addr_Index(char* macaddr, char* ip)
-//{
-//OutputDebugString("GLB -------get_glb_addr_Index------\n");
-//
-//
-//	CString file;
-//	file.Format("%s\\exe\\axisglb.dll", Axis::home);
-//	
-//	typedef long (WINAPI *GETGLBFUNC)(char*, char*, int, char*, int, int, bool);
-//	HMODULE hModule = LoadLibrary(file);
-//	CString ips("");
-//	
-//	if (hModule)
-//	{
-//		GETGLBFUNC func = (GETGLBFUNC)GetProcAddress(hModule, "axGetGLB_Index");
-//		if (func)
-//		{
-//			typedef struct {
-//				char user[12];
-//				char pass[8];
-//				char dats[10];
-//				char cpas[30];
-//				char uips[15];
-//				char madr[16];
-//				char fill[32];
-//			} axglbM;
-//			
-//			typedef struct {
-//				char result;  // R: ok  X: failed (ip는 준다) ===> X, R 이외의 플래그일 경우 추후 메시지 처리 가능.
-//				char ip[16];
-//				char ecod[1];
-//				char verx[32];
-//			} axglbRcv; 
-//			
-//			axglbM mid{};
-//			axglbRcv mod{};
-//			
-//			if(m_bUseNewLogin)
-//			{
-//				CString str = m_axConnect->GetSignInfo();
-//				
-//				Axis::userID = m_axConnect->GetUserID();
-//				m_pass = m_axConnect->GetPassword();
-//				m_cpass  = m_axConnect->GetCPass();
-//				
-//				memset(&mid, ' ', sizeof(mid));
-//				memset(&mod, ' ', sizeof(mod));
-//				//보안상의 이유로 비밀번호 제거 - 2012.10.07
-//				FormatCopy(mid.user, Axis::userID);
-//				FormatCopy(mid.pass, "");
-//				CopyMemory(mid.dats, str, str.GetLength());
-//				FormatCopy(mid.cpas, "");
-//				FormatCopy(mid.uips, ip);
-//				FormatCopy(mid.madr, macaddr);
-//
-//				FormatCopy(mid.fill, "HTS_vc2019");
-//				
-//				int len =  func((char*)(const char*)(Axis::home + "\\" + TABDIR), 
-//					(char*)&mid, sizeof(axglbM), (char*)&mod, sizeof(axglbRcv), m_iGlbIndex, (bool)!Axis::isCustomer);
-//				
-//				ips = CString(mod.ip, sizeof(mod.ip));
-//				ips.TrimRight();
-//			}
-//			else
-//			{
-//				CString str = m_axConnectOld->GetSignInfo();
-//				
-//				Axis::userID = m_axConnectOld->GetUserID();
-//				m_pass = m_axConnectOld->GetPassword();
-//				m_cpass  = m_axConnectOld->GetCPass();
-//				
-//				memset(&mid, ' ', sizeof(mid));
-//				memset(&mod, ' ', sizeof(mod));
-//				//보안상의 이유로 비밀번호 제거 - 2012.10.07
-//				FormatCopy(mid.user, Axis::userID);
-//				FormatCopy(mid.pass, "");
-//				CopyMemory(mid.dats, str, str.GetLength());
-//				FormatCopy(mid.cpas, "");
-//				FormatCopy(mid.uips, ip);
-//				FormatCopy(mid.madr, macaddr);
-//
-//				FormatCopy(mid.fill, "HTS_vc2019");
-//				
-//				int len =  func((char*)(const char*)(Axis::home + "\\" + TABDIR), 
-//					(char*)&mid, sizeof(axglbM), (char*)&mod, sizeof(axglbRcv), m_iGlbIndex, (bool)!Axis::isCustomer);
-//				
-//				ips = CString(mod.ip, sizeof(mod.ip));
-//				ips.TrimRight();
-//			}
-//			
-//			m_axis->WriteProfileString(INFORMATION, "Server", ips);	
-//		}
-//		FreeLibrary(hModule);
-//	}
-//	
-//	return ips;
-//}
 #endif

@@ -75,6 +75,8 @@ protected:
 	virtual void OnPaint();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 //{{AFX_INSERT_LOCATION}}

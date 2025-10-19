@@ -67,6 +67,7 @@ protected:
 	BOOL		m_activeCap;
 
 	CString		m_title;
+	CString		m_sMapnum{};
 #ifdef DF_USE_CPLUS17
 	std::unique_ptr <CToolTipCtrl>m_ToolTip;
 #else
@@ -126,6 +127,7 @@ public:
 	bool	changePin();
 	void	SetSDI();
 	BOOL	IsActive()	{ return m_activeCap; }
+
 protected:
 	int		GetLuminosity(COLORREF color) const;
 	int		GetSysCommand(CPoint point);
@@ -191,6 +193,26 @@ public:
 	virtual int	 GetSelectItem(CPoint point) = 0;
 
 	virtual void DrawFrame(CDC* dc, CRect rc) {}
+
+#ifdef DF_MK_CAPTION
+	CString m_slog{};
+	BOOL	m_MkLock = 0;
+	int		m_iMkPermission{};
+	int		m_marketN = 1; //modi NXT   1:K krx  2:N nxt  3 : 통합 4 : 선택불가
+	int		ClickMK();  //modi NXT 
+	void		ChangeLock() {
+		m_MkLock = !m_MkLock;
+		Invalidate();
+	}
+	int		GetMarkgetType() { return m_marketN; }
+	void    	SetMarket(int iMarket);//modi NXT 
+	void     SetMapNum(CString smap);
+	CString GetMapNum() {
+		return m_sMapnum;
+	}
+	void SetMapPermission(int ival);
+#endif
+
 };
 
 //** CXChildCaption

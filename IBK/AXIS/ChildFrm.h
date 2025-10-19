@@ -60,6 +60,8 @@ public:
 
 	void	SetTabView(bool isTabView);
 	bool	IsTabView();
+
+	CString m_slog{};
 protected:
 	CPoint	m_SP;
 // Operations

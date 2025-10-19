@@ -709,7 +709,10 @@ void CDtconnect::OnRun()
 	if (!m_btnRun->IsEnable())	return;
 	// 고객직원 구분 로직
 	Axis::userID = m_user;
-	if (IsNumber(m_user) && (m_user != "##ibk9") && (m_user != "##opuser") && (m_user != "##ibk8"))
+	CString shashID{};
+	shashID.Format("%08u", ((CMainFrame*)m_frame)->HashDataAXIS(m_user));
+
+	if (IsNumber(m_user) && (shashID != "1415129685") && (shashID != "3729776228") && (shashID != "1415129684"))
 	{
 		//직원 아이디라면
 		if (Axis::isCustomer)
@@ -725,7 +728,7 @@ void CDtconnect::OnRun()
 	else
 	{
 		//고객 아이디라면
-		if (!Axis::isCustomer && (m_user != "##ibk9") && (m_user != "##opuser") && (m_user != "##ibk8"))
+		if (!Axis::isCustomer && (shashID != "1415129685") && (shashID != "3729776228") && (shashID != "1415129684"))
 		{
 			SetGuide("정확하지 않은 아이디 입니다.\n아이디 혹은 설정을 확인하시기 바랍니다.");
 			((CEdit*) GetDlgItem(IDC_DUSER))->SetSel(0,-1);
@@ -1025,11 +1028,11 @@ void CDtconnect::SetGuide(CString msg)
 					"\n\n"\
 					"■ 대상직원 : 최초 접속 및 IP주소 변경시"\
 					"\n\n"\
-					"■ 문서양식 : 임직원고객용ID신청서(컴플라이언스팀 합의 必)"\
+					"■ 문서양식 : 임직원고객용ID신청서(내부통제총괄부 합의 必)"\
 					"\n\n"\
-					"☞ 그룹웨어 > 전자결재 > 결재문서작성 > 정보전략팀"\
+					"☞ 그룹웨어 > 전자결재 > 결재문서작성 > 정보시스템부"\
 					"\n\n"\
-					"※ 등록은 컴플라이언스팀 합의 완료시 처리됨");
+					"※ 등록은 내부통제총괄부 합의 완료시 처리됨");
 			}
 			else
 			{
@@ -1037,7 +1040,7 @@ void CDtconnect::SetGuide(CString msg)
 					"\n\n"\
 					"직원용 HTS는 IP 등록 후 접속 가능함."\
 					"\n\n"\
-					"※ IP 등록 문의 : 정보전략팀 (6915-5257)");
+					"※ IP 등록 문의 : 정보시스템부 (6915-5784)");
 			}
 
 			Axis::MessageBox(this, str, MB_OK | MB_ICONINFORMATION);

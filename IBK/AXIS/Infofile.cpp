@@ -271,10 +271,12 @@ void CInfofile::Init()
 	{
 		title.LoadString(ST_USEINFO_UPTITLE);
 		guide.LoadString(ST_USEINFO_STARTUPGUIDE);
+		GetWnd(IDC_CODEMEMO)->ShowWindow(SW_SHOW);
 	}
 	else
 	{
 		title.LoadString(ST_USEINFO_DOWNTITLE);
+		GetWnd(IDC_CODEMEMO)->ShowWindow(SW_HIDE);
 		guide.LoadString(ST_USEINFO_STARTDOWNGUIDE);
 		PostMessage(WM_USERINFO, 0, K_QUERYFILELIST);
 	}
@@ -749,7 +751,7 @@ void CInfofile::Uploadfile()
 	CString		file, fileN, str;
 	CFile		hFile;
 	char		sndB[UPMAXSIZE]{};
-
+	m_bUploadMemo = false; 
 	for (;;)
 	{
 		if (m_sfilelist.GetSize() <= 0)
@@ -763,6 +765,12 @@ void CInfofile::Uploadfile()
 		}
 		fileN = m_sfilelist.GetAt(0);
 		m_sfilelist.RemoveAt(0);
+
+		if (fileN.Find("memo") >= 0)
+		{
+			m_bUploadMemo = true; 
+			continue;
+		}
 
 		CString s;
 // 		s.Format("FILE NAME : %s\n",fileN);
@@ -842,6 +850,9 @@ void CInfofile::Downloadfile()
 		bool	match  = false;
 		fileN = m_sfilelist.GetAt(0);
 		m_sfilelist.RemoveAt(0);
+
+		if (fileN.Find("memo") >= 0) 
+			continue;
 
 		CString s;
 // 		s.Format("DN FILE NAME : %s\n",fileN);

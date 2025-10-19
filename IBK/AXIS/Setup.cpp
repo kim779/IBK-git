@@ -117,9 +117,8 @@ void CSetup::Init()
 		GetDlgItem(IDC_EMP)->EnableWindow(FALSE);
 	}
 	**/
-	//AfxGetApp()->WriteProfileInt(INFORMATION, "INTERNAL", 1);
-	if (app->GetProfileInt(INFORMATION, "INTERNAL", 1))  //내부망 직원
-	{
+	if (app->GetProfileInt(INFORMATION, "INTERNAL", 0))
+	{  //내부망 직원이거나 NOAOS.TXT 파일존재시
 		if (app->GetProfileInt(INFORMATION, "AOS", 1))
 			GetDlgItem(IDC_AOS)->SendMessage(BM_SETCHECK, TRUE);
 
@@ -134,22 +133,18 @@ void CSetup::Init()
 	}
 	else
 	{
-			GetDlgItem(IDC_AOS)->EnableWindow(FALSE);
-			GetDlgItem(IDC_PCFIREWALL)->EnableWindow(FALSE);
-			GetDlgItem(IDC_KEYPROTECT)->EnableWindow(FALSE);
+		GetDlgItem(IDC_AOS)->EnableWindow(FALSE);
+		GetDlgItem(IDC_PCFIREWALL)->EnableWindow(FALSE);
+		GetDlgItem(IDC_KEYPROTECT)->EnableWindow(FALSE);
 
-			GetDlgItem(IDC_AOS)->SendMessage(BM_SETCHECK, TRUE);
-			GetDlgItem(IDC_PCFIREWALL)->SendMessage(BM_SETCHECK, TRUE);
-			GetDlgItem(IDC_KEYPROTECT)->SendMessage(BM_SETCHECK, TRUE);
+		GetDlgItem(IDC_AOS)->SendMessage(BM_SETCHECK, TRUE);
+		GetDlgItem(IDC_PCFIREWALL)->SendMessage(BM_SETCHECK, TRUE);
+		GetDlgItem(IDC_KEYPROTECT)->SendMessage(BM_SETCHECK, TRUE);
 
-			app->WriteProfileInt(INFORMATION, "AOS", GetDlgItem(IDC_AOS)->SendMessage(BM_GETCHECK));
-			app->WriteProfileInt(INFORMATION, "PCFireWall", GetDlgItem(IDC_PCFIREWALL)->SendMessage(BM_GETCHECK));
-			app->WriteProfileInt(ENVIRONMENT, "KeyProtect", GetDlgItem(IDC_KEYPROTECT)->SendMessage(BM_GETCHECK));
-
-		if (app->GetProfileInt(WORKSTATION, "ServerTime", 0))
-			GetDlgItem(IDC_USESERVERTIME)->SendMessage(BM_SETCHECK, TRUE);
+		app->WriteProfileInt(INFORMATION, "AOS", GetDlgItem(IDC_AOS)->SendMessage(BM_GETCHECK));
+		app->WriteProfileInt(INFORMATION, "PCFireWall", GetDlgItem(IDC_PCFIREWALL)->SendMessage(BM_GETCHECK));
+		app->WriteProfileInt(ENVIRONMENT, "KeyProtect", GetDlgItem(IDC_KEYPROTECT)->SendMessage(BM_GETCHECK));
 	}
-	
 }
 
 void CSetup::Save()

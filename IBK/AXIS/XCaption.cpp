@@ -40,6 +40,28 @@ void CStaticCmdUI::SetText(LPCTSTR lpszText)
 /////////////////////////////////////////////////////////////////////////////
 // CXCaption
 
+auto SMarketTobit = [](CString smarket)
+{
+	if (smarket == "KRX") 
+		return 1;
+	if (smarket == "NXT") 
+		return 2;
+	if (smarket == "통합") 
+		return 4;
+	return 0;
+};
+
+auto iMarketTobit = [](int imarket)
+{
+	if (imarket == 1)
+		return 1;
+	if (imarket == 2)
+		return 2;
+	if (imarket ==3)
+		return 4;
+	return 0;
+};
+
 CXCaption::CXCaption()
 {
 	m_cyBottomBorder= m_cyTopBorder = 4;	// l&r default to 6; t&b was 1
@@ -67,7 +89,9 @@ CXCaption::CXCaption()
 		m_arRc.Add(CRect(0, 0, 0, 0));
 
 	m_gradientDraw = TRUE;
-
+#ifdef DF_MK_CAPTION
+	m_marketN = MK_NON;
+#endif
 	LoadBitmap();
 
 	Initialize();
@@ -213,6 +237,15 @@ void CXCaption::OnLButtonUp(UINT nFlags, CPoint point)
 	{
 		ReleaseCapture();
 		const int nItem = GetSelectItem(point);
+#ifdef DF_MK_CAPTION
+		if (m_marketN == 4 &&((nItem == IDX_LOCK) || (nItem == IDX_MARKET)))
+		{  //거래소 선택 불가상태 일때 압정이나 거래소 영역 클릭업
+			m_action = -1;
+			m_downI = -1;
+			CControlBar::OnLButtonUp(nFlags, point);
+			return;
+		}
+#endif
 		if (nItem == m_downI)
 		{ 
 			m_action = nItem;
@@ -435,6 +468,14 @@ void CXCaption::OnPaint()
 
 			iRc = m_arRc.GetAt(IDX_GROUP);	
 			DrawBitmap(&memDC, IDX_GROUP, iRc);
+
+#ifdef DF_MK_CAPTION
+			iRc = m_arRc.GetAt(IDX_MARKET);
+			DrawBitmap(&memDC, IDX_MARKET, iRc);
+
+			iRc = m_arRc.GetAt(IDX_LOCK);
+			DrawBitmap(&memDC, IDX_LOCK, iRc);
+#endif
 
 			if (m_sdiMode)
 			{
@@ -808,7 +849,57 @@ int CXCaption::ChangeFont()
 #endif
 	return comm - base;
 }
+#ifdef DF_MK_CAPTION
+int CXCaption::ClickMK()
+{//popup 메뉴
+	std::unique_ptr<CMenuXP> menu = std::make_unique<CMenuXP>();
+	CString	str;
 
+
+	m_slog.Format("[AXIS][MARKET] ClickMK    m_iMkPermission=[%d] m_marketN=[%d] ]",
+		m_iMkPermission, m_marketN);
+	OutputDebugString(m_slog);
+
+
+	menu->CreatePopupMenu();
+	const int base = 25000;
+
+	
+	
+	struct MenuItem {
+		int menuCode;
+		int bit;
+		const char* name;
+	};
+
+	MenuItem items[] = {
+		{3, 4, "통합"},
+		{1, 1, "KRX"},
+		{2, 2, "NXT"}	
+	};
+
+	for (auto& item : items)
+	{
+		if (m_iMkPermission & item.bit)
+		{
+			menu->AppendMenuX(MF_STRING, base + item.menuCode, item.name);
+
+			if(m_marketN == item.menuCode)
+				menu->CheckMenuItem(base + item.menuCode, MF_CHECKED);
+		}
+	}
+	
+
+
+	const UINT	nFlags = TPM_RETURNCMD | TPM_LEFTALIGN | TPM_RIGHTBUTTON;
+	const CRect	rect = m_arRc.GetAt(IDX_MARKET);
+
+	CPoint	point = CPoint(rect.left, rect.bottom);
+	ClientToScreen(&point);
+	const int	comm = menu->TrackPopupMenu(nFlags, point.x, point.y + GAP, this);
+	return comm - base;
+}
+#endif
 int CXCaption::ChangeGroup()
 {
 #ifdef DF_USE_CPLUS17
@@ -880,7 +971,7 @@ int CXCaption::DrawBitmap(CDC* pDC, int index, CRect bRC, bool bDown)
 	if (bRC.IsRectEmpty())	return 0;
 	return DrawBitmapByMask(pDC, index, bRC, bDown);
 	
-	CDC	memDC;
+	/*CDC	memDC;
 	if (!memDC.CreateCompatibleDC(pDC))
 		return 0;
 
@@ -896,6 +987,17 @@ int CXCaption::DrawBitmap(CDC* pDC, int index, CRect bRC, bool bDown)
 
 	switch (index)
 	{
+#ifdef DF_MK_CAPTION
+	case IDX_MARKET:
+	{
+		iCnt = bm.bmWidth / (2 * UB_WIDTH);
+		if (m_marketN == MK_TOT)
+			sx = bDown ? iCnt * UB_WIDTH + (iCnt - 1) * UB_WIDTH : (iCnt - 1) * UB_WIDTH;
+		else
+			sx = bDown ? iCnt * UB_WIDTH + m_marketN * UB_WIDTH : m_marketN * UB_WIDTH;
+	}
+	break;
+#endif
 	case IDX_GROUP:
 		iCnt = bm.bmWidth/(2 * UB_WIDTH);
 		if (m_groupN == ALL_GROUP)
@@ -922,7 +1024,7 @@ int CXCaption::DrawBitmap(CDC* pDC, int index, CRect bRC, bool bDown)
 	memDC.SelectObject(pbitmap);
 	memDC.DeleteDC();
 
-	return bx;
+	return bx;*/
 }
 
 void CXCaption::OnSize(UINT nType, int cx, int cy) 
@@ -1013,7 +1115,7 @@ CXChildCaption::~CXChildCaption()
 
 void CXChildCaption::Initialize()
 {
-
+	
 }
 
 void CXChildCaption::Release()
@@ -1031,7 +1133,7 @@ int CXChildCaption::DrawBitmapByMask(CDC* pDC, int index, CRect bRC, bool bDown,
 	bx = bRC.Width();
 	by = bRC.Height();
 
-	sx = bDown ? bx: 0;
+	sx = bDown ? bx : 0;
 
 	bitmap = GetButtonImage(index);
 	if (bitmap && bitmap->m_hObject)
@@ -1041,24 +1143,62 @@ int CXChildCaption::DrawBitmapByMask(CDC* pDC, int index, CRect bRC, bool bDown,
 
 	const int drawIndex = 0;
 	CSize size(UB_WIDTH, UB_WIDTH);
-	
+
 	switch (index)
 	{
+#ifdef DF_MK_CAPTION
+	case IDX_LOCK:
+	{
+		sx = 0;
+	}
+	break;
+	case IDX_MARKET:
+	{
+		iCnt = bm.bmWidth / (2 * UB_WIDTH * 2);
+
+		switch (m_marketN)
+		{
+		case 1:  //KRX
+		  //  sx = bDown ? 90 : 0;
+			sx = 0;
+			break;
+		case 2:
+			//sx = bDown ? 120 : 30;
+			//sx = 30;
+			sx = 45;
+			break;
+		case 3:
+			//sx = bDown ? 150 : 60;
+			//sx = 60;
+			sx = 90;
+			break;
+		case 4:
+			//sx = 180;
+			sx = 270;
+			break;
+		}
+		m_slog.Format("[mkbitmap] [%s]<%d> iCnt=[%d] m_marketN=[%d] bDown=[%d] sx=[%d]",
+			__FUNCTION__, __LINE__, iCnt, m_marketN, bDown, sx);
+		OutputDebugString(m_slog);
+
+	}
+	break;
+#endif
 	case IDX_GROUP:
-		iCnt = bm.bmWidth/(2*UB_WIDTH);
+		iCnt = bm.bmWidth / (2 * UB_WIDTH);
 		if (m_groupN == ALL_GROUP)
-			sx = bDown ? iCnt*UB_WIDTH + (iCnt-1)*UB_WIDTH : (iCnt-1)*UB_WIDTH;
-		else	
-			sx = bDown ? iCnt*UB_WIDTH + m_groupN*UB_WIDTH : m_groupN*UB_WIDTH;
+			sx = bDown ? iCnt * UB_WIDTH + (iCnt - 1) * UB_WIDTH : (iCnt - 1) * UB_WIDTH;
+		else
+			sx = bDown ? iCnt * UB_WIDTH + m_groupN * UB_WIDTH : m_groupN * UB_WIDTH;
 		break;
 	case IDX_SINGLE:
 		if (m_single)
-			sx = bDown ? UB_WIDTH*3 : UB_WIDTH*2;
+			sx = bDown ? UB_WIDTH * 3 : UB_WIDTH * 2;
 		break;
 	case IDX_PIN:
 		if (m_pinON)
-			sx = bDown ? bm.bmWidth/2 + UB_WIDTH : bm.bmWidth/2;
-		else	
+			sx = bDown ? bm.bmWidth / 2 + UB_WIDTH : bm.bmWidth / 2;
+		else
 			sx = bDown ? UB_WIDTH : 0;
 		break;
 	case IDX_ICON:
@@ -1073,8 +1213,28 @@ int CXChildCaption::DrawBitmapByMask(CDC* pDC, int index, CRect bRC, bool bDown,
 	if (index <= IDX_ICON)
 		bRC.top += 1;
 
+#ifdef DF_MK_CAPTION
+	CAxDrawHelper painter(pDC);
+	if (index == IDX_MARKET)
+	{
+		if(m_marketN == 4)
+			painter.DrawIndexedBitmap(bRC.left, bRC.top, bitmap, maskcolor, 0, 0, sx);
+		else
+			painter.DrawIndexedBitmap(bRC.left, bRC.top, bitmap, maskcolor, 45, size.cy, sx);
+	}
+	else if (index == IDX_LOCK)
+	{
+		if (m_marketN == 4)
+			painter.DrawIndexedBitmap(bRC.left, bRC.top, bitmap, maskcolor, 0, 0, sx);
+		else
+			painter.DrawIndexedBitmap(bRC.left, bRC.top, bitmap, maskcolor, size.cx, size.cy, sx);
+}
+	else
+		painter.DrawIndexedBitmap(bRC.left, bRC.top, bitmap, maskcolor, size.cx, size.cy, sx);
+#else
 	CAxDrawHelper painter(pDC);
 	painter.DrawIndexedBitmap(bRC.left, bRC.top, bitmap, maskcolor, size.cx, size.cy, sx);
+#endif
 
 	return bx;
 }
@@ -1175,6 +1335,28 @@ bool CXChildCaption::ActivateApp(BOOL bActive)
 
 CBitmap* CXChildCaption::GetButtonImage(int index)
 {
+#ifdef DF_MK_CAPTION
+	const char* const buttonNames[13] =
+	{
+		m_MkLock == TRUE ? "LOCK" : "UnLOCK", "MARKET","PIN", "독립화면", "GROUP", "FONT", "COPY", "HELP", "최소화_T", "최대화_T", "창닫기_T", "창복원_T", "ICON"
+	};
+
+	if (index == 2 && !m_activeCap)
+		TRACE("test");
+
+	if (index == 12)
+		return Axis::GetBitmap(IDB_IBK);
+
+	if (index >= 0 && index < 13)
+	{
+		if (m_activeCap)
+			return Axis::GetSkinBitmap(buttonNames[index]);
+		else
+			return Axis::GetBitmap(Format("XN_%s", buttonNames[index]));
+	}
+	else
+		return NULL;
+#else
 	const char* const buttonNames[11] = 
 	{
 		"PIN", "독립화면", "GROUP", "FONT", "COPY", "HELP", "최소화_T", "최대화_T", "창닫기_T", "창복원_T", "ICON"
@@ -1192,10 +1374,31 @@ CBitmap* CXChildCaption::GetButtonImage(int index)
 	}
 	else
 		return NULL;
+#endif
 }
 
 CString CXChildCaption::GetItemTipText(int nItem)
 {
+#ifdef DF_MK_CAPTION
+	CString tipS = "";
+	switch (nItem)
+	{
+	case IDX_PIN:	tipS = m_pinON ? _T("압정해제") : _T("압정설정");	break;
+	case IDX_SINGLE:tipS = m_single ? _T("복원") : _T("독립실행");	break;
+	case IDX_MARKET:tipS = m_bIconic ? _T("") : m_marketN == 4? _T("") : _T("거래소선택");	break;
+	case IDX_GROUP:	tipS = m_bIconic ? _T("") : _T("종목공유그룹");	break;
+	case IDX_COPY:	tipS = m_bIconic ? _T("") : _T("화면복사");	break;
+	case IDX_HELP:	tipS = m_bIconic ? _T("") : _T("도움말");	break;
+	case IDX_FONT:	tipS = m_bIconic ? _T("") : _T("폰트변경");	break;
+	case IDX_MIN:	tipS = _T("최소화");	break;
+	case IDX_MAX:	m_bMax ? tipS = _T("이전크기로") : tipS = _T("최대화");	break;
+	case IDX_CLOSE:	tipS = _T("닫기");	break;
+	case IDX_RESTORE:tipS = _T("이전크기로");
+	default:	break;
+	}
+
+	return tipS;
+#else
 	CString tipS = "";
 	switch (nItem)
 	{
@@ -1213,6 +1416,7 @@ CString CXChildCaption::GetItemTipText(int nItem)
 	}
 
 	return tipS;
+#endif
 }
 
 void CXChildCaption::FocusNotify()
@@ -1239,20 +1443,51 @@ void CXChildCaption::SetRegion()
 	iRc.SetRect(pt.x, pt.y, pt.x + bm.bmWidth/2, pt.y + bm.bmHeight);
 	iRc.OffsetRect(-GAP, 0);
 
-
+#ifdef DF_MK_CAPTION
+	for (int ii = IDX_CLOSE; ii >= IDX_LOCK; ii--)
+#else
 	for (int ii = IDX_CLOSE; ii >= IDX_PIN; ii--)
+#endif
 	{
 		switch (ii)
 		{
+#ifdef DF_MK_CAPTION
+		case IDX_LOCK:
+		{
+			m_arRc.SetAt(IDX_LOCK, iRc);
+
+			m_slog.Format("[title][setrect] [%d]     L=[%d] R=[%d] W=[%d]", ii, iRc.left, iRc.right, iRc.Width());
+			OutputDebugString(m_slog);
+
+			iRc.OffsetRect(-1, 0);
+		}
+		break;
+		case IDX_MARKET:
+		{
+			iRc.OffsetRect(-30, 0);
+			iRc.right += 30;
+
+			m_slog.Format("[title][setrect] [%d]     L=[%d] R=[%d] W=[%d]", ii, iRc.left, iRc.right, iRc.Width());
+			OutputDebugString(m_slog);
+
+			if (!m_single)  //testcode 
+				iRc.OffsetRect(bm.bmWidth / 2, 0);
+
+			m_arRc.SetAt(IDX_MARKET, iRc);
+
+			iRc.right -= 30;
+		}
+		break;
+#endif
 		case IDX_PIN:
-			/*if (m_sdiMode)
-				iRc = m_arRc.GetAt(IDX_SINGLE);
-			else if (!m_single)
-				iRc.SetRectEmpty();*/
 			if (!m_sdiMode)
 			{
+#ifdef DF_MK_CAPTION
+				
+#else
 				if (!m_single)
 					iRc.SetRectEmpty();
+#endif
 			}
 			m_arRc.SetAt(IDX_PIN, iRc);	break;
 			break;
@@ -1346,6 +1581,10 @@ int CXChildCaption::GetSelectItem(CPoint point)
 			if (m_bMax)	return IDX_RESTORE;
 		case IDX_PIN:
 		case IDX_ICON:
+#ifdef DF_MK_CAPTION
+		case IDX_MARKET:
+		case IDX_LOCK:
+#endif
 		case IDX_CLOSE:	return ii;
 		case IDX_MIN:	return m_bIconic ? IDX_RESTORE : IDX_MIN;
 		case IDX_GROUP:	case IDX_COPY:
@@ -1413,3 +1652,132 @@ int CXCaption::DefaultFont()
 	
 	return INITMAPSIZE;
 }
+#ifdef DF_MK_CAPTION
+void	CXCaption::SetMarket(int iMarket)
+{
+	m_marketN = iMarket;
+	Invalidate(FALSE);
+	return;
+
+	CString stitle;
+	GetParent()->GetWindowText(stitle);
+
+	m_slog.Format("[mkbitmap] [%s]<%d> iMarket=[%d] m_marketN=[%d]",
+		__FUNCTION__, __LINE__, iMarket, m_marketN);
+	OutputDebugString(m_slog);
+	
+	if (m_marketN == MK_TOT)
+	{
+		stitle.Replace(TITLE_KRX, TITLE_TOT);
+		stitle.Replace(TITLE_NXT, TITLE_TOT);
+	}
+	else if (m_marketN == MK_KRX)
+	{
+		stitle.Replace(TITLE_TOT, TITLE_KRX);
+		stitle.Replace(TITLE_NXT, TITLE_KRX);
+	}
+	else if (m_marketN == MK_NXT)
+	{
+		stitle.Replace(TITLE_TOT, TITLE_NXT);
+		stitle.Replace(TITLE_KRX, TITLE_NXT);
+	}
+
+	m_title = stitle;
+	GetParent()->SetWindowText(stitle);
+	Invalidate(FALSE);
+}
+
+
+#ifdef DF_MK_CAPTION
+void CXCaption::SetMapPermission(int ival)
+{
+	CWnd* pwnd = AfxGetMainWnd();
+	if (!pwnd)
+		return;
+
+	m_iMkPermission = ival;
+	CString* pMapNum = new CString(m_sMapnum);
+	int ipermission = pwnd->SendMessage(WM_AXIS, MAKEWPARAM(axGetMarKetType, 0), (LPARAM)pMapNum);
+
+	if ((m_iMkPermission & ipermission) == 0)
+	{
+		if (m_iMkPermission & 1)
+			m_marketN = 1;
+		else if (m_iMkPermission & 2)
+			m_marketN = 2;
+		else if (m_iMkPermission & 4)
+			m_marketN = 3;
+	}
+
+
+	m_slog.Format("[AXIS][MARKET] SetMapPermission    m_iMkPermission=[%d] m_marketN=[%d] ]",
+		m_iMkPermission, m_marketN);
+	OutputDebugString(m_slog);
+
+	Invalidate();
+}
+
+void CXCaption::SetMapNum(CString smap)
+{
+	bool bCheckMapPermission{};
+	m_MkLock = FALSE;
+
+	if (m_sMapnum != smap)
+		bCheckMapPermission = true;
+
+	m_sMapnum = smap;
+	CWnd* pwnd = AfxGetMainWnd();
+	if (!pwnd)
+		return;
+
+	CString* pMapNum = new CString(smap);
+
+	//nxt나 통합권이 있나? 없으면 디폴트 KRX 이고 거래소 변경이 안된다
+	if(bCheckMapPermission)
+		m_iMkPermission = pwnd->SendMessage(WM_AXIS, MAKEWPARAM(axGetMarKetType, 0), (LPARAM)pMapNum);
+
+	m_slog.Format("[AXIS][AXIS][MARKET] SetMapNum    m_iMkPermission=[%d] m_marketN=[%d] bCheckMapPermission=[%d]]",
+		m_iMkPermission, m_marketN, bCheckMapPermission);
+	OutputDebugString(m_slog);
+
+	if (m_iMkPermission == 0)
+	{
+		//m_MkLock = TRUE;
+		m_marketN = 4;
+
+		Invalidate();
+		return;
+	}
+
+	char redB[32]{};
+	int redL;
+	CString file, stmp;
+	file.Format("%s\\%s\\%s\\%s", Axis::home, USRDIR, Axis::user, "userconf.ini");
+	redL = GetPrivateProfileString("MKgubn", "Market", "KRX", redB, sizeof(redB), file);
+	stmp.Format("%s", redB);
+	stmp.TrimRight();
+
+	if (stmp == "KRX")
+		m_marketN = 1;
+	else if (stmp == "NXT")
+		m_marketN = 2;
+	else if (stmp == "통합")
+		m_marketN = 3;
+
+	int bitMarket = iMarketTobit(m_marketN);
+
+	if ((m_iMkPermission & bitMarket) == 0)
+	{
+		if (m_iMkPermission & 1)
+			m_marketN = 1;
+		else if (m_iMkPermission & 2)
+			m_marketN = 2;
+		else if (m_iMkPermission & 4)
+			m_marketN = 3;
+	}
+
+	Invalidate();
+}
+#endif
+
+#endif

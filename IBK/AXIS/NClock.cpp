@@ -144,7 +144,8 @@ void CNClock::OnTimer(UINT nIDEvent)
 	if (nIDEvent == TM_CLOCK)
 	{
 		CWindowDC dc(this);
-		Draw(dc);
+		if(IsWindowVisible())
+			Draw(dc);
 	}
 	
 

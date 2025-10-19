@@ -31,6 +31,7 @@ static char THIS_FILE[] = __FILE__;
 
 #pragma warning (disable : 6273)
 
+
 class GS
 {
 public:
@@ -896,7 +897,7 @@ OutputDebugString(s);
 
 	CString domino_data;
 
-	if(mapN == "IB714100" || mapN == "IB714200" || mapN == "IB714500")
+	if(mapN == "IB714200" || mapN == "IB714500")
 	{
 		if(m_main->m_miniWid == NULL || !m_main->m_miniWid->GetSafeHwnd())
 		{
@@ -1267,7 +1268,7 @@ OutputDebugString(s);
 		return TRUE;
 	}
 
-	if(mapN == "IB714100" || mapN == "IB714200" || mapN == "IB714500")
+	if( mapN == "IB714200" || mapN == "IB714500")
 	{
 		if(m_main->m_miniWid == NULL || !m_main->m_miniWid->GetSafeHwnd())
 		{
@@ -2363,11 +2364,13 @@ int CMapHelper::CreateMDIbySDI_Tabview(CString mapN, int group, int fontN, CRect
 int CMapHelper::CopyScreen(CString mapN, int group, int fontsize, CPoint sp)
 {
 	//test cdd
+#ifdef DF_CDDUSE  
 	if (m_main->isCDDScreen(mapN))
 	{
 		ChangeChild(MAPN_CDDEDD);
 		return 0;
 	}
+#endif
 
 	if (!IsValidMap(mapN.Left(L_MAPN)))	
 		return 0;
@@ -2628,12 +2631,14 @@ int CMapHelper::CopyTabScreen(CString mapN, int group, int fontsize, CPoint sp)
 
 int CMapHelper::ChangeChild(CString mapN, int trigger, int key, int position)
 {
-	//test CDD
+	//test cdd
+#ifdef DF_CDDUSE  
 	if (m_main->isCDDScreen(mapN))
 	{
 		ChangeChild(MAPN_CDDEDD);
 		return 0;
 	}
+#endif
 CString s;
 
 s.Format("[AXIS]_ [map] ChangeChild[CString] : mapN=[%s] trigger=[%d] key=[%d]\n",
@@ -2747,7 +2752,7 @@ OutputDebugString(s);
 
 		BOOL bOnlyOne = FALSE;
 
-		if( mapname.Find("IB713300") > -1 || mapname.Find("IB713400") > -1 || mapname.Find("IB714100") > -1 || mapname.Find("IB714200") > -1 || mapname.Find("IB714500") > -1)
+		if( mapname.Find("IB713300") > -1 || mapname.Find("IB713400") > -1 || mapname.Find("IB714200") > -1 || mapname.Find("IB714500") > -1)
 		{
 			//OutputDebugString("ONLY ONE SCREEN\n");
 			bOnlyOne = TRUE;
@@ -4378,7 +4383,9 @@ void CMapHelper::TransformMDIChildToSingleWindow(int key, int vs)
 		m_main->m_MClient->ClientToScreen(&rc);
 
 	}
-
+#ifdef DF_MK_CAPTION
+	schild->m_xcaption.m_marketN = child->m_xcaption.m_marketN;
+#endif
 	oldView->SetParent(schild);
 
 	CString title = child->m_xcaption.GetTitle();
@@ -4510,7 +4517,9 @@ void CMapHelper::TransformSingleWindowToMDIChild(int key, int vs)
 
 	child->SetMisc(WM_AXIS, m_main, axiscall, font, vwTYPE == vtypeWND ? false: true);
 	child->SetActiveView(oldView);
-
+#ifdef DF_MK_CAPTION
+	child->m_xcaption.m_marketN = schild->m_xcaption.m_marketN;
+#endif
 	newView->SetParent(schild);
 	schild->SetActiveView(newView);
 	child->m_bBackGround = schild->m_bBackGround;

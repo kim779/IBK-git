@@ -500,6 +500,7 @@ void CExitD::OnShapeButton(int index)
 	}
 }
 
+#include "axMsg.hxx"
 BOOL CExitD::OnCommand(WPARAM wParam, LPARAM lParam) 
 {
 	CString		file, keys;
@@ -508,6 +509,13 @@ BOOL CExitD::OnCommand(WPARAM wParam, LPARAM lParam)
 
 	if (event != BN_CLICKED)
 		return CDialog::OnCommand(wParam, lParam);
+
+	if (cmd == IDOK)
+	{
+		/*bool bret = GetParent()->SendMessage(WM_AXIS, MAKEWPARAM(axUPLODING_LOG, 0));
+		if (!bret)
+			return TRUE;*/
+	}
 
 	if(m_bUseNewLogin)
 	{
@@ -531,3 +539,16 @@ BOOL CExitD::OnCommand(WPARAM wParam, LPARAM lParam)
 
 #pragma warning(default : 26400)
 #pragma warning(default : 26409)
+
+
+BOOL CExitD::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN)
+	{
+		bool bret = GetParent()->SendMessage(WM_AXIS, MAKEWPARAM(axUPLODING_LOG, 0));
+		if (!bret)
+			return TRUE;
+	}
+	return CDialog::PreTranslateMessage(pMsg);
+}

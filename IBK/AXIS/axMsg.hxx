@@ -72,7 +72,7 @@
 #define	axALARM		100	// alarm Msg
 #define	axDIALOG	101	// duplication notice
 #define	axKONG		102	// processfmx
-
+#define    axUPLODING_LOG 103  //uploaing log NOW!!!
 // NSocket message
 #define	axREPEATSOCK	200	// connect socket
 #define	axCONNECTSOCK	201	// connect socket
@@ -101,6 +101,9 @@
 #define axChaserOFF	9999	// Chaser OFF
 #define axMRADAR	9997	// 
 #define axToolbarHide 8998 //Toolbar Hide
+
+#define axGetMarKetType  445
+#define axSetMarKetType  446
 //
 //	systemTR ID
 //
@@ -213,5 +216,23 @@
 #define MMSG_SAVEINTEREST		0x05
 #define MMSG_NEWINTEREST		0x06
 #define MMSG_RESTORECONDLG		0x07
-
+#define MMSG_RESTORESERVERORD		0x08
+#define MMSG_SHARED_GETKEY		0x09
+#define MMSG_SHARED_REGWND		0x10                         //cx_market 윈도우 핸들 등록
+#define MMSG_SHARED_BROADCAST		0x11
+#define MMSG_SHARED_CTRLDESTROY		0x12                    //cx_market  윈도우 핸들 삭제
+#define MMSG_SHARED_GETHANDLECNT		0x13
+#define MMSG_SHARED_GUIDEMESSAGE		0x14               //cx_market  가이드 메시지 요청
+#define MMSG_POP_MAP 0x15
+#define MMSG_GETDN_CERTIFY 0x16
+#define MMSG_MKMSG_FROM_MAP 0x17                          //cx_market  -> main   타이틀 거래소 구분 변경
+#define MMSG_MKMSG_FROM_SM 0x18
+#define MMSG_SHARED_PROCDLL 0x19
+#define MMSG_SET_USER_ABORAD_AUTH 0x20
+#define MMSG_GET_USER_ABORAD_AUTH 0x21
+#define MMSG_MKMSG_GET_MAP_MARKET 0x22            //cx_market  -> main    맵번호를 주고 권한을 받아온다
+#define MMSG_MKMSG_GET_MAP_BLOCK 0x23                //cx_market  -> main   현재 선택한 화면 거래소자물쇠 채움 여부  (onlbuttondown)
+#define MMSG_MKMSG_GET_MAP_INFO 0x24                //cx_market  -> main  현재 선택 화면 맵정보 받아온다 (onlbuttondown)
+#define MMSG_MKMSG_FROM_MAPNMAP 0x25				//cx_market ->main  화면타이틀의 거래소 변경 및  화면 권한도 변경
+#define MMSG_MKMSG_FROM_MAPSMAP 0x26		    //특정 화면에서(dll )  화면타이틀 거래소 변경
 #endif

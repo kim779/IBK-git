@@ -219,6 +219,82 @@ BOOL CAxDrawHelper::DrawBitmap(int x, int y, CBitmap* bitmap, int maskcolor)
 	return DrawIndexedBitmap(x, y, bitmap, maskcolor, bm.bmWidth, bm.bmHeight, 0);
 }
 
+BOOL CAxDrawHelper::DrawScaledIndexedBitmap(
+	int x, int y,
+	CBitmap* bitmap,
+	int maskcolor,
+	int width, int height,
+	int offset,
+	double scale) // 예: 0.3 = 30% 축소, 2.0 = 2배 확대
+{
+	if (!bitmap || !bitmap->m_hObject)
+		return FALSE;
+
+	// 최종 출력 크기
+	int scaledWidth = static_cast<int>(width * scale);
+	int scaledHeight = static_cast<int>(height * scale);
+
+	CDC buffDC, maskDC, memoryDC, copyDC;
+	CBitmap buffBitmap, maskBitmap, copyBitmap;
+	CBitmap* oldbuffBitmap{}, * oldmaskBitmap{}, * oldmemoryBitmap{}, * oldcopyBitmap{};
+
+	// 버퍼 DC
+	buffDC.CreateCompatibleDC(m_dc);
+	buffBitmap.CreateCompatibleBitmap(m_dc, scaledWidth, scaledHeight);
+	oldbuffBitmap = buffDC.SelectObject(&buffBitmap);
+
+	// 마스크 DC
+	maskDC.CreateCompatibleDC(m_dc);
+	maskBitmap.CreateBitmap(scaledWidth, scaledHeight, 1, 1, NULL);
+	oldmaskBitmap = maskDC.SelectObject(&maskBitmap);
+
+	// 배경색 채우기
+	const CRect maskRc(0, 0, scaledWidth, scaledHeight);
+	buffDC.FillSolidRect(&maskRc, maskcolor);
+
+	// 원본 비트맵 DC
+	memoryDC.CreateCompatibleDC(m_dc);
+	oldmemoryBitmap = memoryDC.SelectObject(bitmap);
+
+	// StretchBlt 사용 (확대/축소)
+	buffDC.StretchBlt(
+		0, 0, scaledWidth, scaledHeight, // 대상
+		&memoryDC,
+		offset, 0, width, height,        // 소스 (offset부터 width x height 영역)
+		SRCCOPY
+	);
+
+	// 마스크 생성
+	maskDC.BitBlt(0, 0, scaledWidth, scaledHeight, &buffDC, 0, 0, SRCCOPY);
+
+	// 복사 DC
+	copyDC.CreateCompatibleDC(m_dc);
+	copyBitmap.CreateCompatibleBitmap(m_dc, scaledWidth, scaledHeight);
+	oldcopyBitmap = copyDC.SelectObject(&copyBitmap);
+
+	// 대상 DC 백업 후 마스크 연산
+	copyDC.BitBlt(0, 0, scaledWidth, scaledHeight, m_dc, x, y, SRCCOPY);
+	copyDC.BitBlt(0, 0, scaledWidth, scaledHeight, &maskDC, 0, 0, SRCAND);
+	buffDC.BitBlt(0, 0, scaledWidth, scaledHeight, &maskDC, 0, 0, SRCMASK);
+	copyDC.BitBlt(0, 0, scaledWidth, scaledHeight, &buffDC, 0, 0, SRCPAINT);
+
+	// 최종 그리기
+	m_dc->BitBlt(x, y, scaledWidth, scaledHeight, &copyDC, 0, 0, SRCCOPY);
+
+	// DC 원복
+	copyDC.SelectObject(oldcopyBitmap);
+	memoryDC.SelectObject(oldmemoryBitmap);
+	maskDC.SelectObject(oldmaskBitmap);
+	buffDC.SelectObject(oldbuffBitmap);
+
+	buffDC.DeleteDC();
+	maskDC.DeleteDC();
+	memoryDC.DeleteDC();
+	copyDC.DeleteDC();
+
+	return TRUE;
+}
+
 BOOL CAxDrawHelper::DrawIndexedBitmap(int x, int y, CBitmap* bitmap, int maskcolor, int width, int height, int offset)
 {
 	if (!bitmap || !bitmap->m_hObject)

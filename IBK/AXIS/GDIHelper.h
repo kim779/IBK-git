@@ -30,6 +30,7 @@ public:
 	BOOL DrawBitmap(int x, int y, UINT nResID, int maskcolor);	
 	BOOL DrawBitmap(int x, int y, CBitmap* bitmap, int maskcolor);
 	BOOL DrawIndexedBitmap(int x, int y, CBitmap* bitmap, int maskcolor, int width, int height, int offset);
+	BOOL DrawScaledIndexedBitmap(int x, int y, CBitmap* bitmap, int maskcolor, int width, int height, int offset, double scale);
 
 	//void DrawChildFrame(CRect winRc);  //vc2019
 	void DrawChildFrame(CRect winRc, bool bActive = true);

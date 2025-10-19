@@ -157,25 +157,6 @@ BOOL CAxisApp::InitInstance()
 {
 	// Parse command line for standard shell commands, DDE, file open
 	// Interface 포인터 넘겨주기
-	//0x01 -> 0001   -> 1번 코어만
-		//0x02 -> 0010   -> 2번 코어만
-		//0x03 -> 0011   -> 3번 코어만
-		//0x04 -> 0100
-		//0x05 -> 0101
-		//0x06 -> 0110
-		//0x07 -> 0111
-		//0x08 -> 1000
-	////DWORD_PTR dwProcessAffinityMask = 0x01;
-	DWORD_PTR dwProcessAffinityMask = 0x01| 0x02| 0x03| 0x04| 0x05| 0x06| 0x07| 0x08| 0x09| 0x0a;
-	if (SetProcessAffinityMask(GetCurrentProcess(),  dwProcessAffinityMask) == 0) {
-		int ierror = GetLastError();
-		CString slog;
-		slog.Format(" 프로세스 친화도 실패[%d]", ierror);
-		AfxMessageBox(slog);
-		return FALSE;
-	}
-
-
 
 	Axis::Initialize();
 

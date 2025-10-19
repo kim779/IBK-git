@@ -16,7 +16,7 @@ public:
 //	DECLARE_DYNCREATE(CSChild)
 	CSChild(CWnd* mainframe, bool stealth = false);           // protected constructor used by dynamic creation
 	virtual ~CSChild();
-
+	CString m_slog{};
 // Attributes
 private:
 	bool		m_tView;

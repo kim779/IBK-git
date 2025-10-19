@@ -737,6 +737,13 @@ void CChildFrame::SetMapName(bool (*axiscall)(int, WPARAM, LPARAM), CString sMap
 {
 	(*axiscall)(AXI_LASTMAPS, (WPARAM)(LPCTSTR)m_mapN, (LPARAM)(LPCTSTR)sMapName);
 	m_mapN = sMapName;
+
+#ifdef DF_MK_CAPTION
+	m_xcaption.SetMapNum(m_mapN);
+
+	m_slog.Format("[AXIS][market][%s]<%d> sMapName=[%s] ", __FUNCTION__, __LINE__, sMapName);
+	OutputDebugString(m_slog);
+#endif
 }
 
 void CChildFrame::OnClose() 

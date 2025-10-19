@@ -324,6 +324,24 @@
     <ClCompile Include="whdump.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CUploadFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CNoteWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CSlideWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDlgServerOrder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDLG_Notice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDlg_MSGBOX.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="axis.rc">
@@ -666,6 +684,24 @@
     </ClInclude>
     <ClInclude Include="sk_pc_identity.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CUploadFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CDlgServerOrder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CSlideWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CNoteWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CDLG_Notice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CDlg_MSGBOX.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

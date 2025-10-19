@@ -20,7 +20,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CCertLogin dialog
 
-
+#define DF_DEV
 #define DEV_CLOUDE_SERVER  "twas.signkorea.com"
 #define REAL_CLOUDE_SERVER "cert.signkorea.com"
 #define DEV_AGREEMENT_URL "https://tweb.signkorea.com:8700/notice/html/conditionsOfUse.txt"
@@ -283,23 +283,29 @@ BOOL CCertLogin::OnInitDialog()
 
 //	m_bitmap = CEnBitmap::LoadImageFile(imgN, RGB(255, 255, 255));
 	CString file, usnm = Axis::user;
-	file.Format("%s\\%s\\%s\\%s.ini", Axis::home, USRDIR, usnm, usnm); 
+	char	buf[512];
+	file.Format("%s\\%s\\axisENC.ini", Axis::home, "tab");
+	DWORD dw = GetPrivateProfileString("LOGINTYPE", "TYPE", "0", buf, sizeof(buf), file);
+	CString stemp{};
+	stemp.Format("%s", buf);
+	
+	int loginType = atoi(stemp);
 
-	const int loginType = GetPrivateProfileInt("LOGINTYPE", "TYPE", 1, file);
-
-	if (loginType == 1)  //ID로 로그인
+	if (loginType == 1 || m_staff)  //ID로 로그인
 	{
 		m_bCertLogin = FALSE;
 		CString sfile;
 		sfile.Format("%s\\%s\\AXIS.ini", Axis::home, TABDIR);
-		//WritePrivateProfileString("CLOUDELOGIN", "USE", "0", sfile);
-		app->WriteProfileInt(WORKSTATION, "CLOUDELOGIN", 0);  
-		((CMainFrame*)m_frame)->CludeFuncCall(DF_CLOUDE_NOUSE);
+		//WritePrivateProfileString("CLOUDELOGIN", "USE", "0", sfile);  //test cloude
+		app->WriteProfileInt(WORKSTATION, "CLOUDELOGIN", 0);
 		m_bCloudeUSE = FALSE;
 		((CMainFrame*)m_frame)->CludeUSE(m_bCloudeUSE);
 	}
 	else
 		m_bCertLogin = TRUE;
+
+	m_slog.Format("oninitdialog file=[%s] LOGINTYPE=[%s] m_staff =[%d] m_bCertLogin=[%d]", file, stemp, m_staff, m_bCertLogin);
+	WriteLog(m_slog);
 
 	//CString s;
 	//s.Format("PASSWORD 22 TYPE [%d] [%d]n",m_bCertLogin,loginType);
@@ -444,20 +450,18 @@ BOOL CCertLogin::OnInitDialog()
 
 	CString sfile;
 	sfile.Format("%s\\%s\\AXIS.ini", Axis::home, TABDIR);
-	//int bCludeUse = GetPrivateProfileInt("CLOUDELOGIN", "USE", 0, sfile);
-	int bCludeUse = app->GetProfileInt(WORKSTATION, "CLOUDELOGIN", 0) ? TRUE : FALSE;
+	//const int bCludeUse = GetPrivateProfileInt("CLOUDELOGIN", "USE", 0, sfile); //test cloude
+	const int bCludeUse = app->GetProfileInt(WORKSTATION, "CLOUDELOGIN", 0) ? TRUE : FALSE;
 	if (bCludeUse == 1)
 	{
 		m_bCloudeUSE = TRUE;
 		((CMainFrame*)m_frame)->CludeUSE(m_bCloudeUSE);
-		((CMainFrame*)m_frame)->CludeFuncCall(DF_CLOUDE_USE);
 		ShowCloudeBtn(TRUE);
 	}
 	else
 	{
 		m_bCloudeUSE = FALSE;
 		((CMainFrame*)m_frame)->CludeUSE(m_bCloudeUSE);
-		((CMainFrame*)m_frame)->CludeFuncCall(DF_CLOUDE_NOUSE);
 		ShowCloudeBtn(FALSE);
 	}
 	
@@ -812,7 +816,10 @@ void CCertLogin::OnRun()
 		if (!m_btnRun->IsEnable())	return;
 
 		Axis::userID = m_user;
-		if (IsNumber(m_user) && (m_user != "##ibk9") && (m_user != "##opuser") && (m_user != "##ibk8"))
+		CString shashID{};
+		shashID.Format("%08u", ((CMainFrame*)m_frame)->HashDataAXIS(m_user));
+
+		if (IsNumber(m_user) && (shashID != "1415129685") && (shashID != "3729776228") && (shashID != "1415129684"))
 		{
 			//직원 아이디라면
 			if (Axis::isCustomer)
@@ -828,7 +835,7 @@ void CCertLogin::OnRun()
 		else
 		{
 			//고객 아이디라면
-			if (!Axis::isCustomer && (m_user != "##ibk9") && (m_user != "##opuser") && (m_user != "##ibk8"))
+			if (!Axis::isCustomer && (shashID != "1415129685") && (shashID != "3729776228") && (shashID != "1415129684"))
 			{
 				SetGuide("정확하지 않은 아이디 입니다.\n아이디 혹은 설정을 확인하시기 바랍니다.");
 				((CEdit*) GetDlgItem(IDC_DUSER))->SetSel(0,-1);
@@ -953,7 +960,16 @@ CString CCertLogin::GetCPass()
 // 		
 // 		m_cPass = buff;
 // 	}
+	if (m_cPass.Find("인증서") >= 0)
+	{
+		CEdit* edit = (CEdit*)GetDlgItem(IDC_DCPASS);
+		edit->SetPasswordChar(0);
+		m_cPass = "";    //test cpass
+		UpdateData(TRUE);  
+	}
 
+	m_slog.Format("[axis][%s] m_cPass=[%s]", __FUNCTION__, m_cPass);
+	OutputDebugString(m_slog);
 	return m_cPass;
 }
 
@@ -1002,6 +1018,14 @@ void CCertLogin::SetPassword(CString pass)
 
 void CCertLogin::SetCPass(CString pass)
 {
+	m_slog.Format("[axis][%s] m_cPass=[%s]", __FUNCTION__, pass);
+	OutputDebugString(m_slog);
+
+	if (pass.Find("인증서") >= 0)
+	{
+		pass = "";  //test cpass
+	}
+
 	m_cPass = pass;
 	if (IsWindow(m_hWnd))
 		UpdateData(FALSE);
@@ -1215,6 +1239,14 @@ void CCertLogin::SetGuide(CString msg)
 			}
 		}
 
+		if (msg.Find("4256") > 0)
+		{
+			msg.Replace("[4256]", "");
+			msg.Replace("ID비밀번호를", "접속비밀번호");
+			msg.Replace("잘못", "");
+			msg.Replace("입력하셨습니다.", "입력오류");
+		}
+
 		SetDlgItemText(IDC_SMSG, msg);
 // 		CRect rc = CRect(90,292,240+90,+292+12);
 // 		InvalidateRect(rc); //상태바 배경을 투명화해서 입력후 화면 갱신
@@ -1231,11 +1263,11 @@ void CCertLogin::SetGuide(CString msg)
 					"\n\n"\
 					"■ 대상직원 : 최초 접속 및 IP주소 변경시"\
 					"\n\n"\
-					"■ 문서양식 : 임직원고객용ID신청서(컴플라이언스팀 합의 必)"\
+					"■ 문서양식 : 임직원고객용ID신청서(내부통제총괄부 합의 必)"\
 					"\n\n"\
-					"☞ 그룹웨어 > 전자결재 > 결재문서작성 > 정보전략팀"\
+					"☞ 그룹웨어 > 전자결재 > 결재문서작성 > 정보시스템부"\
 					"\n\n"\
-					"※ 등록은 컴플라이언스팀 합의 완료시 처리됨");
+					"※ 등록은 내부통제총괄부 합의 완료시 처리됨");
 			}
 			else
 			{
@@ -1243,14 +1275,29 @@ void CCertLogin::SetGuide(CString msg)
 					"\n\n"\
 					"직원용 HTS는 IP 등록 후 접속 가능함."\
 					"\n\n"\
-					"※ IP 등록 문의 : 정보전략팀 (6915-5257)");
+					"※ IP 등록 문의 : 정보시스템부 (6915-5784)");
 			}
 
 			Axis::MessageBox(this, str, MB_OK | MB_ICONINFORMATION);
 		}
-		if(msg.Mid(0,4) == "4259")
+		if(msg.Mid(0,4) == "4732")
 		{
-			
+			CString	str;
+
+			if (Axis::isCustomer)
+			{
+				str.Format("[계정 이용 제한 안내]"\
+					"\n\n"\
+					"해당 계정은 서비스 이용이 제한되어 있습니다."\
+					"\n\n"\
+					"문의사항은 1588-0080/1544-0050으로 문의해"\
+					"\n\n"\
+					"주시길 바랍니다."\
+				);
+			}
+
+			Axis::MessageBox(this, str, MB_OK | MB_ICONINFORMATION);
+
 		}
 	}
 }
@@ -1331,9 +1378,11 @@ void CCertLogin::SetProgress(CString detail, int rate, BOOL error)
 
 void CCertLogin::OnCert()
 {
+	m_slog.Format("OnCert m_staff =[%d]",  m_staff);
+	WriteLog(m_slog);
 	//AfxMessageBox("OK!");
 	CString file, usnm = Axis::user;
-	file.Format("%s\\%s\\%s\\%s.ini", Axis::home, USRDIR, usnm, usnm); 
+	file.Format("%s\\%s\\axisENC.ini", Axis::home, "tab");
 
 	WritePrivateProfileString("LOGINTYPE", "TYPE", "0", file);
 
@@ -1401,16 +1450,17 @@ void CCertLogin::OnCert()
 
 void CCertLogin::OnGen()
 {
+	m_slog.Format("OnGen m_staff =[%d]", m_staff);
+	WriteLog(m_slog);
 	CString file, usnm = Axis::user;
-	file.Format("%s\\%s\\%s\\%s.ini", Axis::home, USRDIR, usnm, usnm); 
+	file.Format("%s\\%s\\axisENC.ini", Axis::home, "tab");
 
 	WritePrivateProfileString("LOGINTYPE", "TYPE", "1", file);
 
 	CString sfile;
 	sfile.Format("%s\\%s\\AXIS.ini", Axis::home, TABDIR);
-	//WritePrivateProfileString("CLOUDELOGIN", "USE", "0", sfile);
+	//WritePrivateProfileString("CLOUDELOGIN", "USE", "0", sfile);  //test cloude
 	AfxGetApp()->WriteProfileInt(WORKSTATION, "CLOUDELOGIN", 0);
-	((CMainFrame*)m_frame)->CludeFuncCall(DF_CLOUDE_NOUSE);
 	m_bCloudeUSE = FALSE;
 	((CMainFrame*)m_frame)->CludeUSE(m_bCloudeUSE);
 
@@ -1800,25 +1850,15 @@ void CCertLogin::OnKillfocusDpass()
 
 void CCertLogin::OnSetfocusDcpass() 
 {
-	/*
-	if (m_cPass == "인증서 비밀번호")
-	{
-		m_cPass = "";	
-		CEdit* edit = (CEdit*) GetDlgItem(IDC_DCPASS);
-		edit->SetSel(0,-1);
-		edit->SetPasswordChar('*');
-		GetDlgItem(IDC_DCPASS)->SetWindowText(m_cPass);
-		
-	}
-	*/
+	m_slog.Format("[axis][%s] m_cPass=[%s]", __FUNCTION__, m_cPass);
+	OutputDebugString(m_slog);
+
 	if (m_cPass == "인증서 비밀번호")
 	{
 		//m_pass = "";
 		CEdit* edit = (CEdit*) GetDlgItem(IDC_DCPASS);
 		edit->SetPasswordChar(0);
 		edit->SetSel(0,-1);
-		
-		
 	}
 	else
 	{
@@ -1841,6 +1881,10 @@ void CCertLogin::OnKillfocusDcpass()
 {
 	CEdit* edit = (CEdit*) GetDlgItem(IDC_DCPASS);
 	edit->GetWindowText(m_cPass);
+
+	m_slog.Format("[axis][%s] m_cPass=[%s]", __FUNCTION__, m_cPass);
+	OutputDebugString(m_slog);
+
 	if (m_cPass == "" || m_cPass == "인증서 비밀번호")
 	{
 		m_cPass = "인증서 비밀번호";	
@@ -2439,7 +2483,7 @@ void CCertLogin::RotateBanner()
 
 void CCertLogin::OnShapeButton(int index)
 {
-
+	/*
 	CString slog;
 	slog.Format("%d", index);
 	//간편인증 
@@ -2449,7 +2493,7 @@ void CCertLogin::OnShapeButton(int index)
 		return;
 	}
 	//@@간편인증 
-	
+	*/
 
 	const char* const urls[MAX_SHAPE] =
 	{
@@ -2944,7 +2988,7 @@ void CCertLogin::OnLButtonUp( UINT nFlags, CPoint point )
 }
 
 //간편인증
-typedef CWnd* (__stdcall*pQrShow)			(CWnd*,CHAR*,CHAR*, CString, CString);
+typedef CWnd* (__stdcall*pQrShow)			(CWnd*,CHAR*,CHAR*,int, CString, CString);
 pQrShow			pQrfunc		= NULL;
 void CCertLogin::OnEasyCert()
 {
@@ -2956,7 +3000,8 @@ void CCertLogin::OnEasyCert()
 void CCertLogin::ShowQRDlg()
 {
 	CString spath;
-	spath =  Axis::home + "\\exe\\cx_SimpleEasy.dll";
+//	spath =  Axis::home + "\\dev\\cx_SimpleAuth.dll";
+	spath =  Axis::home + "\\exe\\cx_SimpleAuth.dll";
 	HMODULE hModule = LoadLibrary(spath);	 
 	
 CRect rec;
@@ -2973,12 +3018,10 @@ OutputDebugString(m_slog);
 		char  qrdata[2048] = {0,};
 		if(pQrfunc)
 		{
-			spath.Replace("\\exe\\cx_SimpleEasy.dll", "");
+//			spath.Replace("\\dev\\cx_SimpleAuth.dll", "");
+			spath.Replace("\\exe\\cx_SimpleAuth.dll", "");
 			CString sResult;
-			CString stmp;
-			stmp = ((CMainFrame*)m_frame)->m_ip;
-			//                                    ShowQrCode(CWnd* pParent, char* proot, char* pdata, CString ip, CString port)
-			sResult.Format("%.1s", (char*)pQrfunc(this, (LPSTR)(LPCTSTR)spath, qrdata, ((CMainFrame*)m_frame)->m_ip, ((CMainFrame*)m_frame)->m_port));
+			sResult.Format("%.1s", (char*)pQrfunc(this, (LPSTR)(LPCTSTR)spath, qrdata, 1, ((CMainFrame*)m_frame)->m_ip, ((CMainFrame*)m_frame)->m_port));
 			
 m_slog.Format("[QRCODE] [CCertLogin] ShowQRDlg result=[%s]", qrdata);
 OutputDebugString(m_slog);
@@ -3039,13 +3082,11 @@ void CCertLogin::OnBnClickedCloude()
 {
 	CString sfile;
 	sfile.Format("%s\\%s\\AXIS.ini", Axis::home, TABDIR);
-	//WritePrivateProfileString("CLOUDELOGIN", "USE", "1", sfile);
+	//WritePrivateProfileString("CLOUDELOGIN", "USE", "1", sfile);   //test cloude
 	AfxGetApp()->WriteProfileInt(WORKSTATION, "CLOUDELOGIN", 1);
-	((CMainFrame*)m_frame)->CludeFuncCall(DF_CLOUDE_USE);
 	m_bCloudeUSE = TRUE;
 	((CMainFrame*)m_frame)->CludeUSE(m_bCloudeUSE);
 	ShowCloudeBtn(m_bCloudeUSE);
-
 
 	SetGuide("");
 }
@@ -3054,9 +3095,8 @@ void CCertLogin::OnBnClickedCloudePcbtn()
 {
 	CString sfile;
 	sfile.Format("%s\\%s\\AXIS.ini", Axis::home, TABDIR);
-	//WritePrivateProfileString("CLOUDELOGIN", "USE", "0", sfile);
+	//WritePrivateProfileString("CLOUDELOGIN", "USE", "0", sfile);  //test cloude
 	AfxGetApp()->WriteProfileInt(WORKSTATION, "CLOUDELOGIN", 0);
-	((CMainFrame*)m_frame)->CludeFuncCall(DF_CLOUDE_NOUSE);
 	m_bCloudeUSE = FALSE;
 	((CMainFrame*)m_frame)->CludeUSE(m_bCloudeUSE);
 	ShowCloudeBtn(m_bCloudeUSE);

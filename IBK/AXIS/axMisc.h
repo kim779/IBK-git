@@ -20,21 +20,39 @@
 #define	verUSERID	1
 #define	verRETRY	2
 
-#if 0
-#define	BMP_CNT		10
-#define GROUP_CNT	7
-#define IDX_PIN		0
-#define IDX_SINGLE	1
-#define	IDX_GROUP	2
-#define	IDX_COPY	3
-#define	IDX_HELP	4
-#define	IDX_FONT	5
-#define	IDX_MIN		6
-#define	IDX_MAX		7
-#define	IDX_CLOSE	8
-#define	IDX_RESTORE	9
-#define IDX_ICON	10
-#define	IDX_FONTX	11
+#ifdef DF_MK_CAPTION
+#define  MK_KRX 1
+#define  MK_NXT 2
+#define  MK_TOT 3
+#define  MK_NON 4
+#define TITLE_TOT   _T("[통합]")
+#define TITLE_KRX	 _T("[KRX]")
+#define TITLE_NXT	 _T("[NXT]")
+
+#define	BMP_CNT		12
+#define	GROUP_CNT	9
+#define IDX_LOCK      0
+#define IDX_MARKET 1
+#define IDX_PIN         2
+#define IDX_SINGLE         3
+#define IDX_GROUP		4
+#define IDX_FONT			5
+#define IDX_COPY			6
+#define IDX_HELP			7
+#define	IDX_MIN			8
+#define	IDX_MAX			9
+#define	IDX_CLOSE		10
+#define	IDX_RESTORE	11
+#define	IDX_ICON			12
+#define	IDX_FONTX		13
+
+enum MarketPermission
+{
+	MARKET_NONE = 0,       // 불가
+	MARKET_KRX = 1 << 0,  // 1
+	MARKET_NXT = 1 << 1,  // 2
+	MARKET_TOT = 1 << 2,  // 4
+};
 #else
 #define	BMP_CNT		10
 #define GROUP_CNT	7
@@ -113,7 +131,7 @@ public:
 
 public:
 	CString	m_regkey;
-
+	CWnd* m_pMain{};
 protected:
 	CString	m_root;
 	CMap	< int, int, CString, CString& > m_guide;
@@ -123,7 +141,7 @@ public:
 	void	LoadGuide();
 	void	GetGuide(int key, CString& string);
 	BOOL	RunVers(int type, CString user = _T(""), CString pass = _T(""), CString cpass = _T(""));
-	BOOL	NewRunVers(int type, CString user = _T(""), CString pass = _T(""), CString cpass = _T(""));
+
 protected:
 };
 

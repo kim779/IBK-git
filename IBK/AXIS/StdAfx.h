@@ -52,6 +52,10 @@ extern CComModule _Module;
 
 #include <AxStd.hpp>
 
+#define DF_ENCUSER
+#define DF_LOGKEY  "command"
+#define DF_2LOGKEY  "RunVers"
+
 #if defined _M_IX86
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #elif defined _M_X64
@@ -61,8 +65,8 @@ extern CComModule _Module;
 #endif
 
 typedef BOOL(WINAPI* RtlGetVersion_FUNC) (OSVERSIONINFOEXW*);
-#include "../H/axislog.h"
 
+#define DF_MK_CAPTION   //childframe 타이틀에 거래소 추가
 
 //#define DF_NO_PRELOADHIDDEN
 

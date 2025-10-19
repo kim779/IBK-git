@@ -21,20 +21,21 @@ static char THIS_FILE[] = __FILE__;
 
 #define idGRID 9898
 #define CNT_INIT_ROWS 8
-#define CNT_COL	10
+#define CNT_COL	11
 #define SIZE_CORRECT 17
 #define GRIDH_RATIO	0.77
 
-#define COL_0   0   //체결시간
+#define COL_0   0   //체결시각
 #define COL_1   1   //주문#
 #define COL_2   2   //원주문
-#define COL_3   3   //계좌번호
-#define COL_4   4   //고객명
-#define COL_5   5   //종목명 
-#define COL_6   6   //구분 
-#define COL_7   7   //수량 
-#define COL_8   8   //가격
-#define COL_9   9   //미체결
+#define COL_3   3   //거래소 구분
+#define COL_4   4   //계좌번호
+#define COL_5   5   //고객명
+#define COL_6   6   //종목명 
+#define COL_7   7   //구분 
+#define COL_8   8   //수량 
+#define COL_9   9   //가격
+#define COL_10   10   //미체결
 
 #define TM_RESTOREREC 9797
 #define TM_SIEZDEF 9796
@@ -42,6 +43,9 @@ static char THIS_FILE[] = __FILE__;
 #define BTNGAP 3
 #define ORIW 590  //590
 #define ORIH 185
+
+#define DF_STR_CHETIME  "체결시각"   // "체결시간" 
+#define DF_STR_ORDERNUM  "주문번호"   // "주문#" 
 
 CConclusion::CConclusion(CWnd* pParent /*=NULL*/)
 	: CDialog(CConclusion::IDD, pParent)
@@ -201,7 +205,8 @@ slog.Format("[conclusion] Init start 전체DLG  [%d][%d][%d][%d]   [%d][%d]\n", cl
 	{
 		keys.Format("title%02d", ii);
 		str_tmp = profile.GetString(szConclusionList, keys, keys);
-		if (str_tmp == "시간") str_tmp = "체결시간";
+		if (str_tmp == "시간") str_tmp = DF_STR_CHETIME;
+		if (str_tmp == "주문#") str_tmp = DF_STR_ORDERNUM;
 //		if (str_tmp == "가격") str_tmp = " 가격 ";
 //		if (str_tmp == "종목명") str_tmp = " 종목명 ";
 
@@ -234,15 +239,26 @@ slog.Format("[conclusion] [%s] [%d] [%d] [%d]\n", profile.GetString(szConclusion
 	{
 		keys.Format("title%02d", ii);
 		str_tmp = profile.GetString(szConclusionList, keys, keys);
-		if (str_tmp == "시간") str_tmp = "체결시간";
+		if (str_tmp == "시간") str_tmp = DF_STR_CHETIME;
+		if (str_tmp == "주문#") str_tmp = DF_STR_ORDERNUM;
 		iCol.m_sHeadCaption = str_tmp;
 		
 		keys.Format("wide%02d", ii);
 		str_tmp = profile.GetString(szConclusionList, keys, keys);
 
-		if(ii == COL_5 || ii == COL_0 || ii == COL_3)
+	//	if(ii == COL_6 || ii == COL_0 || ii == COL_4)
+		if ( ii == COL_0 )
 			str_tmp += "  ";
 
+		if (  ii == COL_4)
+			str_tmp += "    ";
+
+#ifndef DF_MK_CAPTION
+		if (ii == COL_3)
+		{
+			str_tmp += "   ";
+		}
+#endif
 		const CSize sz = pDC->GetTextExtent(str_tmp);
 
 		gvitem.state = 0;
@@ -274,15 +290,15 @@ slog.Format("[conclusion] [%s] [%d] [%d] [%d]\n", profile.GetString(szConclusion
 			iCol.m_sEditFormat.Empty();
 
 		gvitem.format = GVFM_CENTER;
-		if(ii == COL_1 || ii == COL_7 || ii == COL_8 || ii == COL_9)
+		if(ii == COL_1 || ii == COL_8 || ii == COL_9 || ii == COL_10)
 			gvitem.format = GVFM_RIGHT;
-		else if(ii == COL_3 || ii == COL_4 || ii == COL_5 || ii == COL_8)
+		else if(ii == COL_4 || ii == COL_5 || ii == COL_6 || ii == COL_9)
 			gvitem.format = GVFM_LEFT;
 
-		if(ii == COL_6 )
+		if(ii == COL_7 )
 			gvitem.attr = GVAT_CONDITIONx;
 
-		if(ii == COL_8 )
+		if(ii == COL_9 )
 			gvitem.attr = gvitem.attr | GVAT_COMMA;
 
 		CopyMemory(&gvitem.font, &lf, sizeof(LOGFONT));
@@ -467,11 +483,11 @@ slog.Format("[conclusion] [%s][%d]\n", dat, m_pGrid->GetRowCount());
 CString tmpS, tmp;
 	tmpS = dat;
 
-	if (dat.IsEmpty())	return FALSE;
+	if (dat.IsEmpty()) return FALSE;
 	if (m_pGrid)
 	//	return m_grid->AddData(dat, max, bConclusion);
 	{
-		CString sTmp = dat, sOrdNo = "", stime = "", sjum = "", sacc = "";
+		CString sTmp = dat, sOrdNo = "", stime = "", sjum = "", sacc = "", smkgb = "";
 		stime = parseX(dat, "\t"); stime.TrimRight();
 
 		if(!stime.IsEmpty())
@@ -479,6 +495,7 @@ CString tmpS, tmp;
 
 		sjum = parseX(dat, "\t");
 		sOrdNo = parseX(dat, "\t");
+		smkgb = parseX(dat, "\t");
 		sacc = parseX(dat, "\t");
 		sacc.Format("%s-%s-%s", sacc.Left(3), sacc.Mid(3,2), sacc.Right(6));
 		sOrdNo = stime + " " + sjum;
@@ -487,7 +504,7 @@ slog.Format("[conclusion] sOrdNo = [%s]\n", sOrdNo);
 	/*	
 		if (!sOrdNo.IsEmpty())
 		{
-			int nRow = FindColData(sOrdNo);	// 체결시간(0), 주문번호(1)
+			int nRow = FindColData(sOrdNo);	// 체결시각(0), 주문번호(1)
 			if (nRow >= 0)
 				m_pGrid->DeleteRow(nRow);
 		}
@@ -545,7 +562,9 @@ OutputDebugString(slog);
 				m_pGrid->SetItemText(1, ii, sjum);
 			else if(ii == COL_2)
 				m_pGrid->SetItemText(1, ii, "");
-			else if(ii == COL_3)
+			else if (ii == COL_3)
+				m_pGrid->SetItemText(1, ii, smkgb);
+			else if(ii == COL_4)
 				m_pGrid->SetItemText(1, ii, sacc);
 			else
 			{
@@ -576,7 +595,7 @@ slog.Format("[conclusion] AddFail [%s] [%d]\n", dat, max);
 	if (m_pGrid)
 		//return m_grid->AddFail(dat, max);
 	{
-		CString sTmp = dat, sOrdNo = "", stime = "", sjum = "", sacc = "";
+		CString sTmp = dat, sOrdNo = "", stime = "", sjum = "", sacc = "", smkgb = "";
 		stime = parseX(dat, "\t");
 		stime.TrimRight();
 
@@ -585,6 +604,7 @@ slog.Format("[conclusion] AddFail [%s] [%d]\n", dat, max);
 		
 		sjum = parseX(dat, "\t");
 		sOrdNo = parseX(dat, "\t");
+		smkgb = parseX(dat, "\t");
 		sacc = parseX(dat, "\t");
 		sacc.Format("%s-%s-%s", sacc.Left(3), sacc.Mid(3,2), sacc.Right(6));
 	
@@ -592,7 +612,7 @@ slog.Format("[conclusion] AddFail [%s] [%d]\n", dat, max);
 		/*
 		if (!sOrdNo.IsEmpty())
 		{	
-			int nRow = FindColData(sOrdNo);	// 체결시간(0), 주문번호(1)
+			int nRow = FindColData(sOrdNo);	// 체결시각(0), 주문번호(1)
 			if (nRow >= 0)
 				m_pGrid->DeleteRow(nRow);
 		}
@@ -625,17 +645,27 @@ slog.Format("[conclusion] AddFail [%s] [%d]\n", dat, max);
 				m_pGrid->SetItemText(1, ii, sjum);
 			else if(ii == COL_2)
 				m_pGrid->SetItemText(1, ii, "");
-			else if(ii == COL_3)
+			else if (ii == COL_3)
+				m_pGrid->SetItemText(1, ii, smkgb);
+			else if(ii == COL_4)
 				m_pGrid->SetItemText(1, ii, sacc);
-			else if(ii == COL_6)
+			else if(ii == COL_7)
 			{	
 				stmp = parseX(dat, "\t");	
-				stmp = "+" + stmp;
+				stmp.TrimLeft();
+				stmp.TrimRight();
+				if(stmp.Find("매도") >=0)
+					stmp = "-" + stmp;
+				else if(stmp.Find("매수") >= 0)
+					stmp = "+" + stmp;
+
 				m_pGrid->SetItemText(1, ii, stmp);
 			}
 			else
 			{
 				stmp = parseX(dat, "\t");
+				stmp.TrimLeft();
+				stmp.TrimRight();
 				m_pGrid->SetItemText(1, ii, stmp);
 			}
 		}

@@ -453,6 +453,7 @@ void CBmpButton::CreateTooltip()
 	//m_pTipCtrl = new CToolTipCtrl;
 	m_pTipCtrl = std::make_unique< CToolTipCtrl>();
 	m_pTipCtrl->Create(this);
+	m_pTipCtrl->SetMaxTipWidth(400);
 	m_pTipCtrl->AddTool(this, txt, &rc, GetDlgCtrlID());
 	m_pTipCtrl->Activate(TRUE);
 }

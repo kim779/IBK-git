@@ -261,8 +261,9 @@ public:
 		OnRun();
 	}
 
-	//로그인 버트
+	//로그인 버튼
 	void SetLoginBtnEnable(bool bEnable) { m_btnRun->EnableWindow(bEnable); }
+
 	//간편인증
 	CString m_slog;
 	void OnEasyCert();

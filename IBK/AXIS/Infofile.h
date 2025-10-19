@@ -55,6 +55,7 @@ public:
 	void	ProcessFMX(WPARAM wParam, LPARAM lParam);
 	DWORD	GetApplyBits()	{ return m_applyBits; }
 
+	bool GetUploadMemoYN() { return m_bUploadMemo; }
 protected:
 	CString Parser(CString &srcstr, CString substr);
 	void	Init();
@@ -110,7 +111,7 @@ protected:
 
 	bool	m_bULFlag;
 	CString m_strUL;
-	
+	bool m_bUploadMemo{}; //memo
 	// Generated message map functions
 	//{{AFX_MSG(CInfofile)
 	virtual BOOL OnInitDialog();

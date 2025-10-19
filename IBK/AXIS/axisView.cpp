@@ -59,7 +59,9 @@ CAxisView::~CAxisView()
 	RemoveAllMouseMap();
 	if (m_hCursorHand)
 		DestroyCursor(m_hCursorHand);
-	AfxGetMainWnd()->SendMessage(WM_AXIS, MAKEWPARAM(axCLOSEV, m_key), 0);
+	CWnd* pMain = AfxGetMainWnd(); //test ¼öÁ¤ 20250613
+	if(pMain)
+		pMain->SendMessage(WM_AXIS, MAKEWPARAM(axCLOSEV, m_key), 0);
 }
 
 BOOL CAxisView::PreCreateWindow(CREATESTRUCT& cs)

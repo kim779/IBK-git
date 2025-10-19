@@ -163,6 +163,10 @@
 #define IDD_LOCK_PASS                   472
 #define IDD_DLGPB                       475
 #define IDB_BITMAP_EVENT                477
+#define IDD_DLG_SLIDEWND                478
+#define IDD_DLG_SERVERORDER             480
+#define IDD_DLG_NOTICEPOPUP             482
+#define IDD_DLG_MSGBOX                  484
 #define IDC_USER                        1001
 #define IDC_PASS                        1002
 #define IDC_CPASS                       1003
@@ -449,8 +453,14 @@
 #define IDC_BUTTON_L50                  1302
 #define IDC_CLOUDE_PCBTN                1302
 #define IDC_BUTTON_L51                  1303
+#define IDC_SSETUP                      1303
+#define IDC_CHK1_CONFIRM                1303
 #define IDC_BUTTON_L52                  1304
+#define IDC_ORIRECT                     1304
+#define IDC_CHK2_CONFIRM                1304
 #define IDC_BUTTON_L53                  1305
+#define IDC_SCLEAR                      1305
+#define IDC_BTN_DEVCLOSE                1305
 #define IDC_BUTTON_L54                  1306
 #define IDC_BUTTON_L55                  1307
 #define IDC_BUTTON_L56                  1308
@@ -626,9 +636,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        478
+#define _APS_NEXT_RESOURCE_VALUE        484
 #define _APS_NEXT_COMMAND_VALUE         32879
-#define _APS_NEXT_CONTROL_VALUE         1303
+#define _APS_NEXT_CONTROL_VALUE         1306
 #define _APS_NEXT_SYMED_VALUE           113
 #endif
 #endif
