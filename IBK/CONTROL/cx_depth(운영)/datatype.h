@@ -23,6 +23,41 @@
 	#define	SCRL_VCHANGE	1		// change vscroll by Contract
 #define	WM_MBONG	WM_USER+200	// MBong message by lbuttondown
 
+//NXT 통합호가 추가
+struct	_cheTick {          //체결틱
+	char	ctime[8];			// tick time
+	char	curr[8];			    // 현재가
+	char	cvol[9];		        // 거래량
+};
+
+struct	_dBong {			//일봉데이터
+	char	date[8];			// 일자
+	char	siga[8];				// 시가
+	char	koga[8];			// 고가
+	char	jega[8];			// 저가
+	char	jgga[8];			// 종가
+	char	gvol[12];			// 거래량
+};
+
+
+struct _tickBongData {
+	char ntick[2];           // 틱 개수 (최대 15개)
+	char nbong[2];           // 봉 개수 (최대 30개)
+
+	_cheTick ctick[15];      // 체결 틱 15개
+	_dBong   dBong[30];      // 일봉 데이터 30개
+
+};
+struct	_hogavol {             //시장별호가수량
+	char	kdvol[9];				// KRX매도호가수량
+	char	ksvol[9];			    // KRX매수호가수량
+	char	ndvol[9];		        // NXT매도호가수량
+	char	nsvol[9];		        // NXT매수호가수량
+};
+
+
+//NXT 통합호가 추가 !!!! end
+
 struct	_price {
 	char	ask[8];			// 매도호가
 	char	bid[8];			// 매수호가
@@ -81,6 +116,30 @@ struct	_hoga	{			// 10호가
 	char	viss[9];	/* 정적VI예상상승가 */
 	char	vihr[9];	/* 정적VI예상하락가 */
 	char	fill[18];	/* FILLER */
+
+	char ntick[2];   //틱개수
+	char nbong[2];   //봉개수
+
+	struct	_cheTick	ctick[15];
+	struct	_dBong	dBong[30];
+	struct  _hogavol  hogavol[10];
+
+	char kdvol[9];    //KRX매도호가총수량
+	char ksvol[9];	 //KRX매수호가총수량
+	char ndvol[9];   //NXT매도호가총수량
+	char nsvol[9];	//NXT매수호가총수량
+	char kmiga[9];    //KRX중간가
+	char kmdmq[9];    //KRX매도중간가잔량
+	char kmsmq[9];    //KRX매수중간가잔량
+	char kmdha[9];      //KRX중간가매도비
+	char kmsha[9];      //KRX중간가매수비
+	char krate[9];          //KRX중간가등락율
+	char nmiga[9];       //NXT중간가
+	char nmdmq[9];    //NXT매도중간가잔량
+	char nmsmq[9];     //NXT매수중간가잔량
+	char nmdha[9];    //NXT중간가매도비
+	char nmsha[9];    //NXT중간가매수비
+	char nrate[9];      //NXT중간가등락율
 };
 #define sz_hoga	sizeof(struct _hoga)
 

@@ -48,11 +48,19 @@ static char THIS_FILE[] = __FILE__;
 #define CLR_HHPRICE		RGB(0,0,255)		//하한가
 #define CLR_GAJUNGPRICE	RGB(50,180,240)		//가중평균가
 #define CLR_VI			RGB(112,173,71)	//정적vi 상한 하한
+#define CLR_KMIDPRICE	RGB(0,255,0)	//KRX 중간가 네모칸
+#define CLR_NMIDPRICE	RGB(255,201,14)	//NXT 중간가 네모칸
 
+#define DF_TOT 0  //통합
+#define DF_SEP  1  //개별
 
 const int	imgCX1 = 15, imgCX2 = 15, imgCY1 = 15, imgCY2 = 15;
 /////////////////////////////////////////////////////////////////////////////
 // Cdepth
+
+#define DF_MIDPRC
+#define CLR_MIDPRC RGB(255, 255, 255)
+#define CLR_IVS_MIDPRC RGB(207, 193, 242)
 
 Cdepth::Cdepth()
 {
@@ -116,13 +124,16 @@ Cdepth::Cdepth()
 	m_bBoldPrice	 = false;
 	m_bBoldRemain    = false;
 	m_bBoldCnt       = false;
-	m_bPredict	 = false;
+	m_bPredict	 = false;				//하단에 클릭시 토글되는 버튼인데 예상가 여부를 나타낸다
+	//m_iBottomType = 0;		 //0:예상체결 ,    1:시간외,    2:현재가(K)   --> m_bPredict 대체
 	m_bConfig	 = true;
 
 	m_pBitmapC1 = nullptr;
 	m_pBitmapC2 = nullptr;
 	m_pBitmapP1 = nullptr;
 	m_pBitmapP2 = nullptr;
+	m_pBitmapT1 = nullptr;
+	m_pBitmapS1 = nullptr;
 	
 	m_bLPMode = false;
 
@@ -136,7 +147,7 @@ Cdepth::Cdepth()
 	m_bAble = false;
 
 	EW_Init();
-
+	m_mkgubn = mkKRX;
 	ZeroMemory(&m_config, sz_CONFIG);
 }
 
@@ -219,6 +230,9 @@ BEGIN_DISPATCH_MAP(Cdepth, CWnd)
 	DISP_FUNCTION(Cdepth, "SetPriceRange", SetPriceRange, VT_EMPTY, VTS_I4 VTS_I4)
 	DISP_FUNCTION(Cdepth, "SetPercent", SetPercent, VT_EMPTY, VTS_I2 VTS_I2)
 	//}}AFX_DISPATCH_MAP
+	DISP_FUNCTION_ID(Cdepth, "SetMKtype", dispidSetMKtype, SetMKtype, VT_EMPTY, VTS_I2)
+	DISP_FUNCTION_ID(Cdepth, "SetPrcEdit", dispidSetPrcEdit, SetPrcEdit, VT_EMPTY, VTS_BSTR)
+	DISP_FUNCTION_ID(Cdepth, "InsertObjData", dispidInsertObjData, InsertObjData, VT_EMPTY, VTS_BSTR)
 END_DISPATCH_MAP()
 
 // Note: we add support for IID_Idepth to support typesafe binding
@@ -485,6 +499,7 @@ BOOL Cdepth::Create(CWnd* parent, void* ptr)
 	root = Variant(homeCC, "");
 	user = Variant(nameCC, "");
 	m_file.Format("%s\\user\\%s\\curamtset.ini", root, user);
+	m_sUserConfFile.Format("%s\\user\\%s\\userconf.ini", root, user);
 	m_configFile = _T("");
 	m_mapName = (LPCTSTR)m_parent->SendMessage(WM_USER, MAKEWPARAM(mapDLL, 0));
 
@@ -609,9 +624,21 @@ void Cdepth::OnLButtonUp(UINT nFlags, CPoint point)
 				InvalidateRect(m_prect);
 				m_focus = -1;
 			}
+			else if (m_focus == MIDKPRICE && m_iShowMIDPRC)
+			{  //좌클릭후 업할때 중간가면 원래색상으로
+				m_items.GetAt(m_focus)->m_pRGB = CLR_MIDPRC;
+				InvalidateRect(m_prect);
+				m_focus = -1;
+			}
 		}
 
 		const	int	select = getIndexByPoint(point);
+
+CString slog;
+slog.Format("[midprc] select = [%d]", select);
+OutputDebugString(slog);
+
+
 		if (select > 0)
 		{
 			CString Price = m_items.GetAt(select)->m_data;
@@ -620,7 +647,39 @@ void Cdepth::OnLButtonUp(UINT nFlags, CPoint point)
 			{
 			case ctCode:
 			case ctECN:
-				if (atof(Price) && Price.Find('%') == -1)
+				if (select == MIDKPRICE && m_bShowMidtooltip)
+				{
+					m_bClickMIDPRC = TRUE;
+					CString strTooltip;
+					if (m_pToolTip->IsWindowVisible())
+					{
+						m_pToolTip->ShowWindow(SW_HIDE);
+					}
+					CPoint	pt = point;
+					ClientToScreen(&pt);
+					pt.x += 10;
+					pt.y += 10;
+
+					CRect	rect;
+					CSize	size;
+
+					//strTooltip.Format("중간가로 주문을 원하시면  \t\n구분을 변경해 주세요.  \t\n▶ 중간가(KRX)란?  \t\n    최우선 매도호가와 \t\n    최우선 매수호가의  \t\n    중간가격이에요  \t\n ");
+					strTooltip.Format("▶ K는 KRX중간가,  \t\n   N는 NXT중간가에요. \t\n ");
+					m_pToolTip->SetData(strTooltip);
+
+					size.cx = rect.Width();
+					size.cy = rect.Height();
+
+					rect.left = pt.x;
+					rect.right = pt.x + size.cx;
+					rect.top = pt.y;
+					rect.bottom = rect.top + size.cy;
+
+					m_pToolTip->SetWindowPos(&wndTop, rect.left, rect.top, rect.Width(), rect.Height(), SWP_NOACTIVATE);  //else if (m_bBong)
+					m_pToolTip->ShowWindow(SW_SHOWNOACTIVATE);
+					return;
+				}
+				else if (atof(Price) && Price.Find('%') == -1)
 				{
 					switch (m_action)
 					{
@@ -663,8 +722,21 @@ void Cdepth::OnLButtonUp(UINT nFlags, CPoint point)
 	}
 	else if (m_rcTime.PtInRect(point))
 	{
-		m_bPredict = !m_bPredict;
+		m_bPredict = !m_bPredict;	 //버튼클릭시 토글되는곳
 		m_config.pre = m_bPredict ? 1 : 0;
+
+		//m_iBottomType = (m_iBottomType + 1) % 3;
+		//if (m_mkgubn == mkKRX || m_mkgubn == mkTOT)
+		//{
+		//	if (m_bPredict)
+		//		m_iBottomType = 0;
+		//	else
+		//		m_iBottomType = 1;
+		//}
+
+		//m_slog.Format("pcx_depth][%s]<%d>  토글클릭시 설정저장 pre = [%d] m_iBottomType=[%d]", __FUNCTION__, __LINE__, m_config.pre, m_iBottomType);
+		//OutputDebugString(m_slog);
+
 		SaveCondition(m_path, &m_config);
 
 		setFocus(point);
@@ -679,6 +751,39 @@ void Cdepth::OnLButtonUp(UINT nFlags, CPoint point)
 			ConfigDlgL();	
 		else if (m_rcConfigR.PtInRect(point))
 			ConfigDlgR();	
+		else if (m_rcMKPOPMenu.PtInRect(point))
+		{
+			if (m_mkgubn == mkKRX || m_mkgubn == mkNXT)
+				return;
+
+			CMenu cMenu;
+			cMenu.CreatePopupMenu();
+			if (m_iDataType == DF_TOT)
+			{
+				cMenu.AppendMenu(MFT_STRING | MF_CHECKED, 0, "통합(T)");
+				cMenu.AppendMenu(MFT_STRING, 1, "개별(S)");
+			}
+			else
+			{
+				cMenu.AppendMenu(MFT_STRING, 0, "통합(T)");
+				cMenu.AppendMenu(MFT_STRING | MF_CHECKED, 1, "개별(S)");
+			}
+
+
+
+			CRect rect;
+			rect = m_rcMKPOPMenu;
+			ClientToScreen(rect);
+
+			CPoint pt(rect.left, rect.bottom); // 좌측 하단 점을 잡는다.
+
+			const	int	ret = cMenu.TrackPopupMenu(TPM_RIGHTBUTTON | TPM_RETURNCMD,
+				pt.x, pt.y, this, NULL);
+
+			m_iDataType = ret;   //0 통합 1 개별
+			m_slog.Format("%d", ret);
+			Invalidate();
+		}
 	}
 
 	if (!m_refsym.IsEmpty())
@@ -704,7 +809,27 @@ void Cdepth::OnLButtonUp(UINT nFlags, CPoint point)
 		if (!text.IsEmpty())
 		{
 			CString pdat;
-			pdat.Format("SetPrice\t%s,%s", m_code, text);
+			if (m_sPrcTrigger_File.GetLength() > 0)
+			{
+				CString stmp;
+				char	wb[32];
+				GetPrivateProfileString("IB100000", "edit_trigger", "", wb, sizeof(wb), m_sUserConfFile);
+				stmp.Format("%s", wb);
+				stmp.TrimRight();
+				if(stmp.Find("edStopPrc") >= 0)
+					pdat.Format("SetStopPrice\t%s,%s", m_code, text);
+				else
+					pdat.Format("SetPrice\t%s,%s", m_code, text);
+			}
+			else
+			{
+				if (m_iPrcType == TYPE_STOPPRC)
+					pdat.Format("SetStopPrice\t%s,%s", m_code, text);
+				else
+					pdat.Format("SetPrice\t%s,%s", m_code, text);
+			}
+			
+
 			m_parent->SendMessage(WM_USER, MAKEWPARAM(procDLL, 0), (LPARAM)(LPCTSTR)pdat);			
 //			trigger(m_refsym + "\t" + text);
 		}
@@ -825,6 +950,11 @@ long Cdepth::OnMBong(WPARAM wParam, LPARAM lParam)
 
 LRESULT Cdepth::OnMouseLeave(WPARAM wParam, LPARAM lParam) 
 {
+	CString slog;
+	slog.Format("[midprc] OnMouseLeave m_focus= [%d] ",m_focus);
+	OutputDebugString(slog);
+
+
 	m_tracking = FALSE;
 	if (m_focus > -1)
 	{
@@ -839,6 +969,12 @@ LRESULT Cdepth::OnMouseLeave(WPARAM wParam, LPARAM lParam)
 		{
 			m_items.GetAt(m_focus)->m_pRGB    = SetItemBGColor(m_focus);
 			m_items.GetAt(m_focus+10)->m_pRGB = SetItemBGColor(m_focus);
+			m_focus = -1;
+			InvalidateRect(m_prect);
+		}
+		else if (m_focus == MIDKPRICE && m_iShowMIDPRC)
+		{  //중간가에 마우스를 올리면 색이 변하는데 이상태에서 아예 호가윈도우를 벗어나면 색 원복
+			m_items.GetAt(m_focus)->m_pRGB = CLR_MIDPRC;
 			m_focus = -1;
 			InvalidateRect(m_prect);
 		}
@@ -880,7 +1016,7 @@ void Cdepth::initialColor()
 	m_clrDown	= getColor(95);
 
 	m_clrFocus	= getColor(86);
-
+	
 	m_clrBarAsk	= getColor(82);
 	m_clrBarBid	= getColor(85);
 
@@ -902,10 +1038,19 @@ void Cdepth::initialize()
 		item->m_bRc.SetRectEmpty();
 		item->m_fRc.SetRectEmpty();
 		
-		if (ii >= askSize1 && ii <= askSize10)
+		if (ii >= askSize1 && ii <= askSize10)   //매수잔량
 			item->m_fRGB = m_clrAskSzFg;
-		else if (ii >= bidSize1 && ii <= bidSize10)
+		else if (ii >= bidSize1 && ii <= bidSize10)  //매도잔량
 			item->m_fRGB = m_clrBidSzFg;
+
+		if (ii >= kmd1size && ii <= kmd10size)   //통합KRX매도잔량
+			item->m_fRGB = m_clrAskSzFg;
+		if (ii >= kms1size && ii <= kms10size)   //통합KRX매수잔량
+			item->m_fRGB = m_clrAskSzFg;
+		if (ii >= nmd1size && ii <= nmd10size)   //통합NXT매도잔량
+			item->m_fRGB = m_clrAskSzFg;
+		if (ii >= nms1size && ii <= nms10size)   //통합NXT매수잔량
+			item->m_fRGB = m_clrAskSzFg;
 
 		if (ii >= askPrice1 && ii <= askBefore10)
 		{
@@ -1042,6 +1187,45 @@ void Cdepth::initialize()
 			case SVIDN:
 				item->m_attr = atCoRgbSup;
 				break;
+			case MIDKPRCDBMD:     //modi KRX 중간가매도대비
+			case MIDNPRCDBMD:     //modi NXT 중간가매도대비
+			case tkmiddr:      //통합용  KRX 중간가매도대비
+			case tnmiddr:      //통합용  NXT 중간가매도대비
+				item->m_attr = atCoRgbSup;
+			break;
+			case MIDKPRCMD:    //KRX 중간가매도잔량
+			case MIDNPRCMD:    //NXT 중간가매도잔량
+			case tkmiddv:		//통합용  KRX 중간가매도잔량
+			case tnmiddv:		 //통합용  NXT 중간가매도잔량
+				item->m_attr = atSignSup;
+			break;
+			case MIDKPRICE:  //KRX 중간가
+			case MIDNPRICE:  //NXT 중간가
+			case tkmid:    //통합용  KRX 중간가
+			case tnmid:   //통합용  NXT 중간가
+				{
+					item->m_attr = atCoRgbSup;
+					//item->m_center = true;
+				}
+				break;
+			case MIDKPRCMS:   //KRX 중간가매수잔량
+			case MIDNPRCMS:   //NXT 중간가매수잔량
+			case tkmidsv:   //통합용  KRX 중간가매수잔량
+			case tnmidsv:   //통합용  NXT 중간가매수잔량
+				item->m_attr = atSignSup;
+			break;
+			case MIDKPRCDBMS:   //KRX 중간가매수대비
+			case MIDNPRCDBMS:   //NXT 중간가매수대비
+			case tkmidsr:   //통합용  KRX 중간가매수대비
+			case tnmidsr:    //통합용  NXT 중간가매수대비
+				item->m_attr = atCoRgbSup;
+			break;
+			case MIDKPRCRATE:   //KRX 중간가등락율
+			case MIDNPRCRATE:   //NXT 중간가등락율
+			case tkmidrate:      // 통합용  KRX 중간가등락율
+			case tnmidrate:      // 통합용  NXT 중간가등락율
+				item->m_attr = atCoRgbSup;
+				break;
 			}
 		}
 		m_items.Add(item);
@@ -1063,6 +1247,8 @@ void Cdepth::initialize()
 	if (m_pBitmapC2 == NULL) m_pBitmapC2 = getBitmap(image + _T("호가_설정_dn.bmp"));
 	if (m_pBitmapP1 == NULL) m_pBitmapP1 = getBitmap(image + _T("호가_시간.bmp"));
 	if (m_pBitmapP2 == NULL) m_pBitmapP2 = getBitmap(image + _T("호가_시간_dn.bmp"));
+	if (m_pBitmapT1 == NULL) m_pBitmapT1 = getBitmap(image + _T("통합.BMP"));
+	if (m_pBitmapS1 == NULL) m_pBitmapS1 = getBitmap(image + _T("개별.BMP"));
 
 	m_path.Format("%s\\%s\\%s\\", root, USRDIR, name);
 	if (!ReadCondition(m_path, &m_config))
@@ -1077,6 +1263,7 @@ void Cdepth::initialize()
 		m_config.currset = 1;
 		m_config.shl = 1;
 		m_config.pre = 1;
+		m_config.bshowMidPrc = 1;
 
 		SaveCondition(m_path, &m_config);
 	}
@@ -1103,6 +1290,21 @@ void Cdepth::setIndices()
 	}
 }
 
+int CountOccurrences(const CString& str, TCHAR ch)
+{
+	int count = 0;
+	int pos = 0;
+
+	// CString::Find를 사용하여 ch 문자가 나타나는 위치를 반복적으로 찾습니다.
+	while ((pos = str.Find(ch, pos)) != -1)
+	{
+		count++;
+		pos++; // 다음 위치로 이동
+	}
+
+	return count;
+}
+
 void Cdepth::dispatch(char* datB, int datL)
 {
 	if (datL == 0)
@@ -1112,12 +1314,19 @@ void Cdepth::dispatch(char* datB, int datL)
 		return;
 	}
 	
-	if (datL == sz_hoga + sz_Extra)
+	m_slog.Format("[cx_depth][%s]<%d> datL=[%d]  sz_hoga=[%d]  sz_Extra=[%d] ", __FUNCTION__, __LINE__, datL, sz_hoga, sz_Extra);
+	OutputDebugString(m_slog);
+
+	//if (datL == sz_hoga + sz_Extra)  //testcode
+	clear();  //testcode 우선 클리어
+	if(1)
 	{
 		dispatchTEN(datB, datL);
 		EW_Dispatch(datB, true);
 		if (m_bSiseMemo)
 			SendSiseMemo();
+
+		//SearchChegang();
 	}
 	else if (datL == sz_hogax + sz_Extra)
 	{
@@ -1125,6 +1334,86 @@ void Cdepth::dispatch(char* datB, int datL)
 		EW_Dispatch(datB, false);
 		if (m_bSiseMemo)
 			SendSiseMemo();
+
+		//SearchChegang();
+	}
+	else if (datL < 50)
+	{
+
+		char* pdata = new char[datL + 1];
+		memset(pdata, 0x00, datL + 1);
+		memcpy(pdata, datB, datL);
+
+		CString sval, svalue;
+		sval.Format("%s", pdata);
+
+		CString slog, stmp;
+
+
+		if (CountOccurrences(sval, '\t') == 6)
+		{
+			stmp += "MD비 =";
+			svalue = Parser(sval, "\t");
+			if (svalue == "0")
+				svalue.Empty();
+			m_items.GetAt(MIDKPRCDBMD)->m_data = format(svalue, MIDKPRCDBMD);
+			//m_items.GetAt(MIDKPRCDBMD)->m_data = format("+555555", MIDKPRCDBMD);    //nxt test
+			//m_items.GetAt(MIDNPRCDBMD)->m_data = format("+555555", MIDKPRCDBMD);    //nxt test
+			stmp += m_items.GetAt(MIDKPRCDBMD)->m_data;
+
+			stmp += " MD잔량 =";
+			svalue = Parser(sval, "\t");
+			if (svalue == "0")
+				svalue.Empty();
+			m_items.GetAt(MIDKPRCMD)->m_data = format(svalue, MIDKPRCMD);;
+			//m_items.GetAt(MIDKPRCMD)->m_data = format("+666666", MIDKPRCMD);   //nxt test
+			//m_items.GetAt(MIDNPRCMD)->m_data = format("+666666", MIDKPRCMD);   //nxt test
+			stmp += m_items.GetAt(MIDKPRCMD)->m_data;
+
+			stmp += "   |중간가 =";
+			svalue = Parser(sval, "\t");
+			if (svalue == "0")
+				svalue.Empty();
+			m_strMidPrice = svalue;
+			m_strMidPrice.Replace("+", "");
+			m_strMidPrice.Replace("-", "");
+			addComma(m_strMidPrice);
+			m_items.GetAt(MIDKPRICE)->m_data = format(svalue, MIDKPRICE);
+			//m_items.GetAt(MIDKPRICE)->m_data = format("+777777", MIDKPRICE);  //nxt test
+			//m_items.GetAt(MIDNPRICE)->m_data = format("+787878", MIDKPRICE);  //nxt test
+			stmp += m_items.GetAt(MIDKPRICE)->m_data;
+
+			stmp += "   |매수잔량 =";
+			svalue = Parser(sval, "\t");
+			if (svalue == "0")
+				svalue.Empty();
+			m_items.GetAt(MIDKPRCMS)->m_data = format(svalue, MIDKPRCMS);
+			//m_items.GetAt(MIDKPRCMS)->m_data = format("+888888", MIDKPRCMS);    //nxt test
+			//m_items.GetAt(MIDNPRCMS)->m_data = format("+888888", MIDKPRCMS);    //nxt test
+			stmp += m_items.GetAt(MIDKPRCMS)->m_data;
+
+			stmp += "   |매수비 =";
+			svalue = Parser(sval, "\t");
+			if (svalue == "0")
+				svalue.Empty();
+			m_items.GetAt(MIDKPRCDBMS)->m_data = format(svalue, MIDKPRCDBMS);
+			stmp += m_items.GetAt(MIDKPRCDBMS)->m_data;
+			//m_items.GetAt(MIDKPRCDBMS)->m_data = format("+999999", MIDKPRCDBMS);   //nxt test
+			//m_items.GetAt(MIDNPRCDBMS)->m_data = format("+999999", MIDKPRCDBMS);   //nxt test
+
+			stmp += "   |등락율 =";
+			svalue = Parser(sval, "\t");
+			if (svalue == "0")
+				svalue.Empty();
+			if (svalue.Find("0.00") >= 0)
+				m_items.GetAt(MIDKPRCRATE)->m_data = "0.00";
+			else
+				m_items.GetAt(MIDKPRCRATE)->m_data = format(svalue, MIDKPRCRATE);
+			stmp += m_items.GetAt(MIDKPRCRATE)->m_data;
+			//m_items.GetAt(MIDKPRCRATE)->m_data = format("+0.12", MIDKPRCRATE);   //nxt test
+			//m_items.GetAt(MIDNPRCRATE)->m_data = format("+0.12", MIDKPRCRATE);   //nxt test
+			Invalidate();
+		}
 	}
 
 	if (m_bPercent)
@@ -1146,6 +1435,7 @@ void Cdepth::dispatchTEN(char* datB, int datL)
 
 	m_code = CString(hoga->codx, sizeof(hoga->codx));
 	m_code.Trim();
+	//m_code.Replace("N.", "");
 	bELW = IsELW(m_code);
 
 	if (IsELW(m_code))
@@ -1243,21 +1533,7 @@ void Cdepth::dispatchTEN(char* datB, int datL)
 	m_items.GetAt(shPrice)->m_data = format(CString(hoga->shga, sizeof(hoga->shga)), shPrice);
 	m_items.GetAt(hhPrice)->m_data = format(CString(hoga->hhga, sizeof(hoga->hhga)), hhPrice);
 	m_items.GetAt(gajungPrice)->m_data = format(CString(hoga->pgga, sizeof(hoga->pgga)), gajungPrice);
-	/*
-	CString text; text = m_items.GetAt(gajungPrice))->m_data;
-	if (text.Find("+") != -1)
-	{
-		text.Delete(0,1);
-		m_items.GetAt(gajungPrice))->m_fRGB = m_clrUp;
-	}else if (text.Find("-") != -1)
-	{
-		text.Delete(0,1);
-		m_items.GetAt(gajungPrice))->m_fRGB = m_clrDown;
-	}else
-	{
-		m_items.GetAt(gajungPrice))->m_fRGB = m_clrDataFg;
-	}
-	*/
+
 	m_items.GetAt(sojinRate)->m_data = format(CString(hoga->sjrt, sizeof(hoga->sjrt)), sojinRate);
 
 	m_items.GetAt(askSizeTime)->m_data       = format(CString(hoga->ahvol, sizeof(hoga->ahvol)), askSizeTime);
@@ -1291,7 +1567,157 @@ void Cdepth::dispatchTEN(char* datB, int datL)
 
 	m_items.GetAt(SVIUP)->m_data = format(CString(hoga->viss, sizeof(hoga->viss)), SVIUP);
 	m_items.GetAt(SVIDN)->m_data = format(CString(hoga->vihr, sizeof(hoga->vihr)), SVIDN);
+
+	CString stmp, sresult;
+	int icntTick{};
+	int icntBong;
+	icntTick = atoi(CString(hoga->ntick, sizeof(hoga->ntick)));
+	icntBong = atoi(CString(hoga->nbong, sizeof(hoga->nbong)));
 	
+	//if (m_code.Left(2) == "M.")   //통합호가인경우 
+	{
+		for (int ii = 0; ii < 10; ii++)
+		{
+			sresult = "[cx_depth]marketvol K매도잔량 ";
+			stmp = CString(hoga->hogavol[ii].kdvol, sizeof(hoga->hogavol[ii].kdvol));
+			sresult += stmp;
+			sresult += "    K매수잔량 ";
+			stmp = CString(hoga->hogavol[ii].ksvol, sizeof(hoga->hogavol[ii].ksvol));
+			sresult += stmp;
+			sresult += "    N매도잔량 ";
+			stmp = CString(hoga->hogavol[ii].ndvol, sizeof(hoga->hogavol[ii].ndvol));
+			sresult += stmp;
+			sresult += "    N매수잔량 ";
+			stmp = CString(hoga->hogavol[ii].nsvol, sizeof(hoga->hogavol[ii].nsvol));
+			sresult += stmp;
+			sresult += "\n";
+
+			OutputDebugString(sresult);
+			sresult.Empty();
+
+			//KRX 매도수량
+			stmp = CString(hoga->hogavol[ii].kdvol, sizeof(hoga->hogavol[ii].kdvol));
+			stmp.Trim();
+			if (atoi(stmp) > 0)
+				m_items.GetAt(kmd1size + ii)->m_data = format(stmp, kmd1size + ii);
+			else
+				m_items.GetAt(kmd1size + ii)->m_data = _T("");
+
+			//KRX 매수수량
+			stmp = CString(hoga->hogavol[ii].ksvol, sizeof(hoga->hogavol[ii].ksvol));
+			stmp.Trim();
+			if (atoi(stmp) > 0)
+				m_items.GetAt(kms1size + ii)->m_data = format(stmp, kms1size + ii);
+			else
+				m_items.GetAt(kms1size + ii)->m_data = _T("");
+
+			//NXT 매도수량
+			stmp = CString(hoga->hogavol[ii].ndvol, sizeof(hoga->hogavol[ii].ndvol));
+			stmp.Trim();
+			if (atoi(stmp) > 0)
+				m_items.GetAt(nmd1size + ii)->m_data = format(stmp, nmd1size + ii);
+			else
+				m_items.GetAt(nmd1size + ii)->m_data = _T("");
+
+			//NXT 매수수량
+			stmp = CString(hoga->hogavol[ii].nsvol, sizeof(hoga->hogavol[ii].nsvol));
+			stmp.Trim();
+			if (atoi(stmp) > 0)
+				m_items.GetAt(nms1size + ii)->m_data = format(stmp, nms1size + ii);
+			else
+				m_items.GetAt(nms1size + ii)->m_data = _T("");
+		}
+
+		m_items.GetAt(MIDKPRCMD)->m_data = format(CString(hoga->kmdmq, sizeof(hoga->kmdmq)),
+			MIDKPRCMD);  //KRX중간가매도잔량
+		m_items.GetAt(tkmiddv)->m_data = m_items.GetAt(MIDKPRCMD)->m_data;
+
+		m_items.GetAt(MIDKPRICE)->m_data = format(CString(hoga->kmiga, sizeof(hoga->kmiga)),
+			MIDKPRICE);  //KRX중간가
+		m_items.GetAt(tkmid)->m_data = m_items.GetAt(MIDKPRICE)->m_data;
+
+		m_items.GetAt(MIDKPRCMS)->m_data = format(CString(hoga->kmsmq, sizeof(hoga->kmsmq)),
+			MIDKPRCMS);  //KRX중간가매수잔량
+		m_items.GetAt(tkmidsv)->m_data = m_items.GetAt(MIDKPRCMS)->m_data;
+
+		m_items.GetAt(MIDKPRCDBMD)->m_data = format(CString(hoga->kmdha, sizeof(hoga->kmdha)),
+			MIDKPRCDBMD);  //KRX중간가매도대비
+		m_items.GetAt(tkmiddr)->m_data = m_items.GetAt(MIDKPRCDBMD)->m_data;
+
+		m_items.GetAt(MIDKPRCDBMS)->m_data = format(CString(hoga->kmsha, sizeof(hoga->kmsha)),
+			MIDKPRCDBMS);  //KRX중간가매수대비
+		m_items.GetAt(tkmidsr)->m_data = m_items.GetAt(MIDKPRCDBMS)->m_data;
+
+		m_items.GetAt(MIDKPRCRATE)->m_data = format(CString(hoga->kmdha, sizeof(hoga->kmdha)),
+			MIDKPRCRATE);  //KRX중간가 등락율
+		m_items.GetAt(tkmidrate)->m_data = m_items.GetAt(MIDKPRCRATE)->m_data;
+
+		sresult.Format("marketvol[K]  매도대비 [%s] 매도잔량 [%s]  중간가[%s]  매수잔량 [%s] 매수대비 [%s] 등락율[%s]",
+			m_items.GetAt(MIDKPRCDBMD)->m_data,
+			m_items.GetAt(MIDKPRCMD)->m_data,
+			m_items.GetAt(MIDKPRICE)->m_data,
+			m_items.GetAt(MIDKPRCMS)->m_data,
+			m_items.GetAt(MIDKPRCDBMS)->m_data,
+			m_items.GetAt(MIDKPRCRATE)->m_data);
+		OutputDebugString(sresult);
+		//m_items.GetAt(MIDKPRCDBMD)->m_data = "11111";
+		//m_items.GetAt(MIDKPRCMD)->m_data = "22222";
+		//m_items.GetAt(MIDKPRICE)->m_data = "33333";
+		//m_items.GetAt(MIDKPRCMS)->m_data = "44444";
+		//m_items.GetAt(MIDKPRCDBMS)->m_data = "55555";
+		//m_items.GetAt(MIDKPRCRATE)->m_data = "66.66";
+
+
+		m_items.GetAt(MIDNPRCMD)->m_data = format(CString(hoga->nmdmq, sizeof(hoga->nmdmq)),
+			MIDNPRCMD);  //NXT중간가매도잔량
+		m_items.GetAt(tnmiddv)->m_data = m_items.GetAt(MIDNPRCMD)->m_data;
+
+		m_items.GetAt(MIDNPRICE)->m_data = format(CString(hoga->nmiga, sizeof(hoga->nmiga)),
+			MIDNPRICE);  //NXT중간가
+		m_items.GetAt(tnmid)->m_data = m_items.GetAt(MIDNPRICE)->m_data;
+
+		m_items.GetAt(MIDNPRCMS)->m_data = format(CString(hoga->nmsmq, sizeof(hoga->nmsmq)),
+			MIDNPRCMS);  //NXT중간가매수잔량
+		m_items.GetAt(tnmidsv)->m_data = m_items.GetAt(MIDNPRCMS)->m_data;
+
+		m_items.GetAt(MIDNPRCDBMD)->m_data = format(CString(hoga->nmdha, sizeof(hoga->nmdha)),
+			MIDNPRCDBMD);  //NXT중간가매도대비
+		m_items.GetAt(tnmiddr)->m_data = m_items.GetAt(MIDNPRCDBMD)->m_data;
+
+		m_items.GetAt(MIDNPRCDBMS)->m_data = format(CString(hoga->nmsha, sizeof(hoga->nmsha)),
+			MIDNPRCDBMS);  //NXT중간가매수대비
+		m_items.GetAt(tnmidsr)->m_data = m_items.GetAt(MIDNPRCDBMS)->m_data;
+
+		m_items.GetAt(MIDNPRCRATE)->m_data = format(CString(hoga->nrate, sizeof(hoga->nrate)),
+			MIDNPRCRATE);  //NXT중간가등락률
+		m_items.GetAt(tnmidrate)->m_data = m_items.GetAt(MIDNPRCRATE)->m_data;
+
+		sresult.Format("marketvol[N]  매도대비 [%s] 매도잔량 [%s]  중간가[%s]  매수잔량 [%s] 매수대비 [%s] 등락율[%s]",
+			m_items.GetAt(MIDNPRCDBMD)->m_data,
+			m_items.GetAt(MIDNPRCMD)->m_data,
+			m_items.GetAt(MIDNPRICE)->m_data,
+			m_items.GetAt(MIDNPRCMS)->m_data,
+			m_items.GetAt(MIDNPRCDBMS)->m_data,
+			m_items.GetAt(MIDNPRCRATE)->m_data);
+		OutputDebugString(sresult);
+
+		m_items.GetAt(tkdtjan)->m_data = format(CString(hoga->kdvol, sizeof(hoga->kdvol)),
+			tkdtjan);  //KRX매도호가총수량
+		m_items.GetAt(tkstjan)->m_data = format(CString(hoga->ksvol, sizeof(hoga->ksvol)),
+			tkstjan);  //KRX매수호가총수량
+		m_items.GetAt(tndtjan)->m_data = format(CString(hoga->ndvol, sizeof(hoga->ndvol)),
+			tndtjan);  //NXT매도호가총수량
+		m_items.GetAt(tnstjan)->m_data = format(CString(hoga->nsvol, sizeof(hoga->nsvol)),
+			tnstjan);  //NXT매수호가총수량
+
+		//m_items.GetAt(MIDNPRCDBMD)->m_data = "66666";
+		//m_items.GetAt(MIDNPRCMD)->m_data = "77777";
+		//m_items.GetAt(MIDNPRICE)->m_data = "88888";
+		//m_items.GetAt(MIDNPRCMS)->m_data = "99999";
+		//m_items.GetAt(MIDNPRCDBMS)->m_data = "121212";
+		//m_items.GetAt(MIDNPRCRATE)->m_data = "77.66";
+	}
+
 	calculateRowHeight();
 	calculateColumnWidth();
 	EW_Move();
@@ -1313,6 +1739,7 @@ void Cdepth::dispatchFIVE(char* datB, int datL)
 
 	m_code = CString(hoga->codx, sizeof(hoga->codx));
 	m_code.Trim();
+	//m_code.Replace("N.", "");
 	if (IsELW(m_code))
 	{
 		askI = askLp1;
@@ -1517,19 +1944,7 @@ void Cdepth::alert(CString data)
 					
 					m_items.GetAt(gajungPrice)->m_data = text;
 				}
-				/*
-				else if (atoi(syms) == 311) //52주 최고가
-				{
-					addComma(text);
-					m_items.GetAt(max52))->m_data = text;
-				}
-				else if (atoi(syms) == 312)  //52주 최저가
-				{
-					addComma(text);
-					m_items.GetAt(min52))->m_data = text;
-				}
-				*/
-					//TRACE("text [%s]\n",text);
+				
 				continue;
 			}
 #ifdef LP_AMOUNT
@@ -1592,13 +2007,6 @@ void Cdepth::alert(CString data)
 			rect.UnionRect(rect, m_prect);
 	}
 
-/*
-	if ((changePrice || changeCurr) && m_percent)
-		rect.UnionRect(rect, getPercentRect());
-
-	if (changePrice && changeCurr)
-		rect.UnionRect(rect, m_prect);
-*/
 	if (changeSize && (m_bar == grBar || m_bar == grBarText))
 		getMaxSize();
 
@@ -1628,20 +2036,12 @@ void Cdepth::alert(CString data)
 		for (int ii = prePrice; ii <= preVolume; ii++)
 			rect.UnionRect(rect, m_items.GetAt(ii)->m_bRc);
 	}
-	/*
-	CString str1,str2,str3;
-	str1 = m_items.GetAt(gAMT))->m_data;
-	str2 = m_items.GetAt(gVolume))->m_data;
-	str1.Remove(','); str2.Remove(',');
-	str3.Format("%d", (int)(atoi(str1)*1000000/(atoi(str2))));
-	m_items.GetAt(gajungPrice))->m_data = str3;
-	TRACE("거래대금: "+str1+", 거래량: "+str2+", 가중평균가: "+str3+"\n");
-	*/
+
 	if (m_pRgn && !rect.IsRectEmpty())
 		InvalidateRgn(m_pRgn.get());
 }
 
-void Cdepth::alert(struct _alertR* alertR)
+void Cdepth::alert(struct _alertR* alertR)  //실제 실시간처리
 {
 	CRect	rect;
 	CString	syms, text;
@@ -1669,11 +2069,7 @@ void Cdepth::alert(struct _alertR* alertR)
 			}
 		}
 		m_curr = fabs(str2double(text));
-		/*
-		CString tmp;
-		tmp.Format("[%d] %s \n",ii, text);
-		TRACE(tmp);
-		*/
+	
 		rect.UnionRect(rect, CRect(0,0,10,10));
 		changeCurr = true;
 	}
@@ -1748,6 +2144,12 @@ void Cdepth::alert(struct _alertR* alertR)
 		key = keys[ii].key;
 		index = keys[ii].index;
 
+		if (index >= 170)
+		{
+			m_slog.Format("%d %d %s", index, key, data[key]);
+			TRACE(m_slog);
+		}
+
 		if (!data[key])
 		{
 			continue;
@@ -1764,7 +2166,17 @@ void Cdepth::alert(struct _alertR* alertR)
 		}
 		else
 		{
-			if ((index >= askLp1 && ii <= askLp10) || (index >= bidLp1 && index <= bidLp10) ||
+			if (index >= MIDKPRCMD && index <= MIDKPRCRATE && m_iShowMIDPRC)
+			{
+				if (index == MIDKPRICE)
+				{
+					m_strMidPrice = text;
+					m_strMidPrice.Replace("+", "");
+					m_strMidPrice.Replace("-", "");
+					addComma(m_strMidPrice);
+				}
+			}
+			else if ((index >= askLp1 && index <= askLp10) || (index >= bidLp1 && index <= bidLp10) ||
 				index == askTotalLp || index == bidTotalLp)
 				continue;
 		}
@@ -1772,7 +2184,18 @@ void Cdepth::alert(struct _alertR* alertR)
 		item = m_items.GetAt(index);
 		text = format(text, index);
 
-		//if (text.GetLength() > 7) m_bBigDigit = TRUE;
+		if (index == MIDKPRCRATE && key == 181)
+			text.TrimRight();
+
+		//testcode
+		if (index >= kmd1size && index <= nms10size)   //통합일경우에만 사용됨
+		{//511 ~ 550   통합조회후 개별선택할때 사용되는 KRX,NXT 매도매수 잔량
+			if (m_mkgubn != mkTOT || m_iDataType != DF_SEP)  //다른경우는 사용안됨
+				continue;
+		}
+
+
+
 
 		if (item->m_data.CompareNoCase(text))
 		{
@@ -1797,11 +2220,6 @@ void Cdepth::alert(struct _alertR* alertR)
 			}
 			rect.UnionRect(rect, item->m_fRc);
 
-			//현재가등이 변하지 않으면 다시 그리지 않는데 시간을 매번 그리게 하기 위해서는 아래의 주석을 제거
-// 				if (key == 40 && rect.IsRectEmpty())
-// 				{
-// 					InvalidateRgn(m_pRgn);
-// 				}
 
 			if ((index >= askPrice1 && index <= askPrice10) || (index >= bidPrice1 && index <= bidPrice10))
 			{
@@ -1812,7 +2230,51 @@ void Cdepth::alert(struct _alertR* alertR)
 				changeSize = true;
 			else if (index >= prePrice && index <= preVolume)
 				changePre = true;
+			else if ((index >= tkmid && index <= tnmidrate))
+				changePrice = true;
 		}
+
+		//if (m_mkgubn == mkNXT)
+		//{
+		//	if (index >= 170)
+		//	{
+		//		switch (index)
+		//		{
+		//		case MIDNPRCMD:
+		//		{
+		//			m_slog.Format("%d %d %s", index, key, data);
+		//			TRACE(m_slog);
+		//		}
+		//		break;
+		//		case MIDNPRICE:
+		//		{
+		//			m_slog.Format("%d %d %s", index, key, data);
+		//			TRACE(m_slog);
+		//		}
+		//		break;
+		//		case MIDNPRCMS:
+		//		{
+
+		//		}
+		//		break;
+		//		case MIDNPRCDBMD:
+		//		{
+
+		//		}
+		//		break;
+		//		case MIDNPRCDBMS:
+		//		{
+
+		//		}
+		//		break;
+		//		case MIDNPRCRATE:
+		//		{
+
+		//		}
+		//		break;
+		//		}  //switch
+		//	}
+		//} //if
 	}
 
 	calculatePreValue();
@@ -1996,6 +2458,8 @@ void Cdepth::drawItems(CDC* dc)
 		}
 		
 	}
+
+
 	//5단호가 안에 색 넣는 로직 시작
 	//매도
 	for (int idx = askPrice1; idx < askPrice6; idx++)
@@ -2074,6 +2538,45 @@ void Cdepth::drawItems(CDC* dc)
 	}
 	//5단호가 안에 색 넣는 로직 끝
 
+	if (m_iShowMIDPRC)
+	{
+		for (int idx3 = MIDKPRCMD; idx3 <= MIDKPRCMS; idx3++)
+		{  //modi NXT  ref 중간가 rect 색
+			CRect	drc;
+			COLORREF clr = 0;
+
+			drc = m_items.GetAt(idx3)->m_fRc;
+
+			switch (idx3)
+			{
+			case MIDKPRCMD:
+			{
+				clr = RGB(255, 255, 255);
+				drc.top = drc.top - 2;
+			}
+			break;
+			case MIDKPRICE:
+			{
+				clr = CLR_MIDPRC;
+				drc.left = m_prect.left;
+				drc.right = m_prect.right;
+				drc.top = drc.top - 2;
+			}
+			break;
+			case MIDKPRCMS:
+			{
+				clr = RGB(255, 255, 255);
+				drc.top = drc.top - 2;
+			}
+			break;
+			default:
+				break;
+			}
+
+			dc->FillSolidRect(drc, clr);
+		}
+	}
+
 	//특수배경
 	if (m_b1801) //매도쪽 배경
 	{
@@ -2105,20 +2608,35 @@ void Cdepth::drawItems(CDC* dc)
 	m_rcCurr.SetRectEmpty();
 
 #ifdef LP_AMOUNT
-	for (int ii = askPrice1; ii <= bidTotalLp; ii++)
+	for (int ii = askPrice1; ii <= tnmidrate; ii++)   //실제 드로잉을 위한 루프 1~224
 	{
 		if (ii >= gAMT && ii < askLp1)
 			continue;
+
+		//tsetcode
+		if ((ii >= askTotalSize && ii <= bidTotalBefore))
+		{
+			CString sibal{};
+		}
 #else
 	for (int ii = askPrice1; ii < gAMT; ii++)
 	{
 #endif
 	
-		if (m_bPredict && (ii >= askSizeTime && ii <= bidSizeTimeBefore))
-			continue;
-		else if (!m_bPredict && (ii >= prePrice && ii <= preVolume))
-			continue;
-
+		//if (m_mkgubn == mkNXT)   ////0:예상체결 , 1:시간외, 2:현재가(K)
+		//{ //NXT에서는 하단토클이 예상->시간외->현재가  3가지라서 다르게 동작하기 때문
+		//	if ((m_iBottomType == 0) && (ii >= askSizeTime && ii <= bidSizeTimeBefore))  //예상일때  86~89 시간외는 안받는다
+		//		continue;
+		//	else if ((m_iBottomType == 1) && (ii >= prePrice && ii <= preVolume)) //시간외일때  98~99 예상은 안받는다
+		//		continue;
+		//}
+		//else
+		{
+			if (m_bPredict && (ii >= askSizeTime && ii <= bidSizeTimeBefore))  //예상일때  86~89 시간외는 안받는다
+				continue;
+			else if (!m_bPredict && (ii >= prePrice && ii <= preVolume)) //시간외일때  98~99 예상은 안받는다
+				continue;
+		}
 		if (!m_showBeforeDiff)
 		{
 			if ((ii >= askBefore1 && ii <= askBefore10) || (ii >= bidBefore1 && ii <= bidBefore10))
@@ -2194,6 +2712,7 @@ void Cdepth::drawItems(CDC* dc)
 				dc->SelectObject(font);
 			if (atof(m_items.GetAt(ii+20)->m_data) > 0)
 			{
+				
 				string = item->m_data;
 
 				//호가 캡쳐
@@ -2217,43 +2736,18 @@ void Cdepth::drawItems(CDC* dc)
 				case SVIDN:
 					dc->FillSolidRect(&CRect(item->m_fRc.right+1,item->m_fRc.top-1,item->m_fRc.right+6,item->m_fRc.bottom-1), CLR_VI);
 					break;
-				/*	
-				case shPrice:
-					dc->FillSolidRect(&CRect(item->m_fRc.right+1,item->m_fRc.top-1,item->m_fRc.right+6,item->m_fRc.bottom-1), CLR_SHPRICE);
-					break;
-				case hhPrice:
-					dc->FillSolidRect(&CRect(item->m_fRc.right+1,item->m_fRc.top-1,item->m_fRc.right+6,item->m_fRc.bottom-1), CLR_HHPRICE);
-					break;
-				*/	
-				/*	
-				case gajungPrice:
-					dc->FillSolidRect(&CRect(item->m_fRc.right+1,item->m_fRc.top-1,item->m_fRc.right+6,item->m_fRc.bottom-1), CLR_GAJUNGPRICE);
-					break;
-				*/	
+
 				default:
 					//dc->SetBkMode(TRANSPARENT);
 					break;
 				}	
 
-				//dc->SelectObject(m_poldFont);
 				if (!m_bAble && m_config.hdyul == 1)
 				{
 					if (string.GetLength() > 7)
 						string.Remove(',');
 				}
-// 				else
-// 				{
-// 					if (string.GetLength() > 7)
-// 					{
-// 						if (m_bAble)
-// 						{
-// 							m_bBigDigit = TRUE;
-// 							font = getFont(m_point -1, m_fonts, FW_BOLD);
-// 							dc->SelectObject(font);
-// 						}
-// 					}
-// 				}
-				
+
 				dc->DrawText(string, item->m_fRc, style);
 			}
 		}
@@ -2262,32 +2756,243 @@ void Cdepth::drawItems(CDC* dc)
 			if (false && m_bBoldPrice)
 				dc->SelectObject(font);
 
-// 			if (m_bAble && m_bBigDigit)
-// 			{
-// 				font = getFont(m_point -1, m_fonts, FW_NORMAL);
-// 				dc->SelectObject(font);
-// 			}
-
 			if (atof(m_items.GetAt(ii+10)->m_data) > 0)
 				dc->DrawText(item->m_data, item->m_fRc, style);
 		}
 		else if ((ii >= askSize1 && ii <= askSize10) || (ii >= bidSize1 && ii <= bidSize10) )
 		{
-			if (m_bBoldRemain)
-				dc->SelectObject(font);
-			dc->DrawText(item->m_data, item->m_fRc, style);
+			if (m_mkgubn != mkTOT || m_iDataType != DF_SEP)   //통합거래소 아니거나 각거래소 잔량보여주기가 아닌경우
+				dc->DrawText(item->m_data, item->m_fRc, style);
 		}
 		else if (!IsELW(m_code) && ((ii >= askBefore1 && ii <= askBefore10) || (ii >= bidBefore1 && ii <= bidBefore10)) )
 		{
 			if (m_bBoldCnt)
 				dc->SelectObject(font);
-			dc->DrawText(item->m_data, item->m_fRc, style);
+			if (m_mkgubn != mkTOT || m_iDataType != DF_SEP)
+				dc->DrawText(item->m_data, item->m_fRc, style);
+		
 		}
 		else if (IsELW(m_code) && ((ii >= askLp1 && ii <= askLp10) || (ii >= bidLp1 && ii <= bidLp10)))
 		{
 			if (m_bBoldCnt)
 				dc->SelectObject(font);
 			dc->DrawText(item->m_data, item->m_fRc, style);
+		}
+		else if ((ii >= MIDKPRCMD) && (ii <= MIDKPRCRATE) && m_iShowMIDPRC && (m_mkgubn == mkKRX))
+		{
+			if (1)
+			{
+				//modi NXT  drawitem 중간가영역에 실제 값넣어주는 곳
+				item = m_items.GetAt(ii);
+				string = item->m_data;
+
+				CRect	drc;
+
+				/*if (m_focus == ii)
+				{
+					drc = m_items.GetAt(MIDKPRICE)->m_fRc;
+					drc.right = m_prect.right - 1;
+					drc.OffsetRect(0, -1);
+
+					if (m_config.hdyul == 0)
+						drc.left = m_columns[0] + 2;
+
+					dc->SelectObject(getBrush(CLR_IVS_MIDPRC));
+					dc->Rectangle(drc);
+					InvalidateRect(m_items.GetAt(MIDKPRCMD)->m_fRc);
+				}
+				else*/
+				{
+					drc = m_items.GetAt(MIDKPRICE)->m_fRc;
+					drc.right = m_prect.right - 1;
+					drc.OffsetRect(0, -1);
+					dc->SelectObject(getBrush(CLR_MIDPRC));
+				}
+
+				style = DT_SINGLELINE | DT_VCENTER | DT_RIGHT;
+
+				if (m_bBoldPrice && ii == MIDKPRICE)
+					dc->SelectObject(font);
+
+				if (ii == MIDKPRICE)
+				{
+					//if (!m_bAble && m_config.hdyul == 1)
+					{
+						if (string.GetLength() > 7)
+							string.Remove(',');
+					}
+
+					if (string.GetLength() >= 7)
+					{
+						CFont* poldfont = dc->SelectObject(m_sfont);
+						dc->DrawText(string, item->m_fRc, style);
+						dc->SelectObject(poldfont);
+					}
+					else
+						dc->DrawText(string, item->m_fRc, style);
+
+				}
+				else
+					dc->DrawText(string, item->m_fRc, style);
+
+				if (ii == MIDKPRCRATE)
+				{
+					dc->DrawText(string, m_rcMIDPercent, style);
+				}
+				else if (ii == MIDKPRICE)
+				{
+					if (string != "0" && string.GetLength() > 0)
+						dc->FillSolidRect(&CRect(item->m_fRc.right + 1, item->m_fRc.top, item->m_fRc.right + 6, item->m_fRc.bottom - 1), CLR_KMIDPRICE);
+				}
+			}
+		}
+		else if ((ii >= MIDNPRCMD) && (ii <= MIDNPRCRATE) && m_iShowMIDPRC && (m_mkgubn == mkNXT))  //NXT 중간가
+		{
+			if (1)
+			{
+				item = m_items.GetAt(ii);
+				string = item->m_data;
+
+				CRect	drc;
+
+				/*if (m_focus == ii)
+				{
+					drc = m_items.GetAt(MIDNPRICE)->m_fRc;
+					drc.right = m_prect.right - 1;
+					drc.OffsetRect(0, -1);
+
+					if (m_config.hdyul == 0)
+						drc.left = m_columns[0] + 2;
+
+					dc->SelectObject(getBrush(CLR_IVS_MIDPRC));
+					dc->Rectangle(drc);
+					InvalidateRect(m_items.GetAt(MIDNPRCMD)->m_fRc);
+				}
+				else*/
+				{
+					drc = m_items.GetAt(MIDNPRICE)->m_fRc;
+					drc.right = m_prect.right - 1;
+					drc.OffsetRect(0, -1);
+					//dc->SelectObject(getPen(RGB(210, 210, 210), 1));
+					dc->SelectObject(getBrush(CLR_MIDPRC));
+					//dc->Rectangle(drc);
+				}
+
+				style = DT_SINGLELINE | DT_VCENTER | DT_RIGHT;
+
+				if (m_bBoldPrice && ii == MIDNPRICE)
+					dc->SelectObject(font);
+
+				if (ii == MIDNPRICE)
+				{
+					//if (!m_bAble && m_config.hdyul == 1)
+					{
+						if (string.GetLength() > 7)
+							string.Remove(',');
+					}
+
+					if (string.GetLength() >= 7)
+					{
+						CFont* poldfont = dc->SelectObject(m_sfont);
+						dc->DrawText(string, item->m_fRc, style);
+						dc->SelectObject(poldfont);
+					}
+					else
+						dc->DrawText(string, item->m_fRc, style);
+				}
+				else
+					dc->DrawText(string, item->m_fRc, style);
+
+				if (ii == MIDNPRCRATE)
+				{
+					dc->DrawText(string, m_rcNMIDPercent, style);
+				}
+				else if (ii == MIDNPRICE)
+				{
+					if (string != "0" && string.GetLength() > 0)
+						dc->FillSolidRect(&CRect(item->m_fRc.right + 1, item->m_fRc.top, item->m_fRc.right + 6, item->m_fRc.bottom - 1), CLR_NMIDPRICE);
+				}
+			}
+		}
+		else if (ii >= cticktime && ii <= dbongvol)
+		{
+		}
+		else if (ii >= kmd1size && ii <= nms10size && (m_mkgubn == mkTOT))  //185 ~ 224 통합호가에서 NXT, KRX 매도매수 잔량 그리기
+		{
+			if (m_mkgubn == mkTOT && m_iDataType == DF_SEP)
+			{
+				dc->DrawText(item->m_data, item->m_fRc, style);
+			}
+		}
+		else if (ii >= tkdtjan && ii <= tnstjan && (m_mkgubn == mkTOT) && m_iDataType == DF_SEP)  //225 ~ 228 통합호가  개별보기에서 NXT, KRX 매도매수 잔량 그리기
+		{
+			switch (ii)
+			{
+				case tkdtjan:  //통합 KRX 매도총잔량  <--  매도총잔량대비 위치
+				{
+					dc->DrawText(item->m_data, m_items.GetAt(askTotalSize)->m_fRc, style);
+				}
+				break;
+				case tkstjan:   //통합 KRX 매수총잔량  <--  매수총잔량대비 위치
+				{
+					dc->DrawText(item->m_data, m_items.GetAt(bidTotalSize)->m_fRc, style);
+				}
+				break;
+				case tndtjan:   //통합 NXT 매도총잔량  <--  매도총잔량 위치
+				{
+					dc->DrawText(item->m_data, m_items.GetAt(askTotalBefore)->m_fRc, style);
+				}
+				break; 
+				case tnstjan:   //통합 NXT 매수총잔량  <--  매수총잔량 위치
+				{
+					dc->DrawText(item->m_data, m_items.GetAt(bidTotalBefore)->m_fRc, style);
+				}
+				break;
+			}
+		}
+		else if (ii >= tkmid && ii <= tnmidrate && (m_mkgubn == mkTOT))   //229 ~ 240  통합에서 중간가 그리기
+		{
+			if (1)
+			{
+				if (m_mkgubn == mkTOT)
+				{
+					//dc->DrawText(item->m_data, item->m_fRc, style);
+					item = m_items.GetAt(ii);
+					string = item->m_data;
+
+					style = DT_SINGLELINE | DT_VCENTER | DT_RIGHT;
+
+					if (m_bBoldPrice && (ii == tkmid || ii == tnmid))
+						dc->SelectObject(font);
+
+					if (ii == tkmid || ii == tnmid)
+					{
+						if (string.GetLength() > 7)
+							string.Remove(',');
+
+						if (string.GetLength() >= 7)
+						{
+							CFont* poldfont = dc->SelectObject(m_sfont);
+							dc->DrawText(string, item->m_fRc, style);
+							dc->SelectObject(poldfont);
+						}
+						else
+							dc->DrawText(string, item->m_fRc, style);
+					}
+					else
+						dc->DrawText(string, item->m_fRc, style);
+
+					if (ii == tkmidrate)
+					{
+						dc->DrawText(string, m_rcMIDPercent, style);
+					}
+					else if (ii == tnmidrate)
+					{
+						dc->DrawText(string, m_rcNMIDPercent, style);
+					}
+				}
+			}  //if(0)
+
 		}
 		else
 		{
@@ -2305,8 +3010,70 @@ void Cdepth::drawItems(CDC* dc)
 					continue;
 			}
 #endif
-			dc->DrawText(item->m_data, item->m_fRc, style);
+			if (ii == preVolume || ii == bidSizeTime)//예상체결량  현재 m_iBottomType = 2(현재가K)일때  askSizeTime,  prePrice 는 안그려야 하기 때문
+			{
+				CFont* poldfont{};
+				if (item->m_data.GetLength() >= 9)
+					poldfont = dc->SelectObject(m_sfont);
+
+				dc->DrawText(item->m_data, item->m_fRc, style);
+
+				if (item->m_data.GetLength() >= 9)
+					dc->SelectObject(poldfont);
+			}
+			else
+			{
+				if (m_mkgubn == mkTOT && (ii >= MIDKPRCMD && ii <= MIDNPRCRATE))
+				{
+					CString  ssss;
+				}
+				else if(m_mkgubn == mkKRX && (ii >= MIDNPRCMD))  //KRX는 NXT의 중간가 처리를 안한다.
+				{
+					CString  ssss;
+				}
+				else if (m_mkgubn == mkNXT && (ii >= MIDKPRCMD && ii <= MIDKPRCRATE))  //NXT는 KRX 중간가 처리를 안한다.
+				{
+					CString  ssss;
+				}
+				else if (m_mkgubn == mkTOT && m_iDataType == DF_SEP && (ii >= askTotalSize && ii <=  bidTotalBefore))  
+				{//통합에서 개별일때 기존      매도총잔량(askTotalSize(82)) ~ 매수총잔량대비(bidTotalBefore)(85))  영역은 안그린다
+					CString  ssss;
+				}
+				else if (m_mkgubn == mkTOT && m_iDataType == DF_TOT && (ii >= askTotalSize && ii <= bidTotalBefore))
+				{
+					dc->DrawText(item->m_data, item->m_fRc, style);
+				}
+				else
+				{
+					dc->DrawText(item->m_data, item->m_fRc, style);
+				}
+			}
 		}
+	}
+
+	// 중간가 K,  N 이니셜 그리는부분 //testcode
+	CRect rc;
+	rc = m_items.GetAt(MIDKPRICE)->m_fRc;
+	rc.left = m_columns[0] + 2;
+	rc.right = m_columns[0] + 13;
+	style = DT_SINGLELINE | DT_VCENTER | DT_LEFT;
+	dc->SelectObject(font);
+	dc->SetTextColor(RGB(0, 0, 0));
+
+	if (m_mkgubn == mkKRX || m_mkgubn == mkTOT)
+		dc->DrawText("K", rc, style);
+	else if (m_mkgubn == mkNXT)
+		dc->DrawText("N", rc, style);
+
+	if (m_mkgubn == mkTOT)
+	{
+		rc = m_items.GetAt(MIDNPRICE)->m_fRc;
+		rc.left = m_columns[0] + 2;
+		rc.right = m_columns[0] + 13;
+		style = DT_SINGLELINE | DT_VCENTER | DT_LEFT;
+		dc->SelectObject(font);
+		dc->SetTextColor(RGB(0, 0, 0));
+		dc->DrawText("N", rc, style);
 	}
 
 	dc->RestoreDC(ndc);
@@ -2359,6 +3126,7 @@ void Cdepth::drawBong(CDC* dc)
 		bongR.SetRect(pItem->m_bRc.left + 1, pItem->m_bRc.top + sigaY -1, pItem->m_bRc.right - 1, pItem->m_bRc.top + jjgaY);
 	else	bongR.SetRect(pItem->m_bRc.left + 1, pItem->m_bRc.top + jjgaY, pItem->m_bRc.right - 1, pItem->m_bRc.top + sigaY+1);
 	*/
+	int ival{};
 	if (siga <= jjga)
 	{
 		if (sigaY == jjgaY) jjgaY++;
@@ -2367,7 +3135,11 @@ void Cdepth::drawBong(CDC* dc)
 		//CString tmp; tmp.Format("%d,%d", sigaY, kogaY);
 		//dc->TextOut(11,11,tmp);
 		dc->MoveTo(pItem->m_bRc.CenterPoint().x, pItem->m_bRc.top + kogaY);
+		m_slog.Format("[bong] moveto  x=[%d],  y=[%d]", pItem->m_bRc.CenterPoint().x, pItem->m_bRc.top + kogaY);
+		OutputDebugString(m_slog);
 		dc->LineTo(pItem->m_bRc.CenterPoint().x, pItem->m_bRc.top + jegaY);	
+		m_slog.Format("[bong] lineto  x=[%d],  y=[%d]", pItem->m_bRc.CenterPoint().x, pItem->m_bRc.top + kogaY);
+		OutputDebugString(m_slog);
 		
 	}
 	else
@@ -2376,7 +3148,11 @@ void Cdepth::drawBong(CDC* dc)
 		bongR.SetRect(pItem->m_bRc.left + 1, pItem->m_bRc.top + jjgaY, pItem->m_bRc.right - 1, pItem->m_bRc.top + sigaY);
 		dc->FillSolidRect(bongR, siga <= jjga ? m_clrUp : m_clrDown);
 		dc->MoveTo(pItem->m_bRc.CenterPoint().x, pItem->m_bRc.top + kogaY);
+		m_slog.Format("[bong] moveto  x=[%d],  y=[%d]", pItem->m_bRc.CenterPoint().x, pItem->m_bRc.top + kogaY);
+		OutputDebugString(m_slog);
 		dc->LineTo(pItem->m_bRc.CenterPoint().x, pItem->m_bRc.top + jegaY);
+		m_slog.Format("[bong] lineto  x=[%d],  y=[%d]", pItem->m_bRc.CenterPoint().x, pItem->m_bRc.top + jegaY);
+		OutputDebugString(m_slog);
 	}
 	
 
@@ -2668,7 +3444,7 @@ void Cdepth::drawInfo(CDC* dc)
 					if (tmpS.GetLength() > 7) tmpS.Remove(',');
 					dc->DrawText(tmpS, rect, DT_SINGLELINE|DT_VCENTER|DT_RIGHT);
 					*/
-					dc->DrawText(_T("   상  "), rect, DT_SINGLELINE|DT_VCENTER|DT_LEFT);
+					dc->DrawText(_T("   상  "), rect, DT_SINGLELINE|DT_VCENTER|DT_LEFT);   //10호가
 					dc->SetTextColor(m_items.GetAt(shPrice)->m_fRGB);
 					tmpS = m_items.GetAt(shPrice)->m_data;
 					if (!m_bAble && m_config.hdyul == 1)
@@ -2736,13 +3512,12 @@ void Cdepth::drawInfo(CDC* dc)
 					*/
 					break;
 				case 9:
-					dc->DrawText(_T(" 체강  "), rect, DT_SINGLELINE|DT_VCENTER|DT_LEFT);
-					dc->SetTextColor(m_items.GetAt(chegang)->m_fRGB);
-					tmpS = m_items.GetAt(chegang)->m_data;
-					if (!m_bAble && m_config.hdyul == 1)
-					if (tmpS.GetLength() > 7) tmpS.Remove(',');
-					dc->DrawText(tmpS, rect, DT_SINGLELINE|DT_VCENTER|DT_RIGHT);
-						break;
+						dc->DrawText(_T(" 체강  "), rect, DT_SINGLELINE | DT_VCENTER | DT_LEFT);   //10호가
+						dc->SetTextColor(m_items.GetAt(chegang)->m_fRGB);
+						tmpS = m_items.GetAt(chegang)->m_data;
+						if (!m_bAble && m_config.hdyul == 1)
+							if (tmpS.GetLength() > 7) tmpS.Remove(',');
+						dc->DrawText(tmpS, rect, DT_SINGLELINE | DT_VCENTER | DT_RIGHT);
 					break;
 				}
 			}
@@ -2788,37 +3563,77 @@ void Cdepth::drawInfo(CDC* dc)
 					dc->DrawText(tmpS, rect, DT_SINGLELINE|DT_VCENTER|DT_RIGHT);
 					break;
 				case 3:
-					/*
-					dc->DrawText(_T("  기준가"), rect, DT_SINGLELINE|DT_VCENTER|DT_LEFT);
-					dc->SetTextColor(m_items.GetAt(pivotPrice))->m_fRGB);
-					tmpS = m_items.GetAt(pivotPrice))->m_data;
-					if (tmpS.GetLength() > 7) tmpS.Remove(',');
-					dc->DrawText(tmpS, rect, DT_SINGLELINE|DT_VCENTER|DT_RIGHT);
-					*/
-					dc->DrawText(_T("   상  "), rect, DT_SINGLELINE|DT_VCENTER|DT_LEFT);
-					dc->SetTextColor(m_items.GetAt(shPrice)->m_fRGB);
-					tmpS = m_items.GetAt(shPrice)->m_data;
-					if (!m_bAble && m_config.hdyul == 1)
-						if (tmpS.GetLength() > 7) tmpS.Remove(',');
-					dc->DrawText(tmpS, rect, DT_SINGLELINE|DT_VCENTER|DT_RIGHT);
+					//if (m_mkgubn == mkKRX)
+					{
+						dc->DrawText(_T("   상  "), rect, DT_SINGLELINE | DT_VCENTER | DT_LEFT);   //5호가
+						dc->SetTextColor(m_items.GetAt(shPrice)->m_fRGB);
+						tmpS = m_items.GetAt(shPrice)->m_data;
+						if (!m_bAble && m_config.hdyul == 1)
+							if (tmpS.GetLength() > 7) tmpS.Remove(',');
+						dc->DrawText(tmpS, rect, DT_SINGLELINE | DT_VCENTER | DT_RIGHT);
+					}
+					//else if (m_mkgubn == mkNXT)
+					//{
+					//	dc->DrawText(_T("전일(K) "), rect, DT_SINGLELINE | DT_VCENTER | DT_LEFT);   //5호가
+					//	
+					//	tmpS = m_items.GetAt(shPrice)->m_data;
+					//	if (!m_bAble && m_config.hdyul == 1)
+					//		if (tmpS.GetLength() > 7) tmpS.Remove(',');
+
+					//	if (!m_code.IsEmpty())
+					//		tmpS = getKRXValue(m_code.Mid(1), "2320");  //NXT시장  전일(K) 
+					//	else
+					//		tmpS = "";
+
+					//	tmpS.Replace("+", "");
+					//	tmpS.Replace("-", "");
+					//	addComma(tmpS);
+					//	dc->DrawText(tmpS, rect, DT_SINGLELINE | DT_VCENTER | DT_RIGHT);
+					//}
 					break;
 				case 4:
-					dc->DrawText(_T("   하  "), rect, DT_SINGLELINE|DT_VCENTER|DT_LEFT);
-					dc->SetTextColor(m_items.GetAt(hhPrice)->m_fRGB);
-					tmpS = m_items.GetAt(hhPrice)->m_data;
-					if (!m_bAble && m_config.hdyul == 1)
-						if (tmpS.GetLength() > 7) tmpS.Remove(',');
-					dc->DrawText(tmpS, rect, DT_SINGLELINE|DT_VCENTER|DT_RIGHT);
-					break;
-					break;
-				case 5:
-					dc->DrawText(_T("  체강  "), rect, DT_SINGLELINE|DT_VCENTER|DT_LEFT);
-					dc->SetTextColor(m_items.GetAt(chegang)->m_fRGB);
-					tmpS = m_items.GetAt(chegang)->m_data;
-					if (!m_bAble && m_config.hdyul == 1)
-						if (tmpS.GetLength() > 7) tmpS.Remove(',');
-						dc->DrawText(tmpS, rect, DT_SINGLELINE|DT_VCENTER|DT_RIGHT);
+					//if (m_mkgubn == mkKRX)
+					{
+						dc->DrawText(_T("   하  "), rect, DT_SINGLELINE | DT_VCENTER | DT_LEFT);
+						dc->SetTextColor(m_items.GetAt(hhPrice)->m_fRGB);
+						tmpS = m_items.GetAt(hhPrice)->m_data;
+						if (!m_bAble && m_config.hdyul == 1)
+							if (tmpS.GetLength() > 7) tmpS.Remove(',');
+						dc->DrawText(tmpS, rect, DT_SINGLELINE | DT_VCENTER | DT_RIGHT);
 						break;
+					}
+					//else if (m_mkgubn == mkNXT)
+					//{
+					//	dc->DrawText(_T("당일(K)  "), rect, DT_SINGLELINE | DT_VCENTER | DT_LEFT);
+
+					//	tmpS = m_items.GetAt(hhPrice)->m_data;
+					//	if (!m_bAble && m_config.hdyul == 1)
+					//		if (tmpS.GetLength() > 7) tmpS.Remove(',');
+
+					//	if (!m_code.IsEmpty())
+					//		tmpS = getKRXValue(m_code.Mid(1), "2023");   //NXT시장  당일(K)
+					//	else
+					//		tmpS = "";
+
+					//	if (tmpS.Find("+") >= 0)
+					//		dc->SetTextColor(m_items.GetAt(shPrice)->m_fRGB);
+					//	else if (tmpS.Find("-") >= 0)
+					//		dc->SetTextColor(m_items.GetAt(hhPrice)->m_fRGB);
+
+					//	tmpS.Replace("+", "");
+					//	tmpS.Replace("-", "");
+					//	addComma(tmpS);
+					//	dc->DrawText(tmpS, rect, DT_SINGLELINE | DT_VCENTER | DT_RIGHT);
+					//	break;
+					//}
+					break;
+				case 5:	
+						dc->DrawText(_T("  체강  "), rect, DT_SINGLELINE | DT_VCENTER | DT_LEFT);
+						dc->SetTextColor(m_items.GetAt(chegang)->m_fRGB);
+						tmpS = m_items.GetAt(chegang)->m_data;
+						if (!m_bAble && m_config.hdyul == 1)
+							if (tmpS.GetLength() > 7) tmpS.Remove(',');
+						dc->DrawText(tmpS, rect, DT_SINGLELINE | DT_VCENTER | DT_RIGHT);
 					break;
 				}
 			}
@@ -3075,7 +3890,7 @@ void Cdepth::drawInfo(CDC* dc)
 					dc->DrawText(tmpS, rect, DT_SINGLELINE|DT_VCENTER|DT_RIGHT);
 					break;
 				case 3:
-					dc->DrawText(_T("   상  "), rect, DT_SINGLELINE|DT_VCENTER|DT_LEFT);
+					dc->DrawText(_T("   상  "), rect, DT_SINGLELINE|DT_VCENTER|DT_LEFT);   //10호가
 					dc->SetTextColor(m_items.GetAt(shPrice)->m_fRGB);
 					tmpS = m_items.GetAt(shPrice)->m_data;
 					if (!m_bAble && m_config.hdyul == 1)
@@ -3229,9 +4044,11 @@ void Cdepth::drawInfo(CDC* dc)
 					dc->SetTextColor(m_items.GetAt(prePercent)->m_fRGB);
 					tmpS = _T("");
 					if (m_curr > 0.)
-					{ tmpS.Format("%.f", m_curr); addComma(tmpS); }
-					dc->DrawText(tmpS, rect, DT_SINGLELINE|DT_VCENTER|DT_RIGHT);
-					break;
+					{ 
+						tmpS.Format("%.f", m_curr); addComma(tmpS); 
+					}
+						dc->DrawText(tmpS, rect, DT_SINGLELINE|DT_VCENTER|DT_RIGHT);
+						break;
 				case 1:
 					dc->DrawText(_T("  대비  "), rect, DT_SINGLELINE|DT_VCENTER|DT_LEFT);
 					dc->SetTextColor(m_items.GetAt(preBefore)->m_fRGB);
@@ -3295,7 +4112,7 @@ void Cdepth::drawInfo(CDC* dc)
 					dc->DrawText(tmpS, rect, DT_SINGLELINE|DT_VCENTER|DT_RIGHT);
 					break;
 				case 3:
-					dc->DrawText(_T("   상  "), rect, DT_SINGLELINE|DT_VCENTER|DT_LEFT);
+					dc->DrawText(_T("   상  "), rect, DT_SINGLELINE|DT_VCENTER|DT_LEFT);   //10호가
 					dc->SetTextColor(m_items.GetAt(shPrice)->m_fRGB);
 					tmpS = m_items.GetAt(shPrice)->m_data;
 					if (!m_bAble && m_config.hdyul == 1)
@@ -3442,49 +4259,52 @@ void Cdepth::drawGraph(CDC* dc, int index)
 	std::shared_ptr<Citem> itemX = nullptr;
 	std::shared_ptr<Citem> item = m_items.GetAt(index);
 
-	if (index >= askSize1 && index <= askSize10)
-	{
-		rect = item->m_fRc;
-		if (m_showBeforeDiff)
+	if (m_iDataType != DF_SEP || m_mkgubn != mkTOT)  //통합호가의 KRX, NXT 둘다 보여주기 모드가 아닌경우에 그래프
+	{//둘다 보여주기 모드는 통합에서만 제공하는 기능
+		if (index >= askSize1 && index <= askSize10)  //매도 잔량 그래프
 		{
-			itemX = m_items.GetAt(index + 10);
-			rect.left = itemX->m_fRc.left;
-		}
+			rect = item->m_fRc;
+			if (m_showBeforeDiff)
+			{
+				itemX = m_items.GetAt(index + 10);  //매도잔량대비의 왼쪽좌표로 변경
+				rect.left = itemX->m_fRc.left;
+			}
 
-		marginT = rect.Height() - (m_fontH + 2);
-		marginB = 2;
-		if (marginT > 0)
+			marginT = rect.Height() - (m_fontH + 2);
+			marginB = 2;
+			if (marginT > 0)
+			{
+				marginB += (marginT % 2);
+				marginT /= 2; marginB += marginT;
+			}
+			rect.DeflateRect(0, marginT, 0, marginB);
+
+			rect.left = rect.right - (int)(((double)rect.Width() * str2double(item->m_data)) / m_maxsize);
+			//		rect.IntersectRect(rect, item->m_bRc);
+			dc->FillSolidRect(rect, m_clrBarAsk);
+		}
+		else if (index >= bidSize1 && index <= bidSize10)   //매수 잔량 그래프 
 		{
-			marginB += (marginT % 2);
-			marginT /= 2; marginB += marginT;
-		}
-		rect.DeflateRect(0, marginT, 0, marginB);
+			rect = item->m_fRc;
+			if (m_showBeforeDiff)
+			{
+				itemX = m_items.GetAt(index + 10);  //매수잔량대비의 오른쪽좌표로 변경
+				rect.right = itemX->m_fRc.right;
+			}
 
-		rect.left = rect.right - (int)(((double)rect.Width() * str2double(item->m_data))/m_maxsize);
-//		rect.IntersectRect(rect, item->m_bRc);
-		dc->FillSolidRect(rect, m_clrBarAsk);
-	}
-	else if (index >= bidSize1 && index <= bidSize10)
-	{
-		rect = item->m_fRc;
-		if (m_showBeforeDiff)
-		{
-			itemX = m_items.GetAt(index + 10);
-			rect.right = itemX->m_fRc.right;
-		}
+			marginT = rect.Height() - (m_fontH + 2);
+			marginB = 2;
+			if (marginT > 0)
+			{
+				marginB += (marginT % 2);
+				marginT /= 2; marginB += marginT;
+			}
+			rect.DeflateRect(0, marginT, 0, marginB);
 
-		marginT = rect.Height() - (m_fontH + 2);
-		marginB = 2;
-		if (marginT > 0)
-		{
-			marginB += (marginT % 2);
-			marginT /= 2; marginB += marginT;
+			rect.right = rect.left + (int)(((double)rect.Width() * str2double(item->m_data)) / m_maxsize);
+			//		rect.IntersectRect(rect, item->m_bRc);
+			dc->FillSolidRect(rect, m_clrBarBid);
 		}
-		rect.DeflateRect(0, marginT, 0, marginB);
-
-		rect.right = rect.left + (int)(((double)rect.Width() * str2double(item->m_data))/m_maxsize);
-//		rect.IntersectRect(rect, item->m_bRc);
-		dc->FillSolidRect(rect, m_clrBarBid);
 	}
 	
 	if (m_bottom == btSize || m_bottom == btSizeTime)
@@ -3575,7 +4395,15 @@ void Cdepth::drawHead(CDC* dc)
 		{
 			rect.SetRect(0, 1, m_columns[0], (int)(m_topH+1));
 			rect.left = RATERECTSEL(rect);
-			dc->DrawText(_T("매도잔량"), rect, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+			if (m_mkgubn == mkKRX || m_mkgubn == mkNXT)  //KRX, NXT 인경우
+				dc->DrawText(_T("매도잔량"), rect, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+			else
+			{
+				if (m_iDataType == DF_TOT) //통합
+					dc->DrawText(_T("매도잔량"), rect, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+				else
+					dc->DrawText(_T("KRX"), rect, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+			}
 			
 			rect.SetRect(0, 1, m_columns[0], (int)(m_topH + 1));
 			rect.right = RATERECTSEL(rect);
@@ -3591,7 +4419,17 @@ void Cdepth::drawHead(CDC* dc)
 			if (IsELW(m_code))
 				str = _T("LP");
 			else if (m_type == ctCode || m_type == ctECN)
-				str = _T("대비");
+			{
+				if (m_mkgubn == mkKRX || m_mkgubn == mkNXT)
+					str = _T("대비");
+				else
+				{
+					if (m_iDataType == DF_TOT) //통합
+						str = _T("대비");
+					else
+						str = _T("NXT");
+				}
+			}
 			else	str = _T("건수");
 			dc->DrawText(str, rect, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
 #else
@@ -3611,12 +4449,39 @@ void Cdepth::drawHead(CDC* dc)
 				rect.DeflateRect(3, 1, 20, 1);
 			}
 
+			int left = rect.left - 2;
+			int right = rect.left + m_rcConfig.Width() - 3;
+			int top = rect.top;
+			int bottom = rect.bottom - 1;
+			m_rcMKPOPMenu.SetRect(left, top, right, bottom);
+			//m_rcMKPOPMenu.InflateRect(2, 0);
+			m_rcMarket = m_rcMKPOPMenu;
+			m_rcMarket.OffsetRect(m_rcMarket.Width() + 2, 0);
+
+			CRect timeRec;
+			timeRec = rect;
+			timeRec.OffsetRect(5, 0);  //상단 시간영역
 			std::shared_ptr<Citem> item = m_items.GetAt(cTime);
-			dc->DrawText(item->m_data, rect, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+			CFont* poldfont = dc->SelectObject(m_sfont);
+			dc->DrawText(item->m_data, timeRec, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+			dc->SelectObject(poldfont);
+
 			rect.SetRect(m_columns[1] + 1, 1, m_columns[2], (int)(m_topH + 1));
 			rect.right = RATERECTBUY(rect);
-			dc->DrawText(_T("매수잔량"), rect, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
-			
+
+			if (m_mkgubn == mkKRX || m_mkgubn == mkNXT)  //KRX, NXT 인경우
+				dc->DrawText(_T("매수잔량"), rect, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+			else
+			{
+				if (m_iDataType == DF_TOT) //통합
+					dc->DrawText(_T("매수잔량"), rect, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+				else
+					dc->DrawText(_T("KRX"), rect, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+			}
+
+			rect.SetRect(m_columns[1] + 1, 1, m_columns[2], (int)(m_topH + 1));
+			rect.right = RATERECTBUY(rect);
+		
 			rect.SetRect(m_columns[1] + 1, 1, m_columns[2], (int)(m_topH + 1));
 			rect.left = RATERECTBUY(rect);
 
@@ -3630,7 +4495,17 @@ void Cdepth::drawHead(CDC* dc)
 			if (IsELW(m_code))
 				str = _T("LP");
 			else if (m_type == ctCode || m_type == ctECN)
-				str = _T("대비");
+			{
+				if (m_mkgubn == mkKRX || m_mkgubn == mkNXT)
+					str = _T("대비");
+				else
+				{
+					if (m_iDataType == DF_TOT) //통합
+						str = _T("대비");
+					else
+						str = _T("NXT");
+				}
+			}
 			else	str = _T("건수");
 			dc->DrawText(str, rect, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
 #else
@@ -3649,7 +4524,15 @@ void Cdepth::drawHead(CDC* dc)
 				m_rcConfigL.SetRect(rect.right - (rect.Height()), rect.top+1 /*+ topOff*/, rect.right - 1, rect.bottom-1);// + topOff + imgCY1);
 				rect.DeflateRect(3, 1, 20, 1);
 			}
-			dc->DrawText(_T("매도잔량"), rect, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+			if (m_mkgubn == mkKRX || m_mkgubn == mkNXT)  //KRX, NXT 인경우
+				dc->DrawText(_T("매도잔량"), rect, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+			else
+			{
+				if (m_iDataType == DF_TOT) //통합
+					dc->DrawText(_T("매도잔량"), rect, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+				else
+					dc->DrawText(_T("KRX"), rect, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+			}
 			
 			rect.SetRect(m_columns[0] + 1, 1, m_columns[1], (int)(m_topH + 1));
 			if (m_bConfig)
@@ -3659,8 +4542,16 @@ void Cdepth::drawHead(CDC* dc)
 				rect.DeflateRect(3, 1, 20, 1);
 			}
 
+			int left = rect.left - 2;
+			int right = rect.left + m_rcConfig.Width() - 3;
+			int top = rect.top;
+			int bottom = rect.bottom - 1;
+			m_rcMKPOPMenu.SetRect(left, top, right, bottom);
+			//m_rcMKPOPMenu.InflateRect(2, 0);
+			m_rcMarket = m_rcMKPOPMenu;
+			m_rcMarket.OffsetRect(m_rcMarket.Width() + 2, 0);
+
 			dc->DrawText(_T("호가"), rect, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
-			
 			rect.SetRect(m_columns[1] + 1, 1, m_columns[2], (int)(m_topH + 1));
 			if (m_bConfig)
 			{
@@ -3668,7 +4559,15 @@ void Cdepth::drawHead(CDC* dc)
 				m_rcConfigR.SetRect(rect.right - (rect.Height()), rect.top + 1, rect.right - 1, rect.bottom-1);
 				rect.DeflateRect(3, 1, 20, 1);
 			}
-			dc->DrawText(_T("매수잔량"), rect, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+			if (m_mkgubn == mkKRX || m_mkgubn == mkNXT)  //KRX, NXT 인경우
+				dc->DrawText(_T("매수잔량"), rect, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+			else
+			{
+				if (m_iDataType == DF_TOT) //통합
+					dc->DrawText(_T("매수잔량"), rect, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+				else
+					dc->DrawText(_T("KRX"), rect, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+			}
 		}
 	}
 	dc->RestoreDC(ndc);
@@ -3679,7 +4578,9 @@ void Cdepth::drawBottom(CDC* dc)
 	CRect	bRc, fRc;
 	const	int	ndc = dc->SaveDC();
 	const	int	top = m_showTop ? m_topH : 0;
-	const	int	startL = m_depth*2;
+
+     //modi NXT  하단 예상체결관련
+	const	int	startL = m_depth * 2 + m_iShowMIDPRC;
 	int	endL   = startL;
 	
 	switch (m_bottom)
@@ -3723,6 +4624,7 @@ void Cdepth::drawBottom(CDC* dc)
 			{
 				bRc.SetRect(m_columns[0] + 1, (int)(m_rowH * startL + 1) + top, m_columns[1], (int)(m_rowH*endL) + top);
 				fRc = bRc;
+				m_rcExpecArea = fRc;
 				fRc.DeflateRect(3, 1, 18, 1);
 				dc->FillSolidRect(bRc, m_clrHeadBk);
 				dc->DrawText(_T("대비"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
@@ -3734,9 +4636,12 @@ void Cdepth::drawBottom(CDC* dc)
 					//int	topOff = (bRc.Height() - imgCY2) / 2;
 					m_rcTime.SetRect(bRc.right - (bRc.Height()+1), bRc.top +1, bRc.right - 3, bRc.bottom-1);
 				}
-				if (m_bPredict)
+
+				//if (m_iBottomType == 0)  //예상가
+				if (m_bPredict)  //test comment  btTime !m_showBeforeDiff
 				{
-					dc->DrawText(_T("예상체결"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+					dc->DrawText(_T("예상체결"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
 					
 					bRc.SetRect(1, bRc.top, m_columns[0], bRc.bottom);
 					bRc.right = RATERECTSEL(bRc);
@@ -3753,12 +4658,39 @@ void Cdepth::drawBottom(CDC* dc)
 					dc->DrawText(_T("체결량"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
 				}
 				else
-					dc->DrawText(_T("시간외"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+				{
+					dc->DrawText(_T("시간외"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//if (m_mkgubn == mkNXT)
+					//{
+					//	dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//	if (m_iBottomType == 2)   //현재가(K)를 보여줄때
+					//	{
+					//		bRc.SetRect(1, bRc.top, m_columns[0], bRc.bottom);
+					//		bRc.right = RATERECTSEL(bRc);
+					//		fRc = bRc;
+					//		fRc.DeflateRect(3, 1);
+					//		dc->FillSolidRect(bRc, m_clrHeadBk);
+					//		dc->DrawText(_T("종가"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+
+					//		bRc.SetRect(m_columns[1] + 1, bRc.top, m_columns[2], bRc.bottom);
+					//		bRc.left = RATERECTBUY(bRc) + 1;
+					//		fRc = bRc;
+					//		fRc.DeflateRect(3, 1);
+					//		dc->FillSolidRect(bRc, m_clrHeadBk);
+					//		dc->DrawText(_T("거래량"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//	}
+					//}
+					//else if (m_mkgubn == mkKRX || m_mkgubn == mkTOT)
+					//{
+					//	dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//}
+				}
 			}
 			else
 			{
 				bRc.SetRect(m_columns[0] + 1, (int)(m_rowH * startL + 1) + top, m_columns[1], (int)(m_rowH*endL) + top);
 				fRc = bRc;
+				m_rcExpecArea = fRc;
 				fRc.DeflateRect(3, 1, 18, 1);
 				fRc.DeflateRect(0, 0, 18, 0);
 				dc->FillSolidRect(bRc, m_clrHeadBk);
@@ -3768,9 +4700,11 @@ void Cdepth::drawBottom(CDC* dc)
 					m_rcTime.SetRect(bRc.right - (bRc.Height()+1), bRc.top +1, bRc.right - 3, bRc.bottom-1);
 				}
 
-				if (m_bPredict)
+				//if (m_iBottomType == 0)  //예상가 
+				if (m_bPredict)  //test comment  btTime m_showBeforeDiff
 				{
-					dc->DrawText(_T("예상체결"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+					//dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					dc->DrawText(_T("예상체결"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
 					
 					bRc.SetRect(1, bRc.top, m_columns[0], bRc.bottom);
 					bRc.right = RATERECTSEL(bRc);
@@ -3787,7 +4721,33 @@ void Cdepth::drawBottom(CDC* dc)
 					dc->DrawText(_T("체결량"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
 				}
 				else
-					dc->DrawText(_T("시간외"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+				{
+					dc->DrawText(_T("시간외"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//if (m_mkgubn == mkNXT)
+					//{
+					//	dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//	if (m_iBottomType == 2)   //현재가(K)를 보여줄때
+					//	{
+					//		bRc.SetRect(1, bRc.top, m_columns[0], bRc.bottom);
+					//		bRc.right = RATERECTSEL(bRc);
+					//		fRc = bRc;
+					//		fRc.DeflateRect(3, 1);
+					//		dc->FillSolidRect(bRc, m_clrHeadBk);
+					//		dc->DrawText(_T("종가"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+
+					//		bRc.SetRect(m_columns[1] + 1, bRc.top, m_columns[2], bRc.bottom);
+					//		bRc.left = RATERECTBUY(bRc) + 1;
+					//		fRc = bRc;
+					//		fRc.DeflateRect(3, 1);
+					//		dc->FillSolidRect(bRc, m_clrHeadBk);
+					//		dc->DrawText(_T("거래량"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//	}
+					//}
+					//else if (m_mkgubn == mkKRX || m_mkgubn == mkTOT)
+					//{
+					//	dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//}
+				}
 			}
 			break;
 		case btSizeTime:
@@ -3795,6 +4755,7 @@ void Cdepth::drawBottom(CDC* dc)
 			{
 				bRc.SetRect(m_columns[0] + 1, (int)(m_rowH * (endL-1) + 1) + top, m_columns[1], (int)(m_rowH * endL) + top);
 				fRc = bRc;
+				m_rcExpecArea = fRc;
 				fRc.DeflateRect(3, 1, 18, 1);
 				dc->FillSolidRect(bRc, m_clrHeadBk);
 				dc->DrawText(_T("대비"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
@@ -3808,9 +4769,11 @@ void Cdepth::drawBottom(CDC* dc)
 					m_rcTime.SetRect(bRc.right - (bRc.Height()+1), bRc.top +1, bRc.right - 3, bRc.bottom-1);
 				}
 
-				if (m_bPredict)
+				//if (m_iBottomType == 0)  //예상가 
+				if (m_bPredict)   //test comment btSizeTime !m_showBeforeDiff
 				{
-					dc->DrawText(_T("예상체결"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+					//dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					dc->DrawText(_T("예상체결"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
 					
 					bRc.SetRect(1, bRc.top, m_columns[0], bRc.bottom);
 					bRc.right = RATERECTSEL(bRc);
@@ -3827,12 +4790,42 @@ void Cdepth::drawBottom(CDC* dc)
 					dc->DrawText(_T("체결량"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
 				}
 				else
-					dc->DrawText(_T("시간외"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+				{
+					dc->DrawText(_T("시간외"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//if (m_mkgubn == mkNXT)
+					//{
+					//	dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//	if (m_iBottomType == 2)   //현재가(K)를 보여줄때
+					//	{
+					//		bRc.SetRect(1, bRc.top, m_columns[0], bRc.bottom);
+					//		bRc.right = RATERECTSEL(bRc);
+					//		fRc = bRc;
+					//		fRc.DeflateRect(3, 1);
+					//		dc->FillSolidRect(bRc, m_clrHeadBk);
+					//		dc->DrawText(_T("종가"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+
+					//		bRc.SetRect(m_columns[1] + 1, bRc.top, m_columns[2], bRc.bottom);
+					//		bRc.left = RATERECTBUY(bRc) + 1;
+					//		fRc = bRc;
+					//		fRc.DeflateRect(3, 1);
+					//		dc->FillSolidRect(bRc, m_clrHeadBk);
+					//		dc->DrawText(_T("거래량"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//	}
+					//}
+					//else if (m_mkgubn == mkKRX || m_mkgubn == mkTOT)
+					//{
+					//	dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//}
+				}
 			}
 			else
 			{
+				/*m_slog.Format("[cx_depth][%s]<%d> m_iBottomType =[%d] m_bPredict=[%d]", __FUNCTION__, __LINE__, m_iBottomType, m_bPredict);
+				OutputDebugString(m_slog);*/
+
 				bRc.SetRect(m_columns[0] + 1, (int)(m_rowH * (endL-1) + 1) + top, m_columns[1], (int)(m_rowH * endL) + top);
 				fRc = bRc;
+				m_rcExpecArea = fRc;
 				fRc.DeflateRect(3, 1, 18, 1);
 				dc->FillSolidRect(bRc, m_clrHeadBk);
 				{
@@ -3841,9 +4834,11 @@ void Cdepth::drawBottom(CDC* dc)
 					m_rcTime.SetRect(bRc.right - (bRc.Height()+1), bRc.top +1, bRc.right - 3, bRc.bottom-1);
 				}
 
-				if (m_bPredict)
+				//if (m_iBottomType == 0)  //예상가
+				if (m_bPredict)  //test comment  btSizeTime m_showBeforeDiff
 				{
-					dc->DrawText(_T("예상체결"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+					//dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					dc->DrawText(_T("예상체결"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
 					
 					bRc.SetRect(1, bRc.top, m_columns[0], bRc.bottom);
 					bRc.right = RATERECTSEL(bRc);
@@ -3860,7 +4855,33 @@ void Cdepth::drawBottom(CDC* dc)
 					dc->DrawText(_T("체결량"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
 				}
 				else
-					dc->DrawText(_T("시간외"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+				{
+					dc->DrawText(_T("시간외"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//if (m_mkgubn == mkNXT)
+					//{
+					//	dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//	if (m_iBottomType == 2)   //현재가(K)를 보여줄때
+					//	{
+					//		bRc.SetRect(1, bRc.top, m_columns[0], bRc.bottom);
+					//		bRc.right = RATERECTSEL(bRc);
+					//		fRc = bRc;
+					//		fRc.DeflateRect(3, 1);
+					//		dc->FillSolidRect(bRc, m_clrHeadBk);
+					//		dc->DrawText(_T("종가"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+
+					//		bRc.SetRect(m_columns[1] + 1, bRc.top, m_columns[2], bRc.bottom);
+					//		bRc.left = RATERECTBUY(bRc) + 1;
+					//		fRc = bRc;
+					//		fRc.DeflateRect(3, 1);
+					//		dc->FillSolidRect(bRc, m_clrHeadBk);
+					//		dc->DrawText(_T("거래량"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//	}
+					//}
+					//else if (m_mkgubn == mkKRX || m_mkgubn == mkTOT)
+					//{
+					//	dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//}
+				}
 			}
 			break;
 		}
@@ -3894,6 +4915,7 @@ void Cdepth::drawBottom(CDC* dc)
 			{
 				bRc.SetRect(m_columns[0] + 1, (int)(m_rowH * startL + 1), m_columns[1], (int)(m_rowH*endL));
 				fRc = bRc;
+				m_rcExpecArea = fRc;
 				fRc.DeflateRect(3, 1);
 				dc->FillSolidRect(bRc, m_clrHeadBk);
 				dc->DrawText(_T("대비"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
@@ -3908,9 +4930,12 @@ void Cdepth::drawBottom(CDC* dc)
 					m_rcTime.SetRect(bRc.right - (bRc.Height()+1), bRc.top +1, bRc.right - 3, bRc.bottom-1);
 				}
 
-				if (m_bPredict)
+				//if (m_ bPredict) //test comment  btTime !m_showBeforeDiff
+				//if (m_iBottomType == 0)  //예상가
+				if (m_bPredict) //test comment  btTime !m_showBeforeDiff
 				{
-					dc->DrawText(_T("예상체결"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+					//dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					dc->DrawText(_T("예상체결"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
 					
 					bRc.SetRect(1, bRc.top, m_columns[0], bRc.bottom);
 					bRc.right = RATERECTSEL(bRc);
@@ -3927,12 +4952,39 @@ void Cdepth::drawBottom(CDC* dc)
 					dc->DrawText(_T("체결량"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
 				}
 				else
-					dc->DrawText(_T("시간외"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+				{
+					dc->DrawText(_T("시간외"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//if (m_mkgubn == mkNXT)
+					//{
+					//	dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//	if (m_iBottomType == 2)   //현재가(K)를 보여줄때
+					//	{
+					//		bRc.SetRect(1, bRc.top, m_columns[0], bRc.bottom);
+					//		bRc.right = RATERECTSEL(bRc);
+					//		fRc = bRc;
+					//		fRc.DeflateRect(3, 1);
+					//		dc->FillSolidRect(bRc, m_clrHeadBk);
+					//		dc->DrawText(_T("종가"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+
+					//		bRc.SetRect(m_columns[1] + 1, bRc.top, m_columns[2], bRc.bottom);
+					//		bRc.left = RATERECTBUY(bRc) + 1;
+					//		fRc = bRc;
+					//		fRc.DeflateRect(3, 1);
+					//		dc->FillSolidRect(bRc, m_clrHeadBk);
+					//		dc->DrawText(_T("거래량"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//	}
+					//}
+					//else if (m_mkgubn == mkKRX || m_mkgubn == mkTOT)
+					//{
+					//	dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//}
+				}
 			}
 			else
 			{
 				bRc.SetRect(m_columns[0] + 1, (int)(m_rowH * startL + 1), m_columns[1], (int)(m_rowH * endL));
 				fRc = bRc;
+				m_rcExpecArea = fRc;
 				fRc.DeflateRect(3, 1, 18, 1);
 				dc->FillSolidRect(bRc, m_clrHeadBk);
 				{
@@ -3941,9 +4993,11 @@ void Cdepth::drawBottom(CDC* dc)
 					m_rcTime.SetRect(bRc.right - (bRc.Height()+1), bRc.top +1, bRc.right - 3, bRc.bottom-1);
 				}
 
-				if (m_bPredict)
+				//if (m_iBottomType == 0)  //예상가
+				if (m_bPredict) //test comment  btTime m_showBeforeDiff
 				{
-					dc->DrawText(_T("예상체결"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+					//dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					dc->DrawText(_T("예상체결"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
 					
 					bRc.SetRect(1, bRc.top, m_columns[0], bRc.bottom);
 					bRc.right = RATERECTSEL(bRc);
@@ -3960,7 +5014,33 @@ void Cdepth::drawBottom(CDC* dc)
 					dc->DrawText(_T("체결량"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
 				}
 				else
-					dc->DrawText(_T("시간외"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+				{
+					dc->DrawText(_T("시간외"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//if (m_mkgubn == mkNXT)
+					//{
+					//	dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//	if (m_iBottomType == 2)   //현재가(K)를 보여줄때
+					//	{
+					//		bRc.SetRect(1, bRc.top, m_columns[0], bRc.bottom);
+					//		bRc.right = RATERECTSEL(bRc);
+					//		fRc = bRc;
+					//		fRc.DeflateRect(3, 1);
+					//		dc->FillSolidRect(bRc, m_clrHeadBk);
+					//		dc->DrawText(_T("종가"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+
+					//		bRc.SetRect(m_columns[1] + 1, bRc.top, m_columns[2], bRc.bottom);
+					//		bRc.left = RATERECTBUY(bRc) + 1;
+					//		fRc = bRc;
+					//		fRc.DeflateRect(3, 1);
+					//		dc->FillSolidRect(bRc, m_clrHeadBk);
+					//		dc->DrawText(_T("거래량"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//	}
+					//}
+					//else if (m_mkgubn == mkKRX || m_mkgubn == mkTOT)
+					//{
+					//	dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//}
+				}
 			}
 			break;
 		case btSizeTime:
@@ -3968,6 +5048,7 @@ void Cdepth::drawBottom(CDC* dc)
 			{
 				bRc.SetRect(m_columns[0] + 1, (int)(m_rowH * (endL-1) + 1), m_columns[1], (int)(m_rowH * endL));
 				fRc = bRc;
+				m_rcExpecArea = fRc;
 				fRc.DeflateRect(3, 1);
 				dc->FillSolidRect(bRc, m_clrHeadBk);
 				dc->DrawText(_T("대비"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
@@ -3982,31 +5063,62 @@ void Cdepth::drawBottom(CDC* dc)
 					m_rcTime.SetRect(bRc.right - (bRc.Height()+1), bRc.top +1, bRc.right - 3, bRc.bottom-1);
 				}
 
-				if (m_bPredict)
+				//if (m_iBottomType == 0)  //예상가
+				if (m_bPredict) //test comment  btSizeTime !m_showBeforeDiff
 				{
-					dc->DrawText(_T("예상체결"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
-					
-					bRc.SetRect(1, bRc.top, m_columns[0], bRc.bottom);
-					bRc.right = RATERECTSEL(bRc);
-					fRc = bRc;
-					fRc.DeflateRect(3, 1);
-					dc->FillSolidRect(bRc, m_clrHeadBk);
-					dc->DrawText(_T("예상가"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+					//dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//if (m_iBottomType == 2)   //현재가(K)를 보여줄때
+					//{
+						dc->DrawText(_T("예상체결"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+						bRc.SetRect(1, bRc.top, m_columns[0], bRc.bottom);
+						bRc.right = RATERECTSEL(bRc);
+						fRc = bRc;
+						fRc.DeflateRect(3, 1);
+						dc->FillSolidRect(bRc, m_clrHeadBk);
+						dc->DrawText(_T("예상가"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
 
-					bRc.SetRect(m_columns[1] + 1, bRc.top, m_columns[2], bRc.bottom);
-					bRc.left = RATERECTBUY(bRc) + 1;
-					fRc = bRc;
-					fRc.DeflateRect(3, 1);
-					dc->FillSolidRect(bRc, m_clrHeadBk);
-					dc->DrawText(_T("체결량"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+						bRc.SetRect(m_columns[1] + 1, bRc.top, m_columns[2], bRc.bottom);
+						bRc.left = RATERECTBUY(bRc) + 1;
+						fRc = bRc;
+						fRc.DeflateRect(3, 1);
+						dc->FillSolidRect(bRc, m_clrHeadBk);
+						dc->DrawText(_T("체결량"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//}
 				}
 				else
-					dc->DrawText(_T("시간외"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+				{
+					dc->DrawText(_T("시간외"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//if (m_mkgubn == mkNXT)
+					//{
+					//	dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//	if (m_iBottomType == 2)   //현재가(K)를 보여줄때
+					//	{
+					//		bRc.SetRect(1, bRc.top, m_columns[0], bRc.bottom);
+					//		bRc.right = RATERECTSEL(bRc);
+					//		fRc = bRc;
+					//		fRc.DeflateRect(3, 1);
+					//		dc->FillSolidRect(bRc, m_clrHeadBk);
+					//		dc->DrawText(_T("종가"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+
+					//		bRc.SetRect(m_columns[1] + 1, bRc.top, m_columns[2], bRc.bottom);
+					//		bRc.left = RATERECTBUY(bRc) + 1;
+					//		fRc = bRc;
+					//		fRc.DeflateRect(3, 1);
+					//		dc->FillSolidRect(bRc, m_clrHeadBk);
+					//		dc->DrawText(_T("거래량"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//	}
+					//}
+					//else if (m_mkgubn == mkKRX || m_mkgubn == mkTOT)
+					//{
+					//	dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//}
+				}
 			}
 			else
 			{
 				bRc.SetRect(m_columns[0] + 1, (int)(m_rowH * (endL-1) + 1), m_columns[1], (int)(m_rowH * endL));
 				fRc = bRc;
+				m_rcExpecArea = fRc;
 				fRc.DeflateRect(3, 1);
 				fRc.DeflateRect(3, 1, 18, 1);
 				{
@@ -4016,9 +5128,11 @@ void Cdepth::drawBottom(CDC* dc)
 				}
 
 				dc->FillSolidRect(bRc, m_clrHeadBk);
-				if (m_bPredict)
+				//if (m_iBottomType == 0)  //예상가
+				if (m_bPredict) //test comment  btSizeTime m_showBeforeDiff
 				{
-					dc->DrawText(_T("예상체결"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+					//dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					dc->DrawText(_T("예상체결"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
 					
 					bRc.SetRect(1, bRc.top, m_columns[0], bRc.bottom);
 					bRc.right = RATERECTSEL(bRc);
@@ -4035,7 +5149,33 @@ void Cdepth::drawBottom(CDC* dc)
 					dc->DrawText(_T("체결량"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
 				}
 				else
-					dc->DrawText(_T("시간외"), fRc, DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+				{
+					dc->DrawText(_T("시간외"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//if (m_mkgubn == mkNXT)
+					//{
+					//	dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//	if (m_iBottomType == 2)   //현재가(K)를 보여줄때
+					//	{
+					//		bRc.SetRect(1, bRc.top, m_columns[0], bRc.bottom);
+					//		bRc.right = RATERECTSEL(bRc);
+					//		fRc = bRc;
+					//		fRc.DeflateRect(3, 1);
+					//		dc->FillSolidRect(bRc, m_clrHeadBk);
+					//		dc->DrawText(_T("종가"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+
+					//		bRc.SetRect(m_columns[1] + 1, bRc.top, m_columns[2], bRc.bottom);
+					//		bRc.left = RATERECTBUY(bRc) + 1;
+					//		fRc = bRc;
+					//		fRc.DeflateRect(3, 1);
+					//		dc->FillSolidRect(bRc, m_clrHeadBk);
+					//		dc->DrawText(_T("거래량"), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//	}
+					//}
+					//else if (m_mkgubn == mkKRX || m_mkgubn == mkTOT)
+					//{
+					//	dc->DrawText(GetBottomDataType(__FUNCTION__, __LINE__), fRc, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+					//}
+				}
 			}
 			break;
 		}
@@ -4059,9 +5199,18 @@ void Cdepth::drawLine(CDC* dc)
 	dc->MoveTo(0, (int)(m_rowH * m_depth + top));
 	dc->LineTo(m_columns[2], (int)(m_rowH * m_depth + top));
 	
-	dc->MoveTo(0, (int)(m_rowH * m_depth*2 + top));
-	dc->LineTo(m_columns[2], (int)(m_rowH * m_depth*2 + top));
-	
+     //modi NXT  우측하단 호가잔량영역 상단 가로줄
+	if (m_iShowMIDPRC)
+	{
+		dc->MoveTo(0, (int)(m_rowH * m_depth + top + (m_rowH * m_iShowMIDPRC)));
+		dc->LineTo(m_columns[2], (int)(m_rowH * m_depth + top + (m_rowH * m_iShowMIDPRC)));
+	}
+	else
+	{
+		dc->MoveTo(0, (int)(m_rowH * m_depth * 2 + top));
+		dc->LineTo(m_columns[2], (int)(m_rowH * m_depth * 2 + top));
+	}
+
 	if (m_depth == 10)
 	{
 		LOGBRUSH lb{};
@@ -4076,8 +5225,8 @@ void Cdepth::drawLine(CDC* dc)
 		dc->MoveTo(0, (int)(m_rowH * (m_depth/2) + top));
 		dc->LineTo(m_columns[2], (int)(m_rowH * (m_depth/2) + top));
 
-		dc->MoveTo(0, (int)(m_rowH * (m_depth + m_depth/2) + top));
-		dc->LineTo(m_columns[2], (int)(m_rowH * (m_depth+m_depth/2) + top));
+		dc->MoveTo(0, (int)(m_rowH * (m_depth + m_depth/2 + m_iShowMIDPRC) + top));
+		dc->LineTo(m_columns[2], (int)(m_rowH * (m_depth+m_depth/2 + m_iShowMIDPRC) + top));
 
 		dc->SelectObject(hPenDashOld);
 		DeleteObject(hPenDash);
@@ -4092,41 +5241,41 @@ void Cdepth::drawLine(CDC* dc)
 		vertical = m_depth*2;
 		if (!m_showBeforeDiff)
 		{
-			dc->MoveTo(0, (int)(m_rowH * (m_depth*2 + 1) + top));
-			dc->LineTo(m_columns[2], (int)(m_rowH * (m_depth*2 + 1) + top));
+			dc->MoveTo(0, (int)(m_rowH * (m_depth * 2 + 2) + top));
+			dc->LineTo(m_columns[2], (int)(m_rowH * (m_depth * 2 + 2) + top));
 			vertical++;
 		}
 		break;
 		
 	case btSize:
 	case btTime:
-		dc->MoveTo(0, (int)(m_rowH * (m_depth*2 + 1) + top));
-		dc->LineTo(m_columns[2], (int)(m_rowH * (m_depth*2 + 1) + top));
+		dc->MoveTo(0, (int)(m_rowH * (m_depth * 2 + 2) + top));
+		dc->LineTo(m_columns[2], (int)(m_rowH * (m_depth * 2 + 2) + top));
 		vertical = m_depth*2 + 1;
 		if (!m_showBeforeDiff)
 		{
-			dc->MoveTo(0, (int)(m_rowH * (m_depth*2 + 2) + top));
-			dc->LineTo(m_columns[2], (int)(m_rowH * (m_depth*2 + 2) + top));
+			dc->MoveTo(0, (int)(m_rowH * (m_depth * 2 + 4) + top));
+			dc->LineTo(m_columns[2], (int)(m_rowH * (m_depth * 2 + 4) + top));
 			vertical++;
 		}
 		break;
 		
 	case btSizeTime:
-		dc->MoveTo(0, (int)(m_rowH * (m_depth*2 + 1) + top));
-		dc->LineTo(m_columns[2], (int)(m_rowH * (m_depth*2 + 1) + top));
-		
-		dc->MoveTo(0, (int)(m_rowH * (m_depth*2 + 2) + top));
-		dc->LineTo(m_columns[2], (int)(m_rowH * (m_depth*2 + 2) + top));
-		vertical = m_depth*2 + 2;
+		dc->MoveTo(0, (int)(m_rowH * (m_depth * 2 + m_iShowMIDPRC) + top));
+		dc->LineTo(m_columns[2], (int)(m_rowH * (m_depth * 2 + m_iShowMIDPRC) + top));
+
+		dc->MoveTo(0, (int)(m_rowH * (m_depth * 2 + m_iShowMIDPRC + 1) + top));
+		dc->LineTo(m_columns[2], (int)(m_rowH * (m_depth * 2 + m_iShowMIDPRC + 1) + top));
+		vertical = m_depth * 2 + 2;
 		if (!m_showBeforeDiff)
 		{
-			dc->MoveTo(0, (int)(m_rowH * (m_depth*2 + 3) + top));
-			dc->LineTo(m_columns[2], (int)(m_rowH * (m_depth*2 + 3) + top));
+			dc->MoveTo(0, (int)(m_rowH * (m_depth * 2 + 4) + top));
+			dc->LineTo(m_columns[2], (int)(m_rowH * (m_depth * 2 + 4) + top));
 			vertical++;
 		}
 		break;
 	}
-	
+
 	dc->MoveTo(0, 0);
 	dc->LineTo(0, (int)(m_rowH * vertical + top));
 	
@@ -4191,27 +5340,33 @@ void Cdepth::drawLine(CDC* dc)
 			dc->MoveTo(left, 0);
 		
 		dc->LineTo(left, (int)(m_rowH * m_depth + top));
-		dc->MoveTo(right, (int)(m_rowH * m_depth + top));
-		dc->LineTo(right, (int)(m_rowH * m_depth*2 + top));
 
+		  //modi NXT  우측하단 호가잔량과 그오른쪽 빈영역 세로줄
+		dc->MoveTo(right, (int)(m_rowH* (m_depth + m_iShowMIDPRC) + top));
+		dc->LineTo(right, (int)(m_rowH* (m_depth * 2 + 2) + top));
 
 		switch (m_bottom)
 		{
 		case btSize:
 		case btTime:
-			dc->MoveTo(left, (int)(m_rowH * m_depth*2 + top));
-			dc->LineTo(left, (int)(m_rowH * (m_depth*2 + 1) + top));
-			
-			dc->MoveTo(right, (int)(m_rowH * m_depth*2 + top));
-			dc->LineTo(right, (int)(m_rowH * (m_depth*2 + 1) + top));
+			if (m_mkgubn == mkKRX)
+			{
+				dc->MoveTo(left, (int)(m_rowH * m_depth * 2 + top));
+				dc->LineTo(left, (int)(m_rowH * (m_depth * 2 + 1) + top));
+
+				dc->MoveTo(right, (int)(m_rowH * m_depth * 2 + top));
+				dc->LineTo(right, (int)(m_rowH * (m_depth * 2 + 1) + top));
+			}
 			break;
-			
 		case btSizeTime:
-			dc->MoveTo(left, (int)(m_rowH * m_depth*2 + top));
-			dc->LineTo(left, (int)(m_rowH * (m_depth*2 + 2) + top));
-			
-			dc->MoveTo(right, (int)(m_rowH * m_depth*2 + top));
-			dc->LineTo(right, (int)(m_rowH * (m_depth*2 + 2) + top));
+			/*if (m_mkgubn == mkKRX)
+			{
+				dc->MoveTo(left, (int)(m_rowH * m_depth * 2 + top));
+				dc->LineTo(left, (int)(m_rowH * (m_depth * 2 + 2) + top));
+
+				dc->MoveTo(right, (int)(m_rowH * m_depth * 2 + top));
+				dc->LineTo(right, (int)(m_rowH * (m_depth * 2 + 2) + top));
+			}*/
 			break;
 		}
 	}
@@ -4340,6 +5495,10 @@ void Cdepth::calculateRowHeight()
 	}
 	if (!m_showBeforeDiff)
 		divider += 1;
+
+	//modi 중간가
+    //modi NXT 최초 호가영역 분할영역 갯수 지정
+	divider += m_iShowMIDPRC;
 
 	m_rowH = (double)(m_rect.Height() - 1) / (double)divider;
 	m_OneMoreRowH = (double)(m_rect.Height() - 1) / (double)(divider + 3);
@@ -5211,10 +6370,24 @@ void Cdepth::setItemRect5()
 		}
 	}
 
+	for (int ii = 0; ii < 5; ii++)  //통합호가 개별거래소 영역    매도
+	{
+		item = m_items.GetAt(askSize1 + ii);
+		m_items.GetAt(kmd1size + ii)->m_bRc = item->m_bRc;
+		m_items.GetAt(kmd1size + ii)->m_fRc = item->m_fRc;
+
+		item = m_items.GetAt(askBefore1 + ii);
+		m_items.GetAt(nmd1size + ii)->m_bRc = item->m_bRc;
+		m_items.GetAt(nmd1size + ii)->m_fRc = item->m_fRc;
+	}
+
 	// 매수
+	
 	if (m_percent)
 	{
-		line = 5;
+		 //modi NXT 5호가 하단 라인 시작 5->6
+		line = 5 + m_iShowMIDPRC;
+
 		for (ii = bidPrice1; ii <= bidPrice5; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5225,12 +6398,14 @@ void Cdepth::setItemRect5()
 				item->m_bRc.right = item->m_bRc.left + (int)(item->m_bRc.Width() * P_BIG_RATIO);
 			else
 				item->m_bRc.right = item->m_bRc.left + (int)(item->m_bRc.Width() * P_RATIO);
-			//item->m_bRc.right = item->m_bRc.left + (int)(item->m_bRc.Width() * P_RATIO);//item->m_bRc.CenterPoint().x;
+			
 			item->m_fRc = item->m_bRc;
 			item->m_fRc.DeflateRect(1, 1);
 		}
 		
-		line = 5;
+		 //modi NXT 5호가 하단 라인 시작 5->6
+		line = 5 + m_iShowMIDPRC;
+
 		for (ii = bidPercent1; ii <= bidPercent5; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5246,7 +6421,9 @@ void Cdepth::setItemRect5()
 			item->m_fRc.DeflateRect(1, 1); item->m_fRc.right -= 2;
 		}
 		
-		line = 5;
+		 //modi NXT 5호가 하단 라인 시작 5->6
+		line = 5 + m_iShowMIDPRC;
+
 		for (ii = bidMemo1; ii <= bidMemo5; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5259,7 +6436,9 @@ void Cdepth::setItemRect5()
 	}
 	else
 	{
-		line = 5;
+		 //modi NXT 5호가 하단 라인 시작 5->6
+		line = 5 + m_iShowMIDPRC;
+
 		for (ii = bidPrice1; ii <= bidPrice5; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5270,7 +6449,9 @@ void Cdepth::setItemRect5()
 			item->m_fRc.DeflateRect(3, 1);
 		}
 		
-		line = 5;
+		 //modi NXT 5호가 하단 라인 시작 5->6
+		line = 5 + m_iShowMIDPRC;
+
 		for (ii = bidMemo1; ii <= bidMemo5; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5284,7 +6465,9 @@ void Cdepth::setItemRect5()
 	
 	if (m_showBeforeDiff)
 	{
-		line = 5;
+		 //modi NXT 5호가 하단 라인 시작 5->6
+		line = 5 + m_iShowMIDPRC;
+
 		for (ii = bidSize1; ii <= bidSize5; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5295,7 +6478,9 @@ void Cdepth::setItemRect5()
 			item->m_fRc.DeflateRect(3, 1);
 		}
 		
-		line = 5;
+		//modi NXT 5호가 하단 라인 시작 5->6
+		line = 5 + m_iShowMIDPRC;
+
 		for (ii = bidBefore1; ii <= bidBefore5; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5306,7 +6491,9 @@ void Cdepth::setItemRect5()
 			item->m_fRc.DeflateRect(3, 1);
 		}
 
-		line = 5;
+		  //modi NXT 5호가 하단 라인 시작 5->6
+		line = 5 + m_iShowMIDPRC;
+
 		for (ii = bidLp1; ii <= bidLp5; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5319,7 +6506,9 @@ void Cdepth::setItemRect5()
 	}
 	else
 	{
-		line = 5;
+		//modi NXT 5호가 하단 라인 시작 5->6
+		line = 5 + m_iShowMIDPRC;
+
 		for (ii = bidSize1; ii <= bidSize5; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5329,7 +6518,9 @@ void Cdepth::setItemRect5()
 			item->m_fRc.DeflateRect(3, 1);
 		}
 		
-		line = 5;
+		//modi NXT 5호가 하단 라인 시작 5->6
+		line = 5 + m_iShowMIDPRC;
+
 		for (ii = bidBefore1; ii <= bidBefore5; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5339,7 +6530,9 @@ void Cdepth::setItemRect5()
 			item->m_fRc.DeflateRect(3, 1);
 		}
 
-		line = 5;
+		 //modi NXT 5호가 하단 라인 시작 5->6
+		line = 5 + m_iShowMIDPRC;
+
 		for (ii = bidLp1; ii <= bidLp5; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5350,6 +6543,17 @@ void Cdepth::setItemRect5()
 		}
 	}
 
+	for (int ii = 0; ii < 5; ii++)  //통합호가 개별거래소 영역    매수
+	{
+		item = m_items.GetAt(bidSize1 + ii);
+		m_items.GetAt(kms1size + ii)->m_bRc = item->m_bRc;
+		m_items.GetAt(kms1size + ii)->m_fRc = item->m_fRc;
+
+		item = m_items.GetAt(bidBefore1 + ii);
+		m_items.GetAt(nms1size + ii)->m_bRc = item->m_bRc;
+		m_items.GetAt(nms1size + ii)->m_fRc = item->m_fRc;
+	}
+
 	line = 0;
 	if (m_bBong)
 		m_rcInfo.SetRect(m_columns[1]+bongWIDTH+1, (int)(m_rowH*line), m_columns[2], (int)(m_rowH*(line+5)));
@@ -5357,20 +6561,208 @@ void Cdepth::setItemRect5()
 		m_rcInfo.SetRect(m_columns[1]+1, (int)(m_rowH*line), m_columns[2], (int)(m_rowH*(line+5)));
 	if (m_showTop)	m_rcInfo.OffsetRect(0, m_topH + 1);	
 
+	 //modi NXT  ref 5호가의 중간가 1컬 2컬 3컬  중간가영역의 rect를 정해준다 !!!!!   setmidrec 5호가
+	if (m_iShowMIDPRC)
+	{
+		for (int ii = MIDKPRCMD; ii <= MIDKPRCDBMS; ii++)
+		{
+			line = 5;
+			item = m_items.GetAt(ii);
+
+			switch (ii)
+			{
+			case MIDKPRCMD:   // 중간가매도잔량
+				item->m_bRc.SetRect(m_items.GetAt(askSize5)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(askSize5)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				break;
+			case MIDKPRICE:  // 중간가 영역 지정 KRX
+			{
+				item->m_bRc.SetRect(m_items.GetAt(askPrice1)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(askPrice1)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				m_rcMIDPercent.SetRect(m_items.GetAt(askPercent1)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(askPercent1)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				m_rcMIDPercent.OffsetRect(-3, m_topH + 1);
+
+				if (m_config.hdyul == 0)  //등락율 안보기
+				{
+					int igap = (m_columns[1] - m_columns[0])/4.6;
+					igap = -1 * igap - (0.2524*(m_columns[1] - m_columns[0])-22.72);
+					item->m_bRc.OffsetRect(igap, 0);
+				}
+				
+			}
+			break;
+			case MIDKPRCMS:  // 중간가매수잔량
+				item->m_bRc.SetRect(m_items.GetAt(bidSize5)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(bidSize5)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				break;
+			case MIDKPRCDBMD:   // 중간가매도대비
+				item->m_bRc.SetRect(m_items.GetAt(askBefore1)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(askBefore1)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				break;
+			case MIDKPRCDBMS:    // 중간가매수대비
+				item->m_bRc.SetRect(m_items.GetAt(bidBefore5)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(bidBefore5)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				break;
+			}
+
+
+
+			m_slog.Format("[%s][%s]  ii=[%d] line=[%d]  m_rowH=[%f] mid top=[%d]  [%d]", DF_LOGKEY, DF_LOGKEY1, ii, line, m_rowH, m_rcMIDPercent.top, m_items.GetAt(MIDKPRICE)->m_bRc.top);
+			OutputDebugString(m_slog);
+
+			if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
+
+			item->m_fRc = item->m_bRc;
+			item->m_fRc.DeflateRect(1, 1);
+		}
+
+		//통합호가 KRX 중간가 영역 지정 5호가
+		for (int ii = tkmid; ii < tkmidrate; ii++)
+		{
+			item = m_items.GetAt(ii);
+			switch (ii)
+			{
+				case tkmid:  //중간가
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDKPRICE)->m_bRc.left, m_items.GetAt(MIDKPRICE)->m_bRc.top,
+						m_items.GetAt(MIDKPRICE)->m_bRc.right, m_items.GetAt(MIDKPRICE)->m_bRc.bottom);
+				}
+				break;
+				case tkmiddv:  //매도잔량 
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDKPRCMD)->m_bRc.left, m_items.GetAt(MIDKPRCMD)->m_bRc.top,
+						m_items.GetAt(MIDKPRCMD)->m_bRc.right, m_items.GetAt(MIDKPRCMD)->m_bRc.bottom);
+				}
+				break;
+				case tkmidsv:  //매수잔량
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDKPRCMS)->m_bRc.left, m_items.GetAt(MIDKPRCMS)->m_bRc.top,
+						m_items.GetAt(MIDKPRCMS)->m_bRc.right, m_items.GetAt(MIDKPRCMS)->m_bRc.bottom);
+				}
+				break;
+				case tkmiddr:  //매도비
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDKPRCDBMD)->m_bRc.left, m_items.GetAt(MIDKPRCDBMD)->m_bRc.top,
+						m_items.GetAt(MIDKPRCDBMD)->m_bRc.right, m_items.GetAt(MIDKPRCDBMD)->m_bRc.bottom);
+				}
+				break;
+				case tkmidsr:  //매수비
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDKPRCDBMS)->m_bRc.left, m_items.GetAt(MIDKPRCDBMS)->m_bRc.top,
+						m_items.GetAt(MIDKPRCDBMS)->m_bRc.right, m_items.GetAt(MIDKPRCDBMS)->m_bRc.bottom);
+				}
+				break;
+			}
+			item->m_fRc = item->m_bRc;
+		}
+
+		for (int ii = MIDNPRCMD; ii <= MIDNPRCDBMS; ii++)
+		{
+			if(m_mkgubn == mkNXT || m_mkgubn == mkKRX)
+				line = 5; 
+			else
+				line = 6;
+
+			item = m_items.GetAt(ii);
+
+			switch (ii)
+			{
+			case MIDNPRCMD:   // 중간가MD잔량
+				item->m_bRc.SetRect(m_items.GetAt(askSize5)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(askSize5)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				break;
+			case MIDNPRICE:  // 중간가 영역 지정 NXT
+			{
+				item->m_bRc.SetRect(m_items.GetAt(askPrice1)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(askPrice1)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				m_rcNMIDPercent.SetRect(m_items.GetAt(askPercent1)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(askPercent1)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				m_rcNMIDPercent.OffsetRect(-3, m_topH + 1);
+
+				if (m_config.hdyul == 0)  //등락율 안보기
+				{
+					int igap = (m_columns[1] - m_columns[0]) / 4.6;
+					igap = -1 * igap - (0.2524 * (m_columns[1] - m_columns[0]) - 22.72);
+					item->m_bRc.OffsetRect(igap, 0);
+				}
+
+			}
+			break;
+			case MIDNPRCMS:  // 중간가매수잔량
+				item->m_bRc.SetRect(m_items.GetAt(bidSize5)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(bidSize5)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				break;
+			case MIDNPRCDBMD:   // 중간가매도대비
+				item->m_bRc.SetRect(m_items.GetAt(askBefore1)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(askBefore1)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				break;
+			case MIDNPRCDBMS:    // 중간가매수대비
+				item->m_bRc.SetRect(m_items.GetAt(bidBefore5)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(bidBefore5)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				break;
+			}
+
+			m_slog.Format("[%s][%s]  ii=[%d] line=[%d]  m_rowH=[%f] mid top=[%d]  [%d]", DF_LOGKEY, DF_LOGKEY1, ii, line, m_rowH, m_rcMIDPercent.top, m_items.GetAt(MIDKPRICE)->m_bRc.top);
+
+			if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
+
+			item->m_fRc = item->m_bRc;
+			item->m_fRc.DeflateRect(1, 1);
+		}
+
+		//통합호가 NXT 중간가 영역 지정 5호가
+		for (int ii = tnmid; ii < tnmidrate; ii++)
+		{
+			item = m_items.GetAt(ii);
+			switch (ii)
+			{
+				case tnmid:  //중간가
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDNPRICE)->m_bRc.left, m_items.GetAt(MIDNPRICE)->m_bRc.top,
+						m_items.GetAt(MIDNPRICE)->m_bRc.right, m_items.GetAt(MIDNPRICE)->m_bRc.bottom);
+				}
+				break;
+				case tnmiddv:  //매도잔량 
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDNPRCMD)->m_bRc.left, m_items.GetAt(MIDNPRCMD)->m_bRc.top,
+						m_items.GetAt(MIDNPRCMD)->m_bRc.right, m_items.GetAt(MIDNPRCMD)->m_bRc.bottom);
+				}
+				break;
+				case tnmidsv:  //매수잔량
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDNPRCMS)->m_bRc.left, m_items.GetAt(MIDNPRCMS)->m_bRc.top,
+						m_items.GetAt(MIDNPRCMS)->m_bRc.right, m_items.GetAt(MIDNPRCMS)->m_bRc.bottom);
+				}
+				break;
+				case tnmiddr:  //매도비
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDNPRCDBMD)->m_bRc.left, m_items.GetAt(MIDNPRCDBMD)->m_bRc.top,
+						m_items.GetAt(MIDNPRCDBMD)->m_bRc.right, m_items.GetAt(MIDNPRCDBMD)->m_bRc.bottom);
+				}
+				break;
+				case tnmidsr:  //매수비
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDNPRCDBMS)->m_bRc.left, m_items.GetAt(MIDNPRCDBMS)->m_bRc.top,
+						m_items.GetAt(MIDNPRCDBMS)->m_bRc.right, m_items.GetAt(MIDNPRCDBMS)->m_bRc.bottom);
+				}
+				break;
+			}
+			item->m_fRc = item->m_bRc;
+		}//for
+	}
+	else
+	{
+		for (int ii = MIDKPRCMD; ii <= MIDKPRCDBMS; ii++)
+		{
+			item = m_items.GetAt(ii);
+			item->m_bRc.SetRectEmpty();
+		}
+	}
+
 	switch (m_bottom)
 	{
 	case btNo:
-		line = 10;
-		
+		 //modi NXT 5호가 하단 라인 마지막 10->11
+		line = 10 + m_iShowMIDPRC;
+
 		if (!m_showBeforeDiff)
 		{
-			item = m_items.GetAt(askTotalBefore);
+			item = m_items.GetAt(askTotalBefore);   //setItemRect5
 			item->m_bRc.SetRect(1, (int)(m_rowH*line), m_columns[0], (int)(m_rowH*(line+1)));
 			if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
 			item->m_fRc = item->m_bRc;
 			item->m_fRc.DeflateRect(3, 1);
 			
-			item = m_items.GetAt(bidTotalBefore);
+			item = m_items.GetAt(bidTotalBefore);  //setItemRect5
 			item->m_bRc.SetRect(m_columns[1]+1, (int)(m_rowH*line), m_columns[2], (int)(m_rowH*(line+1)));
 			if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
 			item->m_fRc = item->m_bRc;
@@ -5392,7 +6784,9 @@ void Cdepth::setItemRect5()
 		break;
 		
 	case btSize:
-		line = 10;
+		 //modi NXT 5호가 하단 라인 마지막 10->11
+		line = 10 + m_iShowMIDPRC;
+
 		item = m_items.GetAt(sizeDiff);
 		item->m_bRc.SetRect(m_columns[0]+1, (int)(m_rowH*line), m_columns[1], (int)(m_rowH*(line+1)));
 		if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
@@ -5407,7 +6801,7 @@ void Cdepth::setItemRect5()
 			item->m_fRc = item->m_bRc;
 			item->m_fRc.DeflateRect(3, 1);
 			
-			item = m_items.GetAt(askTotalBefore);
+			item = m_items.GetAt(askTotalBefore);  //setItemRect5
 			item->m_bRc.SetRect(1, (int)(m_rowH*line), m_columns[0], (int)(m_rowH*(line+1)));
 			if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
 			item->m_bRc.right = RATERECTSEL(item->m_bRc);
@@ -5421,7 +6815,7 @@ void Cdepth::setItemRect5()
 			item->m_fRc = item->m_bRc;
 			item->m_fRc.DeflateRect(3, 1);
 			
-			item = m_items.GetAt(bidTotalBefore);
+			item = m_items.GetAt(bidTotalBefore);    //setItemRect5
 			item->m_bRc.SetRect(m_columns[1]+1, (int)(m_rowH*line), m_columns[2], (int)(m_rowH*(line+1)));
 			if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
 			item->m_bRc.left = RATERECTBUY(item->m_bRc)+1;
@@ -5457,13 +6851,13 @@ void Cdepth::setItemRect5()
 			item->m_fRc = item->m_bRc;
 			item->m_fRc.DeflateRect(3, 1);
 			
-			item = m_items.GetAt(askTotalBefore);
+			item = m_items.GetAt(askTotalBefore);  //setItemRect5
 			item->m_bRc.SetRect(1, (int)(m_rowH*(line+1)), m_columns[0], (int)(m_rowH*(line+2)));
 			if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
 			item->m_fRc = item->m_bRc;
 			item->m_fRc.DeflateRect(3, 1);
 			
-			item = m_items.GetAt(bidTotalBefore);
+			item = m_items.GetAt(bidTotalBefore);  //setItemRect5
 			item->m_bRc.SetRect(m_columns[1]+1, (int)(m_rowH*(line+1)), m_columns[2], (int)(m_rowH*(line+2)));
 			if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
 			item->m_fRc = item->m_bRc;
@@ -5485,7 +6879,9 @@ void Cdepth::setItemRect5()
 		break;
 		
 	case btTime:
-		line = 10;
+		 //modi NXT 5호가 하단 라인 마지막 10->11
+		line = 10 + m_iShowMIDPRC;
+
 		if (m_showBeforeDiff)
 		{
 			item = m_items.GetAt(askSizeTime);
@@ -5526,13 +6922,13 @@ void Cdepth::setItemRect5()
 		}
 		else
 		{
-			item = m_items.GetAt(askTotalBefore);
+			item = m_items.GetAt(askTotalBefore);  //setItemRect5
 			item->m_bRc.SetRect(1, (int)(m_rowH*line), m_columns[0], (int)(m_rowH*(line+1)));
 			if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
 			item->m_fRc = item->m_bRc;
 			item->m_fRc.DeflateRect(3, 1);
 			
-			item = m_items.GetAt(bidTotalBefore);
+			item = m_items.GetAt(bidTotalBefore);  //setItemRect5
 			item->m_bRc.SetRect(m_columns[1]+1, (int)(m_rowH*line), m_columns[2], (int)(m_rowH*(line+1)));
 			if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
 			item->m_fRc = item->m_bRc;
@@ -5566,7 +6962,9 @@ void Cdepth::setItemRect5()
 		break;
 		
 	case btSizeTime:
-		line = 10;
+		 //modi NXT 5호가 하단 라인 마지막 10->11
+		line = 10 + m_iShowMIDPRC;
+
 		item = m_items.GetAt(sizeDiff);
 		item->m_bRc.SetRect(m_columns[0]+1, (int)(m_rowH*line), m_columns[1], (int)(m_rowH*(line+1)));
 		if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
@@ -5581,7 +6979,7 @@ void Cdepth::setItemRect5()
 			item->m_fRc = item->m_bRc;
 			item->m_fRc.DeflateRect(3, 1);
 			
-			item = m_items.GetAt(askTotalBefore);
+			item = m_items.GetAt(askTotalBefore);  //setItemRect5
 			item->m_bRc.SetRect(1, (int)(m_rowH*line), m_columns[0], (int)(m_rowH*(line+1)));
 			if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
 			item->m_bRc.right = RATERECTSEL(item->m_bRc);
@@ -5595,7 +6993,7 @@ void Cdepth::setItemRect5()
 			item->m_fRc = item->m_bRc;
 			item->m_fRc.DeflateRect(3, 1);
 			
-			item = m_items.GetAt(bidTotalBefore);
+			item = m_items.GetAt(bidTotalBefore);  //setItemRect5
 			item->m_bRc.SetRect(m_columns[1]+1, (int)(m_rowH*line), m_columns[2], (int)(m_rowH*(line+1)));
 			if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
 			item->m_bRc.left = RATERECTBUY(item->m_bRc)+1;
@@ -5625,7 +7023,7 @@ void Cdepth::setItemRect5()
 			item->m_fRc = item->m_bRc;
 			item->m_fRc.DeflateRect(3, 1);
 			
-			item = m_items.GetAt(askTotalBefore);
+			item = m_items.GetAt(askTotalBefore);  //setItemRect5
 			item->m_bRc.SetRect(1, (int)(m_rowH*(line+1)), m_columns[0], (int)(m_rowH*(line+2)));
 			if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
 			item->m_fRc = item->m_bRc;
@@ -5637,7 +7035,7 @@ void Cdepth::setItemRect5()
 			item->m_fRc = item->m_bRc;
 			item->m_fRc.DeflateRect(3, 1);
 			
-			item = m_items.GetAt(bidTotalBefore);
+			item = m_items.GetAt(bidTotalBefore);  //setItemRect5
 			item->m_bRc.SetRect(m_columns[1]+1, (int)(m_rowH*(line+1)), m_columns[2], (int)(m_rowH*(line+2)));
 			if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
 			item->m_fRc = item->m_bRc;
@@ -5656,8 +7054,10 @@ void Cdepth::setItemRect5()
 			item->m_fRc.DeflateRect(3, 1);
 #endif
 		}
-		
-		line = 11 + (m_showBeforeDiff ? 0 : 1);
+	
+	   //modi NXT 5호가 하단 라인 마지막 11->12
+		line = 11 + m_iShowMIDPRC + (m_showBeforeDiff ? 0 : 1);
+
 		if (m_showBeforeDiff)
 		{
 			item = m_items.GetAt(askSizeTime);
@@ -5885,10 +7285,24 @@ void Cdepth::setItemRect10()
 		}
 	}
 	
+	for (int ii = 0; ii < 10; ii++)  //통합호가 개별거래소 영역    매도
+	{
+		item = m_items.GetAt(askSize1 + ii);
+		m_items.GetAt(kmd1size + ii)->m_bRc = item->m_bRc;
+		m_items.GetAt(kmd1size + ii)->m_fRc = item->m_fRc;
+
+		item = m_items.GetAt(askBefore1 + ii);
+		m_items.GetAt(nmd1size + ii)->m_bRc = item->m_bRc;
+		m_items.GetAt(nmd1size + ii)->m_fRc = item->m_fRc;
+	}
+
+
 	// 매수
 	if (m_percent)
 	{
-		line = 10;
+		 //modi NXT 10호가 하단 라인 마지막 10->11
+		line = 10 + m_iShowMIDPRC;
+
 		for (ii = bidPrice1; ii <= bidPrice10; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5904,7 +7318,9 @@ void Cdepth::setItemRect10()
 			item->m_fRc.DeflateRect(1, 1);
 		}
 		
-		line = 10;
+		 //modi NXT 10호가 하단 라인 마지막 10->11
+		line = 10 + m_iShowMIDPRC;
+
 		for (ii = bidPercent1; ii <= bidPercent10; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5920,7 +7336,9 @@ void Cdepth::setItemRect10()
 			item->m_fRc.DeflateRect(1, 1); item->m_fRc.right -= 2;
 		}
 		
-		line = 10;
+		//modi NXT 10호가 하단 라인 마지막 10->11
+		line = 10 + m_iShowMIDPRC;
+
 		for (ii = bidMemo1; ii <= bidMemo10; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5934,7 +7352,9 @@ void Cdepth::setItemRect10()
 	}
 	else
 	{
-		line = 10;
+		 //modi NXT 10호가 하단 라인 마지막 10->11
+		line = 10 + m_iShowMIDPRC;
+
 		for (ii = bidPrice1; ii <= bidPrice10; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5945,7 +7365,9 @@ void Cdepth::setItemRect10()
 			item->m_fRc.DeflateRect(3, 1);
 		}
 		
-		line = 10;
+		 //modi NXT 10호가 하단 라인 마지막 10->11
+		line = 10 + m_iShowMIDPRC;
+
 		for (ii = bidMemo1; ii <= bidMemo10; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5959,7 +7381,9 @@ void Cdepth::setItemRect10()
 
 	if (m_showBeforeDiff)
 	{
-		line = 10;
+		//modi NXT 10호가 하단 라인 마지막 10->11
+		line = 10 + m_iShowMIDPRC;
+
 		for (ii = bidSize1; ii <= bidSize10; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5970,7 +7394,9 @@ void Cdepth::setItemRect10()
 			item->m_fRc.DeflateRect(3, 1);
 		}
 		
-		line = 10;
+		//modi NXT 10호가 하단 라인 마지막 10->11
+		line = 10 + m_iShowMIDPRC;
+
 		for (ii = bidLp1; ii <= bidLp10; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5981,7 +7407,9 @@ void Cdepth::setItemRect10()
 			item->m_fRc.DeflateRect(3, 1);
 		}
 
-		line = 10;
+		//modi NXT 10호가 하단 라인 마지막 10->11
+		line = 10 + m_iShowMIDPRC;
+
 		for (ii = bidBefore1; ii <= bidBefore10; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -5994,7 +7422,9 @@ void Cdepth::setItemRect10()
 	}
 	else
 	{
-		line = 10;
+		 //modi NXT 10호가 하단 라인 마지막 10->11
+		line = 10 + m_iShowMIDPRC;
+
 		for (ii = bidSize1; ii <= bidSize10; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -6004,7 +7434,9 @@ void Cdepth::setItemRect10()
 			item->m_fRc.DeflateRect(3, 1);
 		}
 		
-		line = 10;
+		//modi NXT 10호가 하단 라인 마지막 10->11
+		line = 10 + m_iShowMIDPRC;
+
 		for (ii = bidBefore1; ii <= bidBefore10; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -6014,7 +7446,9 @@ void Cdepth::setItemRect10()
 			item->m_fRc.DeflateRect(3, 1);
 		}
 
-		line = 10;
+		 //modi NXT 10호가 하단 라인 마지막 10->11
+		line = 10 + m_iShowMIDPRC;
+
 		for (ii = bidLp1; ii <= bidLp10; ii++, line++)
 		{
 			item = m_items.GetAt(ii);
@@ -6025,6 +7459,17 @@ void Cdepth::setItemRect10()
 		}
 	}
 	
+	for (int ii = 0; ii < 10; ii++)  //통합호가 개별거래소 영역    매수
+	{
+		item = m_items.GetAt(bidSize1 + ii);
+		m_items.GetAt(kms1size + ii)->m_bRc = item->m_bRc;
+		m_items.GetAt(kms1size + ii)->m_fRc = item->m_fRc;
+
+		item = m_items.GetAt(bidBefore1 + ii);
+		m_items.GetAt(nms1size + ii)->m_bRc = item->m_bRc;
+		m_items.GetAt(nms1size + ii)->m_fRc = item->m_fRc;
+	}
+
 	line = 0;
 	if (m_bBong)
 		m_rcInfo.SetRect(m_columns[1]+bongWIDTH+1, (int)(m_rowH*line), m_columns[2], (int)(m_rowH*(line+10)));
@@ -6032,10 +7477,189 @@ void Cdepth::setItemRect10()
 		m_rcInfo.SetRect(m_columns[1]+1, (int)(m_rowH*line), m_columns[2], (int)(m_rowH*(line+10)));
 	if (m_showTop)	m_rcInfo.OffsetRect(0, m_topH + 1);
 	
+	//modi NXT ref 10호가 중간가 1컬 2컬 3컬  중간가영역의 rect를 정해준다 !!!!!  setmidrec  10호가
+	if (m_iShowMIDPRC)
+	{
+		int iculindex{};
+		for (int ii = MIDKPRCMD; ii <= MIDKPRCDBMS; ii++)
+		{
+			iculindex = ii - MIDKPRCMD;
+			line = 10;
+
+			item = m_items.GetAt(ii);
+
+			switch (ii)
+			{
+			case MIDKPRCMD:   // 중간가매도잔량
+				item->m_bRc.SetRect(m_items.GetAt(askSize5)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(askSize5)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				break;
+			case MIDKPRICE:  // 중간가 영역 지정  KRX 10호가
+			{
+				item->m_bRc.SetRect(m_items.GetAt(askPrice1)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(askPrice1)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				m_rcMIDPercent.SetRect(m_items.GetAt(askPercent1)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(askPercent1)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				m_rcMIDPercent.OffsetRect(-3, m_topH + 1);
+
+				if (m_config.hdyul == 0)  //등락율 안보기
+				{
+					int igap = (m_columns[1] - m_columns[0]) / 4.6;
+					igap = -1 * igap - (0.2524 * (m_columns[1] - m_columns[0]) - 22.72);
+					item->m_bRc.OffsetRect(igap, 0);
+				}
+			}
+			break;
+			case MIDKPRCMS:  // 중간가매수잔량
+				item->m_bRc.SetRect(m_items.GetAt(bidSize5)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(bidSize5)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				break;
+			case MIDKPRCDBMD:   // 중간가매도대비
+				item->m_bRc.SetRect(m_items.GetAt(askBefore1)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(askBefore1)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				break;
+			case MIDKPRCDBMS:    // 중간가매수대비
+				item->m_bRc.SetRect(m_items.GetAt(bidBefore5)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(bidBefore5)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				break;
+
+			}
+
+
+			if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
+
+			item->m_fRc = item->m_bRc;
+			item->m_fRc.DeflateRect(1, 1);
+		}
+
+		//통합호가 KRX 중간가 영역 지정 10호가
+		for (int ii = tkmid; ii < tkmidrate; ii++)
+		{
+			item = m_items.GetAt(ii);
+			switch (ii)
+			{
+				case tkmid:  //중간가
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDKPRICE)->m_bRc.left, m_items.GetAt(MIDKPRICE)->m_bRc.top,
+						m_items.GetAt(MIDKPRICE)->m_bRc.right, m_items.GetAt(MIDKPRICE)->m_bRc.bottom);
+				}
+				break;
+				case tkmiddv:  //매도잔량 
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDKPRCMD)->m_bRc.left, m_items.GetAt(MIDKPRCMD)->m_bRc.top,
+						m_items.GetAt(MIDKPRCMD)->m_bRc.right, m_items.GetAt(MIDKPRCMD)->m_bRc.bottom);
+				}
+				break;
+				case tkmidsv:  //매수잔량
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDKPRCMS)->m_bRc.left, m_items.GetAt(MIDKPRCMS)->m_bRc.top,
+						m_items.GetAt(MIDKPRCMS)->m_bRc.right, m_items.GetAt(MIDKPRCMS)->m_bRc.bottom);
+				}
+				break;
+				case tkmiddr:  //매도비
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDKPRCDBMD)->m_bRc.left, m_items.GetAt(MIDKPRCDBMD)->m_bRc.top,
+						m_items.GetAt(MIDKPRCDBMD)->m_bRc.right, m_items.GetAt(MIDKPRCDBMD)->m_bRc.bottom);
+				}
+				break;
+				case tkmidsr:  //매수비
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDKPRCDBMS)->m_bRc.left, m_items.GetAt(MIDKPRCDBMS)->m_bRc.top,
+						m_items.GetAt(MIDKPRCDBMS)->m_bRc.right, m_items.GetAt(MIDKPRCDBMS)->m_bRc.bottom);
+				}
+				break;
+			}
+			item->m_fRc = item->m_bRc;
+		}//for
+
+		for (int ii = MIDNPRCMD; ii <= MIDNPRCDBMS; ii++)
+		{
+			if (m_mkgubn == mkNXT || m_mkgubn == mkKRX)
+				line = 10;
+			else
+				line = 11;
+	
+			item = m_items.GetAt(ii);
+
+			switch (ii)
+			{
+			case MIDNPRCMD:   // 중간가MD잔량
+				item->m_bRc.SetRect(m_items.GetAt(askSize5)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(askSize5)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				break;
+			case MIDNPRICE:  // 중간가
+			{
+				item->m_bRc.SetRect(m_items.GetAt(askPrice1)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(askPrice1)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				m_rcNMIDPercent.SetRect(m_items.GetAt(askPercent1)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(askPercent1)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				m_rcNMIDPercent.OffsetRect(-3, m_topH + 1);
+
+				if (m_config.hdyul == 0)  //등락율 안보기
+				{
+					int igap = (m_columns[1] - m_columns[0]) / 4.6;
+					igap = -1 * igap - (0.2524 * (m_columns[1] - m_columns[0]) - 22.72);
+					item->m_bRc.OffsetRect(igap, 0);
+				}
+
+			}
+			break;
+			case MIDNPRCMS:  // 중간가매수잔량
+				item->m_bRc.SetRect(m_items.GetAt(bidSize5)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(bidSize5)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				break;
+			case MIDNPRCDBMD:   // 중간가매도대비
+				item->m_bRc.SetRect(m_items.GetAt(askBefore1)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(askBefore1)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				break;
+			case MIDNPRCDBMS:    // 중간가매수대비
+				item->m_bRc.SetRect(m_items.GetAt(bidBefore5)->m_bRc.left, (int)(m_rowH * line), m_items.GetAt(bidBefore5)->m_bRc.right, (int)(m_rowH * (line + 1)));
+				break;
+			}
+
+			m_slog.Format("[%s][%s]  ii=[%d] line=[%d]  m_rowH=[%f] mid top=[%d]  [%d]", DF_LOGKEY, DF_LOGKEY1, ii, line, m_rowH, m_rcMIDPercent.top, m_items.GetAt(MIDKPRICE)->m_bRc.top);
+
+			if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
+
+			item->m_fRc = item->m_bRc;
+			item->m_fRc.DeflateRect(1, 1);
+		}
+
+		for (int ii = tnmid; ii < tnmidrate; ii++)
+		{
+			item = m_items.GetAt(ii);
+			switch (ii)
+			{
+				case tnmid:  //중간가
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDNPRICE)->m_bRc.left, m_items.GetAt(MIDNPRICE)->m_bRc.top,
+						m_items.GetAt(MIDNPRICE)->m_bRc.right, m_items.GetAt(MIDNPRICE)->m_bRc.bottom);
+				}
+				break;
+				case tnmiddv:  //매도잔량 
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDNPRCMD)->m_bRc.left, m_items.GetAt(MIDNPRCMD)->m_bRc.top,
+						m_items.GetAt(MIDNPRCMD)->m_bRc.right, m_items.GetAt(MIDNPRCMD)->m_bRc.bottom);
+				}
+				break;
+				case tnmidsv:  //매수잔량
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDNPRCMS)->m_bRc.left, m_items.GetAt(MIDNPRCMS)->m_bRc.top,
+						m_items.GetAt(MIDNPRCMS)->m_bRc.right, m_items.GetAt(MIDNPRCMS)->m_bRc.bottom);
+				}
+				break;
+				case tnmiddr:  //매도비
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDNPRCDBMD)->m_bRc.left, m_items.GetAt(MIDNPRCDBMD)->m_bRc.top,
+						m_items.GetAt(MIDNPRCDBMD)->m_bRc.right, m_items.GetAt(MIDNPRCDBMD)->m_bRc.bottom);
+				}
+				break;
+				case tnmidsr:  //매수비
+				{
+					item->m_bRc.SetRect(m_items.GetAt(MIDNPRCDBMS)->m_bRc.left, m_items.GetAt(MIDNPRCDBMS)->m_bRc.top,
+						m_items.GetAt(MIDNPRCDBMS)->m_bRc.right, m_items.GetAt(MIDNPRCDBMS)->m_bRc.bottom);
+				}
+				break;
+			}
+			item->m_fRc = item->m_bRc;
+		}//for
+	}
+
 	switch (m_bottom)
 	{
 	case btNo:
-		line = 20;
+		 //modi NXT 10호가 하단 라인 마지막 20->21
+		line = 20 + m_iShowMIDPRC;
+
 		if (!m_showBeforeDiff)
 		{
 			item = m_items.GetAt(askTotalBefore);
@@ -6066,7 +7690,9 @@ void Cdepth::setItemRect10()
 		break;			
 		
 	case btSize:
-		line = 20;
+		 //modi NXT 10호가 하단 라인 마지막 20->21
+		line = 20 + m_iShowMIDPRC;
+
 		item = m_items.GetAt(sizeDiff);
 		item->m_bRc.SetRect(m_columns[0]+1, (int)(m_rowH*line), m_columns[1], (int)(m_rowH*(line+1)));
 		if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
@@ -6159,7 +7785,9 @@ void Cdepth::setItemRect10()
 		break;
 		
 	case btTime :
-		line = 20;
+		 //modi NXT 10호가 하단 라인 마지막 20->21
+		line = 20 + m_iShowMIDPRC;
+
 		if (m_showBeforeDiff)
 		{
 			item = m_items.GetAt(askSizeTime);
@@ -6240,7 +7868,9 @@ void Cdepth::setItemRect10()
 		break;
 		
 	case btSizeTime:
-		line = 20;
+		 //modi NXT 10호가 하단 라인 마지막 20->21
+		line = 20 + m_iShowMIDPRC;
+
 		item = m_items.GetAt(sizeDiff);
 		item->m_bRc.SetRect(m_columns[0]+1, (int)(m_rowH*line), m_columns[1], (int)(m_rowH*(line+1)));
 		if (m_showTop)	item->m_bRc.OffsetRect(0, m_topH + 1);
@@ -6330,8 +7960,9 @@ void Cdepth::setItemRect10()
 			item->m_fRc.DeflateRect(3, 1);
 #endif
 		}
-		
-		line = 21 + (m_showBeforeDiff ? 0 : 1);
+		 //modi NXT 10호가 하단 라인 마지막 21->22
+		line = 21 + m_iShowMIDPRC + (m_showBeforeDiff ? 0 : 1);
+
 		if (m_showBeforeDiff)
 		{
 			item = m_items.GetAt(askSizeTime);
@@ -6485,6 +8116,13 @@ void Cdepth::setFocus(CPoint point)
 				m_focus = -1;
 				InvalidateRect(m_prect);
 			}
+			 //modi NXT 중간가에 마우스를 올리면 색이 변하는데 이상태에서 아예 호가윈도우를 벗어나면 색 원복
+			else if (m_focus == MIDKPRICE && m_iShowMIDPRC)
+			{
+				m_items.GetAt(m_focus)->m_pRGB = CLR_MIDPRC;
+				m_focus = -1;
+				InvalidateRect(m_prect);
+			}
 		}
 	}
 	else
@@ -6518,6 +8156,24 @@ void Cdepth::setFocus(CPoint point)
 			}
 		}
 
+		 //modi NXT setfocus 중간가 마우스 가면 색변하기 위한
+		if (!found && m_iShowMIDPRC)
+		{
+			item = m_items.GetAt(MIDKPRICE);
+			if (item->m_bRc.PtInRect(point))
+			{
+				ii = MIDKPRICE;
+				found = true;
+			}
+
+			item = m_items.GetAt(MIDNPRICE);
+			if (item->m_bRc.PtInRect(point))
+			{
+				ii = MIDNPRICE;
+				found = true;
+			}
+		}
+
 		if (found && m_focus != ii)
 		{
 			if (m_focus >= askPrice1 && m_focus <= askPrice10)
@@ -6532,8 +8188,14 @@ void Cdepth::setFocus(CPoint point)
 			}
 
 			m_focus = ii;
+
+CString slog;
+slog.Format("[midprc] m_focus = [%d] [%s]", ii, item->m_data);
+OutputDebugString(slog);
+
 			if (!item->m_data.IsEmpty())
 			{
+				item->m_pRGB = RGB(255, 0, 0);
 				item->m_pRGB  = m_clrFocus;
 				itemx->m_pRGB = m_clrFocus;
 			}
@@ -6556,7 +8218,6 @@ void Cdepth::setFocus(CPoint point)
 				CString string;
 				string = calculatePercentByIndex(ii);//m_items.GetAt(ii+10))->m_data;
 				
-				//string = GetHogaTip(string);
 				string.Trim();
 				
 				if (string=="")
@@ -6597,7 +8258,44 @@ void Cdepth::setFocus(CPoint point)
 		}
 	}
 
-	if (m_bSiseMemo)
+	if (m_focus == MIDKPRICE || m_focus == MIDNPRICE)
+	{
+		m_slog.Format("[\r\n cx_depth.dll][%s]<%d> m_focus = [%d] \r\n", __FUNCTION__, __LINE__, m_focus);
+		OutputDebugString(m_slog);
+
+		CString strTooltip;
+		/*if (m_bClickMIDPRC)
+			strTooltip.Format("중간가로 주문을 원하시면  \t\n구분을 변경해 주세요.  \t\n▶ 중간가(KRX)란?  \t\n    최우선 매도호가와 \t\n    최우선 매수호가의  \t\n    중간가격이에요  \t\n ");
+		else
+			strTooltip.Format("▶ 중간가(KRX) : %s  \t\n▶ 중간가(KRX)란? \t\n    최우선 매도호가와  \t\n    최우선 매수호가의 \t\n    중간가격이에요  \t\n ", m_strMidPrice.IsEmpty()? "":m_strMidPrice);*/
+		strTooltip.Format("▶ K는 KRX중간가,  \t\n   N는 NXT중간가에요. \t\n ");
+
+		CPoint	pt = point;
+		ClientToScreen(&pt);
+		pt.x += 10;
+		pt.y += 10;
+
+		CRect	rect;
+		CSize	size;
+
+		rect = m_pToolTip->SetData(strTooltip);
+
+		size.cx = rect.Width();
+		size.cy = rect.Height();
+
+		rect.left = pt.x;
+		rect.right = pt.x + size.cx;
+		rect.top = pt.y;
+		rect.bottom = rect.top + size.cy;
+
+		m_pToolTip->SetWindowPos(&wndTop, rect.left, rect.top, rect.Width(), rect.Height(), SWP_NOACTIVATE);  //else if (m_bBong)
+
+		if (m_pToolTip->IsWindowVisible())
+			m_pToolTip->Invalidate(FALSE);
+		else
+			m_pToolTip->ShowWindow(SW_SHOWNOACTIVATE);
+	}
+	else if (m_bSiseMemo)
 	{
 		CString strTooltip;
 		bool	bShow = false;
@@ -6650,6 +8348,7 @@ void Cdepth::setFocus(CPoint point)
 	}
 	else if (m_rcPriceTip.PtInRect(point))  //가격툴팁
 	{
+		if (m_focus == -1) return; 
 		if (m_config.shl != 1) return;
 		bool	bShow = false;
 		
@@ -6666,8 +8365,7 @@ void Cdepth::setFocus(CPoint point)
 			CString string;
 			string = m_items.GetAt(m_focus)->m_data;
 			string = GetHogaTip(string);
-			string.Trim();
-			//TRACE("ToolTip: [%s]",string);
+			
 			if (string=="")
 			{
 				m_pToolTip->ShowWindow(SW_HIDE);
@@ -6711,10 +8409,20 @@ void Cdepth::setFocus(CPoint point)
 			CRect	rect;
 			CSize	size;	
 			
-			if (!m_bPredict)
-				rect = m_pToolTip->SetData(" 예상체결\t\n");
+			if (!m_bPredict)  //하단토글버턴 마우스 오버시 툴팁내용
+			{
+				if (m_mkgubn == mkNXT)
+					rect = m_pToolTip->SetData(GetBottomDataType(__FUNCTION__, __LINE__) + "\t\n");
+				else
+					rect = m_pToolTip->SetData(GetBottomDataType(__FUNCTION__, __LINE__) + "\t\n");
+			}
 			else
-				rect = m_pToolTip->SetData(" 시간외\t\n");
+			{
+				if (m_mkgubn == mkNXT)
+					rect = m_pToolTip->SetData(GetBottomDataType(__FUNCTION__, __LINE__) + "\t\n");
+				else
+					rect = m_pToolTip->SetData(GetBottomDataType(__FUNCTION__, __LINE__) + "\t\n");
+			}
 			 
 			size.cx = rect.Width();
 			size.cy = rect.Height();
@@ -6922,7 +8630,11 @@ void Cdepth::setFocus(CPoint point)
 					case 3:
 						if ((m_depth == 10 && (m_showOHLC == infoSiga || m_showOHLC == infoCurr || m_showOHLC == infoVI)) || (m_depth == 5 && m_showOHLC == infoSiga))
 						{
-							hTip = _T("상한가");
+							//if (m_mkgubn == mkKRX)
+								hTip = _T("상한가");
+							//hTip.Format("상한가 \t  %s", m_items.GetAt(94)->m_data);
+							//else if(m_mkgubn == mkNXT)  //▶ 중간가(KRX) 
+							//	hTip = _T("▶ 전일(K)란? KRX전일종가에요.\t\n  ▶ 당일(K)란 KRX장중엔 KRX현\t\n  재가, KRX장 마감후엔 KRX당일종\t\n  가에요  ");
 						}
 						else if (m_depth == 10 && m_showOHLC == infoPivot)
 						{
@@ -6945,7 +8657,10 @@ void Cdepth::setFocus(CPoint point)
 					case 4:
 						if ((m_depth == 10 && (m_showOHLC == infoSiga || m_showOHLC == infoCurr || m_showOHLC == infoVI)) || (m_depth == 5 && m_showOHLC == infoSiga))
 						{
-							hTip = _T("하한가");
+							//if (m_mkgubn == mkKRX)
+								hTip = _T("하한가");
+							//else if (m_mkgubn == mkNXT)  //▶ 중간가(KRX) 
+							//	hTip = _T("▶ 전일(K)란? KRX전일종가에요.\t\n  ▶ 당일(K)란 KRX장중엔 KRX현\t\n  재가, KRX장 마감후엔 KRX당일종\t\n  가에요  ");
 						}
 						else if (m_depth == 10 && m_showOHLC == infoPivot)
 						{
@@ -7107,6 +8822,45 @@ void Cdepth::setFocus(CPoint point)
 
 		
 	}
+	else if (m_rcExpecArea.PtInRect(point))
+	{
+		bool	bShow = false;
+
+		if (m_rcExpecArea.PtInRect(point) && m_mkgubn == mkNXT)
+		{
+			CPoint	pt = point;
+			ClientToScreen(&pt);
+			pt.x += 10;
+			pt.y += 10;
+
+			CRect	rect;
+			CSize	size;
+
+
+			if (m_bPredict)
+				rect = m_pToolTip->SetData("▶ 예상체결(N)란? \t\nNXT 애프터마켓 개시전에 예상되는\t\n시가의 가격과 체결량이에요.\t\n ");
+			else
+				rect = m_pToolTip->SetData("▶ 현재가(K)란?\t\nKRX 장중엔 현재가. KRX 장 마감\t\n후엔 KRX 당일종가에요.\t\n");
+
+			size.cx = rect.Width();
+			size.cy = rect.Height();
+
+			rect.left = pt.x;
+			rect.right = pt.x + size.cx;
+			rect.top = pt.y;
+			rect.bottom = rect.top + size.cy;
+
+			m_pToolTip->SetWindowPos(&wndTop, rect.left, rect.top, rect.Width(), rect.Height(), SWP_NOACTIVATE);
+			bShow = true;
+			if (m_pToolTip->IsWindowVisible())
+				m_pToolTip->Invalidate(FALSE);
+			else
+				m_pToolTip->ShowWindow(SW_SHOWNOACTIVATE);
+		}
+
+		if (!bShow)
+			m_pToolTip->ShowWindow(SW_HIDE);
+	}
 	else if (m_bBong)
 	{
 		CString strTooltip;
@@ -7144,7 +8898,11 @@ void Cdepth::setFocus(CPoint point)
 		}
 
 		if (!bShow)
+		{
 			m_pToolTip->ShowWindow(SW_HIDE);
+			if (m_bClickMIDPRC && m_iShowMIDPRC)
+				m_bClickMIDPRC = !m_bClickMIDPRC;
+		}
 	}
 
 
@@ -7175,6 +8933,11 @@ int Cdepth::getIndexByPoint(CPoint point)
 		if (m_items.GetAt(ii)->m_bRc.PtInRect(point))
 			return bidPrice1 + ii - bidPercent1;
 	}
+
+	//modi NXT getindexbypoint 마우스커서 위치를 통해서 호가영역의 어디인지 판단 <-- 중간가 추가
+	if (m_items.GetAt(MIDKPRICE)->m_bRc.PtInRect(point))
+		return MIDKPRICE;
+
 
 	return -1;
 }
@@ -7376,7 +9139,26 @@ void Cdepth::sendMessage(CPoint point, CString Price)
 	if (!Price.IsEmpty())
 	{
 		CString pdat;
-		pdat.Format("SetPrice\t%s,%s", m_code, Price);
+		if (m_sPrcTrigger_File.GetLength() > 0)
+		{
+			CString stmp;
+			char	wb[32];
+			GetPrivateProfileString("IB100000", "edit_trigger", "", wb, sizeof(wb), m_sUserConfFile);
+			stmp.Format("%s", wb);
+			stmp.TrimRight();
+			if (stmp.Find("edStopPrc") >= 0)
+				pdat.Format("SetStopPrice\t%s,%s", m_code, Price);
+			else
+				pdat.Format("SetPrice\t%s,%s", m_code, Price);
+		}
+		else
+		{
+			if (m_iPrcType == TYPE_STOPPRC)
+				pdat.Format("SetStopPrice\t%s,%s", m_code, Price);
+			else
+				pdat.Format("SetPrice\t%s,%s", m_code, Price);
+		}
+
 		m_parent->SendMessage(WM_USER, MAKEWPARAM(procDLL, 0), (LPARAM)(LPCTSTR)pdat);
 			
 //		//trigger(m_refsym + "\t" + Price);
@@ -7699,8 +9481,12 @@ BOOL Cdepth::createFont()
 	if (m_style == FS_ITALIC || m_style == FS_IBOLD)
 		bItalic = true;
 
-	m_font = getFont(m_point, "굴림체", style, bItalic);
-
+	//m_font = getFont(m_point, "굴림체", style, bItalic);
+	m_font = getFont(m_point - 1, "Agency", style, bItalic);
+	m_sfont = getFont(m_point - 1, "Agency FB", FW_NORMAL, false);
+	if (m_sfont == nullptr)
+		m_sfont = m_font;
+	
 	// updateX_20060119
 	LOGFONT	lf{};
 	m_font->GetLogFont(&lf);
@@ -7790,10 +9576,10 @@ CBitmap* Cdepth::getBitmap(CString path)
 void Cdepth::parseOptions()
 {
 	int	idx = 0, pos = 0;
-	CString	keys, text, tmps;
+	CString	keys, text, tmps, strtemp;
 
 	tmps = _T("/ ");
-	keys = _T("dpbschlutoargmxwfyv");
+	keys = _T("dpbschlutoargmxwfyvz");
 
 	for (int ii = 0; ii < keys.GetLength(); ii++)
 	{
@@ -7835,7 +9621,14 @@ void Cdepth::parseOptions()
 			m_type = (_ctype)atoi(text);
 			break;
 		case 't':
-			m_alwaysTEN = true;
+			//m_alwaysTEN = true;
+			m_strOptionFiller = text;
+			strtemp = m_strOptionFiller;
+			if (Parser(strtemp, "|") == "showMIDtooltip")
+				m_bShowMidtooltip = TRUE;
+
+			m_sPrcTrigger_File = Parser(strtemp, "|");
+			
 			break;
 		case 'o':
 			m_showOHLC = (enum _showInfo)atoi(text);
@@ -7863,6 +9656,9 @@ void Cdepth::parseOptions()
 			break;
 		case 'v':
 			m_bMBVolume = false;
+			break;
+		case 'z':
+			m_strMapNum = text;
 			break;
 		}
 	}
@@ -8292,7 +10088,24 @@ void Cdepth::drawButton(CDC *pDC)
 		{
 			drawButton(pDC, m_rcConfigR, m_pBitmapP1);
 		}
+		if (!m_rcMKPOPMenu.IsRectEmpty())
+		{
+			drawButton(pDC, m_rcMKPOPMenu, m_iDataType == DF_TOT ? m_pBitmapT1 : m_pBitmapS1);
+		}
 	}
+
+	//int fontSize = m_rcMarket.Height() * 10 / 2;  // 높이의 절반 정도를 글자 크기로 사용
+	/*pDC->SetBkMode(TRANSPARENT);
+	pDC->SetTextColor(RGB(255, 255, 255));
+	CFont* poldfont{};
+	poldfont = pDC->SelectObject(m_sfont);
+	if (m_mkgubn == mkTOT || m_iDataType == 0)
+		pDC->DrawText("통", m_rcMarket, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	else if (m_mkgubn == mkNXT)
+		pDC->DrawText("N", m_rcMarket, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	else if (m_mkgubn == mkKRX)
+		pDC->DrawText("K", m_rcMarket, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	pDC->SelectObject(poldfont);*/
 }
 
 void Cdepth::drawButton(CDC *pDC, CRect rc, CBitmap *pBitmap)
@@ -8333,6 +10146,12 @@ void Cdepth::drawBox(CDC *pDC)
 void Cdepth::ConfigDlg()
 {
 	CConfigDlg	dlg(&m_config);
+	dlg.m_sRoot = Variant(homeCC, "");
+	dlg.m_iVersion = m_iVersion;
+	if (m_strOptionFiller.Find("DEFAULT_NOMID") >= 0)
+		dlg.m_bEnableMid = FALSE;
+	else
+		dlg.m_bEnableMid = TRUE;
 	if (dlg.DoModal())
 	{
 		SaveCondition(m_path, &m_config);
@@ -8416,6 +10235,7 @@ bool Cdepth::ReadCondition(CString path, struct _config *pConfig)
 void Cdepth::SaveCondition(CString path, struct _config *pConfig)
 {
 	CString file; file.Format("%s\\%s", path, FILENAME);
+	CString stemp{};
 
 	if (!m_configFile.IsEmpty())
 	{
@@ -8426,6 +10246,19 @@ void Cdepth::SaveCondition(CString path, struct _config *pConfig)
 	}
 
 	writeFile(file, (char*)pConfig, sz_CONFIG);
+
+	CString strpath{};
+	const	char* buff = (char*)m_parent->SendMessage(WM_USER, MAKEWPARAM(variantDLL, homeCC), (LPARAM)0);
+	const	char* name = (char*)m_parent->SendMessage(WM_USER, MAKEWPARAM(variantDLL, nameCC), (LPARAM)0);
+	strpath.Format("%s\\user\\%s\\%s.ini", buff, name, name);
+
+	WritePrivateProfileString("VERSION", "cx_depth", (LPCSTR)"1", (LPCSTR)strpath);
+	m_iVersion = DF_DEPTHVS;
+
+	stemp.Format("%d", m_iBottomType);
+	WritePrivateProfileString("BottomType", "cx_depth", stemp, (LPCSTR)strpath);
+
+	//SetMidShowValue(pConfig->bshowMidPrc == 1 ? true : false);
 }
 
 bool Cdepth::readFile(CString path, char *pBytes, int nBytes)
@@ -8447,6 +10280,8 @@ bool Cdepth::readFile(CString path, char *pBytes, int nBytes)
 		return false;
 	}
 	f.Close();
+
+	//GetMidShowValue();
 
 	return true;
 }
@@ -8479,6 +10314,35 @@ void Cdepth::InitEnv()
 	m_bBong = false;	if (m_config.sbong) m_bBong	= true;
 	m_bBoldRemain = false; if (m_config.hrbold) m_bBoldRemain = true;
 	m_bBoldCnt = false; if (m_config.hcbold) m_bBoldCnt = true;
+	//m_iShowMIDPRC = 0; if (m_config.bshowMidPrc) m_iShowMIDPRC = 1;
+
+	CString path{};
+	const	char* buff = (char*)m_parent->SendMessage(WM_USER, MAKEWPARAM(variantDLL, homeCC), (LPARAM)0);
+	const	char* name = (char*)m_parent->SendMessage(WM_USER, MAKEWPARAM(variantDLL, nameCC), (LPARAM)0);
+	path.Format("%s\\user\\%s\\%s.ini", buff, name, name);
+
+	m_slog.Format("pcx_depth][%s]<%d>  화면 오픈시 설정로드 m_bPredict = [%d] m_iBottomType=[%d]", __FUNCTION__, __LINE__, m_bPredict, m_iBottomType);
+	OutputDebugString(m_slog);
+
+	//GetMidShowValue();
+
+	m_iVersion = GetPrivateProfileInt("VERSION", "cx_depth", 0, path);
+
+	if (m_iVersion < DF_DEPTHVS)
+	{
+		m_iShowMIDPRC = 1;
+		m_config.bshowMidPrc = 1;
+	}
+
+	if(m_strOptionFiller.Find("DEFAULT_NOMID") >= 0)
+		m_iShowMIDPRC = 0;
+
+	m_slog.Format("[cx_depth]  m_iVersion=[%d] m_strOptionFiller =[%s]", m_iVersion, m_strOptionFiller);
+	OutputDebugString(m_slog);
+
+	calculateRowHeight();  //mod nxt
+	calculateColumnWidth();
+	EW_Move();
 
 	setItemRect(); calculatePercent();
 }
@@ -8997,7 +10861,14 @@ void Cdepth::EW_Move()
 	CRect	crc, rc;
 
 	GetClientRect(&crc);
-	rc.SetRect(0, (int)(m_topH + m_rowH * m_depth), m_columns[0], (int)(m_topH + m_rowH * m_depth*2));
+
+	 //modi NXT 좌측하단 봉영역 관련된듯하다
+	if (m_iShowMIDPRC)
+		rc.SetRect(0, (int)(m_topH + (m_rowH * m_depth) + (m_rowH * m_iShowMIDPRC)), m_columns[0], (int)(m_topH + (m_rowH * m_depth * 2) + m_rowH));
+	//rc.SetRect(0, (int)(m_topH + (m_rowH * m_depth) + m_rowH), m_columns[0], (int)(m_topH + (m_rowH * m_depth * 2) + m_rowH));
+	else
+		rc.SetRect(0, (int)(m_topH + m_rowH * m_depth), m_columns[0], (int)(m_topH + m_rowH * m_depth * 2));
+
 	if (m_pMBong)
 		m_pMBong->MoveWindow(rc);
 	if (m_pContract)
@@ -9046,16 +10917,33 @@ void Cdepth::EW_Palette()
 	if (m_pMBong)		m_pMBong->Palette();
 }
 
+void CopyTickBongData(const struct _hoga* hoga, struct _tickBongData* out)
+{
+	if (!hoga || !out) return;
+
+	// ntick, nbong 복사
+	memcpy(out->ntick, hoga->ntick, sizeof(hoga->ntick));
+	memcpy(out->nbong, hoga->nbong, sizeof(hoga->nbong));
+
+	// ctick[15] 복사
+	memcpy(out->ctick, hoga->ctick, sizeof(hoga->ctick));
+
+	// dBong[30] 복사
+	memcpy(out->dBong, hoga->dBong, sizeof(hoga->dBong));
+}
+
 void Cdepth::EW_Dispatch(char *dataB, bool bTEN)
 {
 	if (bTEN)
 	{
 		const	struct	_hoga*	hoga = (_hoga*)dataB;
+		_tickBongData tickBongData = {};
+		CopyTickBongData(hoga, &tickBongData);  // 복사 수행
 
 		if (m_pContract)
-			m_pContract->Dispatch(&dataB[sz_hoga], 0);
+			m_pContract->Dispatch((char*)&tickBongData, 0);
 		if (m_pMBong)
-			m_pMBong->Dispatch(&dataB[sz_hoga], 
+			m_pMBong->Dispatch((char*)&tickBongData,
 				CString(hoga->shga, sizeof(hoga->shga)), CString(hoga->hhga, sizeof(hoga->hhga)), 0);
 	}
 	else
@@ -9103,6 +10991,10 @@ int Cdepth::hogaTypeToInt(CString hog)
 	}
 
 	for (int jj = SVIUP; jj <= SVIDN ;jj++)
+		if (hog == m_items.GetAt(jj)->m_data)
+			return jj;
+
+	for (int jj = MIDKPRCMD; jj <= MIDKPRCMS; jj++)
 		if (hog == m_items.GetAt(jj)->m_data)
 			return jj;
 	
@@ -9178,8 +11070,8 @@ CString Cdepth::GetHogaTip(CString hog)
 			tip_str = AddTipStr(val, tip_str, "");
 		}
 	}
-	
-	return tip_str;
+
+ 	return tip_str;
 }
 
 CString Cdepth::AddTipStr(int tp, CString str1, CString str2)
@@ -9206,13 +11098,12 @@ CString Cdepth::AddTipStr(int tp, CString str1, CString str2)
 	case SVIDN:
 		string.Format("VI하락가\t: %s", m_items.GetAt(tp)->m_data);
 		break;
-	/*	
-	case shPrice:
-		string.Format("상한가 \t: %s", m_items.GetAt(tp)->m_data);
-		break;
-	case hhPrice:
-		string.Format("하한가 \t: %s", m_items.GetAt(tp)->m_data);
-		break;
+	//case shPrice:
+	//	string.Format("상한가 \t: %s", m_items.GetAt(tp)->m_data);
+	//	break;
+	//case hhPrice:
+	//	string.Format("하한가 \t: %s", m_items.GetAt(tp)->m_data);
+	//	break;
 	/*	
 	case gajungPrice:
 		string.Format("가중평균가 \t: %s", m_items.GetAt(tp)->m_data);
@@ -9230,6 +11121,9 @@ CString Cdepth::AddTipStr(int tp, CString str1, CString str2)
 CString Cdepth::calculatePercentByIndex(int idx)
 {
 	if (m_clos == 0)
+		return "";
+
+	if (idx + 10 > m_items.GetCount())
 		return "";
 
 	CString ret;
@@ -9521,8 +11415,10 @@ void Cdepth::SearchChegang()
 {
 	CString strText;
 
-	strText.Format("1301%c%s\t2036\t", 0x7f, m_code);
-	SendTR("POOPPOOP", strText, US_OOP, m_key);
+	//strText.Format("1301%c%s\t3149\t3147\t3146\t3148\t3150\t3181\t", 0x7f, m_code, );
+	strText.Format("1301%c%s\t1777%c%d\t3149\t3147\t3146\t3148\t3150\t3181\t", 0x7f, m_code, 0x7f, m_mkgubn);
+	if (m_mkgubn != mkTOT)
+		SendTR("POOPPOOP", strText, US_OOP, m_key);
 }
 
 CString Cdepth::Parser(CString &srcstr, CString substr)
@@ -9540,4 +11436,265 @@ CString Cdepth::Parser(CString &srcstr, CString substr)
 		return temp;
 	}
 	return "";
+}
+
+
+void Cdepth::SetMKtype(SHORT mkgubn)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	m_iShowMIDPRC = 1;
+	m_iDataType = DF_SEP;
+	if (mkgubn == 1)
+		m_mkgubn = mkKRX;
+	else if (mkgubn == 2)
+		m_mkgubn = mkNXT;
+	else if (mkgubn == 3)
+	{
+		m_mkgubn = mkTOT;
+		m_iShowMIDPRC = 2;
+		m_iDataType = DF_TOT;
+	}
+
+	setIndices();
+	getMaxSize();
+
+	InitEnv();
+	Invalidate();
+}
+
+
+void Cdepth::SetPrcEdit(BSTR sPrcEdit)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
+	CString sdata;
+	sdata.Format("%s", sPrcEdit);
+	sdata.MakeUpper();
+
+	if(sdata.Find("JPRC") >= 0)
+		m_iPrcType = TYPE_JPRC;
+	else if(sdata.Find("STOP") >= 0)
+		m_iPrcType = TYPE_STOPPRC;
+}
+
+
+void Cdepth::InsertObjData(BSTR sdata)
+{//안써야 난다
+	return;
+
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	CString sVal, stmp, scode, stemp;
+	sVal.Format("%s", sdata);
+
+	if (sVal.Find("TYPE_MK_TIME") >= 0)
+	{
+		stemp = Parser(sVal, "\t");
+		m_mkTime = (_mkTimetype)atoi(sVal);
+		switch (atoi(sVal))
+		{
+			case 6: m_bPredict = true; break;
+			default:
+			{
+				m_bPredict = false;
+			}
+			break;
+		}
+		Invalidate();
+	}
+	else if (sVal.Find("TYPE_HOGB") >= 0)
+	{
+		stemp = Parser(sVal, "\t");
+		int igubn = atoi(sVal);
+		switch (igubn)
+		{
+			case 81:
+			{
+				m_iBottomType = 1;
+				Invalidate();
+				return;
+			}
+		}
+	}
+	else
+	{
+		stmp = Parser(sVal, "\n");
+		stemp = Parser(stmp, "\t");
+		scode = stmp;
+		m_mapCodeData.SetAt(scode, sVal);  //KRX A**** , NXT N.A***
+
+		m_slog.Format("[TOT][ALERT] scode=[%s] sVal=[%s]", scode, sVal);
+		OutputDebugString(m_slog);
+
+		CRect rec, tmprec;
+		GetClientRect(rec);
+		tmprec.left = rec.right - rec.Width() / 3;
+		tmprec.bottom = rec.top + rec.Height() / 2;
+		tmprec.right = rec.right;
+		tmprec.top = rec.top;
+
+		//통합 > 개별    영역 다시 그리기
+		if (m_mkgubn == mkTOT && m_iDataType == DF_SEP)
+		{
+			CRect rctmp;
+			std::shared_ptr<Citem> item = nullptr;
+			item = m_items.GetAt(askBefore10);
+			rctmp.left = item->m_fRc.left;
+			rctmp.top = item->m_fRc.top;
+			item = m_items.GetAt(askSize1);
+			rctmp.right = item->m_fRc.right;
+			rctmp.bottom = item->m_fRc.bottom;
+			InvalidateRect(rctmp);
+
+			item = m_items.GetAt(bidSize1);
+			rctmp.left = item->m_fRc.left;
+			rctmp.top = item->m_fRc.top;
+			item = m_items.GetAt(bidBefore10);
+			rctmp.right = item->m_fRc.right;
+			rctmp.bottom = item->m_fRc.bottom;
+			InvalidateRect(rctmp);
+		}
+
+		if (m_mkgubn == mkTOT)
+		{
+			//KRX, NXT 중간가 영역
+			CRect rctmp;
+			std::shared_ptr<Citem> item = nullptr;
+			item = m_items.GetAt(MIDKPRCDBMD);
+			rctmp.left = item->m_fRc.left;
+			rctmp.top = item->m_fRc.top;
+			item = m_items.GetAt(MIDNPRCDBMS);
+			rctmp.right = item->m_fRc.right;
+			rctmp.bottom = item->m_fRc.bottom;
+			InvalidateRect(rctmp);
+		}
+	}
+	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
+}
+
+CString  Cdepth::getMKRemainValue(CString scode, CString ssim)
+{
+	return "";
+
+	CString stmp, sval, stemp;
+	if(!m_mapCodeData.Lookup(scode, sval))
+		return "";
+
+	while (sval.GetLength() > 0)
+	{
+		stmp = Parser(sval, "\n");
+		if (stmp.Find(ssim) >= 0)
+		{
+			stemp = Parser(stmp, "\t");
+			stmp.TrimLeft();
+			stmp.TrimRight();
+			//stmp.Replace("+", "");
+			//stmp.Replace("-", "");
+			//addComma(stmp);
+			if (stmp == "0")
+				stmp.Empty();
+			return stmp;
+		}
+	}
+	return "";
+}
+
+void Cdepth::GetMidShowValue()
+{
+	return;
+	CString stmp;
+	char	wb[32];
+	GetPrivateProfileString("MIDKPRICE", "bSHOW", "", wb, sizeof(wb), m_sUserConfFile);
+	stmp.Format("%s", wb);
+	stmp.TrimRight();
+
+	if (stmp == "0" || m_strOptionFiller.Find("DEFAULT_NOMID") >= 0)
+	{
+		m_iShowMIDPRC = 0;
+		m_config.bshowMidPrc = 0;
+	}
+	else
+	{
+		m_iShowMIDPRC = 2;  //testcode
+		m_config.bshowMidPrc = 1;
+	}
+}
+
+void Cdepth::SetMidShowValue(bool bshow)
+{
+	if (m_strOptionFiller.Find("DEFAULT_NOMID") < 0)
+	{
+		CString stmp;
+		stmp.Format("%d", m_iShowMIDPRC);
+		WritePrivateProfileString("MIDKPRICE", "bSHOW", stmp, (LPCSTR)m_sUserConfFile);
+		m_config.bshowMidPrc = bshow ? 1 : 0;
+	}
+}
+
+CString Cdepth::GetBottomDataType(CString fun, int line)
+{
+	CString sVal;
+	if (m_mkgubn == mkKRX)  //예상체결 <-> 시간외
+	{
+		sVal = m_bPredict ? "예상체결" : "시간외";
+	}
+	else if (m_mkgubn == mkNXT)   //현재가(K) <-> 예상체결(N)
+	{
+		switch (m_iBottomType)   //0:예상체결 , 1:시간외, 2:현재가(K)   --> m_bPredict 대체
+		{
+		case 0:
+			sVal = "예상체결(N)";
+			break;
+		case 1:
+			sVal = "시간외";
+			break;
+		case 2:
+			sVal = "현재가(K)";
+			break;
+		default:
+			sVal = "예상체결(N)";
+			break;
+		}
+	}
+	else if (m_mkgubn == mkTOT)  //
+	{
+		sVal = m_bPredict ? "예상체결" : "시간외";
+	}
+
+
+	//m_slog.Format("[cx_depth][%s]<%d> called=[%d][%s]", __FUNCTION__, __LINE__, line, fun);
+	//OutputDebugString(m_slog);
+
+	//m_slog.Format("[cx_depth][%s]<%d> m_iBottomType =[%d] sval=[%s]", __FUNCTION__, __LINE__, m_iBottomType, sVal);
+	//OutputDebugString(m_slog);
+
+
+	return sVal;
+}
+
+void Cdepth::DrawItemData(int index, CString sval)
+{
+	std::shared_ptr<Citem> item = nullptr;
+	item = m_items.GetAt(index);
+
+	item->m_data = sval;
+
+	CDC* pDC = GetDC();
+
+	if (pDC)
+	{
+		UINT	style = 0;
+		style = DT_SINGLELINE | DT_VCENTER;
+
+		if (item->m_center)
+			style |= DT_CENTER;
+		else
+			style |= DT_RIGHT;
+
+		pDC->DrawText(sval, item->m_fRc, style);
+
+
+		ReleaseDC(pDC);
+	}
+
 }

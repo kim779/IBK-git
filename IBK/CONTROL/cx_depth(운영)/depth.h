@@ -69,7 +69,8 @@ struct _config
 	unsigned char	shl;		// 시고저표시
 	unsigned char	hrbold;		// 호가잔량 굵게
 	unsigned char	hcbold;		// 호가건수 굵게
-	char		reserved[27];
+	unsigned char	bshowMidPrc;		// 중간가 표시
+	char		reserved[26];
 };
 #define	sz_CONFIG	sizeof(struct _config)
 
@@ -107,7 +108,7 @@ protected:
 	std::unique_ptr<CRgn>	m_pRgn;
 	CString	m_options;
 
-	CFont*	m_font;
+	CFont*	m_font, *m_sfont;
 	CString	m_fonts;
 	int	m_point;
 	int	m_style;
@@ -139,6 +140,7 @@ protected:
 	CRect	m_rcInfo;		// 부가정보 rect
 	CRect	m_rcCurr;		// 현재가 Rect
 	CRect	m_rcPriceTip;		// 가격 Tip Rect
+	CRect  m_rcExpecArea{};  //하단 예상체결, 시간외 텍스트 영역
 	BOOL	m_bLButtonDown;		// if lbutton down
 
 	int	m_focus;		// focus rect index
@@ -160,7 +162,11 @@ protected:
 
 	int	m_depth;						// 5 or 10 depth
 	bool	m_alwaysTEN;
-	enum	_ctype	{ ctNo=0, ctCode, ctIndex, ctFuture, ctOption, ctECN, ctKOption, ctKOFEX } m_type;
+	enum	_ctype	{
+		dispidInsertObjData = 31L,
+		dispidSetPrcEdit = 30L,
+		dispidSetMKtype = 29L,
+		ctNo=0, ctCode, ctIndex, ctFuture, ctOption, ctECN, ctKOption, ctKOFEX } m_type;
 	bool	m_showBeforeDiff;					// 직전대비
 	enum	_graph	{ grNo=0, grBar, grBarText } m_bar;		// bar graph
 	bool	m_showPreValue;						// 예상 체결가, 예상 체결랑
@@ -181,6 +187,7 @@ protected:
 	bool	m_bBoldRemain;						// 호가잔량 BOLD
 	bool	m_bBoldCnt;						// 호가건수 BOLD
 	bool	m_bPredict;						// 예상체결 / 시간외
+	int	m_iBottomType{};				//0:예상체결 ,    1:시간외,    2:현재가(K)   --> m_bPredict 대체
 	bool	m_bConfig;						// 현재가화면 (설정버튼 유무)
 	CString	m_file;
 	CString m_configFile;
@@ -190,7 +197,7 @@ protected:
 
 	struct _config	m_config;
 	CString	m_path;
-	CBitmap	*m_pBitmapC1, *m_pBitmapC2, *m_pBitmapP1, *m_pBitmapP2;
+	CBitmap *m_pBitmapC1, *m_pBitmapC2, *m_pBitmapP1, *m_pBitmapP2, *m_pBitmapT1, *m_pBitmapS1;
 
 	COLORREF	m_clrWhite;
 	COLORREF	m_clrHeadFg, m_clrHeadBk, m_clrDataFg;
@@ -202,7 +209,20 @@ protected:
 	COLORREF	m_clrBarAsk, m_clrBarBid;
 	bool	m_bBigDigit;
 	bool	m_bAble;
-	
+
+	BOOL m_bClickMIDPRC{};
+	enum	_mktype { mkKRX = 1, mkNXT, mkTOT } m_mkgubn;
+	enum	_mkTimetype {
+		TM_HOLIDAY = 0,			// 휴장일
+		TM_BEFORE,						// 장전   ~ 8:00 
+		TM_FREEMK,					// 프리마켓 08:00  ~ 8:50
+		TM_MORNINGBREAK,		// 오전휴장  08:50  ~ 9:00
+		TM_MAINMK,					// 메인마켓  09:00  ~ 15:20
+		TM_AFTERBREAK,				// 오후휴장  15:20  ~ 15:30
+		TM_SINGLETRADE,			// 단일가매매  15:30  ~ 15:40
+		TM_AFTERBREMK,			// 애프터마켓  15:40  ~ 20:00
+		TM_ENDMK,						// 장마감 20:00~
+	} m_mkTime;
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(Cdepth)
@@ -220,7 +240,7 @@ public:
 	BOOL	m_bDragMode;
 	double	m_nPriceH;
 	double	m_nPriceL;
-	
+	int m_iShowMIDPRC = 1;
 	CWnd*	GetParent() { return m_parent; }
 	CString calculatePercentByIndex(int idx);
 	CString AddTipStr(int tp, CString str1, CString str2);
@@ -412,4 +432,31 @@ protected:
 public:
 	CString Parser(CString &srcstr, CString substr);
 	void	SearchChegang();
+
+	CString m_slog{};
+	CRect m_rcMIDPercent{};  //KRX 중간가 등락율
+	CRect m_rcNMIDPercent{};  //NXT 중간가 등락율
+	CString m_strMidPrice{};
+	CString m_strOptionFiller{};
+	CString m_strMapNum{};
+	BOOL m_bShowMidtooltip{};
+	CString m_sPrcTrigger_File{};
+	CString m_sUserConfFile{};
+	int m_iVersion{};
+	enum {TYPE_JPRC = 0, TYPE_STOPPRC};
+	int m_iPrcType{};   //0 - ed_jprc,  1 - edStopPrc
+protected:
+	void SetMKtype(SHORT mkgubn);
+	void SetPrcEdit(BSTR sPrcEdit);
+	void InsertObjData(BSTR sdata);
+	CMapStringToString m_mapCodeData{};
+	CString getMKRemainValue(CString scode, CString ssim);
+	void GetMidShowValue();
+	void SetMidShowValue(bool bshow);
+	CString GetBottomDataType(CString fun = "", int line = 0);  //하단 데이터 영역 관련 문구 반환 (시장 및 토글상황에 따라서..)
+	CString whocall(const char* caller, int line, const char* file);
+	void DrawItemData(int index, CString sval);
+
+	int m_iDataType = 1;   //0 통합 ,   1 개별
+	CRect	m_rcMarket{}, m_rcMKPOPMenu{};
 };

@@ -443,7 +443,7 @@ void CMBongWnd::calcuArea(int cx, int cy)
 {
 	CSize	csize;
 	CRect	rect;
-	CString	tmpstr;
+	
 	int	nWidth = 0;
 	const	int	nGap = 1;		
 	CDC*	pDC = GetDC();
@@ -462,11 +462,26 @@ void CMBongWnd::calcuArea(int cx, int cy)
 	m_rcBase = rect;
 	if (m_bPrice)
 	{
-		m_rcPlus = m_rcMinus = m_rcBase;
-		rect.top += (csize.cy + 1);
-		m_rcPlus.bottom = rect.top;
-		rect.bottom -= (csize.cy + 1);
-		m_rcMinus.top = rect.bottom;
+		//if (p_depth->m_iShowMIDPRC)
+		if (1)
+		{
+			csize.cy += 1;
+			m_rcPlus = m_rcMinus = m_rcBase;
+			rect.top += (csize.cy * 2 + 2);
+			m_rcMinus.bottom = rect.top + 1;
+			m_rcMinus.top = m_rcMinus.bottom - (csize.cy + 1);
+			m_rcPlus.bottom = m_rcMinus.top - 1;
+			m_rcPlus.top = m_rcPlus.bottom - csize.cy - 1;
+			m_rcMinus.OffsetRect(0, -1);
+		}
+		else
+		{
+			m_rcPlus = m_rcMinus = m_rcBase;
+			rect.top += (csize.cy + 1);
+			m_rcPlus.bottom = rect.top;
+			rect.bottom -= (csize.cy + 1);
+			m_rcMinus.top = rect.bottom;
+		}
 	}
 
 	rect.DeflateRect(2 * nGap, 2 * nGap, nGap * 2, nGap);
@@ -594,8 +609,11 @@ void CMBongWnd::drawPlusMinus(CDC* pDC)
 	pDC->FillSolidRect(m_rcPlus, m_clrTable);
 	if (m_bLine)
 	{
-		pDC->MoveTo(m_rcPlus.left, m_rcPlus.bottom);
-		pDC->LineTo(m_rcPlus.right, m_rcPlus.bottom);
+		if (!p_depth->m_iShowMIDPRC)
+		{
+			pDC->MoveTo(m_rcPlus.left, m_rcPlus.bottom);
+			pDC->LineTo(m_rcPlus.right, m_rcPlus.bottom);
+		}
 	}
 	
 	rect = m_rcPlus;	rect.OffsetRect(0, 1);
@@ -613,8 +631,11 @@ void CMBongWnd::drawPlusMinus(CDC* pDC)
 	pDC->FillSolidRect(m_rcMinus, m_clrTable);
 	if (m_bLine)
 	{
-		pDC->MoveTo(m_rcMinus.left, m_rcMinus.top);
-		pDC->LineTo(m_rcMinus.right, m_rcMinus.top);
+		if (!p_depth->m_iShowMIDPRC)
+		{
+			pDC->MoveTo(m_rcMinus.left, m_rcMinus.top);
+			pDC->LineTo(m_rcMinus.right, m_rcMinus.top);
+		}
 	}
 	
 	rect = m_rcMinus;	rect.OffsetRect(0, 1);

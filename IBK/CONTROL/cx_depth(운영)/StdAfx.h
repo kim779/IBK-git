@@ -31,3 +31,7 @@
 
 #include <AxStd.hpp>
 #include "datatype.h"
+#define DF_LOGKEY "CX_DEPTH"
+#define DF_LOGKEY1 "oubdata"
+
+#define DF_DEPTHVS 2

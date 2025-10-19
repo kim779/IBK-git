@@ -9,7 +9,8 @@ class CConfigDlg : public CDialog
 // Construction
 public:
 	CConfigDlg(struct _config *pConfig, CWnd* pParent = NULL);   // standard constructor
-
+	int m_iVersion{};
+	BOOL m_bEnableMid{};
 // Dialog Data
 	//{{AFX_DATA(CConfigDlg)
 	enum { IDD = IDD_CONFIG };
@@ -21,9 +22,14 @@ public:
 	CButton	m_chkDYUL;
 	CButton	m_chkCURR;
 	CButton	m_chkBOLD;
+	CButton	m_chkMIDPRC;
 	//}}AFX_DATA
 
-
+	CButton m_radios[9]{};
+	CFont m_boldFont;
+	CString   m_sRoot{};
+	CBitmap m_bitmapLeft{};
+	CBitmap m_bitmapRight{};
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CConfigDlg)
@@ -46,4 +52,16 @@ protected:
 
 private:
 	struct _config	*m_pConfig;
+public:
+	afx_msg void OnBnClickedDefault();
+	afx_msg void OnPaint();
+	afx_msg void OnBnClickedLrNo();
+	afx_msg void OnBnClickedLrGraph();
+	afx_msg void OnBnClickedLrChe();
+	afx_msg void OnBnClickedRrNo();
+	afx_msg void OnBnClickedRrSgjj();
+	afx_msg void OnBnClickedRrPivot();
+	afx_msg void OnBnClickedRrCurr();
+	afx_msg void OnBnClickedRrJvi();
+	afx_msg void OnBnClickedRrMid();
 };

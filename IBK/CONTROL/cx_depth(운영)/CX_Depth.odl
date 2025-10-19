@@ -51,6 +51,9 @@ library CX_Depth
 			[id(27)] void SetPriceRange(long high, long low);
 			[id(28)] void SetPercent(short high, short low);
 			//}}AFX_ODL_METHOD
+			[id(29)] void SetMKtype(SHORT mkgubn);
+			[id(30)] void SetPrcEdit(BSTR sPrcEdit);
+			[id(31)] void InsertOjbData(BSTR sdata);
 	};
 
 	//  Class information for Cdepth

@@ -88,6 +88,12 @@
 #define	SHG9	79		/* 9차우선호가(매수)		*/
 #define	SHGA	80		/* 10차우선호가(매수)		*/
 
+#define   MDPR   146   /* 중간가		*/
+#define   MDPRMDJ   147   /* 중간가 매도잔량		*/
+#define   MDPRMSJ    148   /* 중간가 매수잔량		*/
+#define   MDPRMDB  149   /* 중간가 매도직전대비		*/
+#define   MDPRMSB    150   /* 중간가 매수직전대비		*/
+#define   MDPRRATE    181  /* 중간가 등락율		*/
 /********************************/
 /* 호가잔량			*/
 /********************************/
@@ -125,6 +131,70 @@
 #define	SHXX	109		/* 매수총잔량대비		*/
 #define	SHTX	110		/* 시간외매수잔량대비		*/
 #define	DSCHA	120		/* 매수잔량 - 매도잔량		*/
+
+//통합호가 수량(거래소(NXT, KRX) 수량 심볼)
+#define	TKD1VOL	511		/* KRX 	매도1호가수량*/
+#define	TKD2VOL	512		/* KRX 	매도2호가수량*/
+#define	TKD3VOL	513		/* KRX 	매도3호가수량*/
+#define	TKD4VOL	514		/* KRX 	매도4호가수량*/
+#define	TKD5VOL	515		/* KRX 	매도5호가수량*/
+#define	TKD6VOL	516		/* KRX 	매도6호가수량*/
+#define	TKD7VOL	517		/* KRX 	매도7호가수량*/
+#define	TKD8VOL	518		/* KRX 	매도8호가수량*/
+#define	TKD9VOL	519		/* KRX 	매도9호가수량*/
+#define	TKD10VOL	520		/* KRX 	매도10호가수량*/
+
+#define	TKS1VOL	521		/* KRX 	매수1호가수량*/
+#define	TKS2VOL	522		/* KRX 	매수2호가수량*/
+#define	TKS3VOL	523		/* KRX 	매수3호가수량*/
+#define	TKS4VOL	524		/* KRX 	매수4호가수량*/
+#define	TKS5VOL	525		/* KRX 	매수5호가수량*/
+#define	TKS6VOL	526		/* KRX 	매수6호가수량*/
+#define	TKS7VOL	527		/* KRX 	매수7호가수량*/
+#define	TKS8VOL	528		/* KRX 	매수8호가수량*/
+#define	TKS9VOL	529		/* KRX 	매수9호가수량*/
+#define	TKS10VOL 530		/* KRX 	매수10호가수량*/
+
+#define	TND1VOL	531		/* NXT 	매도1호가수량*/
+#define	TND2VOL	532		/* NXT 	매도2호가수량*/
+#define	TND3VOL	533		/* NXT 	매도3호가수량*/
+#define	TND4VOL	534		/* NXT 	매도4호가수량*/
+#define	TND5VOL	535		/* NXT 	매도5호가수량*/
+#define	TND6VOL	536		/* NXT 	매도6호가수량*/
+#define	TND7VOL	537		/* NXT 	매도7호가수량*/
+#define	TND8VOL	538		/* NXT 	매도8호가수량*/
+#define	TND9VOL	539		/* NXT 	매도9호가수량*/
+#define	TND10VOL	540		/* NXT 	매도10호가수량*/
+
+#define	TNS1VOL	541		/* NXT 	매수1호가수량*/
+#define	TNS2VOL	542		/* NXT 	매수2호가수량*/
+#define	TNS3VOL	543		/* NXT 	매수3호가수량*/
+#define	TNS4VOL	544		/* NXT 	매수4호가수량*/
+#define	TNS5VOL	545		/* NXT 	매수5호가수량*/
+#define	TNS6VOL	546		/* NXT 	매수6호가수량*/
+#define	TNS7VOL	547		/* NXT 	매수7호가수량*/
+#define	TNS8VOL	548		/* NXT 	매수8호가수량*/
+#define	TNS9VOL	549		/* NXT 	매수9호가수량*/
+#define	TNS10VOL	550		/* NXT 	매수10호가수량*/
+
+#define TKDTVOL  551  /* 통합 KRX 	매도총잔량*/
+#define TKSTVOL	   552  /* 통합 KRX 	매수총잔량*/
+#define TNDTVOL	553  /* 통합 NXT 매도총잔량*/
+#define TNSTVOL	 554  /* 통합 NXT 	매수총잔량*/
+
+#define TKMID	 555  /* 통합 KRX 중간가*/
+#define TKMIDDV	 556  /* 통합 KRX 매도중간잔량*/
+#define TKMIDSV	 557  /* 통합 KRX 매수중간잔량*/
+#define TKMIDDR	 558  /* 통합 KRX 중간가매도비*/
+#define TKMIDSR	 559  /* 통합 KRX 중간가매수비*/
+#define TKMIDRATE	 560  /* 통합 KRX 중간가등락률*/
+
+#define TNMID	 561  /* 통합 NXT 중간가*/
+#define TNMIDDV	 562  /* 통합 NXT 매도중간잔량*/
+#define TNMIDSV	 563  /* 통합 NXT 매수중간잔량*/
+#define TNMIDDR	 564  /* 통합 NXT 중간가매도비*/
+#define TNMIDSR	 565  /* 통합 NXT 중간가매수비*/
+#define TNMIDRATE	 566  /* 통합 NXT 중간가등락률*/
 
 #define	YSCA	111		/* 예상체결가			*/
 #define	YSCV	112		/* 예상주문체결수량		*/
