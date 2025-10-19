@@ -40,6 +40,7 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	//}}AFX_MSG
+	afx_msg LRESULT OnMessage(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 
 protected:
@@ -74,6 +75,8 @@ private:
 	CSize		m_bmpSize;
 	BOOL		m_stretch;
 	void DrawBitmap(CDC* pDC);
+public:
+	int m_x{}, m_y{};
 };
 
 //{{AFX_INSERT_LOCATION}}

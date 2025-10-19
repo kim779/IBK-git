@@ -65,6 +65,7 @@ BEGIN_MESSAGE_MAP(CManageInfo, CDialog)
 	ON_WM_TIMER()
 	ON_WM_PAINT()
 	ON_WM_LBUTTONDOWN()
+	ON_MESSAGE(WM_USER, OnMessage)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -112,10 +113,35 @@ void CManageInfo::ShowSlide(CRect baseRC)
 
 	SetWindowPos(&wndTop, x, y, m_width, m_height, SWP_NOACTIVATE|SWP_SHOWWINDOW);
 }
-
+//팝업해주고 3초후 닫는다
 void CManageInfo::HideSlide()
 {
-	SetTimer(TM_SLIDE, TMI_SLIDE, NULL);
+#ifdef DF_MNG_THREAD
+	std::thread([this]() {
+		for (;;)
+		{
+			CRect wRc;
+			GetWindowRect(&wRc);
+
+			m_height = wRc.Height() - SLIDEGAP;
+			if (m_height <= 10)
+			{
+				PostMessage(WM_USER, 9898, 1); // 마지막 호출
+				break;
+			}
+
+			m_x = m_baseRc.right - m_width;
+			m_y = m_baseRc.top;
+			if (m_x < 0) m_x = 0;
+			if (m_y < 0) m_y = 0;
+
+			PostMessage(WM_USER, 9898, 0);
+			Sleep(10); // 10~16ms 정도면 부드러움 (60fps 근사)
+		}
+		}).detach();
+#else
+//	SetTimer(TM_SLIDE, TMI_SLIDE, NULL);
+#endif
 }
 
 void CManageInfo::SetData(CString dat, int kind)
@@ -366,4 +392,28 @@ void CManageInfo::OnLButtonDown(UINT nFlags, CPoint point)
 	HideSlide();
 	
 	CDialog::OnLButtonDown(nFlags, point);
+}
+
+LRESULT CManageInfo::OnMessage(WPARAM wParam, LPARAM lParam)
+{
+	switch (wParam)
+	{
+		case 9898:
+		{
+			const UINT uFlags = SWP_NOACTIVATE | SWP_SHOWWINDOW;
+			SetWindowPos(&wndTop, m_x, m_y, m_width, m_height, uFlags);
+
+			if (m_height <= 10 || (int)lParam == 1)
+			{
+				KillTimer(9898);
+				ShowWindow(SW_HIDE);
+				return 0;
+			}
+
+			Invalidate();
+			OutputDebugString("mng_setwindowpos");
+		}
+		break;
+	}
+	return 0;
 }

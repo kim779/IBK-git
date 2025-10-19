@@ -68,6 +68,7 @@ typedef BOOL(WINAPI* RtlGetVersion_FUNC) (OSVERSIONINFOEXW*);
 
 #define DF_MK_CAPTION   //childframe 타이틀에 거래소 추가
 
+#define DF_MNG_THREAD
 //#define DF_NO_PRELOADHIDDEN
 
 //{{AFX_INSERT_LOCATION}}

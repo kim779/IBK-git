@@ -1640,7 +1640,7 @@ WriteLog(m_slog);
 				case 's':
 				case 'S':
 				{
-				
+					ShowMngInfo("testmng", 0);
 				}
 			}	
 	}
@@ -22782,7 +22782,7 @@ void CMainFrame::ShowMngInfo(CString msg, int kind)
 
 #endif
 
-	m_mngInfo->SetData(msg, kind);
+	m_mngInfo->SetData(msg, kind);    //kind = 0   장운영정보
 
 	WINDOWPLACEMENT	pl;
 	GetWindowPlacement(&pl);
