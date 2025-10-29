@@ -87,6 +87,9 @@ library CX_WebView
 			//}}AFX_ODL_METHOD
 
 			[id(1)] void Navigate(BSTR sUrl);
+			[id(2)] void GoBack();
+			[id(3)] void GoForward();
+			[id(4)] void Navigate2(SHORT igubn, BSTR sUrl);
 	};
 
 	//  Class information for CEdgeWnd

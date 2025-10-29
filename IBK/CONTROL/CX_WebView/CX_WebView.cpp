@@ -102,15 +102,44 @@ __declspec(dllexport) CWnd* WINAPI axCreate(CWnd* parent, void* pParam)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	//컴퓨터\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Edge\IEToEdge
+	CString stmp;
 	LONG lResult{};
 	HKEY hKey{};
 
-	lResult = RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Edge\\IEToEdge"), 0, KEY_QUERY_VALUE, &hKey);
+	//lResult = RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Edge\\IEToEdge"), 0, KEY_QUERY_VALUE, &hKey);
 
-	if (lResult == ERROR_SUCCESS)  //edge가 있으면..
+	wil::unique_cotaskmem_string version_info;
+	HRESULT hr = GetAvailableCoreWebView2BrowserVersionString(nullptr, &version_info);
+	stmp.Format("\r\n [edge][szSubKey]  version_info=[%s]", CString(version_info.get()));
+	OutputDebugString(stmp);
+
+	BOOL binstalled{};
+	if (CString(version_info.get()).IsEmpty())
+		lResult = TRUE;
+	else
+		lResult = ERROR_SUCCESS;
+
+	CString _sroot{};
+	_sroot.Format("%s\\tab\\WEBINFO.INI", (char*)parent->SendMessage(WM_USER, MAKEWPARAM(variantDLL, homeCC), 0));
+	char	buf[32]{};
+	GetPrivateProfileString("cx_webEdge", "browser", _T(""), buf, sizeof(buf), _sroot);
+	CString sBrowser;
+	sBrowser.Format("%s", buf); sBrowser.TrimRight();
+
+	CString strTarget{};
+
+	char sbuf[1024]{};
+	GetModuleFileName(nullptr, sbuf, 260);
+	strTarget.Format("%s", sbuf);
+	strTarget.TrimRight();
+
+	if (strTarget.Find("86") >= 0 || strTarget.Find("Program") >= 0)
+		sBrowser = "IE";
+
+	if (lResult == ERROR_SUCCESS && sBrowser != "IE")  //edge가 있으면..  설정파일도 IE가 아니면
 	{
 		CEdgeWnd* pControlWnd = new CEdgeWnd();
-		pControlWnd->m_pParent = parent;
+		pControlWnd->m_pWizard = parent;
 
 		pControlWnd->SetParam((struct _param*)pParam);
 		pControlWnd->Create(NULL, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, pControlWnd->m_Param.rect, parent, 100);

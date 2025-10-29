@@ -23,7 +23,7 @@ class CEdgeWnd : public CWnd
 // Construction
 public:
 	CEdgeWnd();
-	CWnd* m_pParent{};
+	CWnd* m_pWizard{};
 	CParam m_Param;
 	CString m_strurl;
 	CString _sURL;
@@ -58,6 +58,7 @@ public:
 		return this->GetSafeHwnd();
 	}
 protected:
+	//wil::com_ptr<ICoreWebView2_2>
 	HICON m_hIcon;
 	DWORD m_creationModeId = 0;
 	wil::com_ptr<ICoreWebView2Environment> m_webViewEnvironment;
@@ -99,14 +100,55 @@ protected:
 	DECLARE_INTERFACE_MAP()
 	void Navigate(BSTR sUrl);
 	void Navigate_strUrl();
+	void Navigate2(SHORT igubn, BSTR sUrl);
 	enum
 	{
+		dispidNavigate2 = 4L,
+		dispidGoForward = 3L,
+		dispidGoBack = 2L,
 		dispidNavigate = 1L
 	};
 public:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg long OnMessage(WPARAM wParam, LPARAM lParam);
+protected:
+	void GoBack();
+	void GoForward();
+
+public:  //weblink 방식 추가
+	CWnd* m_pMainFrame{};
+
+	int	m_width, m_height;					// web page's size information
+	bool m_bNavigate2;
+	BOOL	m_bCertLogin;
+
+	CString m_sMapName;
+	CString m_slog;
+	CString m_sCert;
+	CString m_ipAddr;
+	CString m_MacAddr;
+	CString m_sRoot{};
+	CString m_strUrl, m_sUrl;
+	CString m_userID, m_baseURL, m_itemCode, m_home, m_menu;
+	CString m_type, m_description, m_url, m_finalurl;		// web parameters & information
+
+	void SearchURL();
+	void GetInformation();
+
+	BOOL CheckCloude();
+	CString CEdgeWnd::HTSEncode(const char* lpszSource, const char* key);
+	CString URLEncode(const char* lpszURL);
+	CString GetUserPassword();
+	CString GetCertPassword();
+	CString GetAuthParam();
+	CString GetURL();
+	CString SetNoParam();
+	CString GetFSDValue();
+	LRESULT SendTR(CString strName, BYTE type, CString strData, BYTE key);
+	void ResizeToFitWindow();
+	
 };
 
 
