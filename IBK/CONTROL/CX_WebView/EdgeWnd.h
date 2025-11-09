@@ -122,7 +122,7 @@ public:  //weblink 방식 추가
 
 	int	m_width, m_height;					// web page's size information
 	bool m_bNavigate2;
-	BOOL	m_bCertLogin;
+	BOOL	m_bCertLogin{};
 
 	CString m_sMapName;
 	CString m_slog;
@@ -146,6 +146,8 @@ public:  //weblink 방식 추가
 	CString GetURL();
 	CString SetNoParam();
 	CString GetFSDValue();
+	void GetMAC();
+	void GetLocalIP();
 	LRESULT SendTR(CString strName, BYTE type, CString strData, BYTE key);
 	void ResizeToFitWindow();
 	

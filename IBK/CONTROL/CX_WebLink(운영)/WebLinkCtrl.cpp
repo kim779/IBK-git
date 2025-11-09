@@ -654,6 +654,10 @@ CString WebLinkCtrl::URLEncode(const char* lpszURL)
 		dest += Encode(lpszURL[i]).value;
 	}
 
+	CString slog;
+	slog.Format("[weblink] 인코딩까지 한 서명값 dest len =[%d]", dest.GetLength());
+	OutputDebugString(slog);
+
 	return dest;
 }
 
@@ -722,6 +726,10 @@ CString WebLinkCtrl::GetAuthParam()
 
 		CString sPswd = GetUserPassword();
 		
+CString slog;
+slog.Format("[weblink][%s]<%d> sPswd=[%s]",__FUNCTION__, __LINE__, sPswd);
+OutputDebugString(slog);
+
 		if (sPswd == "" || sPswd.Find("CERTLOGIN") > -1)
 		{
 			m_bCertLogin = TRUE;
@@ -736,6 +744,9 @@ CString WebLinkCtrl::GetAuthParam()
 		// 	auth += "&certpw=" + URLEncode(m_certpw);
 		
 		auth = URLEncode(HTSEncode(auth, "ibkis"));
+
+		slog.Format("[weblink][%s]<%d> 최종 auth=[%s]", __FUNCTION__, __LINE__, auth);
+		OutputDebugString(slog);
 	}
 	CATCH (CMemoryException, e)
 	{
@@ -990,11 +1001,15 @@ LRESULT WebLinkCtrl::OnUser(WPARAM wParam, LPARAM lParam)
 
 				m_finalurl = url;
 
-			//	openhtml();
-				//if (GetOSversion() == 11)
-				if (1)
+				char buf[256]{};
+				CString	file, stmp, smap;
+				file.Format("%s\\tab\\axis.ini", m_sRoot);
+				DWORD dw = GetPrivateProfileString("WebLink", "html", "", buf, sizeof(buf), file);
+
+				if(dw > 0)
 				{
 					openhtml();
+					//PostMessage(WM_BROWSER, 0, (LPARAM)url.GetString());
 				}
 				else
 					PostMessage(WM_BROWSER, 0, (LPARAM)url.GetString());
@@ -1410,6 +1425,11 @@ void WebLinkCtrl::GetMAC()
 
 void WebLinkCtrl::openhtml()
 {
+	CString slog;
+	slog.Format("[weblink][%s]<%d> openhtml", __FUNCTION__, __LINE__);
+	OutputDebugString(slog);
+
+	OutputDebugString(slog);
 	CString url;
 	url = m_finalurl;
 	
@@ -1449,9 +1469,8 @@ void WebLinkCtrl::openhtml()
 	pdata.reset();
 
 	//.Mid(0, 5)=="DHTTP"  ShellExecute(NULL, _T("open"), szFile, NULL,NULL, SW_SHOW);	
-	CString slog;
-	slog.Format("m_bCertLogin=[%d] m_sCert=[%s] ", m_bCertLogin, m_sCert);
-	AfxMessageBox(slog);
+	slog.Format("[weblink] m_bCertLogin=[%d] Cert len = [%d]  m_sCert=[%.100s] ", m_bCertLogin, m_sCert.GetLength(),  m_sCert);
+	OutputDebugString(slog);
 
 	if (m_bCertLogin)
 		strdata.Replace("replace", m_sCert);
@@ -1470,6 +1489,7 @@ void WebLinkCtrl::openhtml()
 	CFile	file;
 	CString	szFile;
 
+
 	szFile.Format("%s\\%s\\%s", m_sRoot, "TAB", "edgeRP.html");
 	//DeleteFile(szFile);
 
@@ -1486,6 +1506,7 @@ void WebLinkCtrl::openhtml()
 
 LRESULT WebLinkCtrl::OnBrowser( WPARAM wParam, LPARAM lParam )
 {
+	CString slog;
 	TRY
 	{
 		if (m_pIEApp)
@@ -1599,7 +1620,12 @@ LRESULT WebLinkCtrl::OnBrowser( WPARAM wParam, LPARAM lParam )
 						}
 					}
 					
-					
+					slog.Format("[weblink][%s]<%d> m_sUrl len=[%d] m_sUrl=[%.50s]", __FUNCTION__, __LINE__, m_sUrl.GetLength(),  m_sUrl);
+					OutputDebugString(slog);
+
+					slog.Format("[weblink][%s]<%d> sParam=[%.50s]", __FUNCTION__, __LINE__,sParam);
+					OutputDebugString(slog);
+
 					/*int nPostLen = sParam.GetLength();*/
 
 					SAFEARRAY FAR *sfPost = NULL;
@@ -1645,7 +1671,7 @@ LRESULT WebLinkCtrl::OnBrowser( WPARAM wParam, LPARAM lParam )
 				else
 				{
 					CString slog;
-					slog.Format("%s", url);
+					slog.Format("webctrl     ------  len=[%d] bstrURL=[%s]", m_finalurl.GetLength(),CString(bstrURL));
 					OutputDebugString(slog);
 					hr = pBrowser2->Navigate(bstrURL, &vEmpty, &vEmpty, &vEmpty, &vHeader);
 				}
@@ -1781,8 +1807,7 @@ void WebLinkCtrl::NavigateFRmap(LPCTSTR sUrl, bool blogin)
 
 		m_finalurl = url;
 
-	//	if (GetOSversion() == 11)
-		if (1)
+	   if (GetOSversion() == 11)
 		{
 			openhtml();
 		}

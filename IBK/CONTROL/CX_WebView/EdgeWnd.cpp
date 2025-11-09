@@ -178,6 +178,10 @@ void CEdgeWnd::Navigate( BSTR sUrl)
 
 	HRESULT hresult = m_webView->Navigate(strUnicode);
 
+	m_slog.Format("[cx_WebeEdge] not certificate nLen=[%d] m_strurl=[%s]", nLen, m_strurl.Left(30) );
+	OutputDebugString(m_slog);
+
+
 	if (hresult == S_OK)
 	{
 		OutputDebugString("[cx_edge]Web Page Opened Successfully");
@@ -233,8 +237,49 @@ int CEdgeWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_sRoot.Format("%s", (char*)m_pWizard->SendMessage(WM_USER, MAKEWPARAM(variantDLL, homeCC), 0));
 	m_sRoot.TrimRight();
 	m_pMainFrame = AfxGetMainWnd();
+
+	GetLocalIP();	//2013.08.12 KSJ IP구하기
+	GetMAC();
+	m_userID.Format("%s", (char*)m_pWizard->SendMessage(WM_USER, MAKEWPARAM(variantDLL, userCC), 0));
+
 	InitializeWebView();
 	return 0;
+}
+
+void CEdgeWnd::GetMAC()
+{
+	char	buff[20]{};
+	CString file;
+	file.Format("%s\\tab\\AXIS.INI", m_sRoot);
+	GetPrivateProfileString("PCDATA", "sPhyMac", "", buff, sizeof(buff), file);
+	m_MacAddr.Format("%s", buff);
+	m_MacAddr.TrimRight();
+	m_MacAddr.MakeLower();
+}
+
+void CEdgeWnd::GetLocalIP()
+{
+	char szHostName[64] = { 0 };
+
+	::gethostname(szHostName, sizeof(szHostName));
+
+	if (lstrcmp(szHostName, "") != 0)
+	{
+		HOSTENT FAR* lphostent = ::gethostbyname(szHostName);
+
+		for (int ii = 0; lphostent; ii++)
+		{
+			if (!lphostent->h_addr_list[ii])
+				break;
+
+			sprintf(szHostName, "%u.%u.%u.%u",
+				0xff & lphostent->h_addr_list[ii][0],
+				0xff & lphostent->h_addr_list[ii][1],
+				0xff & lphostent->h_addr_list[ii][2],
+				0xff & lphostent->h_addr_list[ii][3]);
+			m_ipAddr = szHostName;
+		}
+	}
 }
 
 void CEdgeWnd::OnSize(UINT nType, int cx, int cy)
@@ -623,6 +668,10 @@ LRESULT CEdgeWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 					IStream* bodyStream = (bodySize > 0 && postStream) ? postStream.p : nullptr;
 					wil::com_ptr<ICoreWebView2Environment2> env2 = m_webViewEnvironment.query<ICoreWebView2Environment2>();
 					if (env2) {
+
+m_slog.Format("[cx_WebeEdge] m_webViewEnvironment.query [111]");
+OutputDebugString(m_slog);
+
 						wil::com_ptr<ICoreWebView2WebResourceRequest> request;
 						HRESULT hr = env2->CreateWebResourceRequest(
 							strUnicode,
@@ -633,30 +682,153 @@ LRESULT CEdgeWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 
 						if (SUCCEEDED(hr)) {
 							auto webView2 = m_webView.query<ICoreWebView2_2>();
+
+m_slog.Format("[cx_WebeEdge] m_webView.query [111.222] ");
+OutputDebugString(m_slog);
+
 							if (webView2) {
 								webView2->NavigateWithWebResourceRequest(request.get());
 							}
 						}
 					}
+
+
+
+
+
+
+
+					wil::com_ptr<ICoreWebView2> webView = m_webView;
+					webView->add_NavigationStarting(
+						Microsoft::WRL::Callback<ICoreWebView2NavigationStartingEventHandler>(
+							[this](ICoreWebView2* sender, ICoreWebView2NavigationStartingEventArgs* args) -> HRESULT {
+
+m_slog.Format("[cx_WebeEdge] webView->add_NavigationStarting [222] ");
+OutputDebugString(m_slog);
+
+								return S_OK;
+							}).Get(), nullptr);
+
+
+
+
+
+
+					m_webView->add_SourceChanged(
+						Microsoft::WRL::Callback<ICoreWebView2SourceChangedEventHandler>(
+							[this](ICoreWebView2* sender, ICoreWebView2SourceChangedEventArgs* args)
+							-> HRESULT {
+
+m_slog.Format("[cx_WebeEdge] webView->add_SourceChanged [333] ");
+OutputDebugString(m_slog);
+
+								wil::unique_cotaskmem_string uri;
+								sender->get_Source(&uri);
+								if (wcscmp(uri.get(), L"about:blank") == 0)
+								{
+									uri = wil::make_cotaskmem_string(L"");
+								}
+								return S_OK;
+							}).Get(), nullptr);
+
+
+
+
+
+					webView->add_NavigationCompleted(
+						Microsoft::WRL::Callback<ICoreWebView2NavigationCompletedEventHandler>(
+							[this](ICoreWebView2* sender, ICoreWebView2NavigationCompletedEventArgs* args) -> HRESULT {
+m_slog.Format("[cx_WebeEdge] webView->add_NavigationCompleted [444] ");
+OutputDebugString(m_slog);
+								return S_OK;
+							}).Get(), nullptr);
+
+
+
+
+
+
+					webView->add_WebMessageReceived(Microsoft::WRL::Callback<ICoreWebView2WebMessageReceivedEventHandler>(
+						[this](ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args) -> HRESULT {
+							wil::unique_bstr message;
+							args->TryGetWebMessageAsString(&message);
+							CString strMsg(message.get());
+m_slog.Format("[cx_WebeEdge] webView->add_WebMessageReceived [555] ");
+OutputDebugString(m_slog);
+
+							// TODO: 응답 처리 로직 추가
+
+							return S_OK;
+						}).Get(), nullptr);
+
+
+
+					m_webView->add_FrameNavigationCompleted(Microsoft::WRL::Callback<ICoreWebView2NavigationCompletedEventHandler>(
+						[this](ICoreWebView2* sender, ICoreWebView2NavigationCompletedEventArgs* args) -> HRESULT
+						{
+							BOOL success = FALSE;
+							if (SUCCEEDED(args->get_IsSuccess(&success)) && success)
+							{
+m_slog.Format("[cx_WebeEdge] webView->add_FrameNavigationCompleted [666] ");
+OutputDebugString(m_slog);
+
+								// 웹페이지 로드 완료 후 메시지 전송
+								LPCWSTR msg = L"{ \"type\": \"notify\", \"data\": \"Hello from native!\" }";
+								HRESULT hr = m_webView->PostWebMessageAsString(msg);
+								if (FAILED(hr))
+								{
+									TRACE(_T("PostWebMessageAsString 실패! hr=0x%08X\n"), hr);
+								}
+							}
+							else
+							{
+								COREWEBVIEW2_WEB_ERROR_STATUS status;
+								args->get_WebErrorStatus(&status);
+								TRACE(_T("FrameNavigation 실패, status=%d\n"), status);
+							}
+							return S_OK;
+						}).Get(),
+							nullptr);
+
+
+
+
 				}
 				else  //공동인증 아닐때 
 				{
-					AfxMessageBox("not cert");
-					BSTR bstrFDS = GetFSDValue().AllocSysString();
 
-					BSTR bstrURL = m_finalurl.AllocSysString();
-					UINT lenURL = SysStringLen(bstrURL);
-					UINT lenFDS = SysStringLen(bstrFDS);
-					BSTR bstrURLFDS = SysAllocStringLen(nullptr, lenURL + lenFDS);
+					if (1)
+					{
+						BSTR bstrURL = m_finalurl.AllocSysString();
+m_slog.Format("[cx_WebeEdge] not certificate len=[%d] m_finalurl=[%s]", m_finalurl.GetLength(),m_finalurl);
+OutputDebugString(m_slog);
+						//Navigate(bstrURL);
+wchar_t strUnicode[256] = { 0, };
+char    strMultibyte[256] = { 0, };
+strcpy_s(strMultibyte, 256, m_finalurl);
+int nLen = MultiByteToWideChar(CP_ACP, 0, strMultibyte, strlen(strMultibyte), NULL, NULL);
+MultiByteToWideChar(CP_ACP, 0, strMultibyte, strlen(strMultibyte), strUnicode, nLen);
 
-					if (bstrURL)
-						memcpy(bstrURLFDS, bstrURL, lenURL * sizeof(OLECHAR));
+HRESULT hresult = m_webView->Navigate(strUnicode);
 
-					if (bstrFDS)
-						memcpy(bstrURLFDS + lenURL, bstrFDS, lenFDS * sizeof(OLECHAR));
+					}
+					else
+					{
+						BSTR bstrFDS = GetFSDValue().AllocSysString();
 
-					Navigate(bstrURLFDS);
-					
+						BSTR bstrURL = m_finalurl.AllocSysString();
+						UINT lenURL = SysStringLen(bstrURL);
+						UINT lenFDS = SysStringLen(bstrFDS);
+						BSTR bstrURLFDS = SysAllocStringLen(nullptr, lenURL + lenFDS);
+
+						if (bstrURL)
+							memcpy(bstrURLFDS, bstrURL, lenURL * sizeof(OLECHAR));
+
+						if (bstrFDS)
+							memcpy(bstrURLFDS + lenURL, bstrFDS, lenFDS * sizeof(OLECHAR));
+
+						Navigate(bstrURLFDS);
+					}
 				}
 			}
 			else  
@@ -735,10 +907,6 @@ CString CEdgeWnd::GetAuthParam()
 
 		CString sPswd = GetUserPassword();
 
-CString slog;
-slog.Format("[weblink][%s]<%d> sPswd=[%s]",__FUNCTION__, __LINE__, sPswd);
-OutputDebugString(slog);
-
 		if (sPswd == "" || sPswd.Find("CERTLOGIN") > -1)
 		{
 			m_bCertLogin = TRUE;
@@ -753,6 +921,9 @@ OutputDebugString(slog);
 		// 	auth += "&certpw=" + URLEncode(m_certpw);
 
 		auth = URLEncode(HTSEncode(auth, "ibkis"));
+
+		m_slog.Format("[cx_WebeEdge][weblink][%s]<%d> 최종 [%d][%s]", __FUNCTION__, __LINE__, auth.GetLength(), auth);
+		OutputDebugString(m_slog);
 	}
 		CATCH(CMemoryException, e)
 	{
@@ -892,8 +1063,10 @@ void CEdgeWnd::SearchURL()
 		return;
 
 	GetInformation();
-	m_pWizard->SetWindowPos(NULL, 0, 0, m_width, m_height, SWP_NOMOVE | SWP_NOZORDER);  //!!!!
-	ResizeToFitWindow();
+	//m_pWizard->SetWindowPos(NULL, 0, 0, m_width, m_height, SWP_NOMOVE | SWP_NOZORDER);  //!!!!
+	m_height = 600;
+	MoveWindow(CRect(0,0, m_width, m_height), TRUE);
+	//ResizeToFitWindow();
 	struct	_web_mid Mid;
 	FillMemory(&Mid, sz_WEBMID, ' ');
 
