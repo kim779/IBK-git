@@ -111,14 +111,6 @@
 #include <sal.h>
 #include <VersionHelpers.h>
 #include <axdll.hpp>
-#include <set>
-#include <any>
-#include <array>
-#include <type_traits>
-#include <concurrent_vector.h>
-#include <filesystem>
-
-
 
 #pragma comment(lib, "crypt32.lib")
 #pragma comment(lib, "advapi32")
@@ -159,7 +151,7 @@ using namespace concurrency;
 #pragma warning(disable : 4996)
 
 typedef BOOL(WINAPI* RtlGetVersion_FUNC) (OSVERSIONINFOEXW*);
-static  ULONGLONG g_begin;
+static  ULONGLONG g_begin = 0;
 
 
 namespace AxStd
@@ -168,6 +160,7 @@ namespace AxStd
 #pragma warning(disable : 26477)
 	inline void AFXAPI _Msg(const TCHAR* fmt = _T(""), ...)
 	{
+//#ifdef _DEBUG
 		CString	tmpstr, str;
 
 		va_list	valist;
@@ -175,40 +168,28 @@ namespace AxStd
 		tmpstr.FormatV(fmt, valist);
 		va_end(valist);
 		const ULONGLONG end = GetTickCount64();
+		if (tmpstr == _T(""))
+		{
+			str = CString(_T("<Debug>")) + CString(_LINE);
+			g_begin = end;
+		}
+		else
+		{
+			const CTime time = CTime::GetCurrentTime();
+			CString sTime;
 
-		std::async(launch::deferred, [&](){	
-			if (tmpstr == _T(""))
-			{
-				str = CString(_T("<Debug>")) + CString(_LINE);
-				g_begin = end;
-			}
-			else
-			{
-				//const CTime time = CTime::GetCurrentTime();
-				CString sTime;
-
-				sTime.Format(_T("[%lld ms]"), gsl::narrow_cast<LONG64>(end - g_begin));
-				str = _T("<Debug>") + sTime + tmpstr;
-			}
-
-			if ((end - g_begin) > 10)
-				OutputDebugString(str + _T("\n"));
+			sTime.Format(_T("[%lld ms]"), gsl::narrow_cast<LONG64>(end - g_begin));
+			str = _T("<Debug>") + sTime + tmpstr;
+		}
+		OutputDebugString(str + _T("\n"));
 		
-			/*
-				ofstream dFile(_T("c:\\Debug.log"), std::ios::app);
-				dFile << str << endl;
-				dFile.close();
-			*/
-		}).get();
+		/*
+			ofstream dFile(_T("c:\\Debug.log"), std::ios::app);
+			dFile << str << endl;
+			dFile.close();
+		*/
+//#endif
 	};
-
-	template <class _Fty, class... _Types>
-	void time_call(_Fty&& func, _Types&&... args)
-	{
-		INT64 start = GetTickCount64();
-		func(_STD forward<_Types>(args)...);        
-		_Msg("Elapsed time: [%ld] milliseconds", GetTickCount64() - start);
-	}
 
 	inline CString AFXAPI FORMAT(const TCHAR* formatString, ...)
 	{
@@ -220,17 +201,6 @@ namespace AxStd
 		va_end(valist);
 		return s;
 	};
-
-	// inline CString AFXAPI FORMAT(const WCHAR* formatString, ...)
-	// {
-	// 	CStringW s;
-	// 	va_list	valist;
-
-	// 	va_start(valist, formatString);
-	// 	s.FormatV(formatString, valist);
-	// 	va_end(valist);
-	// 	return s;
-	// };
 
 #pragma warning(default : 26492)
 #pragma warning(default : 26477)
@@ -272,7 +242,7 @@ namespace AxStd
 
 	inline void xxCopy(gsl::span<char> org, CString src)
 	{
-		CopyMemory(org.data(), src.GetString(), min(org.size(), src.GetLength()));
+		CopyMemory(org.data(), src, org.size());
 	}
 
 	inline BOOL GetVersion(OSVERSIONINFOEX* os) {
@@ -406,23 +376,20 @@ namespace AxStd
 		DllInvoker codedll("AxisCode.dll");	
 		if (codedll.IsLoaded())
 		{
-			auto func = codedll.Function<char* WINAPI(int)>("getArray");
-			if (func)
+			std::map<CString, std::pair<CString, int>>* map =
+				(std::map<CString, std::pair<CString, int>>*) codedll.Function<char* WINAPI(int)>("getArray")(0);
+
+			for_each(map->begin(), map->end(), [&vArr](const auto item) {
+				vArr.emplace_back(std::make_pair(item.first, item.second.first));
+			});
+
+			if (type == 1)
 			{
-				std::map<CString, std::pair<CString, int>>* map =
-					(std::map<CString, std::pair<CString, int>>*) func(0);
-
-				for_each(map->begin(), map->end(), [&vArr](const auto item) {
-					vArr.emplace_back(std::make_pair(item.first, item.second.first));
-					});
-
-				if (type == 1)
-				{
-					std::sort(vArr.begin(), vArr.end(), [](const auto item1, const auto item2) {
-						return (item1.second.Compare(item2.second) < 0);
-					});
-				}
+				std::sort(vArr.begin(), vArr.end(), [](const auto item1, const auto item2) {
+					return (item1.second.Compare(item2.second) < 0);
+				});
 			}
+				
 		}
 	}
 
@@ -431,9 +398,8 @@ namespace AxStd
 		DllInvoker codedll("AxisCode.dll");
 		if (codedll.IsLoaded())
 		{
-			auto func = codedll.Function<const char* WINAPI(const char*)>("getName");
-			if (func)
-				return (char*)func(sCode.GetString());
+			CString sName = (char*)codedll.Function<const char* WINAPI(const char*)>("getName")(sCode.GetString());
+			return sName;
 		}
 		return "";
 	}
@@ -443,21 +409,20 @@ namespace AxStd
 		DllInvoker codedll("AxisCode.dll");
 		if (codedll.IsLoaded())
 		{
-			auto func = codedll.Function<const bool WINAPI(const char*)>("IsNxt");
-			if (func)
-				return func(sCode.GetString());
+			return codedll.Function<const bool WINAPI(const char*)>("IsNxt")(sCode.GetString());
 		}
 		return false;
 	}
+
+
 
 	inline CString getCode(CString sName)
 	{
 		DllInvoker codedll("AxisCode.dll");
 		if (codedll.IsLoaded())
 		{
-			auto func = codedll.Function<const char* WINAPI(const char*)>("getCode");
-			if (func)
-				return (char*)func(sName.GetString());
+			CString sCode = (char*)codedll.Function<const char* WINAPI(const char*)>("getCode")(sName.GetString());
+			return sCode;
 		}
 		return "";
 	}
@@ -475,15 +440,7 @@ namespace AxStd
 			delete[] p;
 		}
 	};
-
-	// 안전하게 멤버함수 호출
-	template<typename T, typename _Fty, typename... _ArgTypes>
-	std::invoke_result_t<_Fty, T*, _ArgTypes...> safe_call(T* obj, _Fty func, _ArgTypes&&... args)
-	{
-		if (obj && obj->GetSafeHwnd())
-			return (obj->*func)(std::forward<_ArgTypes>(args)...);
-	}
-
+	
 	template <class _Fty, class... _ArgTypes>
 	_NODISCARD future<_Invoke_result_t<decay_t<_Fty>, decay_t<_ArgTypes>...>> async(_Fty&& _Fnarg, _ArgTypes&&... _Args) {
 	// manages a callable object launched with default policy
@@ -495,107 +452,96 @@ namespace AxPool {
 	template <int N>
 	class AxThreadPool {
 	public:
-		AxThreadPool<N>() : _stop(false) {
-			static_assert(N > 0,    "N must be greater than 0");
-			static_assert(N < 1001, "N must be less than 1001");	
+		AxThreadPool<N>()
+			: _stop(false) {
+			//_vThreads.reserve(num);
 			for (size_t ii = 0; ii < N; ++ii)
-				_vThreads[ii] = std::make_unique<std::thread>([this]() { run(); });
+				_vThreads[ii] = thread([this]() { run(); });
 		}
 		~AxThreadPool()
 		{
 			_stop = true;
 			_cond.notify_all();
 			for (auto& t : _vThreads)
-				t->join();
-		}
-
-		void Stop() {
-			_stop = true;
-			_cond.notify_all();
-		}
-
-		int getrunningCount() const {
-			return gsl::narrow_cast<int>(_info.size());
+				t.join();
 		}
 
 		template <class _Fty, class... _ArgTypes>
 		_NODISCARD std::future<std::_Invoke_result_t<decay_t<_Fty>, decay_t<_ArgTypes>...>> addJob(_Fty&& _Fnarg, _ArgTypes&&... _Args)
 		{
-			// manages a callable object launched with supplied policy
-			using _Ret = std::_Invoke_result_t<std::decay_t<_Fty>, std::decay_t<_ArgTypes>...>;
-			auto ptask = std::make_shared<std::packaged_task<_Ret()>>(std::_Fake_no_copy_callable_adapter<_Fty, _ArgTypes...>(_STD forward<_Fty>(_Fnarg), _STD forward<_ArgTypes>(_Args)...));
+			using return_type = std::_Invoke_result_t<decay_t<_Fty>, decay_t<_ArgTypes>...>
 
+			if (_stop) {
+				throw std::runtime_error("ThreadPool 사용 중지됨");		
+			}
+
+			auto job = make_shared<std::packaged_task<return_type()>>( bind(std::forward<Function>(_Fty), std::forward<_ArgTypes>(args)...) );
+			std::future<return_type> job_result_future = job->get_future();
 			{
-				std::lock_guard<std::mutex> lock(_xxx);
-				_qJobs.emplace([ptask]() {
-					(*ptask)();
-				});
+				std::lock_guard lock(_xxx);
+				_qJobs.push([job]() { (*job)(); });
 			}
 			_cond.notify_one();
-			return ptask->get_future();
+			return job_result_future;
 		}
 
 	private:
 		bool _stop;
-		std::array<std::unique_ptr<std::thread>, N> _vThreads;
+		std::array<std::thread, N> _vThreads;
 		std::queue<std::function<void()>> _qJobs;
 		std::condition_variable _cond;
 		std::mutex _xxx;
-		std::set<UINT64> _info;;
-
 
 		void run()
 		{
 			while (true) {
 				unique_lock xxx_lock(_xxx);
-				_info.erase(GetCurrentThreadId());
-				_cond.wait(xxx_lock, [this]() { 		
-					return !this->_qJobs.empty() || _stop; 
-				});
-				if (_stop && _qJobs.empty()) {
-					xxx_lock.unlock();
+				_cond.wait(xxx_lock, [this]() { return !this->_qJobs.empty() || _stop; });
+				if (_stop && this->_qJobs.empty()) {
 					return;
 				}
-				if (_qJobs.empty()) {
-					xxx_lock.unlock();
-					continue;
-				}
-					
-				_info.insert(GetCurrentThreadId());				
+
 				function<void()> job = std::move(_qJobs.front());
 				_qJobs.pop();
 				xxx_lock.unlock();
+
 				job();
-				
 			}
 		}
 	};
 
-	class AxMemoryPool 
-	{
-	private:
-		std::queue<std::unique_ptr<char[]>> pool;
-		std::mutex poolMutex;
-	
-	public:
-		std::unique_ptr<char[]> Acquire(size_t size) {
-			std::lock_guard<std::mutex> lock(poolMutex);
-			if (!pool.empty() /*&& /* 크기 검사 */) {
-				auto ptr = std::move(pool.front());
-				pool.pop();
-				return ptr;
-			}
-			return std::make_unique<char[]>(size);
-		}
-	
-		void Release(std::unique_ptr<char[]> ptr) {
-			std::lock_guard<std::mutex> lock(poolMutex);
-			pool.push(std::move(ptr));
-		}
-	};
-
-
+	// 사용 예시
+	//int work(int t, int id) 
+	//{
+	//	TRACE("%d start \n", id);
+	//	std::this_thread::sleep_for(std::chrono::seconds(t));
+	//	TRACE("%d end after %ds\n", id, t);
+	//	return t + id;
+	//}
 }  // namespace ThreadPool
+
+
+
+/*
+// 사용 예시
+int work(int t, int id) {
+	printf("%d start \n", id);
+	std::this_thread::sleep_for(std::chrono::seconds(t));
+	printf("%d end after %ds\n", id, t);
+	return t + id;
+}
+
+int main() {
+	AxThreadPool pool(3);
+	std::vector<std::future<int>> futures;
+	for (int i = 0; i < 10; i++) {
+		futures.emplace_back(pool.EnqueueJob(work, i % 3 + 1, i));
+	}
+	for (auto& f : futures) {
+		printf("result : %d \n", f.get());
+	}
+}
+*/	
 
 //encription!!!!  AES256
 #ifndef DF_ENCAES
@@ -706,6 +652,10 @@ inline BOOL APIENTRY axENCAES(char* src, CString& strENC)
 	HCRYPTKEY hKey{};
 	CString m_slog{};
 
+	//m_slog.Format("[CX_SecureDataEngine][ENC]  axENCAES start   %s", src);
+	//OutputDebugString(m_slog);
+
+
 	if (CryptAcquireContext(&hCryptProv, NULL, MS_ENH_RSA_AES_PROV, PROV_RSA_AES, 0) == FALSE) {
 		m_slog.Format("[CX_SecureDataEngine][ENC] CryptAcquireContext error =  %x", GetLastError());
 		OutputDebugString(m_slog);
@@ -729,7 +679,7 @@ inline BOOL APIENTRY axENCAES(char* src, CString& strENC)
 	keyBlob.hdr.reserved = 0;
 	keyBlob.hdr.aiKeyAlg = CALG_AES_128;
 	keyBlob.cbKeySize = AES_KEY_LENGTH;
-	CopyMemory(keyBlob.rgbKeyData, "", AES_KEY_LENGTH);
+	CopyMemory(keyBlob.rgbKeyData, "!O7#8aksjdf67h53", AES_KEY_LENGTH);
 
 	if (CryptImportKey(hCryptProv, (BYTE*)&keyBlob, sizeof(keyBlob), 0, 0, &hKey) == FALSE) {
 		m_slog.Format("[CX_SecureDataEngine][ENC]   CryptImportKey error ");
@@ -774,9 +724,9 @@ inline BOOL APIENTRY axENCAES(char* src, CString& strENC)
 
 	// Base64 인코딩
 	strENC = Base64Encode((BYTE*)pData, dwBufferLen);
-	CString debugMsg;
-	debugMsg.Format(_T("\r\n[CX_SecureDataEngine][ENC]  ---------암호화성공-----------------------------[%d][%s]"), strENC.GetLength(), strENC);
-	OutputDebugString(debugMsg);
+	//CString debugMsg;
+	//debugMsg.Format(_T("\r\n[CX_SecureDataEngine][ENC]  ---------암호화성공-----------------------------[%d][%s]"), strENC.GetLength(), strENC);
+	//OutputDebugString(debugMsg);
 
 
 	return TRUE;
@@ -790,8 +740,8 @@ inline BOOL APIENTRY axDECAES(char* sEncBase64, CString& sDEC)
 	CString m_slog{};
 
 	sDEC.Empty();
-	m_slog.Format("[CX_SecureDataEngine][DEC]  axDECAES start   len= [%d]  sEncBase64=[%s]", strlen(sEncBase64), sEncBase64);
-	OutputDebugString(m_slog);
+	//m_slog.Format("[CX_SecureDataEngine][DEC]  axDECAES start   len= [%d]  sEncBase64=[%s]", strlen(sEncBase64), sEncBase64);
+	//OutputDebugString(m_slog);
 
 	if (CryptAcquireContext(&hCryptProv, NULL, MS_ENH_RSA_AES_PROV, PROV_RSA_AES, 0) == FALSE) {
 		m_slog.Format("[CX_SecureDataEngine][DEC]   %x", GetLastError());
@@ -820,7 +770,7 @@ inline BOOL APIENTRY axDECAES(char* sEncBase64, CString& sDEC)
 	keyBlob.hdr.reserved = 0;
 	keyBlob.hdr.aiKeyAlg = CALG_AES_128;
 	keyBlob.cbKeySize = AES_KEY_LENGTH;
-	CopyMemory(keyBlob.rgbKeyData, "", AES_KEY_LENGTH);
+	CopyMemory(keyBlob.rgbKeyData, "!O7#8aksjdf67h53", AES_KEY_LENGTH);
 
 	if (CryptImportKey(hCryptProv, (BYTE*)&keyBlob, sizeof(keyBlob), 0, 0, &hKey) == FALSE) {
 		m_slog.Format("[CX_SecureDataEngine][DEC]  CryptImportKey error ");
@@ -869,9 +819,9 @@ inline BOOL APIENTRY axDECAES(char* sEncBase64, CString& sDEC)
 	// 복호화된 데이터 출력
 	pDecodedData[outLen] = '\0'; // Null-terminate
 	sDEC.Format("%s", pDecodedData);
+	//m_slog.Format(_T("\r\n[CX_SecureDataEngine][DEC] ---------복호화성공-----------------------------[%d][%s]"), sDEC.GetLength(), sDEC);
 
-	m_slog.Format(_T("\r\n[CX_SecureDataEngine][DEC] ---------복호화성공-----------------------------[%d][%s] "), sDEC.GetLength(), sDEC);
-	OutputDebugString(m_slog);
+	//OutputDebugString(m_slog);
 
 	return TRUE;
 }

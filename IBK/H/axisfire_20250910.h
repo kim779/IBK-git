@@ -373,7 +373,7 @@ struct	_userWH	{
 //	AxisCode.dll
 //	bool axGetCode(int kind, char* code, int type)
 //
-#define	allCODE			99		
+					#define	allCODE			99		
 #define	kospiCODE		100
 #define	futureCODE		101
 #define	optionCODE		102
@@ -402,15 +402,15 @@ struct	_userWH	{
 #define reitsCODE		124			// Reits Code
 #define goodFOCODE		127			// Reits Code
 #define comspCODE		129
-#define premierIndex		128
-#define konexCODE		130			// 2013.06.05 KSJ 코넥스 추가
-#define	getCODEminifuture	131			// 2015.07.10 KSJ mini FUTURE code
-#define	getCODEminicall		132			// 2015.07.10 KSJ mini ATM CALL option
-#define	getCODEminiput		133			// 2015.07.10 KSJ mini ATM PUT option
-#define	getCODEsfuture		134			// 2016.03.11 KSJ S FUTURE code
-#define WeeklyOption            135
-#define sinjongCODE             136
-#define	sfCODESMALL		137			// only stock future
+					#define premierIndex		128
+					#define konexCODE		130			// 2013.06.05 KSJ 코넥스 추가
+					#define	getCODEminifuture	131			// 2015.07.10 KSJ mini FUTURE code
+					#define	getCODEminicall		132			// 2015.07.10 KSJ mini ATM CALL option
+					#define	getCODEminiput		133			// 2015.07.10 KSJ mini ATM PUT option
+					#define	getCODEsfuture		134			// 2016.03.11 KSJ S FUTURE code
+					#define WeeklyOption            135
+#define sinjongCODE            136
+#define	sfCODESMALL			137			// only stock future
 #define ETFCODE			211
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -495,11 +495,9 @@ struct	_userWH	{
 #define shipType		25			// 선백
 #define infraType		26			// 인프라
 #define etnType			27			// KSJ 2014.10.28 ETN ETN은 "Q"로 시작하므로 ETF와 따로 구분해야한다.
-#define KONEXType		28			//20191107 코넥스 타입
-#define productFutureType	29			//상품선물
-#define singjongType		30			//신종증권
-#define singjongGoodType	31			//신종수익증권
-
+#define KONEXType		28          //20191107 코넥스 타입
+#define productFutureType		29          //상품선물
+#define singjongType		30          //신종증권
 //
 //	AxisCode.dll
 //	bool axGetInfo(int kind, CString code, char* info, int* value)
@@ -846,7 +844,7 @@ struct	_extTH {
 struct	_extTHx {
 	char	key{};				// user-defined key
 						// DLL : userTH.key
-	int	size{};				// DATA size
+	int		size{};				// DATA size
 	char    *data;
 };
 #define	L_extTHx		sizeof(struct _extTHx)

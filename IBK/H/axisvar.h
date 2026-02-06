@@ -16,11 +16,10 @@
 //		 01.00	2000-07	Initial version
 // *****************************************************************************
 
-#ifndef	_AXISVAR_
-#define	_AXISVAR_
+#pragma once
 
-#define	L_VER		8			// 03.00.00
-#define	_AXVER_		"03.0"			// major version
+#define	L_VER		8			// 02.10.00
+#define	_AXVER_		"02.1"			// major version
 #define	_AXUS_		"US"			// axisus design map
 
 #define	L_TRXC		8			// transaction code
@@ -44,7 +43,6 @@
 #define	JNLDIR		"jnl"
 #define	USRDIR		"user"
 #define	GEXDIR		"gex"
-#define	TRXDIR		"trx"
 
 #define SECMSG		"secmsg"
 #define	HJCODE		"hjcode.dat"
@@ -61,11 +59,12 @@
 #define SFCODEDAT	"sfcode.dat"
 #define WOJCODE		"wocode.dat"
 #define HJCODEx		"hjcode3.dat"
+
 //////////////////////////////////////////////////////////////////////////
 ///	AXIS Registry Key
 
 #define	AXISKEY		"AXIS"
-#define	AXISNAME	"Axis Workstation V04.00"
+#define	AXISNAME	"Axis Workstation V03.00"
 #define	ENVIRONMENT	"Environment"
 #define	WORKSTATION	"Workstation"
 #define	INFORMATION	"Information"
@@ -158,11 +157,6 @@
 #define	SERVICEID	"ServiceID"		// string
 #define	SITEID		"SiteID"		// string
 
-#define	AXISONLY	"AxisOnly"		// dword
-#define	DOWNLOAD	"DownloadOption"	// dword
-						// 0 = download all / 1 = download except map
-		
-
 //------------------------------------------------------//
 //		INFORMATION SECTION			//
 //------------------------------------------------------//
@@ -220,4 +214,3 @@
 #define	getEcode	3
 #define	getTimeR	4
 
-#endif

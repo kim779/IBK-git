@@ -16,9 +16,7 @@
 //		 01.00	2001-07	Initial version
 // *****************************************************************************
 
-#ifndef	_AXISERR_
-#define	_AXISERR_
-
+#pragma once
 // guide message
 #define	AE_CLEAR		0		
 #define	AE_CONNECT		1
@@ -82,14 +80,6 @@
 
 #define	AE_CERTIFY		52
 #define	AE_ECERTIFY		53
-#define	AE_EDN			54
-#define	AE_EFILE		55
-#define	AE_ECONVERT		56
-#define	AE_SAVE			57
-#define	AE_STARTXLS		58
-
-#define	AE_EXECCTRL		59
-#define	AE_ECERTCTRL		60
 
 #define	AE_WEB			80
 #define	AE_EMUST		81
@@ -99,6 +89,5 @@
 #define	AE_EDATE		85
 #define	AE_CHOICE		86
 #define	AE_LOAD			87
-#define	AE_MAXIO		88
 
-#endif
+

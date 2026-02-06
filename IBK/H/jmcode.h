@@ -106,7 +106,8 @@ struct	hjcodex {			/* 현물종목코드	정보			*/
 	char    acdl[6];       	/* 업종대분류                      <--- 추가			*/
 	char    acdm[6];       	/* 업종중분류                      <--- 추가, AS-IS의 ucdm	*/
 	char    acds[6];       	/* 업종소분류                     <--- 추가, AS-IS의 ucds	*/
-	char	fill[20];		/* reserved	7						*/
+	char    nxtf;
+	char	fill[19];		/* reserved	7						*/
 };
 /*
 TO-BE 업종분류 첫 바이트가 '0' 이하는 미분류(현재 '000   ' 혹은 '      '으로 셋팅. 추후 데이터 확인 후 둘중 하나로 통일 예정)
@@ -246,7 +247,9 @@ TO-BE 업종분류 첫 바이트가 '0' 이하는 미분류(현재 '000   ' 혹은 '      '으로 셋�
 #define jmETN		16		// KSJ 2014.10.28 ETN 추가
 #define jmSPAC		17		// KSJ 2015.11.03 spac 추가
 #define jmKOSDAQ150	18		// KSJ 2016.08.22 KOSDAQ 150 추가
-
+#define jmTJCONJS 19  //투자계약증권   //20240422
+#define jmSINSUJS 20  //신탁수익증권   //20240422
+#define jmGOODSTOCK     22		// 상장형수익증권 25.06.13 추가
 //
 //	hjcode.ucmd : 보통주, 우선주
 //
@@ -307,7 +310,8 @@ struct  sfcode {            /* 주식선물 종목코드 정보       */
 //	옵션코드 
 //
 
-#define OPriceLen	5
+//#define OPriceLen	5  //test mod
+#define OPriceLen	7
 #define ONameLen	20
 #define OCodeLen	9
 

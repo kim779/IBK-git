@@ -50,18 +50,11 @@ static void FileLog(LPCSTR log, CString spath="", ...)
 		CString spath, slog;
 		spath.Format("%s", buf);
 		spath.TrimRight();
-		if (spath.IsEmpty())
-		{
-			spath.Replace("axis.exe", "axis.log");
-			spath.Replace("AXIS.EXE", "axis.log");
-		}
-		else
-		{
-			spath.Replace("axis.exe", spath);
-			spath.Replace("AXIS.EXE", spath);
-		}
-		
 
+		
+		spath.Replace("axis.exe", "axis.log");
+		spath.Replace("AXIS.EXE", "axis.log");
+	
 		FILE* fp;
 		fopen_s(&fp, spath, "a+");
 		if (!fp) return;

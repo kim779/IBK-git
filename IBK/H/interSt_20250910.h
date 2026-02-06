@@ -55,7 +55,7 @@ struct _intersx
 	CString name;			// 종목명
 	CString	xprc;			// 보유단가
 	CString	xnum;			// 보유수량
-	CString bookrgb;		// 북마크색상
+	CString bookrgb;    //북마크색상
 	CString	xupnum;			// 상장 주식수
 	char	bookmark = '0';		// 북마크
 	char	futureGubn{};		// 신용매매 구분
@@ -159,34 +159,10 @@ typedef struct st_mod_SDEmemo
 
 
 
-constexpr int memo_max = 15 * 1024;
+
 
 typedef struct st_mid_memo
 {
-public:
-	st_mid_memo() = default;
-	st_mid_memo(const char type, const CString& userID, const CString& code)
-	{
-		ZeroMemory(this, sizeof(st_mid_memo));
-		chgubn[0] = type;
-		FillMemory(chusid, sizeof(chusid), ' ');
-		AxStd::xxCopy(chusid, userID);
-		FillMemory(chcode, sizeof(chcode), ' ');
-		AxStd::xxCopy(chcode, code);
-	}
-
-	st_mid_memo(const char type, const CString& userID, const CString& code, const CString& memo)
-	{
-		ZeroMemory(this, sizeof(st_mid_memo));
-		chgubn[0] = type;
-		FillMemory(chusid, sizeof(chusid), ' ');
-		AxStd::xxCopy(chusid, userID);
-		FillMemory(chcode, sizeof(chcode), ' ');
-		AxStd::xxCopy(chcode, code);
-		if (!memo.IsEmpty() && memo.GetLength() > 0)
-			AxStd::xxCopy(chmemo, memo);
-	}
-
 	char chgubn[1]{}; //구분: S-조회 . I-등록, U-수정, D-삭제
 	char chusid[16]{}; //user ID
 	char chcode[16]{}; //종목코드 
@@ -195,12 +171,12 @@ public:
 
 typedef struct st_mod_memo
 {
-	char gubn[1]{}; //요청한 구분값
+	char gubn[1]; //요청한 구분값
 	char chcode[16]{};
 	char chretc[1]{}; //성공여부: 1성공(조회, 등록,수정,삭제) . 0실패 (조회/등록/수정/삭제 데이터 없음/실패 등)
 	char chemsg[64]{}; //결과메시지
 	char chmemo[15 * 1024]{}; //종목메모
-	char chMemoDate[12]{};    //메모업로드 날자
+	char chMemoDate[12]; //메모업로드 날자
 }mod_memo;
 
 #pragma pack()
